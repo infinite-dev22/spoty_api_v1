@@ -2,6 +2,8 @@ package io.nomard.spoty_api_v1.controllers;
 
 import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.models.FindModel;
+import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.BranchServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +24,13 @@ public class BranchController {
     }
 
     @PostMapping("/branch")
-    public Branch getById(@RequestBody Long id) throws NotFoundException {
-        return branchService.getById(id);
+    public Branch getById(@Valid @RequestBody FindModel findModel) throws NotFoundException {
+        return branchService.getById(findModel.getId());
     }
 
     @PostMapping("/branches/search")
-    public List<Branch> getByContains(@RequestBody String search) {
-        return branchService.getByContains(search);
+    public List<Branch> getByContains(@Valid @RequestBody SearchModel searchModel) {
+        return branchService.getByContains(searchModel.getSearch());
     }
 
     @PostMapping("/branch/add")

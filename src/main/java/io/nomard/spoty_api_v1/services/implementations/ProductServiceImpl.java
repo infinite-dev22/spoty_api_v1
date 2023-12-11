@@ -7,6 +7,7 @@ import io.nomard.spoty_api_v1.services.interfaces.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +15,8 @@ import java.util.Optional;
 public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository productRepo;
+    @Autowired
+    private AuthServiceImpl authService;
 
     @Override
     public List<Product> getAll() {
@@ -41,11 +44,15 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product save(Product product) {
+        product.setCreatedBy(authService.authUser());
+        product.setCreatedAt(new Date());
         return productRepo.saveAndFlush(product);
     }
 
     @Override
     public Product update(Long id, Product product) {
+        product.setUpdatedBy(authService.authUser());
+        product.setUpdatedAt(new Date());
         product.setId(id);
         return productRepo.saveAndFlush(product);
     }

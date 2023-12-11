@@ -5,6 +5,7 @@ import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.AuthenticationResponse;
 import io.nomard.spoty_api_v1.models.LoginModel;
 import io.nomard.spoty_api_v1.models.SignUpModel;
+import io.nomard.spoty_api_v1.principals.SpotyUserPrincipal;
 import io.nomard.spoty_api_v1.repositories.UserRepository;
 import io.nomard.spoty_api_v1.services.auth.SpotyTokenService;
 import io.nomard.spoty_api_v1.services.interfaces.AuthService;
@@ -112,5 +113,11 @@ public class AuthServiceImpl implements AuthService {
                             "}", HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
+    }
+
+    @Override
+    public User authUser() {
+        SpotyUserPrincipal principal = (SpotyUserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userRepo.findUserByEmail(principal.getUsername());
     }
 }

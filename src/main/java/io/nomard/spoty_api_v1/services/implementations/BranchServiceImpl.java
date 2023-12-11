@@ -7,6 +7,7 @@ import io.nomard.spoty_api_v1.services.interfaces.BranchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +15,8 @@ import java.util.Optional;
 public class BranchServiceImpl implements BranchService {
     @Autowired
     private BranchRepository branchRepo;
+    @Autowired
+    private AuthServiceImpl authService;
 
     @Override
     public List<Branch> getAll() {
@@ -36,12 +39,16 @@ public class BranchServiceImpl implements BranchService {
 
     @Override
     public Branch save(Branch branch) {
+        branch.setCreatedBy(authService.authUser());
+        branch.setCreatedAt(new Date());
         return branchRepo.saveAndFlush(branch);
     }
 
     @Override
     public Branch update(Long id, Branch branch) {
         branch.setId(id);
+        branch.setUpdatedBy(authService.authUser());
+        branch.setUpdatedAt(new Date());
         return branchRepo.saveAndFlush(branch);
     }
 

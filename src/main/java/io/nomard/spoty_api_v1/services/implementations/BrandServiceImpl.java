@@ -7,6 +7,7 @@ import io.nomard.spoty_api_v1.services.interfaces.BrandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +15,8 @@ import java.util.Optional;
 public class BrandServiceImpl implements BrandService {
     @Autowired
     private BrandRepository brandRepo;
+    @Autowired
+    private AuthServiceImpl authService;
 
     @Override
     public List<Brand> getAll() {
@@ -36,12 +39,16 @@ public class BrandServiceImpl implements BrandService {
 
     @Override
     public Brand save(Brand brand) {
+        brand.setCreatedBy(authService.authUser());
+        brand.setCreatedAt(new Date());
         return brandRepo.saveAndFlush(brand);
     }
 
     @Override
     public Brand update(Long id, Brand brand) {
         brand.setId(id);
+        brand.setUpdatedBy(authService.authUser());
+        brand.setUpdatedAt(new Date());
         return brandRepo.saveAndFlush(brand);
     }
 

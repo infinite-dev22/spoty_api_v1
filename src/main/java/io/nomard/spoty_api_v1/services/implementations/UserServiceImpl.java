@@ -21,11 +21,12 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     @Autowired
     AuthenticationManager authenticationManager;
-
     @Autowired
     private UserRepository userRepo;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private AuthServiceImpl authService;
 
     @Override
     public List<User> getAll() {
@@ -54,6 +55,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User update(Long id, User user) {
         user.setId(id);
+        user.setUpdatedBy(authService.authUser());
         user.setUpdatedAt(new Date());
         return userRepo.saveAndFlush(user);
     }
@@ -97,6 +99,7 @@ public class UserServiceImpl implements UserService {
         user.setFirstName(signUpDetails.getFirstName());
         user.setLastName(signUpDetails.getLastName());
         user.setOtherName(signUpDetails.getOtherName());
+        user.setCreatedBy(authService.authUser());
         user.setCreatedAt(new Date());
 
         try {
