@@ -16,6 +16,7 @@ package io.nomard.spoty_api_v1.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -55,6 +56,11 @@ public class User implements Serializable {
     @Builder.Default
     private List<Role> roles = new ArrayList<>();
 
+    @ManyToOne(targetEntity = Branch.class)
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @JoinColumn(name = "branch_id")
+    private Branch branch;
+
     @Column(nullable = false)
     @Builder.Default
     private boolean active = true;
@@ -74,7 +80,7 @@ public class User implements Serializable {
     private Date createdAt;
 
     @ManyToOne
-    @JoinColumn(name = "created_by")
+    @JoinColumn(nullable = false, name = "created_by")
     private User createdBy;
 
     @Column(name = "updated_at")

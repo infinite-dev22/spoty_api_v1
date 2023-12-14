@@ -1,7 +1,9 @@
 package io.nomard.spoty_api_v1.services.interfaces;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.ProductCategory;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -12,9 +14,9 @@ public interface ProductCategoryService {
 
     List<ProductCategory> getByContains(String search);
 
-    ProductCategory save(ProductCategory productCategory);
+    ResponseEntity<ObjectNode> save(ProductCategory productCategory);
 
-    ProductCategory update(Long id, ProductCategory productCategory);
+    ResponseEntity<ObjectNode> update(Long id, ProductCategory productCategory);
 
-    String delete(Long id);
+    ResponseEntity<ObjectNode> delete(Long id);
 }

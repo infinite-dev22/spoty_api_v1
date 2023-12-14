@@ -36,7 +36,7 @@ public class Holiday implements Serializable {
     private String title;
     @JoinColumn(nullable = false, name = "company_id")
     @ManyToOne
-    private Company company;
+    private Organisation organisation;
 
     @Column(name = "start_date")
     private Date startDate;

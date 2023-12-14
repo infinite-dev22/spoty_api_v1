@@ -1,14 +1,19 @@
 package io.nomard.spoty_api_v1.services.implementations;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Brand;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.BrandRepository;
+import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
+import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.BrandService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -17,6 +22,8 @@ public class BrandServiceImpl implements BrandService {
     private BrandRepository brandRepo;
     @Autowired
     private AuthServiceImpl authService;
+    @Autowired
+    private SpotyResponseImpl spotyResponseImpl;
 
     @Override
     public List<Brand> getAll() {
@@ -34,32 +41,56 @@ public class BrandServiceImpl implements BrandService {
 
     @Override
     public List<Brand> getByContains(String search) {
-        return brandRepo.searchAll(search.toLowerCase());
+        return brandRepo.searchAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
+                search.toLowerCase(),
+                search.toLowerCase());
     }
 
     @Override
-    public Brand save(Brand brand) {
-        brand.setCreatedBy(authService.authUser());
-        brand.setCreatedAt(new Date());
-        return brandRepo.saveAndFlush(brand);
+    public ResponseEntity<ObjectNode> save(Brand brand) {
+        try {
+            brand.setCreatedBy(authService.authUser());
+            brand.setCreatedAt(new Date());
+            brandRepo.saveAndFlush(brand);
+            return spotyResponseImpl.created();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
     }
 
     @Override
-    public Brand update(Long id, Brand brand) {
-        brand.setId(id);
+    public ResponseEntity<ObjectNode> update(Brand data) throws NotFoundException {
+        var opt = brandRepo.findById(data.getId());
+        if (opt.isEmpty()){
+            throw new NotFoundException();
+        }
+        var brand = opt.get();
+
+        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+            brand.setName(data.getName());
+        }
+
+        if (Objects.nonNull(data.getDescription()) && !"".equalsIgnoreCase(data.getDescription())) {
+            brand.setName(data.getName());
+        }
         brand.setUpdatedBy(authService.authUser());
         brand.setUpdatedAt(new Date());
-        return brandRepo.saveAndFlush(brand);
+
+        try {
+            brandRepo.save(brand);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
     }
 
     @Override
-    public String delete(Long id) {
+    public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             brandRepo.deleteById(id);
-            return "Brand successfully deleted";
+            return spotyResponseImpl.ok();
         } catch (Exception e) {
-            e.printStackTrace();
-            return "Unable to delete Brand, Contact your system administrator for assistance";
+            return spotyResponseImpl.error(e);
         }
     }
 }

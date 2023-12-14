@@ -1,5 +1,6 @@
 package io.nomard.spoty_api_v1.configs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nomard.spoty_api_v1.entities.*;
 import io.nomard.spoty_api_v1.filters.SpotyRequestFilter;
 import io.nomard.spoty_api_v1.security.SpotyAuthEntryPoint;
@@ -46,6 +47,11 @@ public class AppConfig {
     @Bean
     public UnitOfMeasure unitOfMeasure() {
         return new UnitOfMeasure();
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 
     @Bean

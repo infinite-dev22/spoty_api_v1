@@ -1,10 +1,14 @@
 package io.nomard.spoty_api_v1.services.implementations;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.ProductCategory;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.ProductCategoryRepository;
+import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
+import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.ProductCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -17,6 +21,8 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     private ProductCategoryRepository productCategoryRepo;
     @Autowired
     private AuthServiceImpl authService;
+    @Autowired
+    private SpotyResponseImpl spotyResponseImpl;
 
     @Override
     public List<ProductCategory> getAll() {
@@ -38,28 +44,37 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     }
 
     @Override
-    public ProductCategory save(ProductCategory productCategory) {
-        productCategory.setCreatedBy(authService.authUser());
-        productCategory.setCreatedAt(new Date());
-        return productCategoryRepo.saveAndFlush(productCategory);
+    public ResponseEntity<ObjectNode> save(ProductCategory productCategory) {
+        try {
+            productCategory.setCreatedBy(authService.authUser());
+            productCategory.setCreatedAt(new Date());
+            productCategoryRepo.saveAndFlush(productCategory);
+            return spotyResponseImpl.created();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
     }
 
     @Override
-    public ProductCategory update(Long id, ProductCategory productCategory) {
-        productCategory.setId(id);
-        productCategory.setUpdatedBy(authService.authUser());
-        productCategory.setUpdatedAt(new Date());
-        return productCategoryRepo.saveAndFlush(productCategory);
+    public ResponseEntity<ObjectNode> update(Long id, ProductCategory productCategory) {
+        try {
+            productCategory.setId(id);
+            productCategory.setUpdatedBy(authService.authUser());
+            productCategory.setUpdatedAt(new Date());
+            productCategoryRepo.saveAndFlush(productCategory);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
     }
 
     @Override
-    public String delete(Long id) {
+    public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             productCategoryRepo.deleteById(id);
-            return "ProductCategory successfully deleted";
+            return spotyResponseImpl.ok();
         } catch (Exception e) {
-            e.printStackTrace();
-            return "Unable to delete ProductCategory, Contact your system administrator for assistance";
+            return spotyResponseImpl.error(e);
         }
     }
 }

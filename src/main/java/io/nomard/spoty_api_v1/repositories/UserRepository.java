@@ -14,7 +14,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "trim(lower(u.firstName))," +
             "trim(lower(u.lastName))," +
             "trim(lower(u.otherName))," +
-            "trim(lower(u.phone))) like %:search")
+            "trim(lower(u.phone))) like %:search%")
     List<User> searchAll(String search);
 
     User findUserByEmail(String email);

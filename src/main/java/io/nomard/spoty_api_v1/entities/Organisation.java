@@ -19,14 +19,14 @@ import lombok.*;
 
 import java.util.Date;
 
-@Table(name = "companies")
+@Table(name = "organisations")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Entity
-public class Company {
+public class Organisation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -13,11 +13,11 @@ import org.springframework.stereotype.Service;
 public class SpotyUserDetailsService implements UserDetailsService {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserRepository userRepo;
 
     @Override
     public UserDetails loadUserByUsername(String email) {
-        User user = userRepository.findUserByEmail(email);
+        User user = userRepo.findUserByEmail(email);
         if (user == null) {
             throw new UsernameNotFoundException(email);
         }

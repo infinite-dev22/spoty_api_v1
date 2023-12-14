@@ -1,5 +1,6 @@
 package io.nomard.spoty_api_v1.services.interfaces;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.User;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.SignUpModel;
@@ -16,9 +17,9 @@ public interface UserService {
 
     List<User> getByContains(String search);
 
-    ResponseEntity<String> save(SignUpModel signUpDetails) throws NotFoundException;
+    ResponseEntity<ObjectNode> add(User usr) throws NotFoundException;
 
-    User update(Long id, User user);
+    ResponseEntity<ObjectNode> update(Long id, User user);
 
-    String delete(Long id);
+    ResponseEntity<ObjectNode> delete(Long id);
 }

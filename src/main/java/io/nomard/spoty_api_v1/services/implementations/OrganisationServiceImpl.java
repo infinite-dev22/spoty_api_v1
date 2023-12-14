@@ -1,12 +1,12 @@
 package io.nomard.spoty_api_v1.services.implementations;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Product;
+import io.nomard.spoty_api_v1.entities.Organisation;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
-import io.nomard.spoty_api_v1.repositories.ProductRepository;
+import io.nomard.spoty_api_v1.repositories.OrganisationRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
-import io.nomard.spoty_api_v1.services.interfaces.ProductService;
+import io.nomard.spoty_api_v1.services.interfaces.OrganisationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -16,44 +16,34 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ProductServiceImpl implements ProductService {
+public class OrganisationServiceImpl implements OrganisationService {
     @Autowired
-    private ProductRepository productRepo;
+    private OrganisationRepository organisationRepo;
     @Autowired
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Product> getAll() {
-        return productRepo.findAll();
+    public List<Organisation> getAll() {
+        return organisationRepo.findAll();
     }
 
     @Override
-    public Product getById(Long id) throws NotFoundException {
-        Optional<Product> product = productRepo.findById(id);
-        if (product.isEmpty()) {
+    public Organisation getById(Long id) throws NotFoundException {
+        Optional<Organisation> organisation = organisationRepo.findById(id);
+        if (organisation.isEmpty()) {
             throw new NotFoundException();
         }
-        return product.get();
+        return organisation.get();
     }
 
     @Override
-    public List<Product> getByContains(String search) {
-        return productRepo.searchAll(search.toLowerCase());
-    }
-
-    @Override
-    public List<Product> getWarning() {
-        return productRepo.findAllByQuantityIsLessThanEqualStockAlert();
-    }
-
-    @Override
-    public ResponseEntity<ObjectNode> save(Product product) {
+    public ResponseEntity<ObjectNode> save(Organisation organisation) {
         try {
-            product.setCreatedBy(authService.authUser());
-            product.setCreatedAt(new Date());
-            productRepo.saveAndFlush(product);
+            organisation.setCreatedBy(authService.authUser());
+            organisation.setCreatedAt(new Date());
+            organisationRepo.saveAndFlush(organisation);
             return spotyResponseImpl.created();
         } catch (Exception e){
             return spotyResponseImpl.error(e);
@@ -61,12 +51,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> update(Long id, Product product) {
+    public ResponseEntity<ObjectNode> update(Long id, Organisation organisation) {
         try {
-            product.setUpdatedBy(authService.authUser());
-            product.setUpdatedAt(new Date());
-            product.setId(id);
-            productRepo.saveAndFlush(product);
+            organisation.setUpdatedBy(authService.authUser());
+            organisation.setUpdatedAt(new Date());
+            organisation.setId(id);
+            organisationRepo.saveAndFlush(organisation);
             return spotyResponseImpl.ok();
         } catch (Exception e){
             return spotyResponseImpl.error(e);
@@ -76,7 +66,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
-            productRepo.deleteById(id);
+            organisationRepo.deleteById(id);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

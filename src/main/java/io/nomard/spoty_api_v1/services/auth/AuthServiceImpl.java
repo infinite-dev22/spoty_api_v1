@@ -1,5 +1,6 @@
-package io.nomard.spoty_api_v1.services.implementations;
+package io.nomard.spoty_api_v1.services.auth;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.User;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.AuthenticationResponse;
@@ -7,8 +8,8 @@ import io.nomard.spoty_api_v1.models.LoginModel;
 import io.nomard.spoty_api_v1.models.SignUpModel;
 import io.nomard.spoty_api_v1.principals.SpotyUserPrincipal;
 import io.nomard.spoty_api_v1.repositories.UserRepository;
-import io.nomard.spoty_api_v1.services.auth.SpotyTokenService;
-import io.nomard.spoty_api_v1.services.interfaces.AuthService;
+import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
+import io.nomard.spoty_api_v1.services.implementations.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,9 +35,11 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     AuthenticationManager authenticationManager;
     @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
     private UserRepository userRepo;
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private SpotyResponseImpl spotyResponseImpl;
 
     @Override
     public AuthenticationResponse login(LoginModel loginDetails) {
@@ -66,25 +69,15 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseEntity<String> register(SignUpModel signUpDetails) throws NotFoundException {
+    public ResponseEntity<ObjectNode> register(SignUpModel signUpDetails) throws NotFoundException {
         if (!Objects.equals(signUpDetails.getPassword(), signUpDetails.getPassword2())) {
-            return new ResponseEntity<>(
-                    "{" +
-                            "\t\"status\": \"AN ERROR OCCURRED\",\n" +
-                            "\t\"message\": \"Passwords do not match\"" +
-                            "}", HttpStatus.CONFLICT
-            );
+            return spotyResponseImpl.custom(HttpStatus.CONFLICT, "Passwords do not match");
         }
 
         User existingUser = userRepo.findUserByEmail(signUpDetails.getEmail());
 
         if (existingUser != null && existingUser.getEmail() != null && !existingUser.getEmail().isEmpty()) {
-            return new ResponseEntity<>(
-                    "{" +
-                            "\t\"status\": \"EMAIL TAKEN\",\n" +
-                            "\t\"message\": \"Hey... looks like someone already used this email to create an account with us\"" +
-                            "}", HttpStatus.CONFLICT
-            );
+            return spotyResponseImpl.taken();
         }
 
         User user = new User();
@@ -97,27 +90,16 @@ public class AuthServiceImpl implements AuthService {
 
         try {
             userRepo.save(user);
-
-            return new ResponseEntity<>(
-                    "{" +
-                            "\t\"status\": \"ACCOUNT CREATED SUCCESSFULLY\",\n" +
-                            "\t\"message\": \"Hooray, your account has been successfully created\"" +
-                            "}", HttpStatus.CREATED
-            );
+            return spotyResponseImpl.created();
         } catch (Exception e) {
-            return new ResponseEntity<>(
-                    "{" +
-                            "\t\"status\": \"INTERNAL SERVER ERROR\",\n" +
-                            "\t\"message\": \"Oops... An error occurred on our side, this is not your problem\",\n" +
-                            "\t\"error\": \"" + e.getMessage() + "\"" +
-                            "}", HttpStatus.INTERNAL_SERVER_ERROR
-            );
+            return spotyResponseImpl.error(e);
         }
     }
 
     @Override
     public User authUser() {
         SpotyUserPrincipal principal = (SpotyUserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
         return userRepo.findUserByEmail(principal.getUsername());
     }
 }

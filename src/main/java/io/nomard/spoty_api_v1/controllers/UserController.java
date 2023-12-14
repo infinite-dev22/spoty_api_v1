@@ -1,8 +1,8 @@
 package io.nomard.spoty_api_v1.controllers;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.User;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
-import io.nomard.spoty_api_v1.models.SignUpModel;
 import io.nomard.spoty_api_v1.services.implementations.UserServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,37 +12,38 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/users")
 public class UserController {
     @Autowired
     private UserServiceImpl userService;
 
-    @GetMapping("/users")
+    @GetMapping("/all")
     public List<User> getAll() {
         return userService.getAll();
     }
 
-    @PostMapping("/user")
+    @PostMapping("/single")
     public User getById(@RequestBody Long id) throws NotFoundException {
         return userService.getById(id);
     }
 
-    @PostMapping("/users/search")
+    @PostMapping("/search")
     public List<User> getByContains(@RequestBody String search) {
         return userService.getByContains(search);
     }
 
-    @PostMapping("/user/add")
-    public ResponseEntity<String> save(@Valid @RequestBody SignUpModel signUpDetails) throws NotFoundException {
-        return userService.save(signUpDetails);
+    @PostMapping("/add")
+    public ObjectNode save(@Valid @RequestBody User user) throws NotFoundException {
+        return userService.add(user).getBody();
     }
 
-    @PutMapping("/user/update")
-    public User update(@RequestBody Long id, @Valid @RequestBody User user) {
+    @PutMapping("/update")
+    public ResponseEntity<ObjectNode> update(@RequestBody Long id, @Valid @RequestBody User user) {
         return userService.update(id, user);
     }
 
-    @PostMapping("/user/delete")
-    public String delete(@RequestBody Long id) {
+    @PostMapping("/single/delete")
+    public ResponseEntity<ObjectNode> delete(@RequestBody Long id) {
         return userService.delete(id);
     }
 }

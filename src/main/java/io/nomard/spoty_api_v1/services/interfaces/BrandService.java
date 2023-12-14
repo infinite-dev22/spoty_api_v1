@@ -1,7 +1,9 @@
 package io.nomard.spoty_api_v1.services.interfaces;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Brand;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -12,9 +14,9 @@ public interface BrandService {
 
     List<Brand> getByContains(String search);
 
-    Brand save(Brand brand);
+    ResponseEntity<ObjectNode> save(Brand brand);
 
-    Brand update(Long id, Brand brand);
+    ResponseEntity<ObjectNode> update(Brand data) throws NotFoundException;
 
-    String delete(Long id);
+    ResponseEntity<ObjectNode> delete(Long id);
 }

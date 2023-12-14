@@ -1,51 +1,52 @@
 package io.nomard.spoty_api_v1.controllers;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Brand;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.models.FindModel;
+import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.BrandServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 
 @RestController
+@RequestMapping("brands")
 public class BrandController {
     @Autowired
     private BrandServiceImpl brandService;
 
 
-    @GetMapping("/brands")
+    @GetMapping("/all")
     public List<Brand> getAll() {
         return brandService.getAll();
     }
 
-    @PostMapping("/brand")
-    public Brand getById(@RequestBody Long id) throws NotFoundException {
-        return brandService.getById(id);
+    @PostMapping("/single")
+    public Brand getById(@RequestBody FindModel findModel) throws NotFoundException {
+        return brandService.getById(findModel.getId());
     }
 
-    @PostMapping("/brands/search")
-    public List<Brand> getByContains(@RequestBody String search) {
-        return brandService.getByContains(search);
+    @PostMapping("/search")
+    public List<Brand> getByContains(@RequestBody SearchModel searchModel) {
+        return brandService.getByContains(searchModel.getSearch());
     }
 
-    @PostMapping("/brand/add")
-    public Brand save(@Valid @RequestBody Brand brand) {
-        brand.setCreatedAt(new Date());
+    @PostMapping("/add")
+    public ResponseEntity<ObjectNode> save(@Valid @RequestBody Brand brand) {
         return brandService.save(brand);
     }
 
-    @PutMapping("/brand/update")
-    public Brand update(@RequestBody Long id, @Valid @RequestBody Brand brand) {
-        brand.setId(id);
-        brand.setUpdatedAt(new Date());
-        return brandService.update(id, brand);
+    @PutMapping("/update")
+    public ResponseEntity<ObjectNode> update(@Valid @RequestBody Brand brand) throws NotFoundException {
+        return brandService.update(brand);
     }
 
-    @PostMapping("/brand/delete")
-    public String delete(@RequestBody Long id) {
-        return brandService.delete(id);
+    @PostMapping("/single/delete")
+    public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
+        return brandService.delete(findModel.getId());
     }
 }

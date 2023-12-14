@@ -1,10 +1,11 @@
 package io.nomard.spoty_api_v1.controllers;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.AuthenticationResponse;
 import io.nomard.spoty_api_v1.models.LoginModel;
 import io.nomard.spoty_api_v1.models.SignUpModel;
-import io.nomard.spoty_api_v1.services.implementations.AuthServiceImpl;
+import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class AuthController {
     private AuthServiceImpl authService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@Valid @RequestBody SignUpModel signUpDetails) throws NotFoundException {
+    public ResponseEntity<ObjectNode> register(@Valid @RequestBody SignUpModel signUpDetails) throws NotFoundException {
         return authService.register(signUpDetails);
     }
 

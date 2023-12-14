@@ -1,14 +1,19 @@
 package io.nomard.spoty_api_v1.services.implementations;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.BranchRepository;
+import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
+import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.BranchService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -17,6 +22,8 @@ public class BranchServiceImpl implements BranchService {
     private BranchRepository branchRepo;
     @Autowired
     private AuthServiceImpl authService;
+    @Autowired
+    private SpotyResponseImpl spotyResponseImpl;
 
     @Override
     public List<Branch> getAll() {
@@ -34,32 +41,72 @@ public class BranchServiceImpl implements BranchService {
 
     @Override
     public List<Branch> getByContains(String search) {
-        return branchRepo.searchAll(search.toLowerCase());
+        return branchRepo.searchAllByEmailContainingIgnoreCaseOrNameContainingIgnoreCaseOrCityContainingIgnoreCaseOrTownContainingIgnoreCaseOrPhoneContainingIgnoreCase(
+                search.toLowerCase(), search.toLowerCase(), search.toLowerCase(), search.toLowerCase(), search.toLowerCase()
+        );
     }
 
     @Override
-    public Branch save(Branch branch) {
-        branch.setCreatedBy(authService.authUser());
-        branch.setCreatedAt(new Date());
-        return branchRepo.saveAndFlush(branch);
+    public ResponseEntity<ObjectNode> save(Branch branch) {
+        try {
+            branch.setCreatedBy(authService.authUser());
+            branch.setCreatedAt(new Date());
+            branchRepo.saveAndFlush(branch);
+            return spotyResponseImpl.created();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
     }
 
     @Override
-    public Branch update(Long id, Branch branch) {
-        branch.setId(id);
+    public ResponseEntity<ObjectNode> update(Branch data) throws NotFoundException {
+        var opt = branchRepo.findById(data.getId());
+        if (opt.isEmpty()){
+            throw new NotFoundException();
+        }
+        var branch = opt.get();
+
+        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+            branch.setName(data.getName());
+        }
+
+        if (Objects.nonNull(data.getCity()) && !"".equalsIgnoreCase(data.getCity())) {
+            branch.setCity(data.getCity());
+        }
+
+        if (Objects.nonNull(data.getPhone()) && !"".equalsIgnoreCase(data.getPhone())) {
+            branch.setPhone(data.getPhone());
+        }
+
+        if (Objects.nonNull(data.getEmail()) && !"".equalsIgnoreCase(data.getEmail())) {
+            branch.setEmail(data.getEmail());
+        }
+
+        if (Objects.nonNull(data.getTown()) && !"".equalsIgnoreCase(data.getTown())) {
+            branch.setTown(data.getTown());
+        }
+
+        if (Objects.nonNull(data.getZipCode()) && !"".equalsIgnoreCase(data.getZipCode())) {
+            branch.setZipCode(data.getZipCode());
+        }
         branch.setUpdatedBy(authService.authUser());
         branch.setUpdatedAt(new Date());
-        return branchRepo.saveAndFlush(branch);
+
+        try {
+            branchRepo.save(branch);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
     }
 
     @Override
-    public String delete(Long id) {
+    public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             branchRepo.deleteById(id);
-            return "Branch successfully deleted";
+            return spotyResponseImpl.ok();
         } catch (Exception e) {
-            e.printStackTrace();
-            return "Unable to delete Branch, Contact your system administrator for assistance";
+            return spotyResponseImpl.error(e);
         }
     }
 }

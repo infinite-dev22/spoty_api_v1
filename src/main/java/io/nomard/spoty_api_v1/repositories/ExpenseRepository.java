@@ -1,6 +1,6 @@
 package io.nomard.spoty_api_v1.repositories;
 
-import io.nomard.spoty_api_v1.entities.Brand;
+import io.nomard.spoty_api_v1.entities.Expense;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface BrandRepository extends JpaRepository<Brand, Long> {
-    List<Brand> searchAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String name, String description);
+public interface ExpenseRepository extends JpaRepository<Expense, Long> {
+    @Query("select e from Expense e where trim(lower(e.name)) like %:search")
+    List<Expense> searchAll(String search);
 }

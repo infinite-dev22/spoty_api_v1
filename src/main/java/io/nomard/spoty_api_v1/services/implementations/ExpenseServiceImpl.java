@@ -1,12 +1,12 @@
 package io.nomard.spoty_api_v1.services.implementations;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Product;
+import io.nomard.spoty_api_v1.entities.Expense;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
-import io.nomard.spoty_api_v1.repositories.ProductRepository;
+import io.nomard.spoty_api_v1.repositories.ExpenseRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
-import io.nomard.spoty_api_v1.services.interfaces.ProductService;
+import io.nomard.spoty_api_v1.services.interfaces.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -16,44 +16,39 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ProductServiceImpl implements ProductService {
-    @Autowired
-    private ProductRepository productRepo;
+public class ExpenseServiceImpl implements ExpenseService {
     @Autowired
     private AuthServiceImpl authService;
+    @Autowired
+    private ExpenseRepository expenseRepo;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Product> getAll() {
-        return productRepo.findAll();
+    public List<Expense> getAll() {
+        return expenseRepo.findAll();
     }
 
     @Override
-    public Product getById(Long id) throws NotFoundException {
-        Optional<Product> product = productRepo.findById(id);
-        if (product.isEmpty()) {
+    public Expense getById(Long id) throws NotFoundException {
+        Optional<Expense> expense = expenseRepo.findById(id);
+        if (expense.isEmpty()) {
             throw new NotFoundException();
         }
-        return product.get();
+        return expense.get();
     }
 
     @Override
-    public List<Product> getByContains(String search) {
-        return productRepo.searchAll(search.toLowerCase());
+    public List<Expense> getByContains(String search) {
+        return expenseRepo.searchAll(search.toLowerCase());
     }
 
     @Override
-    public List<Product> getWarning() {
-        return productRepo.findAllByQuantityIsLessThanEqualStockAlert();
-    }
-
-    @Override
-    public ResponseEntity<ObjectNode> save(Product product) {
+    public ResponseEntity<ObjectNode> save(Expense expense) {
         try {
-            product.setCreatedBy(authService.authUser());
-            product.setCreatedAt(new Date());
-            productRepo.saveAndFlush(product);
+            expense.setCreatedBy(authService.authUser());
+            expense.setCreatedAt(new Date());
+            expenseRepo.saveAndFlush(expense);
             return spotyResponseImpl.created();
         } catch (Exception e){
             return spotyResponseImpl.error(e);
@@ -61,12 +56,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> update(Long id, Product product) {
+    public ResponseEntity<ObjectNode> update(Long id, Expense expense) {
         try {
-            product.setUpdatedBy(authService.authUser());
-            product.setUpdatedAt(new Date());
-            product.setId(id);
-            productRepo.saveAndFlush(product);
+            expense.setUpdatedBy(authService.authUser());
+            expense.setUpdatedAt(new Date());
+            expense.setId(id);
+            expenseRepo.saveAndFlush(expense);
             return spotyResponseImpl.ok();
         } catch (Exception e){
             return spotyResponseImpl.error(e);
@@ -76,7 +71,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
-            productRepo.deleteById(id);
+            expenseRepo.deleteById(id);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

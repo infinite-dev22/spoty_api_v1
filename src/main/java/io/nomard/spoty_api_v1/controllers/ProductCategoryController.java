@@ -1,52 +1,54 @@
 package io.nomard.spoty_api_v1.controllers;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.ProductCategory;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.services.implementations.ProductCategoryServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
 
 @RestController
+@RequestMapping("/product_categories")
 public class ProductCategoryController {
     @Autowired
     private ProductCategoryServiceImpl productCategoryService;
 
 
-    @GetMapping("/product_categories")
+    @GetMapping("/all")
     public List<ProductCategory> getAll() {
         return productCategoryService.getAll();
     }
 
-    @PostMapping("/product_category")
+    @PostMapping("/single")
     public ProductCategory getById(@RequestBody Long id) throws NotFoundException {
         return productCategoryService.getById(id);
     }
 
-    @PostMapping("/product_categories/search")
+    @PostMapping("/search")
     public List<ProductCategory> getByContains(@RequestBody String search) {
         return productCategoryService.getByContains(search);
     }
 
-    @CrossOrigin(origins = "http://localhost:8080")
-    @PostMapping("/product_category/add")
-    public ProductCategory save(@Valid @RequestBody ProductCategory productCategory) {
+    @PostMapping("/add")
+    public ResponseEntity<ObjectNode> save(@Valid @RequestBody ProductCategory productCategory) {
         productCategory.setCreatedAt(new Date());
         return productCategoryService.save(productCategory);
     }
 
-    @PutMapping("/product_category/update")
-    public ProductCategory update(@RequestBody Long id, @Valid @RequestBody ProductCategory productCategory) {
+    @PutMapping("/update")
+    public ResponseEntity<ObjectNode> update(@RequestBody Long id, @Valid @RequestBody ProductCategory productCategory) {
         productCategory.setId(id);
         productCategory.setUpdatedAt(new Date());
         return productCategoryService.update(id, productCategory);
     }
 
-    @PostMapping("/product_category/delete")
-    public String delete(@RequestBody Long id) {
+    @PostMapping("/single/delete")
+    public ResponseEntity<ObjectNode> delete(@RequestBody Long id) {
         return productCategoryService.delete(id);
     }
 }
