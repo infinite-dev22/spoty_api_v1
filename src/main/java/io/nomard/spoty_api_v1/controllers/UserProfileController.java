@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
-public class UserController {
+@RequestMapping("/user_profiles")
+public class UserProfileController {
     @Autowired
     private UserServiceImpl userService;
 

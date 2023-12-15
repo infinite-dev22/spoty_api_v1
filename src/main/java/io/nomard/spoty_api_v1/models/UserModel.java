@@ -12,42 +12,39 @@
  * Jonathan Mark Mwigo makes no warranties, express or implied, with respect to the computer system code. Jonathan Mark Mwigo shall not be liable for any damages, including, but not limited to, direct, indirect, incidental, special, consequential, or punitive damages, arising out of or in connection with the use of the computer system code.
  */
 
-package io.nomard.spoty_api_v1.entities;
+package io.nomard.spoty_api_v1.models;
 
+import io.nomard.spoty_api_v1.entities.Branch;
+import io.nomard.spoty_api_v1.entities.Role;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-@Table(name = "expenses")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity
-public class ExpenseCategory implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class UserModel implements Serializable {
     private Long id;
-
-    @Column(nullable = false)
-    private String name;
-
-    private String description;
-
-    @Column(name = "created_at")
-    private Date createdAt;
-
-    @ManyToOne
-    @JoinColumn(nullable = false, name = "created_by")
-    private User createdBy;
-
-    @Column(name = "updated_at")
-    private Date updatedAt;
-
-    @ManyToOne
-    @JoinColumn(name = "updated_by")
-    private User updatedBy;
+    private String firstName;
+    private String lastName;
+    private String otherName;
+    private String email;
+    private String phone;
+    @Builder.Default
+    private List<Role> roles = new ArrayList<>();
+    private Branch branch;
+    @Builder.Default
+    private boolean active = true;
+    @Builder.Default
+    private boolean locked = false;
+    @Builder.Default
+    private boolean accessAllBranches = false;
+    private String avatar;
 }

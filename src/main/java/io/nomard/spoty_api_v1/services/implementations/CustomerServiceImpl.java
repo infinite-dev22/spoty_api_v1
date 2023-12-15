@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -40,7 +41,13 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<Customer> getByContains(String search) {
-        return customerRepo.searchAll(search.toLowerCase());
+        return customerRepo.searchAllByNameContainingIgnoreCaseOrCodeContainingIgnoreCaseOrCityContainingIgnoreCaseOrPhoneContainingIgnoreCaseOrAddressContainingIgnoreCaseOrCountryContainingIgnoreCase(
+                search.toLowerCase(),
+                search.toLowerCase(),
+                search.toLowerCase(),
+                search.toLowerCase(),
+                search.toLowerCase(),
+                search.toLowerCase());
     }
 
     @Override
@@ -50,20 +57,59 @@ public class CustomerServiceImpl implements CustomerService {
             customer.setCreatedAt(new Date());
             customerRepo.saveAndFlush(customer);
             return spotyResponseImpl.created();
-        } catch (Exception e){
+        } catch (Exception e) {
             return spotyResponseImpl.error(e);
         }
     }
 
     @Override
-    public ResponseEntity<ObjectNode> update(Long id, Customer customer) {
+    public ResponseEntity<ObjectNode> update(Customer data) throws NotFoundException {
+        var opt = customerRepo.findById(data.getId());
+
+        if (opt.isEmpty()) {
+            throw new NotFoundException();
+        }
+        var customer = opt.get();
+
+        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+            customer.setName(data.getName());
+        }
+
+        if (Objects.nonNull(data.getEmail()) && !"".equalsIgnoreCase(data.getEmail())) {
+            customer.setEmail(data.getEmail());
+        }
+
+        if (Objects.nonNull(data.getCity()) && !"".equalsIgnoreCase(data.getCity())) {
+            customer.setCity(data.getCity());
+        }
+
+        if (Objects.nonNull(data.getPhone()) && !"".equalsIgnoreCase(data.getPhone())) {
+            customer.setPhone(data.getPhone());
+        }
+
+        if (Objects.nonNull(data.getAddress()) && !"".equalsIgnoreCase(data.getAddress())) {
+            customer.setAddress(data.getAddress());
+        }
+
+        if (Objects.nonNull(data.getCountry()) && !"".equalsIgnoreCase(data.getCountry())) {
+            customer.setCountry(data.getCountry());
+        }
+
+        if (Objects.nonNull(data.getCode()) && !"".equalsIgnoreCase(data.getCode())) {
+            customer.setCode(data.getCode());
+        }
+
+        if (Objects.nonNull(data.getTaxNumber()) && !"".equalsIgnoreCase(data.getTaxNumber())) {
+            customer.setTaxNumber(data.getTaxNumber());
+        }
+
+        customer.setUpdatedBy(authService.authUser());
+        customer.setUpdatedAt(new Date());
+
         try {
-            customer.setUpdatedBy(authService.authUser());
-            customer.setUpdatedAt(new Date());
-            customer.setId(id);
             customerRepo.saveAndFlush(customer);
             return spotyResponseImpl.ok();
-        } catch (Exception e){
+        } catch (Exception e) {
             return spotyResponseImpl.error(e);
         }
     }

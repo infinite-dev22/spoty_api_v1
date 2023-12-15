@@ -3,6 +3,8 @@ package io.nomard.spoty_api_v1.controllers;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.ExpenseCategory;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.models.FindModel;
+import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.ExpenseCategoryServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +26,14 @@ public class ExpenseCategoryController {
         return expenseCategoryService.getAll();
     }
 
-    @PostMapping("/single")
-    public ExpenseCategory getById(@RequestBody Long id) throws NotFoundException {
-        return expenseCategoryService.getById(id);
+    @GetMapping("/single")
+    public ExpenseCategory getById(@RequestBody FindModel findModel) throws NotFoundException {
+        return expenseCategoryService.getById(findModel.getId());
     }
 
-    @PostMapping("/search")
-    public List<ExpenseCategory> getByContains(@RequestBody String search) {
-        return expenseCategoryService.getByContains(search);
+    @GetMapping("/search")
+    public List<ExpenseCategory> getByContains(@RequestBody SearchModel searchModel) {
+        return expenseCategoryService.getByContains(searchModel.getSearch());
     }
 
     @PostMapping("/add")
@@ -41,14 +43,12 @@ public class ExpenseCategoryController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ObjectNode> update(@RequestBody Long id, @Valid @RequestBody ExpenseCategory expenseCategory) {
-        expenseCategory.setId(id);
-        expenseCategory.setUpdatedAt(new Date());
-        return expenseCategoryService.update(id, expenseCategory);
+    public ResponseEntity<ObjectNode> update(@Valid @RequestBody ExpenseCategory expenseCategory) throws NotFoundException {
+        return expenseCategoryService.update(expenseCategory);
     }
 
-    @PostMapping("/single/delete")
-    public ResponseEntity<ObjectNode> delete(@RequestBody Long id) {
-        return expenseCategoryService.delete(id);
+    @DeleteMapping("/single/delete")
+    public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
+        return expenseCategoryService.delete(findModel.getId());
     }
 }

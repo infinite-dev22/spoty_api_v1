@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -45,20 +46,47 @@ public class OrganisationServiceImpl implements OrganisationService {
             organisation.setCreatedAt(new Date());
             organisationRepo.saveAndFlush(organisation);
             return spotyResponseImpl.created();
-        } catch (Exception e){
+        } catch (Exception e) {
             return spotyResponseImpl.error(e);
         }
     }
 
     @Override
-    public ResponseEntity<ObjectNode> update(Long id, Organisation organisation) {
+    public ResponseEntity<ObjectNode> update(Organisation data) throws NotFoundException {
+        var opt = organisationRepo.findById(data.getId());
+
+        if (opt.isEmpty()) {
+            throw new NotFoundException();
+        }
+        var organisation = opt.get();
+
+        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+            organisation.setName(data.getName());
+        }
+
+        if (Objects.nonNull(data.getPhone()) && !"".equalsIgnoreCase(data.getPhone())) {
+            organisation.setPhone(data.getPhone());
+        }
+
+        if (Objects.nonNull(data.getEmail()) && !"".equalsIgnoreCase(data.getEmail())) {
+            organisation.setEmail(data.getEmail());
+        }
+
+        if (Objects.nonNull(data.getCity()) && !"".equalsIgnoreCase(data.getCity())) {
+            organisation.setCity(data.getCity());
+        }
+
+        if (Objects.nonNull(data.getCountry()) && !"".equalsIgnoreCase(data.getCountry())) {
+            organisation.setCountry(data.getCountry());
+        }
+
+        organisation.setUpdatedBy(authService.authUser());
+        organisation.setUpdatedAt(new Date());
+
         try {
-            organisation.setUpdatedBy(authService.authUser());
-            organisation.setUpdatedAt(new Date());
-            organisation.setId(id);
             organisationRepo.saveAndFlush(organisation);
             return spotyResponseImpl.ok();
-        } catch (Exception e){
+        } catch (Exception e) {
             return spotyResponseImpl.error(e);
         }
     }

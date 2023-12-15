@@ -15,9 +15,9 @@ public interface CurrencyService {
 
     List<Currency> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(Currency currency) throws NotFoundException;
+    ResponseEntity<ObjectNode> save(Currency currency);
 
-    ResponseEntity<ObjectNode> update(Long id, Currency currency);
+    ResponseEntity<ObjectNode> update(Currency currency) throws NotFoundException;
 
     ResponseEntity<ObjectNode> delete(Long id);
 }

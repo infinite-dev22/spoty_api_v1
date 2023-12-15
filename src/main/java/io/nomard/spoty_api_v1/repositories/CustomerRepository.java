@@ -9,13 +9,5 @@ import java.util.List;
 
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
-    @Query("select c from Customer c where concat(" +
-            "trim(lower(c.name))," +
-            "trim(lower(c.code))," +
-            "trim(lower(c.city))," +
-            "trim(lower(c.phone))," +
-            "trim(lower(c.email))," +
-            "trim(lower(c.address))," +
-            "trim(lower(c.country))) like %:search%")
-    List<Customer> searchAll(String search);
+    List<Customer> searchAllByNameContainingIgnoreCaseOrCodeContainingIgnoreCaseOrCityContainingIgnoreCaseOrPhoneContainingIgnoreCaseOrAddressContainingIgnoreCaseOrCountryContainingIgnoreCase(String name, String code, String city, String phone, String address, String country);
 }

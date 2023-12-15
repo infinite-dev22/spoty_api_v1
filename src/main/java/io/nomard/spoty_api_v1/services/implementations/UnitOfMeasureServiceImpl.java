@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -40,7 +41,10 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
 
     @Override
     public List<UnitOfMeasure> getByContains(String search) {
-        return uomRepo.searchAll(search.toLowerCase());
+        return uomRepo.searchAllByNameContainingIgnoreCaseOrShortNameContainingIgnoreCase(
+                search.toLowerCase(),
+                search.toLowerCase()
+        );
     }
 
     @Override
@@ -59,9 +63,34 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> update(Long id, UnitOfMeasure uom) {
+    public ResponseEntity<ObjectNode> update(UnitOfMeasure data) throws NotFoundException {
+        var opt = uomRepo.findById(data.getId());
 
-        uom.setId(id);
+        if (opt.isEmpty()) {
+            throw new NotFoundException();
+        }
+        var uom = opt.get();
+
+        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+            uom.setName(data.getName());
+        }
+
+        if (Objects.nonNull(data.getShortName()) && !"".equalsIgnoreCase(data.getShortName())) {
+            uom.setShortName(data.getShortName());
+        }
+
+        if (Objects.nonNull(data.getOperator()) && !"".equalsIgnoreCase(data.getOperator())) {
+            uom.setOperator(data.getOperator());
+        }
+
+        if (Objects.nonNull(data.getOperatorValue()) && !Objects.equals(data.getOperatorValue(), 0)) {
+            uom.setOperatorValue(data.getOperatorValue());
+        }
+
+        if (Objects.nonNull(data.getBaseUnit())) {
+            uom.setBaseUnit(data.getBaseUnit());
+        }
+
         uom.setUpdatedBy(authService.authUser());
         uom.setUpdatedAt(new Date());
 

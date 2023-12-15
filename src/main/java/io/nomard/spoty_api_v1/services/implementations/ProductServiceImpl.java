@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -55,20 +56,91 @@ public class ProductServiceImpl implements ProductService {
             product.setCreatedAt(new Date());
             productRepo.saveAndFlush(product);
             return spotyResponseImpl.created();
-        } catch (Exception e){
+        } catch (Exception e) {
             return spotyResponseImpl.error(e);
         }
     }
 
     @Override
-    public ResponseEntity<ObjectNode> update(Long id, Product product) {
+    public ResponseEntity<ObjectNode> update(Product data) throws NotFoundException {
+        var opt = productRepo.findById(data.getId());
+
+        if (opt.isEmpty()) {
+            throw new NotFoundException();
+        }
+        var product = opt.get();
+
+        if (Objects.nonNull(data.getUnit())) {
+            product.setUnit(data.getUnit());
+        }
+
+        if (Objects.nonNull(data.getCategory())) {
+            product.setCategory(data.getCategory());
+        }
+
+        if (Objects.nonNull(data.getBrand())) {
+            product.setBrand(data.getBrand());
+        }
+
+        if (Objects.nonNull(data.getBranch()) && !data.getBranch().isEmpty()) {
+            product.setBranch(data.getBranch());
+        }
+
+        if (Objects.nonNull(data.getBarcodeType()) && !"".equalsIgnoreCase(data.getBarcodeType())) {
+            product.setBarcodeType(data.getBarcodeType());
+        }
+
+        if (Objects.nonNull(data.getProductType()) && !"".equalsIgnoreCase(data.getProductType())) {
+            product.setProductType(data.getProductType());
+        }
+
+        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+            product.setName(data.getName());
+        }
+
+        if (Objects.nonNull(data.getQuantity()) && !Objects.equals(data.getQuantity(), 0)) {
+            product.setQuantity(data.getQuantity());
+        }
+
+        if (Objects.nonNull(data.getCost()) && !Objects.equals(data.getCost(), 0)) {
+            product.setCost(data.getCost());
+        }
+
+        if (Objects.nonNull(data.getPrice()) && !Objects.equals(data.getPrice(), 0)) {
+            product.setPrice(data.getPrice());
+        }
+
+        if (Objects.nonNull(data.getDiscount()) && !Objects.equals(data.getDiscount(), 0)) {
+            product.setDiscount(data.getDiscount());
+        }
+
+        if (Objects.nonNull(data.getNetTax()) && !Objects.equals(data.getNetTax(), 0)) {
+            product.setNetTax(data.getNetTax());
+        }
+
+        if (Objects.nonNull(data.getTaxType()) && !"".equalsIgnoreCase(data.getTaxType())) {
+            product.setTaxType(data.getTaxType());
+        }
+
+        if (Objects.nonNull(data.getStockAlert()) && !Objects.equals(data.getStockAlert(), 0)) {
+            product.setStockAlert(data.getStockAlert());
+        }
+
+        if (Objects.nonNull(data.getSerialNumber()) && !"".equalsIgnoreCase(data.getSerialNumber())) {
+            product.setSerialNumber(data.getSerialNumber());
+        }
+
+        if (Objects.nonNull(data.getImage()) && !"".equalsIgnoreCase(data.getImage())) {
+            product.setImage(data.getImage());
+        }
+
+        product.setUpdatedBy(authService.authUser());
+        product.setUpdatedAt(new Date());
+
         try {
-            product.setUpdatedBy(authService.authUser());
-            product.setUpdatedAt(new Date());
-            product.setId(id);
             productRepo.saveAndFlush(product);
             return spotyResponseImpl.ok();
-        } catch (Exception e){
+        } catch (Exception e) {
             return spotyResponseImpl.error(e);
         }
     }

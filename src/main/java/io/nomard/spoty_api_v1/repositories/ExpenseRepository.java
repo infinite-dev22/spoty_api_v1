@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     @Query("select e from Expense e where trim(lower(e.name)) like %:search")
-    List<Expense> searchAll(String search);
+    List<Expense> searchAllByNameContainingIgnoreCase(String search);
 }

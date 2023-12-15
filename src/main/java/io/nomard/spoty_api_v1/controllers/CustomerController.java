@@ -3,6 +3,8 @@ package io.nomard.spoty_api_v1.controllers;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Customer;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.models.FindModel;
+import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.CustomerServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +26,14 @@ public class CustomerController {
         return customerService.getAll();
     }
 
-    @PostMapping("/single")
-    public Customer getById(@RequestBody Long id) throws NotFoundException {
-        return customerService.getById(id);
+    @GetMapping("/single")
+    public Customer getById(@RequestBody FindModel findModel) throws NotFoundException {
+        return customerService.getById(findModel.getId());
     }
 
-    @PostMapping("/search")
-    public List<Customer> getByContains(@RequestBody String search) {
-        return customerService.getByContains(search);
+    @GetMapping("/search")
+    public List<Customer> getByContains(@RequestBody SearchModel searchModel) {
+        return customerService.getByContains(searchModel.getSearch());
     }
 
     @PostMapping("/add")
@@ -41,14 +43,12 @@ public class CustomerController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ObjectNode> update(@RequestBody Long id, @Valid @RequestBody Customer customer) {
-        customer.setId(id);
-        customer.setUpdatedAt(new Date());
-        return customerService.update(id, customer);
+    public ResponseEntity<ObjectNode> update(@Valid @RequestBody Customer customer) throws NotFoundException {
+        return customerService.update(customer);
     }
 
-    @PostMapping("/single/delete")
-    public ResponseEntity<ObjectNode> delete(@RequestBody Long id) {
-        return customerService.delete(id);
+    @DeleteMapping("/single/delete")
+    public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
+        return customerService.delete(findModel.getId());
     }
 }

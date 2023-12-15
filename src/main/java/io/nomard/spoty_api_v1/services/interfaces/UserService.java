@@ -17,9 +17,9 @@ public interface UserService {
 
     List<User> getByContains(String search);
 
-    ResponseEntity<ObjectNode> add(User usr) throws NotFoundException;
+    ResponseEntity<ObjectNode> add(User user) throws NotFoundException;
 
-    ResponseEntity<ObjectNode> update(Long id, User user);
+    ResponseEntity<ObjectNode> update(User user) throws NotFoundException;
 
     ResponseEntity<ObjectNode> delete(Long id);
 }

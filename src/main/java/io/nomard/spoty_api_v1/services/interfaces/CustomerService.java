@@ -15,9 +15,9 @@ public interface CustomerService {
 
     List<Customer> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(Customer customer) throws NotFoundException;
+    ResponseEntity<ObjectNode> save(Customer customer);
 
-    ResponseEntity<ObjectNode> update(Long id, Customer customer);
+    ResponseEntity<ObjectNode> update(Customer customer) throws NotFoundException;
 
     ResponseEntity<ObjectNode> delete(Long id);
 }

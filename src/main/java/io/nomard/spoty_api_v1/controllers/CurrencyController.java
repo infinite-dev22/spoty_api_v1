@@ -3,6 +3,8 @@ package io.nomard.spoty_api_v1.controllers;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Currency;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.models.FindModel;
+import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.CurrencyServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +26,14 @@ public class CurrencyController {
         return currencyService.getAll();
     }
 
-    @PostMapping("/single")
-    public Currency getById(@RequestBody Long id) throws NotFoundException {
-        return currencyService.getById(id);
+    @GetMapping("/single")
+    public Currency getById(@RequestBody FindModel findModel) throws NotFoundException {
+        return currencyService.getById(findModel.getId());
     }
 
-    @PostMapping("/search")
-    public List<Currency> getByContains(@RequestBody String search) {
-        return currencyService.getByContains(search);
+    @GetMapping("/search")
+    public List<Currency> getByContains(@RequestBody SearchModel searchModel) {
+        return currencyService.getByContains(searchModel.getSearch());
     }
 
     @PostMapping("/add")
@@ -41,14 +43,12 @@ public class CurrencyController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ObjectNode> update(@RequestBody Long id, @Valid @RequestBody Currency currency) {
-        currency.setId(id);
-        currency.setUpdatedAt(new Date());
-        return currencyService.update(id, currency);
+    public ResponseEntity<ObjectNode> update(@Valid @RequestBody Currency currency) throws NotFoundException {
+        return currencyService.update(currency);
     }
 
-    @PostMapping("/single/delete")
-    public ResponseEntity<ObjectNode> delete(@RequestBody Long id) {
-        return currencyService.delete(id);
+    @DeleteMapping("/single/delete")
+    public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
+        return currencyService.delete(findModel.getId());
     }
 }

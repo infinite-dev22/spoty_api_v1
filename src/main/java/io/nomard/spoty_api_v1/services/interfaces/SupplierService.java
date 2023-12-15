@@ -15,9 +15,9 @@ public interface SupplierService {
 
     List<Supplier> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(Supplier supplier) throws NotFoundException;
+    ResponseEntity<ObjectNode> save(Supplier supplier);
 
-    ResponseEntity<ObjectNode> update(Long id, Supplier supplier);
+    ResponseEntity<ObjectNode> update(Supplier supplier) throws NotFoundException;
 
     ResponseEntity<ObjectNode> delete(Long id);
 }

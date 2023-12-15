@@ -16,26 +16,42 @@ package io.nomard.spoty_api_v1.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-@Table(name = "expenses")
+@Entity
+@Table(name = "user_profiles")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity
-public class ExpenseCategory implements Serializable {
+public class UserProfile implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String name;
+    @OneToOne(optional = false, targetEntity = User.class, orphanRemoval = true)
+    private User user;
 
-    private String description;
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
+    @Column(name = "other_name")
+    private String otherName;
+
+    private String phone;
+    private String email;
+
+    @Column(unique = true)
+    private String avatar;
 
     @Column(name = "created_at")
     private Date createdAt;

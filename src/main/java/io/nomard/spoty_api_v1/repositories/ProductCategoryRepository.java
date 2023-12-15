@@ -9,8 +9,5 @@ import java.util.List;
 
 @Repository
 public interface ProductCategoryRepository extends JpaRepository<ProductCategory, Long> {
-    @Query("select pc from ProductCategory pc where concat(" +
-            "trim(lower(pc.name))," +
-            "trim(lower(pc.code))) like %:search%")
-    List<ProductCategory> searchAll(String search);
+    List<ProductCategory> searchAllByNameContainingIgnoreCaseOrCodeContainingIgnoreCase(String name, String code);
 }

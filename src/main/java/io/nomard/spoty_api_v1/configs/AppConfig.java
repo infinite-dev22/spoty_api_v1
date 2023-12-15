@@ -50,6 +50,46 @@ public class AppConfig {
     }
 
     @Bean
+    public Organisation organisation() {
+        return new Organisation();
+    }
+
+    @Bean
+    public UserProfile userProfile() {
+        return new UserProfile();
+    }
+
+    @Bean
+    public Supplier supplier() {
+        return new Supplier();
+    }
+
+    @Bean
+    public Customer customer() {
+        return new Customer();
+    }
+
+    @Bean
+    public ExpenseCategory expenseCategory() {
+        return new ExpenseCategory();
+    }
+
+    @Bean
+    public Expense expense() {
+        return new Expense();
+    }
+
+    @Bean
+    public Currency currency() {
+        return new Currency();
+    }
+//
+//    @Bean
+//    public UserProfile userProfile() {
+//        return new UserProfile();
+//    }
+
+    @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper();
     }

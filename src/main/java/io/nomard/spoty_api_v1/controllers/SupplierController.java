@@ -3,6 +3,8 @@ package io.nomard.spoty_api_v1.controllers;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Supplier;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.models.FindModel;
+import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.SupplierServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/expense_categories")
+@RequestMapping("/suppliers")
 public class SupplierController {
     @Autowired
     private SupplierServiceImpl supplierService;
@@ -24,9 +26,9 @@ public class SupplierController {
         return supplierService.getAll();
     }
 
-    @PostMapping("/single")
-    public Supplier getById(@RequestBody Long id) throws NotFoundException {
-        return supplierService.getById(id);
+    @GetMapping("/single")
+    public Supplier getById(@RequestBody FindModel findModel) throws NotFoundException {
+        return supplierService.getById(findModel.getId());
     }
 
     @PostMapping("/add")
@@ -35,15 +37,18 @@ public class SupplierController {
         return supplierService.save(supplier);
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<ObjectNode> update(@RequestBody Long id, @Valid @RequestBody Supplier supplier) {
-        supplier.setId(id);
-        supplier.setUpdatedAt(new Date());
-        return supplierService.update(id, supplier);
+    @GetMapping("/search")
+    public List<Supplier> getByContains(@RequestBody SearchModel searchModel) {
+        return supplierService.getByContains(searchModel.getSearch());
     }
 
-    @PostMapping("/single/delete")
-    public ResponseEntity<ObjectNode> delete(@RequestBody Long id) {
-        return supplierService.delete(id);
+    @PutMapping("/update")
+    public ResponseEntity<ObjectNode> update(@Valid @RequestBody Supplier supplier) throws NotFoundException {
+        return supplierService.update(supplier);
+    }
+
+    @DeleteMapping("/single/delete")
+    public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
+        return supplierService.delete(findModel.getId());
     }
 }

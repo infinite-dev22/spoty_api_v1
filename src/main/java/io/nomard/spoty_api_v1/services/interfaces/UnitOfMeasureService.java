@@ -14,9 +14,9 @@ public interface UnitOfMeasureService {
 
     List<UnitOfMeasure> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(UnitOfMeasure user);
+    ResponseEntity<ObjectNode> save(UnitOfMeasure uom);
 
-    ResponseEntity<ObjectNode> update(Long id, UnitOfMeasure user);
+    ResponseEntity<ObjectNode> update(UnitOfMeasure uom) throws NotFoundException;
 
     ResponseEntity<ObjectNode> delete(Long id);
 }
