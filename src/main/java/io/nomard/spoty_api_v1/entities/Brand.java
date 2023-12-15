@@ -35,7 +35,7 @@ public class Brand {
     private String name;
 
     private String description;
-    private byte[] image;
+    private String image;
     @Column(name = "created_at")
     private Date createdAt;
 

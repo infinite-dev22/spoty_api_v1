@@ -3,6 +3,8 @@ package io.nomard.spoty_api_v1.controllers;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Product;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.models.FindModel;
+import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.ProductServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +26,14 @@ public class ProductController {
         return productService.getAll();
     }
 
-    @PostMapping("/single")
-    public Product getById(@RequestBody Long id) throws NotFoundException {
-        return productService.getById(id);
+    @GetMapping("/single")
+    public Product getById(@RequestBody FindModel findModel) throws NotFoundException {
+        return productService.getById(findModel.getId());
     }
 
-    @PostMapping("/search")
-    public List<Product> getByContains(@RequestBody String search) {
-        return productService.getByContains(search);
+    @GetMapping("/search")
+    public List<Product> getByContains(@RequestBody SearchModel searchModel) {
+        return productService.getByContains(searchModel.getSearch());
     }
 
     @GetMapping("/stock_alert")
@@ -46,14 +48,12 @@ public class ProductController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ObjectNode> update(@RequestBody Long id, @Valid @RequestBody Product product) {
-        product.setId(id);
-        product.setUpdatedAt(new Date());
-        return productService.update(id, product);
+    public ResponseEntity<ObjectNode> update(@Valid @RequestBody Product product) throws NotFoundException {
+        return productService.update(product);
     }
 
-    @PostMapping("/single/delete")
-    public ResponseEntity<ObjectNode> delete(@RequestBody Long id) {
-        return productService.delete(id);
+    @DeleteMapping("/single/delete")
+    public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
+        return productService.delete(findModel.getId());
     }
 }

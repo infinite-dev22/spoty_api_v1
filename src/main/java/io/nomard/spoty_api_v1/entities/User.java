@@ -14,6 +14,7 @@
 
 package io.nomard.spoty_api_v1.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Cascade;
@@ -35,18 +36,14 @@ public class User implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "first_name")
-    private String firstName;
+    @OneToOne(targetEntity = UserProfile.class, mappedBy = "user")
+    @JsonIgnore
+    private UserProfile userProfile;
 
-    @Column(name = "last_name")
-    private String lastName;
-
-    @Column(name = "other_name")
-    private String otherName;
-
+    @JsonIgnore
     private String email;
+    @JsonIgnore
     private String password;
-    private String phone;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
@@ -54,39 +51,45 @@ public class User implements Serializable {
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
     @Builder.Default
+    @JsonIgnore
     private List<Role> roles = new ArrayList<>();
 
     @ManyToOne(targetEntity = Branch.class)
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     @JoinColumn(name = "branch_id")
+    @JsonIgnore
     private Branch branch;
 
     @Column(nullable = false)
     @Builder.Default
+    @JsonIgnore
     private boolean active = true;
 
     @Column(nullable = false)
     @Builder.Default
+    @JsonIgnore
     private boolean locked = false;
 
     @Column(name = "access_all_branches", nullable = false)
     @Builder.Default
+    @JsonIgnore
     private boolean accessAllBranches = false;
 
-    @Column(unique = true)
-    private String avatar;
-
     @Column(name = "created_at")
+    @JsonIgnore
     private Date createdAt;
 
     @ManyToOne
-    @JoinColumn(nullable = false, name = "created_by")
+    @JoinColumn(name = "created_by")
+    @JsonIgnore
     private User createdBy;
 
     @Column(name = "updated_at")
+    @JsonIgnore
     private Date updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "updated_by")
+    @JsonIgnore
     private User updatedBy;
 }

@@ -9,7 +9,6 @@ import io.nomard.spoty_api_v1.models.SignUpModel;
 import io.nomard.spoty_api_v1.principals.SpotyUserPrincipal;
 import io.nomard.spoty_api_v1.repositories.UserRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
-import io.nomard.spoty_api_v1.services.implementations.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -83,9 +82,6 @@ public class AuthServiceImpl implements AuthService {
         User user = new User();
         user.setEmail(signUpDetails.getEmail());
         user.setPassword(passwordEncoder.encode(signUpDetails.getPassword()));
-        user.setFirstName(signUpDetails.getFirstName());
-        user.setLastName(signUpDetails.getLastName());
-        user.setOtherName(signUpDetails.getOtherName());
         user.setCreatedAt(new Date());
 
         try {

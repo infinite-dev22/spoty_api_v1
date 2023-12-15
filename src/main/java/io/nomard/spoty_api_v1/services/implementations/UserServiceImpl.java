@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -51,15 +52,46 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getByContains(String search) {
-        return userRepo.searchAll(search.toLowerCase());
+        return userRepo.searchAllByEmailContainingIgnoreCase(search.toLowerCase());
     }
 
     @Override
-    public ResponseEntity<ObjectNode> update(Long id, User user) {
+    public ResponseEntity<ObjectNode> update(User data) throws NotFoundException {
+        var opt = userRepo.findById(data.getId());
+
+        if (opt.isEmpty()) {
+            throw new NotFoundException();
+        }
+        var user = opt.get();
+
+        if (Objects.nonNull(data.getEmail()) && !"".equalsIgnoreCase(data.getEmail())) {
+            user.setEmail(data.getEmail());
+        }
+
+        if (Objects.nonNull(data.getPassword()) && !"".equalsIgnoreCase(data.getPassword())) {
+            user.setPassword(data.getPassword());
+        }
+
+        if (Objects.nonNull(data.getRoles()) && !data.getRoles().isEmpty()) {
+            user.setRoles(data.getRoles());
+        }
+
+        if (Objects.nonNull(data.isActive())) {
+            user.setActive(data.isActive());
+        }
+
+        if (Objects.nonNull(data.isLocked())) {
+            user.setLocked(data.isLocked());
+        }
+
+        if (Objects.nonNull(data.isAccessAllBranches())) {
+            user.setAccessAllBranches(data.isAccessAllBranches());
+        }
+
+        user.setUpdatedBy(authService.authUser());
+        user.setUpdatedAt(new Date());
+
         try {
-            user.setId(id);
-            user.setUpdatedBy(authService.authUser());
-            user.setUpdatedAt(new Date());
             userRepo.saveAndFlush(user);
 
             return spotyResponseImpl.ok();
@@ -80,19 +112,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> add(User usr) throws NotFoundException {
-        User existingUser = userRepo.findUserByEmail(usr.getEmail());
+    public ResponseEntity<ObjectNode> add(User data) throws NotFoundException {
+        User existingUser = userRepo.findUserByEmail(data.getEmail());
 
         if (existingUser != null && existingUser.getEmail() != null && !existingUser.getEmail().isEmpty()) {
             return spotyResponseImpl.taken();
         }
 
         User user = new User();
-        user.setEmail(usr.getEmail());
-        user.setPassword(passwordEncoder.encode(usr.getPassword()));
-        user.setFirstName(usr.getFirstName());
-        user.setLastName(usr.getLastName());
-        user.setOtherName(usr.getOtherName());
+        user.setEmail(data.getEmail());
+        user.setPassword(passwordEncoder.encode(data.getPassword()));
+        user.setRoles(data.getRoles());
+        user.setActive(data.isActive());
+        user.setLocked(data.isLocked());
+        user.setAccessAllBranches(data.isAccessAllBranches());
         user.setCreatedBy(authService.authUser());
         user.setCreatedAt(new Date());
 

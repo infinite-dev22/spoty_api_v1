@@ -9,8 +9,5 @@ import java.util.List;
 
 @Repository
 public interface UnitOfMeasureRepository extends JpaRepository<UnitOfMeasure, Long> {
-    @Query("select uOM from UnitOfMeasure uOM where concat(" +
-            "trim(lower(uOM.name))," +
-            "trim(lower(uOM.shortName))) like %:search%")
-    List<UnitOfMeasure> searchAll(String search);
+    List<UnitOfMeasure> searchAllByNameContainingIgnoreCaseOrShortNameContainingIgnoreCase(String name, String shortName);
 }

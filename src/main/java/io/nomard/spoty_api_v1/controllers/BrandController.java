@@ -25,12 +25,12 @@ public class BrandController {
         return brandService.getAll();
     }
 
-    @PostMapping("/single")
+    @GetMapping("/single")
     public Brand getById(@RequestBody FindModel findModel) throws NotFoundException {
         return brandService.getById(findModel.getId());
     }
 
-    @PostMapping("/search")
+    @GetMapping("/search")
     public List<Brand> getByContains(@RequestBody SearchModel searchModel) {
         return brandService.getByContains(searchModel.getSearch());
     }
@@ -45,7 +45,7 @@ public class BrandController {
         return brandService.update(brand);
     }
 
-    @PostMapping("/single/delete")
+    @DeleteMapping("/single/delete")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return brandService.delete(findModel.getId());
     }

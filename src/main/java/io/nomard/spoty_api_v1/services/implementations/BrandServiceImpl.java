@@ -71,13 +71,18 @@ public class BrandServiceImpl implements BrandService {
         }
 
         if (Objects.nonNull(data.getDescription()) && !"".equalsIgnoreCase(data.getDescription())) {
-            brand.setName(data.getName());
+            brand.setDescription(data.getDescription());
         }
+
+        if (Objects.nonNull(data.getImage()) && !"".equalsIgnoreCase(data.getImage())) {
+            brand.setImage(data.getImage());
+        }
+
         brand.setUpdatedBy(authService.authUser());
         brand.setUpdatedAt(new Date());
 
         try {
-            brandRepo.save(brand);
+            brandRepo.saveAndFlush(brand);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

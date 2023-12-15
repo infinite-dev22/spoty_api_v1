@@ -1,0 +1,156 @@
+package io.nomard.spoty_api_v1.services.implementations.requisitions;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.requisitions.RequisitionMaster;
+import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.repositories.requisitions.RequisitionMasterRepository;
+import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
+import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
+import io.nomard.spoty_api_v1.services.interfaces.requisitions.RequisitionMasterService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+@Service
+public class RequisitionMasterServiceImpl implements RequisitionMasterService {
+    @Autowired
+    private RequisitionMasterRepository requisitionMasterRepo;
+    @Autowired
+    private AuthServiceImpl authService;
+    @Autowired
+    private SpotyResponseImpl spotyResponseImpl;
+
+    @Override
+    public List<RequisitionMaster> getAll() {
+        return requisitionMasterRepo.findAll();
+    }
+
+    @Override
+    public RequisitionMaster getById(Long id) throws NotFoundException {
+        Optional<RequisitionMaster> requisitionMaster = requisitionMasterRepo.findById(id);
+        if (requisitionMaster.isEmpty()) {
+            throw new NotFoundException();
+        }
+        return requisitionMaster.get();
+    }
+
+    @Override
+    public List<RequisitionMaster> getByContains(String search) {
+        return requisitionMasterRepo.searchAllByRefContainingIgnoreCaseOrStatusContainingIgnoreCase(
+                search.toLowerCase(),
+                search.toLowerCase()
+        );
+    }
+
+    @Override
+    public ResponseEntity<ObjectNode> save(RequisitionMaster requisitionMaster) {
+        try {
+            requisitionMaster.setCreatedBy(authService.authUser());
+            requisitionMaster.setCreatedAt(new Date());
+            requisitionMasterRepo.saveAndFlush(requisitionMaster);
+            return spotyResponseImpl.created();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
+    }
+
+    @Override
+    public ResponseEntity<ObjectNode> update(RequisitionMaster data) throws NotFoundException {
+        var opt = requisitionMasterRepo.findById(data.getId());
+
+        if (opt.isEmpty()) {
+            throw new NotFoundException();
+        }
+        var requisitionMaster = opt.get();
+
+        if (Objects.nonNull(data.getRef()) && !"".equalsIgnoreCase(data.getRef())) {
+            requisitionMaster.setRef(data.getRef());
+        }
+
+        if (Objects.nonNull(data.getDate())) {
+            requisitionMaster.setDate(data.getDate());
+        }
+
+//        if (Objects.nonNull(data.getCustomer())) {
+//            requisitionMaster.setCustomer(data.getCustomer());
+//        }
+
+        if (Objects.nonNull(data.getBranch())) {
+            requisitionMaster.setBranch(data.getBranch());
+        }
+
+        if (Objects.nonNull(data.getRequisitionDetails()) && !data.getRequisitionDetails().isEmpty()) {
+            requisitionMaster.setRequisitionDetails(data.getRequisitionDetails());
+        }
+
+//        if (!Objects.equals(data.getTaxRate(), requisitionMaster.getTaxRate())) {
+//            requisitionMaster.setTaxRate(data.getTaxRate());
+//        }
+//
+//        if (!Objects.equals(data.getNetTax(), requisitionMaster.getNetTax())) {
+//            requisitionMaster.setNetTax(data.getNetTax());
+//        }
+//
+//        if (!Objects.equals(data.getDiscount(), requisitionMaster.getDiscount())) {
+//            requisitionMaster.setDiscount(data.getDiscount());
+//        }
+
+//        if (Objects.nonNull(data.getShipping()) && !"".equalsIgnoreCase(data.getShipping())) {
+//            requisitionMaster.setShipping(data.getShipping());
+//        }
+
+//        if (!Objects.equals(data.getPaid(), requisitionMaster.getPaid())) {
+//            requisitionMaster.setPaid(data.getPaid());
+//        }
+//
+//        if (!Objects.equals(data.getTotal(), requisitionMaster.getTotal())) {
+//            requisitionMaster.setTotal(data.getTotal());
+//        }
+//
+//        if (!Objects.equals(data.getDue(), requisitionMaster.getDue())) {
+//            requisitionMaster.setDue(data.getDue());
+//        }
+//
+//        if (Objects.nonNull(data.getStatus()) && !"".equalsIgnoreCase(data.getStatus())) {
+//            requisitionMaster.setStatus(data.getStatus());
+//        }
+//
+//        if (Objects.nonNull(data.getPaymentStatus()) && !"".equalsIgnoreCase(data.getPaymentStatus())) {
+//            requisitionMaster.setPaymentStatus(data.getPaymentStatus());
+//        }
+
+        if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
+            requisitionMaster.setNotes(data.getNotes());
+        }
+
+        requisitionMaster.setUpdatedBy(authService.authUser());
+        requisitionMaster.setUpdatedAt(new Date());
+
+        try {
+            requisitionMasterRepo.saveAndFlush(requisitionMaster);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
+    }
+
+    @Override
+    public ResponseEntity<ObjectNode> delete(Long id) {
+        try {
+            requisitionMasterRepo.deleteById(id);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
+    }
+
+    @Override
+    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) {
+        return null;
+    }
+}

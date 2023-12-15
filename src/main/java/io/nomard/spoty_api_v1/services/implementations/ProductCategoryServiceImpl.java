@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -40,7 +41,10 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     @Override
     public List<ProductCategory> getByContains(String search) {
-        return productCategoryRepo.searchAll(search.toLowerCase());
+        return productCategoryRepo.searchAllByNameContainingIgnoreCaseOrCodeContainingIgnoreCase(
+                search.toLowerCase(),
+                search.toLowerCase()
+        );
     }
 
     @Override
@@ -56,11 +60,26 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> update(Long id, ProductCategory productCategory) {
+    public ResponseEntity<ObjectNode> update(ProductCategory data) throws NotFoundException {
+        var opt = productCategoryRepo.findById(data.getId());
+
+        if (opt.isEmpty()) {
+            throw new NotFoundException();
+        }
+        var productCategory = opt.get();
+
+        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+            productCategory.setName(data.getName());
+        }
+
+        if (Objects.nonNull(data.getCode()) && !"".equalsIgnoreCase(data.getCode())) {
+            productCategory.setCode(data.getCode());
+        }
+
+        productCategory.setUpdatedBy(authService.authUser());
+        productCategory.setUpdatedAt(new Date());
+
         try {
-            productCategory.setId(id);
-            productCategory.setUpdatedBy(authService.authUser());
-            productCategory.setUpdatedAt(new Date());
             productCategoryRepo.saveAndFlush(productCategory);
             return spotyResponseImpl.ok();
         } catch (Exception e) {

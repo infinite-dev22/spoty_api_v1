@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -40,7 +41,11 @@ public class CurrencyServiceImpl implements CurrencyService {
 
     @Override
     public List<Currency> getByContains(String search) {
-        return currencyRepo.searchAll(search.toLowerCase());
+        return currencyRepo.searchAllByNameContainingIgnoreCaseOrCodeContainingIgnoreCaseOrSymbolContainingIgnoreCase(
+                search.toLowerCase(),
+                search.toLowerCase(),
+                search.toLowerCase()
+        );
     }
 
     @Override
@@ -50,20 +55,39 @@ public class CurrencyServiceImpl implements CurrencyService {
             currency.setCreatedAt(new Date());
             currencyRepo.saveAndFlush(currency);
             return spotyResponseImpl.created();
-        } catch (Exception e){
+        } catch (Exception e) {
             return spotyResponseImpl.error(e);
         }
     }
 
     @Override
-    public ResponseEntity<ObjectNode> update(Long id, Currency currency) {
+    public ResponseEntity<ObjectNode> update(Currency data) throws NotFoundException {
+        var opt = currencyRepo.findById(data.getId());
+
+        if (opt.isEmpty()) {
+            throw new NotFoundException();
+        }
+        var currency = opt.get();
+
+        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+            currency.setName(data.getName());
+        }
+
+        if (Objects.nonNull(data.getCode()) && !"".equalsIgnoreCase(data.getCode())) {
+            currency.setCode(data.getCode());
+        }
+
+        if (Objects.nonNull(data.getSymbol()) && !"".equalsIgnoreCase(data.getSymbol())) {
+            currency.setSymbol(data.getSymbol());
+        }
+
+        currency.setUpdatedBy(authService.authUser());
+        currency.setUpdatedAt(new Date());
+
         try {
-            currency.setUpdatedBy(authService.authUser());
-            currency.setUpdatedAt(new Date());
-            currency.setId(id);
             currencyRepo.saveAndFlush(currency);
             return spotyResponseImpl.ok();
-        } catch (Exception e){
+        } catch (Exception e) {
             return spotyResponseImpl.error(e);
         }
     }

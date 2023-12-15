@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -40,7 +41,7 @@ public class ExpenseCategoryServiceImpl implements ExpenseCategoryService {
 
     @Override
     public List<ExpenseCategory> getByContains(String search) {
-        return expenseCategoryRepo.searchAll(search.toLowerCase());
+        return expenseCategoryRepo.searchAllByNameContainingIgnoreCase(search.toLowerCase());
     }
 
     @Override
@@ -50,20 +51,35 @@ public class ExpenseCategoryServiceImpl implements ExpenseCategoryService {
             expenseCategory.setCreatedAt(new Date());
             expenseCategoryRepo.saveAndFlush(expenseCategory);
             return spotyResponseImpl.created();
-        } catch (Exception e){
+        } catch (Exception e) {
             return spotyResponseImpl.error(e);
         }
     }
 
     @Override
-    public ResponseEntity<ObjectNode> update(Long id, ExpenseCategory expenseCategory) {
+    public ResponseEntity<ObjectNode> update(ExpenseCategory data) throws NotFoundException {
+        var opt = expenseCategoryRepo.findById(data.getId());
+
+        if (opt.isEmpty()) {
+            throw new NotFoundException();
+        }
+        var expenseCategory = opt.get();
+
+        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+            expenseCategory.setName(data.getName());
+        }
+
+        if (Objects.nonNull(data.getDescription()) && !"".equalsIgnoreCase(data.getDescription())) {
+            expenseCategory.setDescription(data.getDescription());
+        }
+
+        expenseCategory.setUpdatedBy(authService.authUser());
+        expenseCategory.setUpdatedAt(new Date());
+
         try {
-            expenseCategory.setUpdatedBy(authService.authUser());
-            expenseCategory.setUpdatedAt(new Date());
-            expenseCategory.setId(id);
             expenseCategoryRepo.saveAndFlush(expenseCategory);
             return spotyResponseImpl.ok();
-        } catch (Exception e){
+        } catch (Exception e) {
             return spotyResponseImpl.error(e);
         }
     }

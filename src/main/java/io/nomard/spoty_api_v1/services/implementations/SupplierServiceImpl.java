@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -56,11 +57,50 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> update(Long id, Supplier supplier) {
+    public ResponseEntity<ObjectNode> update(Supplier data) throws NotFoundException {
+        var opt = supplierRepo.findById(data.getId());
+
+        if (opt.isEmpty()) {
+            throw new NotFoundException();
+        }
+        var supplier = opt.get();
+
+        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+            supplier.setName(data.getName());
+        }
+
+        if (Objects.nonNull(data.getEmail()) && !"".equalsIgnoreCase(data.getEmail())) {
+            supplier.setEmail(data.getEmail());
+        }
+
+        if (Objects.nonNull(data.getCity()) && !"".equalsIgnoreCase(data.getCity())) {
+            supplier.setCity(data.getCity());
+        }
+
+        if (Objects.nonNull(data.getPhone()) && !"".equalsIgnoreCase(data.getPhone())) {
+            supplier.setPhone(data.getPhone());
+        }
+
+        if (Objects.nonNull(data.getAddress()) && !"".equalsIgnoreCase(data.getAddress())) {
+            supplier.setAddress(data.getAddress());
+        }
+
+        if (Objects.nonNull(data.getCountry()) && !"".equalsIgnoreCase(data.getCountry())) {
+            supplier.setCountry(data.getCountry());
+        }
+
+        if (Objects.nonNull(data.getCode()) && !"".equalsIgnoreCase(data.getCode())) {
+            supplier.setCode(data.getCode());
+        }
+
+        if (Objects.nonNull(data.getTaxNumber()) && !"".equalsIgnoreCase(data.getTaxNumber())) {
+            supplier.setTaxNumber(data.getTaxNumber());
+        }
+
+        supplier.setUpdatedBy(authService.authUser());
+        supplier.setUpdatedAt(new Date());
+
         try {
-            supplier.setUpdatedBy(authService.authUser());
-            supplier.setUpdatedAt(new Date());
-            supplier.setId(id);
             supplierRepo.saveAndFlush(supplier);
             return spotyResponseImpl.ok();
         } catch (Exception e) {

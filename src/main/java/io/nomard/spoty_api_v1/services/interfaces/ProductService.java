@@ -18,7 +18,7 @@ public interface ProductService {
 
     ResponseEntity<ObjectNode> save(Product product);
 
-    ResponseEntity<ObjectNode> update(Long id, Product product);
+    ResponseEntity<ObjectNode> update(Product product) throws NotFoundException;
 
     ResponseEntity<ObjectNode> delete(Long id);
 }

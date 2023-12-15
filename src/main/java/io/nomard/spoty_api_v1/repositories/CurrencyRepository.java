@@ -10,9 +10,5 @@ import java.util.List;
 
 @Repository
 public interface CurrencyRepository extends JpaRepository<Currency, Long> {
-    @Query("select c from Currency c where concat(" +
-            "trim(lower(c.name))," +
-            "trim(lower(c.name))," +
-            "trim(lower(c.symbol))) like %:search%")
-    List<Currency> searchAll(String search);
+    List<Currency> searchAllByNameContainingIgnoreCaseOrCodeContainingIgnoreCaseOrSymbolContainingIgnoreCase(String name, String code, String symbol);
 }

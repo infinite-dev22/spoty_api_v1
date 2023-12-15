@@ -1,0 +1,125 @@
+package io.nomard.spoty_api_v1.services.implementations.quotations;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.quotations.QuotationDetail;
+import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.repositories.quotations.QuotationDetailRepository;
+import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
+import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
+import io.nomard.spoty_api_v1.services.interfaces.quotations.QuotationDetailService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+@Service
+public class QuotationDetailServiceImpl implements QuotationDetailService {
+    @Autowired
+    private QuotationDetailRepository quotationDetailRepo;
+    @Autowired
+    private AuthServiceImpl authService;
+    @Autowired
+    private SpotyResponseImpl spotyResponseImpl;
+
+    @Override
+    public List<QuotationDetail> getAll() {
+        return quotationDetailRepo.findAll();
+    }
+
+    @Override
+    public QuotationDetail getById(Long id) throws NotFoundException {
+        Optional<QuotationDetail> quotationDetail = quotationDetailRepo.findById(id);
+        if (quotationDetail.isEmpty()) {
+            throw new NotFoundException();
+        }
+        return quotationDetail.get();
+    }
+
+    @Override
+    public ResponseEntity<ObjectNode> save(QuotationDetail quotationDetail) {
+        try {
+            quotationDetail.setCreatedBy(authService.authUser());
+            quotationDetail.setCreatedAt(new Date());
+            quotationDetailRepo.saveAndFlush(quotationDetail);
+            return spotyResponseImpl.created();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
+    }
+
+    @Override
+    public ResponseEntity<ObjectNode> saveMultiple(List<QuotationDetail> quotationDetailList) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<ObjectNode> update(QuotationDetail data) throws NotFoundException {
+        var opt = quotationDetailRepo.findById(data.getId());
+
+        if (opt.isEmpty()) {
+            throw new NotFoundException();
+        }
+        var quotationDetail = opt.get();
+
+        if (Objects.nonNull(data.getProduct())) {
+            quotationDetail.setProduct(data.getProduct());
+        }
+
+        if (!Objects.equals(data.getNetTax(), quotationDetail.getNetTax())) {
+            quotationDetail.setNetTax(data.getNetTax());
+        }
+
+        if (Objects.nonNull(data.getTaxType()) && !"".equalsIgnoreCase(data.getTaxType())) {
+            quotationDetail.setTaxType(data.getTaxType());
+        }
+
+        if (!Objects.equals(data.getDiscount(), quotationDetail.getDiscount())) {
+            quotationDetail.setDiscount(data.getDiscount());
+        }
+
+        if (Objects.nonNull(data.getDiscountType()) && !"".equalsIgnoreCase(data.getDiscountType())) {
+            quotationDetail.setDiscountType(data.getDiscountType());
+        }
+
+        if (Objects.nonNull(data.getSerialNumber()) && !"".equalsIgnoreCase(data.getSerialNumber())) {
+            quotationDetail.setSerialNumber(data.getSerialNumber());
+        }
+
+        if (!Objects.equals(data.getTotal(), quotationDetail.getTotal())) {
+            quotationDetail.setTotal(data.getTotal());
+        }
+
+        if (!Objects.equals(data.getQuantity(), quotationDetail.getQuantity())) {
+            quotationDetail.setQuantity(data.getQuantity());
+        }
+
+        quotationDetail.setUpdatedBy(authService.authUser());
+        quotationDetail.setUpdatedAt(new Date());
+
+        try {
+            quotationDetailRepo.saveAndFlush(quotationDetail);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
+    }
+
+    @Override
+    public ResponseEntity<ObjectNode> delete(Long id) {
+        try {
+            quotationDetailRepo.deleteById(id);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
+    }
+
+    @Override
+    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException {
+        return null;
+    }
+}

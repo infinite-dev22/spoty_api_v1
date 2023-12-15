@@ -20,7 +20,7 @@ import lombok.*;
 import java.io.Serializable;
 import java.util.Date;
 
-@Table(name = "expense_categories")
+@Table(name = "expenses")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -31,8 +31,6 @@ public class ExpenseCategory implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    // TODO: Add user not nullable later.
-    private User user_detail;
 
     @Column(nullable = false)
     private String name;

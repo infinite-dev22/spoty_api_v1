@@ -26,12 +26,12 @@ public class BranchController {
         return branchService.getAll();
     }
 
-    @PostMapping("/single")
+    @GetMapping("/single")
     public Branch getById(@Valid @RequestBody FindModel findModel) throws NotFoundException {
         return branchService.getById(findModel.getId());
     }
 
-    @PostMapping("/search")
+    @GetMapping("/search")
     public List<Branch> getByContains(@Valid @RequestBody SearchModel searchModel) {
         return branchService.getByContains(searchModel.getSearch());
     }
@@ -48,7 +48,7 @@ public class BranchController {
         return branchService.update(branch);
     }
 
-    @PostMapping("/single/delete")
+    @DeleteMapping("/single/delete")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return branchService.delete(findModel.getId());
     }

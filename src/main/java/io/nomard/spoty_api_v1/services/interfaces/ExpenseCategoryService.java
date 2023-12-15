@@ -15,9 +15,9 @@ public interface ExpenseCategoryService {
 
     List<ExpenseCategory> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(ExpenseCategory expenseCategory) throws NotFoundException;
+    ResponseEntity<ObjectNode> save(ExpenseCategory expenseCategory);
 
-    ResponseEntity<ObjectNode> update(Long id, ExpenseCategory expenseCategory);
+    ResponseEntity<ObjectNode> update(ExpenseCategory expenseCategory) throws NotFoundException;
 
     ResponseEntity<ObjectNode> delete(Long id);
 }

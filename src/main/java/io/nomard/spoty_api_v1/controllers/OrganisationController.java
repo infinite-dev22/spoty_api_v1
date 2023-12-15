@@ -3,6 +3,7 @@ package io.nomard.spoty_api_v1.controllers;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Organisation;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.services.implementations.OrganisationServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/expense_categories")
+@RequestMapping("/organisations")
 public class OrganisationController {
     @Autowired
     private OrganisationServiceImpl organisationService;
@@ -24,9 +25,9 @@ public class OrganisationController {
         return organisationService.getAll();
     }
 
-    @PostMapping("/single")
-    public Organisation getById(@RequestBody Long id) throws NotFoundException {
-        return organisationService.getById(id);
+    @GetMapping("/single")
+    public Organisation getById(@RequestBody FindModel findModel) throws NotFoundException {
+        return organisationService.getById(findModel.getId());
     }
 
     @PostMapping("/add")
@@ -36,14 +37,12 @@ public class OrganisationController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ObjectNode> update(@RequestBody Long id, @Valid @RequestBody Organisation organisation) {
-        organisation.setId(id);
-        organisation.setUpdatedAt(new Date());
-        return organisationService.update(id, organisation);
+    public ResponseEntity<ObjectNode> update(@Valid @RequestBody Organisation organisation) throws NotFoundException {
+        return organisationService.update(organisation);
     }
 
-    @PostMapping("/single/delete")
-    public ResponseEntity<ObjectNode> delete(@RequestBody Long id) {
-        return organisationService.delete(id);
+    @DeleteMapping("/single/delete")
+    public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
+        return organisationService.delete(findModel.getId());
     }
 }

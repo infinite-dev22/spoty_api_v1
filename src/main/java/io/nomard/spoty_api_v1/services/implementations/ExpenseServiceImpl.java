@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -40,7 +41,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public List<Expense> getByContains(String search) {
-        return expenseRepo.searchAll(search.toLowerCase());
+        return expenseRepo.searchAllByNameContainingIgnoreCase(search.toLowerCase());
     }
 
     @Override
@@ -50,20 +51,55 @@ public class ExpenseServiceImpl implements ExpenseService {
             expense.setCreatedAt(new Date());
             expenseRepo.saveAndFlush(expense);
             return spotyResponseImpl.created();
-        } catch (Exception e){
+        } catch (Exception e) {
             return spotyResponseImpl.error(e);
         }
     }
 
     @Override
-    public ResponseEntity<ObjectNode> update(Long id, Expense expense) {
+    public ResponseEntity<ObjectNode> update(Expense data) throws NotFoundException {
+        var opt = expenseRepo.findById(data.getId());
+
+        if (opt.isEmpty()) {
+            throw new NotFoundException();
+        }
+        var expense = opt.get();
+
+        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+            expense.setName(data.getName());
+        }
+
+        if (Objects.nonNull(data.getRef()) && !"".equalsIgnoreCase(data.getRef())) {
+            expense.setRef(data.getRef());
+        }
+
+        if (Objects.nonNull(data.getDetails()) && !"".equalsIgnoreCase(data.getDetails())) {
+            expense.setDetails(data.getDetails());
+        }
+
+        if (Objects.nonNull(data.getAmount()) && !(data.getAmount() == 0)) {
+            expense.setAmount(data.getAmount());
+        }
+
+        if (Objects.nonNull(data.getBranch())) {
+            expense.setBranch(data.getBranch());
+        }
+
+        if (Objects.nonNull(data.getDate())) {
+            expense.setDate(data.getDate());
+        }
+
+        if (Objects.nonNull(data.getExpenseCategory())) {
+            expense.setExpenseCategory(data.getExpenseCategory());
+        }
+
+        expense.setUpdatedBy(authService.authUser());
+        expense.setUpdatedAt(new Date());
+
         try {
-            expense.setUpdatedBy(authService.authUser());
-            expense.setUpdatedAt(new Date());
-            expense.setId(id);
             expenseRepo.saveAndFlush(expense);
             return spotyResponseImpl.ok();
-        } catch (Exception e){
+        } catch (Exception e) {
             return spotyResponseImpl.error(e);
         }
     }

@@ -13,9 +13,9 @@ public interface OrganisationService {
 
     Organisation getById(Long id) throws NotFoundException;
 
-    ResponseEntity<ObjectNode> save(Organisation organisation) throws NotFoundException;
+    ResponseEntity<ObjectNode> save(Organisation organisation);
 
-    ResponseEntity<ObjectNode> update(Long id, Organisation organisation);
+    ResponseEntity<ObjectNode> update(Organisation organisation) throws NotFoundException;
 
     ResponseEntity<ObjectNode> delete(Long id);
 }

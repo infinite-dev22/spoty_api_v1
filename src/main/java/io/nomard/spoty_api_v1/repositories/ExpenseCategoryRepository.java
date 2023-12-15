@@ -9,6 +9,5 @@ import java.util.List;
 
 @Repository
 public interface ExpenseCategoryRepository extends JpaRepository<ExpenseCategory, Long> {
-    @Query("select ec from ExpenseCategory ec where trim(lower(ec.name)) like %:search%")
-    List<ExpenseCategory> searchAll(String search);
+    List<ExpenseCategory> searchAllByNameContainingIgnoreCase(String search);
 }
