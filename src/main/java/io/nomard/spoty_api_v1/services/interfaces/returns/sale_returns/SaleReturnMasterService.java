@@ -5,6 +5,7 @@ import io.nomard.spoty_api_v1.entities.returns.sale_returns.SaleReturnMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface SaleReturnMasterService {
@@ -20,5 +21,5 @@ public interface SaleReturnMasterService {
 
     ResponseEntity<ObjectNode> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList);
+    ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList);
 }

@@ -1,13 +1,11 @@
 package io.nomard.spoty_api_v1.filters;
 
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import io.nomard.spoty_api_v1.services.auth.SpotyTokenService;
 import io.nomard.spoty_api_v1.services.auth.SpotyUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -17,11 +15,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.util.ContentCachingRequestWrapper;
-import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 @Component
 public class SpotyRequestFilter extends OncePerRequestFilter {

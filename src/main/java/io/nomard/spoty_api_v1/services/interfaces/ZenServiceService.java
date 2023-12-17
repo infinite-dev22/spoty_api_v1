@@ -12,9 +12,9 @@ public interface ZenServiceService {
 
     ZenService getById(Long id) throws NotFoundException;
 
-    ResponseEntity<ObjectNode> save(ZenService zenService);
+    ResponseEntity<ObjectNode> save(ZenService service);
 
-    ResponseEntity<ObjectNode> update(ZenService zenService) throws NotFoundException;
+    ResponseEntity<ObjectNode> update(ZenService service) throws NotFoundException;
 
     ResponseEntity<ObjectNode> delete(Long id);
 

@@ -16,13 +16,10 @@ package io.nomard.spoty_api_v1.models;
 
 import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Role;
-import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Cascade;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Getter

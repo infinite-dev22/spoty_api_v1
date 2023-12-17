@@ -18,6 +18,7 @@ public interface SupplierRepository extends JpaRepository<Supplier, Long> {
             "trim(lower(s.address))," +
             "trim(lower(s.country))) like %:search%")
     List<Supplier> searchAll(String search);
+
     List<Supplier> searchAllByNameContainingIgnoreCaseOrCodeContainingIgnoreCaseOrAddressContainingIgnoreCaseOrCityContainingIgnoreCaseOrCountryContainingIgnoreCaseOrEmailContainingIgnoreCaseOrPhoneContainingIgnoreCase(String name, String code, String address, String city, String country, String email, String phone);
 
     Supplier findSupplierByEmail(String email);

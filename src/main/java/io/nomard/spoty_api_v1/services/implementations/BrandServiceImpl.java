@@ -61,7 +61,7 @@ public class BrandServiceImpl implements BrandService {
     @Override
     public ResponseEntity<ObjectNode> update(Brand data) throws NotFoundException {
         var opt = brandRepo.findById(data.getId());
-        if (opt.isEmpty()){
+        if (opt.isEmpty()) {
             throw new NotFoundException();
         }
         var brand = opt.get();

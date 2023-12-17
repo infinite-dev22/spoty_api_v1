@@ -5,6 +5,7 @@ import io.nomard.spoty_api_v1.entities.returns.purchase_returns.PurchaseReturnDe
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface PurchaseReturnDetailService {
@@ -14,11 +15,11 @@ public interface PurchaseReturnDetailService {
 
     ResponseEntity<ObjectNode> save(PurchaseReturnDetail purchaseReturnDetail);
 
-    ResponseEntity<ObjectNode> saveMultiple(List<PurchaseReturnDetail> purchaseReturnDetailList);
+    ResponseEntity<ObjectNode> saveMultiple(ArrayList<PurchaseReturnDetail> purchaseReturnDetailList);
 
     ResponseEntity<ObjectNode> update(PurchaseReturnDetail purchaseReturnDetail) throws NotFoundException;
 
     ResponseEntity<ObjectNode> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException;
+    ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) throws NotFoundException;
 }

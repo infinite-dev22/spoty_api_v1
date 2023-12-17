@@ -1,0 +1,51 @@
+package io.nomard.spoty_api_v1.controllers;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.SaleTermAndCondition;
+import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.models.FindModel;
+import io.nomard.spoty_api_v1.services.implementations.SaleTermAndConditionServiceImpl;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("sale_terms_and_conditions")
+public class SaleTermAndConditionController {
+    @Autowired
+    private SaleTermAndConditionServiceImpl saleTermAndConditionService;
+
+
+    @GetMapping("/all")
+    public List<SaleTermAndCondition> getAll() {
+        return saleTermAndConditionService.getAll();
+    }
+
+    @GetMapping("/single")
+    public SaleTermAndCondition getById(@RequestBody FindModel findModel) throws NotFoundException {
+        return saleTermAndConditionService.getById(findModel.getId());
+    }
+
+//    @GetMapping("/search")
+//    public List<SaleTermAndCondition> getByContains(@RequestBody SearchModel searchModel) {
+//        return saleTermAndConditionService.getByContains(searchModel.getSearch());
+//    }
+
+    @PostMapping("/add")
+    public ResponseEntity<ObjectNode> save(@Valid @RequestBody SaleTermAndCondition saleTermAndCondition) {
+        return saleTermAndConditionService.save(saleTermAndCondition);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<ObjectNode> update(@Valid @RequestBody SaleTermAndCondition saleTermAndCondition) throws NotFoundException {
+        return saleTermAndConditionService.update(saleTermAndCondition);
+    }
+
+    @DeleteMapping("/single/delete")
+    public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
+        return saleTermAndConditionService.delete(findModel.getId());
+    }
+}

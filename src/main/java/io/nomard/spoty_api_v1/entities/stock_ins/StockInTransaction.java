@@ -17,7 +17,6 @@ package io.nomard.spoty_api_v1.entities.stock_ins;
 import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Product;
 import io.nomard.spoty_api_v1.entities.User;
-import io.nomard.spoty_api_v1.entities.stock_ins.StockInDetail;
 import jakarta.persistence.*;
 import lombok.*;
 

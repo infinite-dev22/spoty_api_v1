@@ -61,7 +61,7 @@ public class BranchServiceImpl implements BranchService {
     @Override
     public ResponseEntity<ObjectNode> update(Branch data) throws NotFoundException {
         var opt = branchRepo.findById(data.getId());
-        if (opt.isEmpty()){
+        if (opt.isEmpty()) {
             throw new NotFoundException();
         }
         var branch = opt.get();

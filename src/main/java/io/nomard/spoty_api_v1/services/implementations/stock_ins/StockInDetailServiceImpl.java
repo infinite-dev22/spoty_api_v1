@@ -11,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class StockInDetailServiceImpl implements StockInDetailService {
@@ -52,7 +49,7 @@ public class StockInDetailServiceImpl implements StockInDetailService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> saveMultiple(List<StockInDetail> stockInDetailList) {
+    public ResponseEntity<ObjectNode> saveMultiple(ArrayList<StockInDetail> stockInDetailList) {
         return null;
     }
 
@@ -119,7 +116,12 @@ public class StockInDetailServiceImpl implements StockInDetailService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException {
-        return null;
+    public ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) throws NotFoundException {
+        try {
+            stockInDetailRepo.deleteAllById(idList);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
     }
 }

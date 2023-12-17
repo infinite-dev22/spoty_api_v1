@@ -11,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PurchaseReturnMasterServiceImpl implements PurchaseMasterService {
@@ -152,7 +149,12 @@ public class PurchaseReturnMasterServiceImpl implements PurchaseMasterService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) {
-        return null;
+    public ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) {
+        try {
+            purchaseReturnMasterRepo.deleteAllById(idList);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
     }
 }

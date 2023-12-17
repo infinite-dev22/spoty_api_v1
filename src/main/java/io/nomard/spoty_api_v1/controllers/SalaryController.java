@@ -1,0 +1,51 @@
+package io.nomard.spoty_api_v1.controllers;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.Salary;
+import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.models.FindModel;
+import io.nomard.spoty_api_v1.services.implementations.SalaryServiceImpl;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("salaries")
+public class SalaryController {
+    @Autowired
+    private SalaryServiceImpl salaryService;
+
+
+    @GetMapping("/all")
+    public List<Salary> getAll() {
+        return salaryService.getAll();
+    }
+
+    @GetMapping("/single")
+    public Salary getById(@RequestBody FindModel findModel) throws NotFoundException {
+        return salaryService.getById(findModel.getId());
+    }
+
+//    @GetMapping("/search")
+//    public List<Salary> getByContains(@RequestBody SearchModel searchModel) {
+//        return salaryService.getByContains(searchModel.getSearch());
+//    }
+
+    @PostMapping("/add")
+    public ResponseEntity<ObjectNode> save(@Valid @RequestBody Salary salary) {
+        return salaryService.save(salary);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<ObjectNode> update(@Valid @RequestBody Salary salary) throws NotFoundException {
+        return salaryService.update(salary);
+    }
+
+    @DeleteMapping("/single/delete")
+    public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
+        return salaryService.delete(findModel.getId());
+    }
+}

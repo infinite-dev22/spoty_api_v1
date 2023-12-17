@@ -5,6 +5,7 @@ import io.nomard.spoty_api_v1.entities.sales.SaleDetail;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface SaleDetailService {
@@ -14,11 +15,11 @@ public interface SaleDetailService {
 
     ResponseEntity<ObjectNode> save(SaleDetail saleDetail);
 
-    ResponseEntity<ObjectNode> saveMultiple(List<SaleDetail> saleDetailList);
+    ResponseEntity<ObjectNode> saveMultiple(ArrayList<SaleDetail> saleDetailList);
 
     ResponseEntity<ObjectNode> update(SaleDetail saleDetail) throws NotFoundException;
 
     ResponseEntity<ObjectNode> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException;
+    ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) throws NotFoundException;
 }

@@ -193,6 +193,46 @@ public class AppConfig {
     }
 
     @Bean
+    public Attendance attendance() {
+        return new Attendance();
+    }
+
+    @Bean
+    public Bank bank() {
+        return new Bank();
+    }
+
+    @Bean
+    public Designation designation() {
+        return new Designation();
+    }
+
+    @Bean
+    public SalaryAdvance salaryAdvance() {
+        return new SalaryAdvance();
+    }
+
+    @Bean
+    public Salary salary() {
+        return new Salary();
+    }
+
+    @Bean
+    public SaleTermAndCondition saleTermAndCondition() {
+        return new SaleTermAndCondition();
+    }
+
+    @Bean
+    public ServiceInvoice serviceInvoice() {
+        return new ServiceInvoice();
+    }
+
+    @Bean
+    public ZenService service() {
+        return new ZenService();
+    }
+
+    @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper();
     }

@@ -6,9 +6,14 @@ import org.springframework.http.ResponseEntity;
 
 public interface SpotyResponse {
     ResponseEntity<ObjectNode> ok();
+
     ResponseEntity<ObjectNode> created();
+
     ResponseEntity<ObjectNode> error(Exception exception);
+
     ResponseEntity<ObjectNode> conflict();
+
     ResponseEntity<ObjectNode> taken();
+
     ResponseEntity<ObjectNode> custom(HttpStatus httpStatus, String message);
 }
