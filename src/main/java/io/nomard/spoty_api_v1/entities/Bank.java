@@ -1,5 +1,7 @@
 package io.nomard.spoty_api_v1.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,16 +33,20 @@ public class Bank {
     private String logo;
 
     @Column(name = "created_at")
+    @JsonIgnore
     private Date createdAt;
 
     @ManyToOne
-    @JoinColumn(nullable = false, name = "created_by")
+    @JoinColumn(name = "created_by")
+    @JsonIgnore
     private User createdBy;
 
     @Column(name = "updated_at")
+    @JsonIgnore
     private Date updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "updated_by")
+    @JsonIgnore
     private User updatedBy;
 }

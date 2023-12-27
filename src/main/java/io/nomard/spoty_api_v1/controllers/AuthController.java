@@ -2,7 +2,6 @@ package io.nomard.spoty_api_v1.controllers;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
-import io.nomard.spoty_api_v1.models.AuthenticationResponse;
 import io.nomard.spoty_api_v1.models.LoginModel;
 import io.nomard.spoty_api_v1.models.SignUpModel;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
@@ -26,7 +25,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public AuthenticationResponse login(@Valid @RequestBody LoginModel loginDetails) {
+    public ResponseEntity<ObjectNode> login(@Valid @RequestBody LoginModel loginDetails) {
         return authService.login(loginDetails);
     }
 }

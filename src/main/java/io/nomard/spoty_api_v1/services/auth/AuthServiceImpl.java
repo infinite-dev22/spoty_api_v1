@@ -1,9 +1,9 @@
 package io.nomard.spoty_api_v1.services.auth;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.User;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
-import io.nomard.spoty_api_v1.models.AuthenticationResponse;
 import io.nomard.spoty_api_v1.models.LoginModel;
 import io.nomard.spoty_api_v1.models.SignUpModel;
 import io.nomard.spoty_api_v1.principals.SpotyUserPrincipal;
@@ -20,7 +20,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
 import java.util.Objects;
@@ -39,9 +38,11 @@ public class AuthServiceImpl implements AuthService {
     private UserRepository userRepo;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Override
-    public AuthenticationResponse login(LoginModel loginDetails) {
+    public ResponseEntity<ObjectNode> login(LoginModel loginDetails) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -50,20 +51,18 @@ public class AuthServiceImpl implements AuthService {
                     ));
 
             final UserDetails userDetails = userDetailsService.loadUserByUsername(loginDetails.getEmail());
-            final AuthenticationResponse authenticationResponse = new AuthenticationResponse();
-            authenticationResponse.setAccessToken(spotyTokenService.generateToken(userDetails));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            return authenticationResponse;
-        } catch (Exception e) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED, "{" +
-                    "\t\"status\": \"INTERNAL SERVER ERROR\",\n" +
-                    "\t\"message\": \"Oops... An error occurred on our side, this is not your problem\",\n" +
-                    "\t\"error\": \"" + e.getMessage() + "\"" +
-                    "}"
+            var response = objectMapper.createObjectNode();
+            response.put("status", 200);
+            response.put("token", "Bearer " + spotyTokenService.generateToken(userDetails));
+            response.put("message", "Process successfully completed");
+            return new ResponseEntity<>(
+                    response, HttpStatus.OK
             );
+        } catch (Exception e) {
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 

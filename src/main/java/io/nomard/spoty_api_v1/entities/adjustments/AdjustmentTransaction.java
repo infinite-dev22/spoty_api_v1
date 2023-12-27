@@ -17,6 +17,8 @@ package io.nomard.spoty_api_v1.entities.adjustments;
 import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Product;
 import io.nomard.spoty_api_v1.entities.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -56,16 +58,20 @@ public class AdjustmentTransaction {
     private String adjustmentType;
 
     @Column(name = "created_at")
+    @JsonIgnore
     private Date createdAt;
 
     @ManyToOne
-    @JoinColumn(nullable = false, name = "created_by")
+    @JoinColumn(name = "created_by")
+    @JsonIgnore
     private User createdBy;
 
     @Column(name = "updated_at")
+    @JsonIgnore
     private Date updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "updated_by")
+    @JsonIgnore
     private User updatedBy;
 }
