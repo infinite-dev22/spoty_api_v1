@@ -22,7 +22,7 @@ import lombok.*;
 import java.io.Serializable;
 import java.util.Date;
 
-@Table(name = "expenses")
+@Table(name = "expense_categories")
 @Getter
 @Setter
 @AllArgsConstructor
