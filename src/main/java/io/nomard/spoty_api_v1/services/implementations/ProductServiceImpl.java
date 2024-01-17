@@ -82,7 +82,7 @@ public class ProductServiceImpl implements ProductService {
             product.setBrand(data.getBrand());
         }
 
-        if (Objects.nonNull(data.getBranch()) && !data.getBranch().isEmpty()) {
+        if (Objects.nonNull(data.getBranch())) {
             product.setBranch(data.getBranch());
         }
 
@@ -98,23 +98,23 @@ public class ProductServiceImpl implements ProductService {
             product.setName(data.getName());
         }
 
-        if (Objects.nonNull(data.getQuantity()) && !Objects.equals(data.getQuantity(), 0)) {
+        if (!Objects.equals(data.getQuantity(), 0)) {
             product.setQuantity(data.getQuantity());
         }
 
-        if (Objects.nonNull(data.getCost()) && !Objects.equals(data.getCost(), 0)) {
+        if (!Objects.equals(data.getCost(), 0)) {
             product.setCost(data.getCost());
         }
 
-        if (Objects.nonNull(data.getPrice()) && !Objects.equals(data.getPrice(), 0)) {
+        if (!Objects.equals(data.getPrice(), 0)) {
             product.setPrice(data.getPrice());
         }
 
-        if (Objects.nonNull(data.getDiscount()) && !Objects.equals(data.getDiscount(), 0)) {
+        if (!Objects.equals(data.getDiscount(), 0)) {
             product.setDiscount(data.getDiscount());
         }
 
-        if (Objects.nonNull(data.getNetTax()) && !Objects.equals(data.getNetTax(), 0)) {
+        if (!Objects.equals(data.getNetTax(), 0)) {
             product.setNetTax(data.getNetTax());
         }
 
@@ -122,7 +122,7 @@ public class ProductServiceImpl implements ProductService {
             product.setTaxType(data.getTaxType());
         }
 
-        if (Objects.nonNull(data.getStockAlert()) && !Objects.equals(data.getStockAlert(), 0)) {
+        if (!Objects.equals(data.getStockAlert(), 0)) {
             product.setStockAlert(data.getStockAlert());
         }
 

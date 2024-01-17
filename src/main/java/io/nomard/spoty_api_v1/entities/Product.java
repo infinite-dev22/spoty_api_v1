@@ -47,8 +47,8 @@ public class Product implements Serializable {
     @ManyToOne(optional = false)
     private Brand brand;
 
-    @ManyToMany(targetEntity = Branch.class)
-    private List<Branch> branch;
+    @ManyToOne(targetEntity = Branch.class)
+    private Branch branch;
 
     @Column(name = "barcode_type")
     private String barcodeType;
