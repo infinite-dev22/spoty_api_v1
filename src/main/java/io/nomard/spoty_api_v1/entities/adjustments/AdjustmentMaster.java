@@ -36,7 +36,9 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class AdjustmentMaster implements Serializable {
-    @Id
+    private static final long serialVersionUID = -4254175126124375189L;
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

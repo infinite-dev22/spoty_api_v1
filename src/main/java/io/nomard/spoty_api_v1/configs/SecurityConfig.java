@@ -25,7 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableGlobalAuthentication
 public class SecurityConfig {
-    public static final String[] WHITE_LIST_URL = {"/auth/**", "/error/"};
+    public static final String[] WHITE_LIST_URL = {"/auth/**", "/error/**", "/error"};
 
     @Value("jwt.secret")
     private String secret;

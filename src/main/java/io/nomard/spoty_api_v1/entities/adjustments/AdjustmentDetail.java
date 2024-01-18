@@ -32,7 +32,9 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 public class AdjustmentDetail implements Serializable {
-    @Id
+    private static final long serialVersionUID = -9009352806583421955L;
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

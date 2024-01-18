@@ -8,7 +8,7 @@ plugins {
 }
 
 group = 'io.nomard'
-version = '0.0.1-SNAPSHOT'
+version = '0.1.4-SNAPSHOT'
 
 java {
     sourceCompatibility = '17'
@@ -49,6 +49,7 @@ dependencies {
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     runtimeOnly 'com.mysql:mysql-connector-j'
+    runtimeOnly 'org.springframework.boot:spring-boot-docker-compose'
 }
 
 tasks.named('test') {
