@@ -42,6 +42,7 @@ public class PurchaseDetail implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "purchaseMaster_id", nullable = false)
+    @JsonIgnore
     private PurchaseMaster purchase;
 
     private double netTax;

@@ -17,7 +17,6 @@ package io.nomard.spoty_api_v1.entities.adjustments;
 import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Cascade;
@@ -36,8 +35,6 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class AdjustmentMaster implements Serializable {
-    private static final long serialVersionUID = -4254175126124375189L;
-
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -47,7 +44,7 @@ public class AdjustmentMaster implements Serializable {
     @ManyToOne
     private Branch branch;
 
-    @OneToMany(mappedBy = "adjustment", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "adjustment", fetch = FetchType.EAGER)
     @Cascade({CascadeType.ALL})
     @Builder.Default
     private List<AdjustmentDetail> adjustmentDetails = new LinkedList<>();

@@ -38,6 +38,7 @@ public class SaleReturnDetail implements Serializable {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "saleReturnMaster_id", nullable = false)
+    @JsonIgnore
     private SaleReturnMaster saleReturn;
 
     @ManyToOne(optional = false)

@@ -45,6 +45,7 @@ public class PurchaseReturnDetail implements Serializable {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "purchase_return_master_id", nullable = false)
+    @JsonIgnore
     private PurchaseReturnMaster purchaseReturn;
 
     @ManyToOne(optional = false)

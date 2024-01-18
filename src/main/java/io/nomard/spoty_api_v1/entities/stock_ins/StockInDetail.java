@@ -37,6 +37,7 @@ public class StockInDetail implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "stockIn_id", nullable = false)
+    @JsonIgnore
     private StockInMaster stockIn;
 
     @ManyToOne(optional = false)

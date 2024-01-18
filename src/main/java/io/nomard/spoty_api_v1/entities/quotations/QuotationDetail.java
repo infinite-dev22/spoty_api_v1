@@ -50,6 +50,7 @@ public class QuotationDetail implements Serializable {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "quotation_id", nullable = false)
+    @JsonIgnore
     private QuotationMaster quotation;
 
     private double netTax;

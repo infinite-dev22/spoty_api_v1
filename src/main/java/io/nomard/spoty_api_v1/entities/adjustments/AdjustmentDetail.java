@@ -32,8 +32,6 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 public class AdjustmentDetail implements Serializable {
-    private static final long serialVersionUID = -9009352806583421955L;
-
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -43,6 +41,7 @@ public class AdjustmentDetail implements Serializable {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "adjustment_id", nullable = false)
+    @JsonIgnore
     private AdjustmentMaster adjustment;
 
     private int quantity;

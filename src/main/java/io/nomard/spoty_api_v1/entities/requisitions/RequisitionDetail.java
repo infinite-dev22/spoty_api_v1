@@ -41,6 +41,7 @@ public class RequisitionDetail implements Serializable {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "requisition_id", nullable = false)
+    @JsonIgnore
     private RequisitionMaster requisition;
 
     @Column(nullable = false)

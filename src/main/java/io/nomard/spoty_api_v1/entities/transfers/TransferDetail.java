@@ -37,6 +37,7 @@ public class TransferDetail implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "transfer_id", nullable = false)
+    @JsonIgnore
     private TransferMaster transfer;
 
     @ManyToOne(optional = false)
