@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface CustomerService {
-    List<Customer> getAll();
+    List<Customer> getAll(int pageNo, int pageSize);
 
     Customer getById(Long id) throws NotFoundException;
 

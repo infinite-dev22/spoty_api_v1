@@ -14,6 +14,7 @@
 
 package io.nomard.spoty_api_v1.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -21,7 +22,6 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -36,18 +36,18 @@ public class Product implements Serializable {
     private long id;
 
     @NotNull(message = "unit can't be null")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private UnitOfMeasure unit;
 
     @NotNull(message = "category can't be null")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private ProductCategory category;
 
     @NotNull(message = "brand can't be null")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Brand brand;
 
-    @ManyToOne(targetEntity = Branch.class)
+    @ManyToOne(targetEntity = Branch.class, fetch = FetchType.LAZY)
     private Branch branch;
 
     @Column(name = "barcode_type")
@@ -85,16 +85,20 @@ public class Product implements Serializable {
     private String image;
 
     @Column(name = "created_at")
+    @JsonIgnore
     private Date createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "created_by")
+    @JsonIgnore
     private User createdBy;
 
     @Column(name = "updated_at")
+    @JsonIgnore
     private Date updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")
+    @JsonIgnore
     private User updatedBy;
 }

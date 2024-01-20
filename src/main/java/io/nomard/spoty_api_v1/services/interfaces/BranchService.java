@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface BranchService {
-    List<Branch> getAll();
+    List<Branch> getAll(int pageNo, int pageSize);
 
     Branch getById(Long id) throws NotFoundException;
 

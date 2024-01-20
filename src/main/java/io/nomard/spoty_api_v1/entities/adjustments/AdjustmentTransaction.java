@@ -14,11 +14,10 @@
 
 package io.nomard.spoty_api_v1.entities.adjustments;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Product;
 import io.nomard.spoty_api_v1.entities.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,19 +32,19 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 public class AdjustmentTransaction implements Serializable {
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "branch_id", nullable = false)
     private Branch branch;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "product_id")
     private Product product;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "adjustment_detail_id")
     private AdjustmentDetail adjustmentDetail;
 
@@ -62,7 +61,7 @@ public class AdjustmentTransaction implements Serializable {
     @JsonIgnore
     private Date createdAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     @JsonIgnore
     private User createdBy;
@@ -71,7 +70,7 @@ public class AdjustmentTransaction implements Serializable {
     @JsonIgnore
     private Date updatedAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")
     @JsonIgnore
     private User updatedBy;

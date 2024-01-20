@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface PurchaseReturnDetailService {
-    List<PurchaseReturnDetail> getAll();
+    List<PurchaseReturnDetail> getAll(int pageNo, int pageSize);
 
     PurchaseReturnDetail getById(Long id) throws NotFoundException;
 

@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface BankService {
-    List<Bank> getAll();
+    List<Bank> getAll(int pageNo, int pageSize);
 
     Bank getById(Long id) throws NotFoundException;
 

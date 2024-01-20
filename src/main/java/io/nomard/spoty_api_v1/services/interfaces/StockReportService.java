@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface StockReportService {
-    List<StockReport> getAll();
+    List<StockReport> getAll(int pageNo, int pageSize);
 
     StockReport getById(Long id) throws NotFoundException;
 

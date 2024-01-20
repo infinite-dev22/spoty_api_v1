@@ -22,8 +22,9 @@ public class ProductCategoryController {
 
 
     @GetMapping("/all")
-    public List<ProductCategory> getAll() {
-        return productCategoryService.getAll();
+    public List<ProductCategory> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                        @RequestParam(defaultValue = "20") Integer pageSize) {
+        return productCategoryService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")

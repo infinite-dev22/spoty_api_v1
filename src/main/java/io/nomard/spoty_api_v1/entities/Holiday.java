@@ -15,7 +15,6 @@
 package io.nomard.spoty_api_v1.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,7 +36,7 @@ public class Holiday implements Serializable {
     @Column(nullable = false)
     private String title;
     @JoinColumn(nullable = false, name = "company_id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Organisation organisation;
 
     @Column(name = "start_date")
@@ -52,7 +51,7 @@ public class Holiday implements Serializable {
     @JsonIgnore
     private Date createdAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     @JsonIgnore
     private User createdBy;
@@ -61,7 +60,7 @@ public class Holiday implements Serializable {
     @JsonIgnore
     private Date updatedAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")
     @JsonIgnore
     private User updatedBy;

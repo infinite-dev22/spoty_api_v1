@@ -21,8 +21,9 @@ public class OrganisationController {
 
 
     @GetMapping("/all")
-    public List<Organisation> getAll() {
-        return organisationService.getAll();
+    public List<Organisation> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                     @RequestParam(defaultValue = "20") Integer pageSize) {
+        return organisationService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")

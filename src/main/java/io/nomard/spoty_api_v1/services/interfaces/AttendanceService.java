@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface AttendanceService {
-    List<Attendance> getAll();
+    List<Attendance> getAll(int pageNo, int pageSize);
 
     Attendance getById(Long id) throws NotFoundException;
 

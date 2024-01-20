@@ -8,6 +8,8 @@ import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.ZenServiceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -18,20 +20,25 @@ import java.util.Optional;
 @Service
 public class ZenServiceServiceImpl implements ZenServiceService {
     @Autowired
-    private ZenServiceRepository attendanceRepo;
+    private ZenServiceRepository zenServiceRepo;
     @Autowired
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<ZenService> getAll() {
-        return attendanceRepo.findAll();
+    public List<ZenService> getAll(int pageNo, int pageSize) {
+        //create page request object
+        PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
+        //pass it to repos
+        Page<ZenService> page = zenServiceRepo.findAll(pageRequest);
+        //page.hasContent(); -- to check pages are there or not
+        return page.getContent();
     }
 
     @Override
     public ZenService getById(Long id) throws NotFoundException {
-        Optional<ZenService> attendance = attendanceRepo.findById(id);
+        Optional<ZenService> attendance = zenServiceRepo.findById(id);
         if (attendance.isEmpty()) {
             throw new NotFoundException();
         }
@@ -43,7 +50,7 @@ public class ZenServiceServiceImpl implements ZenServiceService {
         try {
             attendance.setCreatedBy(authService.authUser());
             attendance.setCreatedAt(new Date());
-            attendanceRepo.saveAndFlush(attendance);
+            zenServiceRepo.saveAndFlush(attendance);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -52,7 +59,7 @@ public class ZenServiceServiceImpl implements ZenServiceService {
 
     @Override
     public ResponseEntity<ObjectNode> update(ZenService data) throws NotFoundException {
-        var opt = attendanceRepo.findById(data.getId());
+        var opt = zenServiceRepo.findById(data.getId());
 
         if (opt.isEmpty()) {
             throw new NotFoundException();
@@ -95,7 +102,7 @@ public class ZenServiceServiceImpl implements ZenServiceService {
         attendance.setUpdatedAt(new Date());
 
         try {
-            attendanceRepo.saveAndFlush(attendance);
+            zenServiceRepo.saveAndFlush(attendance);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -105,7 +112,7 @@ public class ZenServiceServiceImpl implements ZenServiceService {
     @Override
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
-            attendanceRepo.deleteById(id);
+            zenServiceRepo.deleteById(id);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

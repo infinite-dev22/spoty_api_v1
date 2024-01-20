@@ -14,10 +14,10 @@
 
 package io.nomard.spoty_api_v1.entities.requisitions;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Supplier;
 import io.nomard.spoty_api_v1.entities.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Cascade;
@@ -45,14 +45,14 @@ public class RequisitionMaster implements Serializable {
     @Column(nullable = false)
     private Date date;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user_detail;
 
-    @OneToOne(optional = false)
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "supplier_id")
     private Supplier supplier;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "branch_id")
     private Branch branch;
 
@@ -77,7 +77,7 @@ public class RequisitionMaster implements Serializable {
     @JsonIgnore
     private Date createdAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     @JsonIgnore
     private User createdBy;

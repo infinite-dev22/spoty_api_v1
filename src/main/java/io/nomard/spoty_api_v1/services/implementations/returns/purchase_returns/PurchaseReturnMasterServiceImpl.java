@@ -1,35 +1,42 @@
 package io.nomard.spoty_api_v1.services.implementations.returns.purchase_returns;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.purchases.PurchaseMaster;
+import io.nomard.spoty_api_v1.entities.returns.purchase_returns.PurchaseReturnMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
-import io.nomard.spoty_api_v1.repositories.purchases.PurchaseMasterRepository;
+import io.nomard.spoty_api_v1.repositories.returns.purchase_returns.PurchaseReturnMasterRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
-import io.nomard.spoty_api_v1.services.interfaces.purchases.PurchaseMasterService;
+import io.nomard.spoty_api_v1.services.interfaces.returns.purchase_returns.PurchaseReturnMasterService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
-public class PurchaseReturnMasterServiceImpl implements PurchaseMasterService {
+public class PurchaseReturnMasterServiceImpl implements PurchaseReturnMasterService {
     @Autowired
-    private PurchaseMasterRepository purchaseReturnMasterRepo;
+    private PurchaseReturnMasterRepository purchaseReturnMasterRepo;
     @Autowired
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<PurchaseMaster> getAll() {
-        return purchaseReturnMasterRepo.findAll();
+    public List<PurchaseReturnMaster> getAll(int pageNo, int pageSize) {
+        //create page request object
+        PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
+        //pass it to repos
+        Page<PurchaseReturnMaster> page = purchaseReturnMasterRepo.findAll(pageRequest);
+        //page.hasContent(); -- to check pages are there or not
+        return page.getContent();
     }
 
     @Override
-    public PurchaseMaster getById(Long id) throws NotFoundException {
-        Optional<PurchaseMaster> purchaseReturnMaster = purchaseReturnMasterRepo.findById(id);
+    public PurchaseReturnMaster getById(Long id) throws NotFoundException {
+        Optional<PurchaseReturnMaster> purchaseReturnMaster = purchaseReturnMasterRepo.findById(id);
         if (purchaseReturnMaster.isEmpty()) {
             throw new NotFoundException();
         }
@@ -37,7 +44,7 @@ public class PurchaseReturnMasterServiceImpl implements PurchaseMasterService {
     }
 
     @Override
-    public List<PurchaseMaster> getByContains(String search) {
+    public List<PurchaseReturnMaster> getByContains(String search) {
         return purchaseReturnMasterRepo.searchAllByRefContainingIgnoreCaseOrShippingContainingIgnoreCaseOrStatusContainingIgnoreCaseOrPaymentStatusContainsIgnoreCase(
                 search.toLowerCase(),
                 search.toLowerCase(),
@@ -47,7 +54,7 @@ public class PurchaseReturnMasterServiceImpl implements PurchaseMasterService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> save(PurchaseMaster purchaseReturnMaster) {
+    public ResponseEntity<ObjectNode> save(PurchaseReturnMaster purchaseReturnMaster) {
         try {
             purchaseReturnMaster.setCreatedBy(authService.authUser());
             purchaseReturnMaster.setCreatedAt(new Date());
@@ -59,7 +66,7 @@ public class PurchaseReturnMasterServiceImpl implements PurchaseMasterService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> update(PurchaseMaster data) throws NotFoundException {
+    public ResponseEntity<ObjectNode> update(PurchaseReturnMaster data) throws NotFoundException {
         var opt = purchaseReturnMasterRepo.findById(data.getId());
 
         if (opt.isEmpty()) {
@@ -83,9 +90,9 @@ public class PurchaseReturnMasterServiceImpl implements PurchaseMasterService {
             purchaseReturnMaster.setBranch(data.getBranch());
         }
 
-        if (Objects.nonNull(data.getPurchaseDetails()) && !data.getPurchaseDetails().isEmpty()) {
-            purchaseReturnMaster.setPurchaseDetails(data.getPurchaseDetails());
-        }
+//        if (Objects.nonNull(data.getPurchaseDetails()) && !data.getPurchaseDetails().isEmpty()) {
+//            purchaseReturnMaster.setPurchaseDetails(data.getPurchaseDetails());
+//        }
 
         if (!Objects.equals(data.getTaxRate(), purchaseReturnMaster.getTaxRate())) {
             purchaseReturnMaster.setTaxRate(data.getTaxRate());
@@ -111,9 +118,9 @@ public class PurchaseReturnMasterServiceImpl implements PurchaseMasterService {
             purchaseReturnMaster.setTotal(data.getTotal());
         }
 
-        if (!Objects.equals(data.getDue(), purchaseReturnMaster.getDue())) {
-            purchaseReturnMaster.setDue(data.getDue());
-        }
+//        if (!Objects.equals(data.getDue(), purchaseReturnMaster.getDue())) {
+//            purchaseReturnMaster.setDue(data.getDue());
+//        }
 
         if (Objects.nonNull(data.getStatus()) && !"".equalsIgnoreCase(data.getStatus())) {
             purchaseReturnMaster.setStatus(data.getStatus());

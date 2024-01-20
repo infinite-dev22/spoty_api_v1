@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface UserService {
-    List<User> getAll();
+    List<User> getAll(int pageNo, int pageSize);
 
     User getById(Long id) throws NotFoundException;
 

@@ -20,8 +20,9 @@ public class SaleTermAndConditionController {
 
 
     @GetMapping("/all")
-    public List<SaleTermAndCondition> getAll() {
-        return saleTermAndConditionService.getAll();
+    public List<SaleTermAndCondition> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                             @RequestParam(defaultValue = "20") Integer pageSize) {
+        return saleTermAndConditionService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")

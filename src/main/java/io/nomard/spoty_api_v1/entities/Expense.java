@@ -15,7 +15,6 @@
 package io.nomard.spoty_api_v1.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -44,14 +43,14 @@ public class Expense implements Serializable {
     @Column(nullable = false)
     private String name;
     // TODO: Add not nullable when the user system works.
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user_detail;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "expense_category_id")
     private ExpenseCategory expenseCategory;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "branch_id")
     private Branch branch;
 
@@ -64,7 +63,7 @@ public class Expense implements Serializable {
     @JsonIgnore
     private Date createdAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     @JsonIgnore
     private User createdBy;
@@ -73,7 +72,7 @@ public class Expense implements Serializable {
     @JsonIgnore
     private Date updatedAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")
     @JsonIgnore
     private User updatedBy;

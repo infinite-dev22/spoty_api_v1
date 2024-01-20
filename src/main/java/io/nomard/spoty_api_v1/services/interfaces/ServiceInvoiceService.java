@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface ServiceInvoiceService {
-    List<ServiceInvoice> getAll();
+    List<ServiceInvoice> getAll(int pageNo, int pageSize);
 
     ServiceInvoice getById(Long id) throws NotFoundException;
 

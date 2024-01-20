@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface BrandService {
-    List<Brand> getAll();
+    List<Brand> getAll(int pageNo, int pageSize);
 
     Brand getById(Long id) throws NotFoundException;
 

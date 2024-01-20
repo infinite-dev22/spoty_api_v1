@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface PurchaseReturnMasterService {
-    List<PurchaseReturnMaster> getAll();
+    List<PurchaseReturnMaster> getAll(int pageNo, int pageSize);
 
     PurchaseReturnMaster getById(Long id) throws NotFoundException;
 

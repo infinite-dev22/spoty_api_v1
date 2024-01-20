@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface SaleDetailService {
-    List<SaleDetail> getAll();
+    List<SaleDetail> getAll(int pageNo, int pageSize);
 
     SaleDetail getById(Long id) throws NotFoundException;
 

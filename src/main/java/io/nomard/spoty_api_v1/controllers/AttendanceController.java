@@ -20,8 +20,9 @@ public class AttendanceController {
 
 
     @GetMapping("/all")
-    public List<Attendance> getAll() {
-        return attendanceService.getAll();
+    public List<Attendance> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                   @RequestParam(defaultValue = "20") Integer pageSize) {
+        return attendanceService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")

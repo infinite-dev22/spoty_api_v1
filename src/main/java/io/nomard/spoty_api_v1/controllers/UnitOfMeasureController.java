@@ -21,8 +21,9 @@ public class UnitOfMeasureController {
 
 
     @GetMapping("/all")
-    public List<UnitOfMeasure> getAll() {
-        return unit_of_measureService.getAll();
+    public List<UnitOfMeasure> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                      @RequestParam(defaultValue = "20") Integer pageSize) {
+        return unit_of_measureService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")

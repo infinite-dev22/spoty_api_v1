@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface DesignationService {
-    List<Designation> getAll();
+    List<Designation> getAll(int pageNo, int pageSize);
 
     Designation getById(Long id) throws NotFoundException;
 

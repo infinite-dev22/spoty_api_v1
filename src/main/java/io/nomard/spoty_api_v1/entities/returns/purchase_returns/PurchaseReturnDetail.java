@@ -14,10 +14,10 @@
 
 package io.nomard.spoty_api_v1.entities.returns.purchase_returns;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Product;
 import io.nomard.spoty_api_v1.entities.UnitOfMeasure;
 import io.nomard.spoty_api_v1.entities.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,16 +39,16 @@ public class PurchaseReturnDetail implements Serializable {
     @Column(nullable = false)
     private double cost;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "purchase_unit_id")
     private UnitOfMeasure purchaseUnit;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "purchase_return_master_id", nullable = false)
     @JsonIgnore
     private PurchaseReturnMaster purchaseReturn;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "product_id")
     private Product product;
 
@@ -69,7 +69,7 @@ public class PurchaseReturnDetail implements Serializable {
     @JsonIgnore
     private Date createdAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     @JsonIgnore
     private User createdBy;
@@ -78,7 +78,7 @@ public class PurchaseReturnDetail implements Serializable {
     @JsonIgnore
     private Date updatedAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")
     @JsonIgnore
     private User updatedBy;

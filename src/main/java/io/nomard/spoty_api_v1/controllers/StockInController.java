@@ -26,8 +26,9 @@ public class StockInController {
 
     // ADJUSTMENT MASTERS.
     @GetMapping("/masters")
-    public List<StockInMaster> getAllMasters() {
-        return stockInMasterService.getAll();
+    public List<StockInMaster> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
+                                             @RequestParam(defaultValue = "20") Integer pageSize) {
+        return stockInMasterService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/master")
@@ -62,8 +63,9 @@ public class StockInController {
 
     // ADJUSTMENT DETAILS.
     @GetMapping("/details")
-    public List<StockInDetail> getAllDetails() {
-        return stockInDetailService.getAll();
+    public List<StockInDetail> getAllDetails(@RequestParam(defaultValue = "0") Integer pageNo,
+                                             @RequestParam(defaultValue = "20") Integer pageSize) {
+        return stockInDetailService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/detail")

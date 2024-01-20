@@ -26,8 +26,9 @@ public class QuotationController {
 
     // ADJUSTMENT MASTERS.
     @GetMapping("/masters")
-    public List<QuotationMaster> getAllMasters() {
-        return quotationMasterService.getAll();
+    public List<QuotationMaster> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
+                                               @RequestParam(defaultValue = "20") Integer pageSize) {
+        return quotationMasterService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/master")
@@ -62,8 +63,9 @@ public class QuotationController {
 
     // ADJUSTMENT DETAILS.
     @GetMapping("/details")
-    public List<QuotationDetail> getAllDetails() {
-        return quotationDetailService.getAll();
+    public List<QuotationDetail> getAllDetails(@RequestParam(defaultValue = "0") Integer pageNo,
+                                               @RequestParam(defaultValue = "20") Integer pageSize) {
+        return quotationDetailService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/detail")

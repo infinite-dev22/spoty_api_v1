@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface SupplierService {
-    List<Supplier> getAll();
+    List<Supplier> getAll(int pageNo, int pageSize);
 
     Supplier getById(Long id) throws NotFoundException;
 

@@ -22,8 +22,9 @@ public class ExpenseController {
 
 
     @GetMapping("/all")
-    public List<Expense> getAll() {
-        return expenseService.getAll();
+    public List<Expense> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                @RequestParam(defaultValue = "20") Integer pageSize) {
+        return expenseService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")

@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface CurrencyService {
-    List<Currency> getAll();
+    List<Currency> getAll(int pageNo, int pageSize);
 
     Currency getById(Long id) throws NotFoundException;
 

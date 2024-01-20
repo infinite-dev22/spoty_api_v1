@@ -3,12 +3,13 @@ package io.nomard.spoty_api_v1.repositories;
 import io.nomard.spoty_api_v1.entities.Supplier;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface SupplierRepository extends JpaRepository<Supplier, Long> {
+public interface SupplierRepository extends PagingAndSortingRepository<Supplier, Long>, JpaRepository<Supplier, Long> {
     @Query("select s from Supplier s where concat(" +
             "trim(lower(s.name))," +
             "trim(lower(s.code))," +

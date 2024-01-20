@@ -20,8 +20,9 @@ public class ZenServiceController {
 
 
     @GetMapping("/all")
-    public List<ZenService> getAll() {
-        return serviceService.getAll();
+    public List<ZenService> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                   @RequestParam(defaultValue = "20") Integer pageSize) {
+        return serviceService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")

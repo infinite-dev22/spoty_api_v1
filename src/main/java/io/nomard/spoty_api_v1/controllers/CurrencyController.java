@@ -22,8 +22,9 @@ public class CurrencyController {
 
 
     @GetMapping("/all")
-    public List<Currency> getAll() {
-        return currencyService.getAll();
+    public List<Currency> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                 @RequestParam(defaultValue = "20") Integer pageSize) {
+        return currencyService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")

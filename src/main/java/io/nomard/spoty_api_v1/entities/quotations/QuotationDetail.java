@@ -14,10 +14,10 @@
 
 package io.nomard.spoty_api_v1.entities.quotations;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Product;
 import io.nomard.spoty_api_v1.entities.UnitOfMeasure;
 import io.nomard.spoty_api_v1.entities.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -41,14 +41,14 @@ public class QuotationDetail implements Serializable {
     private double price = 0;
 
     @JoinColumn(name = "sale_unit_id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private UnitOfMeasure saleUnit;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "product_id")
     private Product product;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "quotation_id", nullable = false)
     @JsonIgnore
     private QuotationMaster quotation;
@@ -72,7 +72,7 @@ public class QuotationDetail implements Serializable {
     @JsonIgnore
     private Date createdAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     @JsonIgnore
     private User createdBy;
@@ -81,7 +81,7 @@ public class QuotationDetail implements Serializable {
     @JsonIgnore
     private Date updatedAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")
     @JsonIgnore
     private User updatedBy;

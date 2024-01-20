@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface SaleTermAndConditionService {
-    List<SaleTermAndCondition> getAll();
+    List<SaleTermAndCondition> getAll(int pageNo, int pageSize);
 
     SaleTermAndCondition getById(Long id) throws NotFoundException;
 

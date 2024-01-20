@@ -26,8 +26,9 @@ public class PurchaseController {
 
     // ADJUSTMENT MASTERS.
     @GetMapping("/masters")
-    public List<PurchaseMaster> getAllMasters() {
-        return purchaseMasterService.getAll();
+    public List<PurchaseMaster> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
+                                              @RequestParam(defaultValue = "20") Integer pageSize) {
+        return purchaseMasterService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/master")
@@ -62,8 +63,9 @@ public class PurchaseController {
 
     // ADJUSTMENT DETAILS.
     @GetMapping("/details")
-    public List<PurchaseDetail> getAllDetails() {
-        return purchaseDetailService.getAll();
+    public List<PurchaseDetail> getAllDetails(@RequestParam(defaultValue = "0") Integer pageNo,
+                                              @RequestParam(defaultValue = "20") Integer pageSize) {
+        return purchaseDetailService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/detail")

@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface SalaryService {
-    List<Salary> getAll();
+    List<Salary> getAll(int pageNo, int pageSize);
 
     Salary getById(Long id) throws NotFoundException;
 

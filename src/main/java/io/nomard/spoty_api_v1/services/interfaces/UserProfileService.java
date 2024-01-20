@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface UserProfileService {
-    List<UserProfile> getAll();
+    List<UserProfile> getAll(int pageNo, int pageSize);
 
     UserProfile getById(Long id) throws NotFoundException;
 

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface AdjustmentMasterService {
-    List<AdjustmentMaster> getAll();
+    List<AdjustmentMaster> getAll(int pageNo, int pageSize);
 
     AdjustmentMaster getById(Long id) throws NotFoundException;
 

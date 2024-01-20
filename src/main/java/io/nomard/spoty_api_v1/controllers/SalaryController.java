@@ -20,8 +20,9 @@ public class SalaryController {
 
 
     @GetMapping("/all")
-    public List<Salary> getAll() {
-        return salaryService.getAll();
+    public List<Salary> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                               @RequestParam(defaultValue = "20") Integer pageSize) {
+        return salaryService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")

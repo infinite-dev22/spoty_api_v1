@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface TransferDetailService {
-    List<TransferDetail> getAll();
+    List<TransferDetail> getAll(int pageNo, int pageSize);
 
     TransferDetail getById(Long id) throws NotFoundException;
 

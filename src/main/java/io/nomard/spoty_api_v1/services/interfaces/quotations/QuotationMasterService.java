@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface QuotationMasterService {
-    List<QuotationMaster> getAll();
+    List<QuotationMaster> getAll(int pageNo, int pageSize);
 
     QuotationMaster getById(Long id) throws NotFoundException;
 

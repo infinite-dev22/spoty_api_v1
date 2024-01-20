@@ -26,8 +26,9 @@ public class RequisitionController {
 
     // ADJUSTMENT MASTERS.
     @GetMapping("/masters")
-    public List<RequisitionMaster> getAllMasters() {
-        return requisitionMasterService.getAll();
+    public List<RequisitionMaster> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
+                                                 @RequestParam(defaultValue = "20") Integer pageSize) {
+        return requisitionMasterService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/master")
@@ -62,8 +63,9 @@ public class RequisitionController {
 
     // ADJUSTMENT DETAILS.
     @GetMapping("/details")
-    public List<RequisitionDetail> getAllDetails() {
-        return requisitionDetailService.getAll();
+    public List<RequisitionDetail> getAllDetails(@RequestParam(defaultValue = "0") Integer pageNo,
+                                                 @RequestParam(defaultValue = "20") Integer pageSize) {
+        return requisitionDetailService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/detail")

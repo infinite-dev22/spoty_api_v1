@@ -8,8 +8,13 @@ import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.adjustments.AdjustmentMasterService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -23,11 +28,20 @@ public class AdjustmentMasterServiceImpl implements AdjustmentMasterService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<AdjustmentMaster> getAll() {
-        return adjustmentMasterRepo.findAll();
+    @Cacheable("adjustment_masters")
+    @Transactional(readOnly = true)
+    public List<AdjustmentMaster> getAll(int pageNo, int pageSize) {
+        //create page request object
+        PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
+        //pass it to repos
+        Page<AdjustmentMaster> page = adjustmentMasterRepo.findAll(pageRequest);
+        //page.hasContent(); -- to check pages are there or not
+        return page.getContent();
     }
 
     @Override
+    @Cacheable("adjustment_masters")
+    @Transactional(readOnly = true)
     public AdjustmentMaster getById(Long id) throws NotFoundException {
         Optional<AdjustmentMaster> adjustmentMaster = adjustmentMasterRepo.findById(id);
         if (adjustmentMaster.isEmpty()) {
@@ -37,6 +51,8 @@ public class AdjustmentMasterServiceImpl implements AdjustmentMasterService {
     }
 
     @Override
+    @Cacheable("adjustment_masters")
+    @Transactional(readOnly = true)
     public List<AdjustmentMaster> getByContains(String search) {
         return adjustmentMasterRepo.searchAllByRefContainingIgnoreCase(search.toLowerCase());
     }
@@ -54,6 +70,7 @@ public class AdjustmentMasterServiceImpl implements AdjustmentMasterService {
     }
 
     @Override
+    @CacheEvict(value = "adjustment_masters", key = "#data.id")
     public ResponseEntity<ObjectNode> update(AdjustmentMaster data) throws NotFoundException {
         var opt = adjustmentMasterRepo.findById(data.getId());
 

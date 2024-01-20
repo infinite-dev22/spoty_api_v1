@@ -20,8 +20,9 @@ public class ServiceInvoiceController {
 
 
     @GetMapping("/all")
-    public List<ServiceInvoice> getAll() {
-        return serviceInvoiceService.getAll();
+    public List<ServiceInvoice> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                       @RequestParam(defaultValue = "20") Integer pageSize) {
+        return serviceInvoiceService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")

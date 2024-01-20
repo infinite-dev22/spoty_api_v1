@@ -20,8 +20,9 @@ public class UserController {
     private UserServiceImpl userService;
 
     @GetMapping("/all")
-    public List<User> getAll() {
-        return userService.getAll();
+    public List<User> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                             @RequestParam(defaultValue = "20") Integer pageSize) {
+        return userService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")

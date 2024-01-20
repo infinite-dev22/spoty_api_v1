@@ -8,6 +8,8 @@ import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.BankService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -25,8 +27,13 @@ public class BankServiceImpl implements BankService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Bank> getAll() {
-        return bankRepo.findAll();
+    public List<Bank> getAll(int pageNo, int pageSize) {
+        //create page request object
+        PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
+        //pass it to repos
+        Page<Bank> page = bankRepo.findAll(pageRequest);
+        //page.hasContent(); -- to check pages are there or not
+        return page.getContent();
     }
 
     @Override

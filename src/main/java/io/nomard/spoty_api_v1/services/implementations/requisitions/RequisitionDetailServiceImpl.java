@@ -8,6 +8,8 @@ import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.requisitions.RequisitionDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +25,13 @@ public class RequisitionDetailServiceImpl implements RequisitionDetailService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<RequisitionDetail> getAll() {
-        return requisitionDetailRepo.findAll();
+    public List<RequisitionDetail> getAll(int pageNo, int pageSize) {
+        //create page request object
+        PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
+        //pass it to repos
+        Page<RequisitionDetail> page = requisitionDetailRepo.findAll(pageRequest);
+        //page.hasContent(); -- to check pages are there or not
+        return page.getContent();
     }
 
     @Override

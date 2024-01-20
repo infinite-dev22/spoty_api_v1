@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface UnitOfMeasureService {
-    List<UnitOfMeasure> getAll();
+    List<UnitOfMeasure> getAll(int pageNo, int pageSize);
 
     UnitOfMeasure getById(Long id) throws NotFoundException;
 

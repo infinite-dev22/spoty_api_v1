@@ -8,8 +8,13 @@ import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -26,11 +31,20 @@ public class ProductServiceImpl implements ProductService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Product> getAll() {
-        return productRepo.findAll();
+    @Cacheable("products")
+    @Transactional(readOnly = true)
+    public List<Product> getAll(int pageNo, int pageSize) {
+        //create page request object
+        PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
+        //pass it to repos
+        Page<Product> page = productRepo.findAll(pageRequest);
+        //page.hasContent(); -- to check pages are there or not
+        return page.getContent();
     }
 
     @Override
+    @Cacheable("products")
+    @Transactional(readOnly = true)
     public Product getById(Long id) throws NotFoundException {
         Optional<Product> product = productRepo.findById(id);
         if (product.isEmpty()) {
@@ -40,11 +54,15 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable("products")
+    @Transactional(readOnly = true)
     public List<Product> getByContains(String search) {
         return productRepo.searchAll(search.toLowerCase());
     }
 
     @Override
+    @Cacheable("products")
+    @Transactional(readOnly = true)
     public List<Product> getWarning() {
         return productRepo.findAllByQuantityIsLessThanEqualStockAlert();
     }
@@ -62,6 +80,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @CacheEvict(value = "products", key = "#data.id")
     public ResponseEntity<ObjectNode> update(Product data) throws NotFoundException {
         var opt = productRepo.findById(data.getId());
 
@@ -146,6 +165,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @CacheEvict(value = "products", key = "#id")
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             productRepo.deleteById(id);

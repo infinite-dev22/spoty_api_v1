@@ -14,9 +14,9 @@
 
 package io.nomard.spoty_api_v1.entities.adjustments;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Cascade;
@@ -35,16 +35,16 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class AdjustmentMaster implements Serializable {
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Date date;
     private String ref;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Branch branch;
 
-    @OneToMany(mappedBy = "adjustment", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "adjustment", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
     @Builder.Default
     private List<AdjustmentDetail> adjustmentDetails = new LinkedList<>();
@@ -55,7 +55,7 @@ public class AdjustmentMaster implements Serializable {
     @JsonIgnore
     private Date createdAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     @JsonIgnore
     private User createdBy;
@@ -64,7 +64,7 @@ public class AdjustmentMaster implements Serializable {
     @JsonIgnore
     private Date updatedAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")
     @JsonIgnore
     private User updatedBy;

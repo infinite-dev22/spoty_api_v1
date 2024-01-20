@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface ZenServiceService {
-    List<ZenService> getAll();
+    List<ZenService> getAll(int pageNo, int pageSize);
 
     ZenService getById(Long id) throws NotFoundException;
 

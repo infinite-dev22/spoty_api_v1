@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface ProductService {
-    List<Product> getAll();
+    List<Product> getAll(int pageNo, int pageSize);
 
     Product getById(Long id) throws NotFoundException;
 

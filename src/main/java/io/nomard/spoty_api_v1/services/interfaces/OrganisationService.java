@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface OrganisationService {
-    List<Organisation> getAll();
+    List<Organisation> getAll(int pageNo, int pageSize);
 
     Organisation getById(Long id) throws NotFoundException;
 

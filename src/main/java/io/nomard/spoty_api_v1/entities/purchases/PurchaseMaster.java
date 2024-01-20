@@ -14,11 +14,10 @@
 
 package io.nomard.spoty_api_v1.entities.purchases;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Supplier;
 import io.nomard.spoty_api_v1.entities.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Cascade;
@@ -44,10 +43,10 @@ public class PurchaseMaster implements Serializable {
     @Column(nullable = false)
     private Date date;
     @JoinColumn(nullable = false, name = "supplier_id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Supplier supplier;
     @JoinColumn(nullable = false, name = "branch_id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Branch branch;
 
     @OneToMany(mappedBy = "purchase", fetch = FetchType.LAZY)
@@ -69,7 +68,7 @@ public class PurchaseMaster implements Serializable {
     @JsonIgnore
     private Date createdAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     @JsonIgnore
     private User createdBy;
@@ -78,7 +77,7 @@ public class PurchaseMaster implements Serializable {
     @JsonIgnore
     private Date updatedAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")
     @JsonIgnore
     private User updatedBy;

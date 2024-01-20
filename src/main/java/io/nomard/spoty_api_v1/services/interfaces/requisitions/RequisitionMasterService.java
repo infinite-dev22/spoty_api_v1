@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface RequisitionMasterService {
-    List<RequisitionMaster> getAll();
+    List<RequisitionMaster> getAll(int pageNo, int pageSize);
 
     RequisitionMaster getById(Long id) throws NotFoundException;
 

@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface ExpenseService {
-    List<Expense> getAll();
+    List<Expense> getAll(int pageNo, int pageSize);
 
     Expense getById(Long id) throws NotFoundException;
 

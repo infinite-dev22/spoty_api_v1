@@ -20,8 +20,9 @@ public class BankController {
 
 
     @GetMapping("/all")
-    public List<Bank> getAll() {
-        return bankService.getAll();
+    public List<Bank> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                             @RequestParam(defaultValue = "20") Integer pageSize) {
+        return bankService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")

@@ -20,8 +20,9 @@ public class DesignationController {
 
 
     @GetMapping("/all")
-    public List<Designation> getAll() {
-        return designationService.getAll();
+    public List<Designation> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                    @RequestParam(defaultValue = "20") Integer pageSize) {
+        return designationService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")

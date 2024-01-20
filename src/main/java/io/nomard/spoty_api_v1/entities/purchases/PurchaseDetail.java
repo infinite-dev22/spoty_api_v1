@@ -14,10 +14,9 @@
 
 package io.nomard.spoty_api_v1.entities.purchases;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Product;
 import io.nomard.spoty_api_v1.entities.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -40,8 +39,8 @@ public class PurchaseDetail implements Serializable {
 
     private double cost;
 
-    @ManyToOne
-    @JoinColumn(name = "purchaseMaster_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "purchaseMaster_id", nullable = false)  // TODO: Change column name.
     @JsonIgnore
     private PurchaseMaster purchase;
 
@@ -50,7 +49,7 @@ public class PurchaseDetail implements Serializable {
     private double discount;
     private String discountType;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Product product;
 
     private String serialNumber;
@@ -61,7 +60,7 @@ public class PurchaseDetail implements Serializable {
     @JsonIgnore
     private Date createdAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     @JsonIgnore
     private User createdBy;
@@ -70,7 +69,7 @@ public class PurchaseDetail implements Serializable {
     @JsonIgnore
     private Date updatedAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")
     @JsonIgnore
     private User updatedBy;

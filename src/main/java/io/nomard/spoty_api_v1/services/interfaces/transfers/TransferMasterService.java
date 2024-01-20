@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface TransferMasterService {
-    List<TransferMaster> getAll();
+    List<TransferMaster> getAll(int pageNo, int pageSize);
 
     TransferMaster getById(Long id) throws NotFoundException;
 
