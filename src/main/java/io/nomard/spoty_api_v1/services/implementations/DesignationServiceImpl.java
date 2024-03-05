@@ -1,9 +1,9 @@
 package io.nomard.spoty_api_v1.services.implementations;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Designation;
+import io.nomard.spoty_api_v1.entities.hrm.hrm.Designation;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
-import io.nomard.spoty_api_v1.repositories.DesignationRepository;
+import io.nomard.spoty_api_v1.repositories.hrm.hrm.DesignationRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.DesignationService;

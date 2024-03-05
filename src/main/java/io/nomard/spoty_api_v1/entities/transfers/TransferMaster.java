@@ -24,7 +24,7 @@ import org.hibernate.annotations.CascadeType;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "transfer_masters")
@@ -55,7 +55,7 @@ public class TransferMaster implements Serializable {
 
     @OneToMany(mappedBy = "transfer", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
-    private List<TransferDetail> transferDetails;
+    private Set<TransferDetail> transferDetails;
 
     private String shipping;
 

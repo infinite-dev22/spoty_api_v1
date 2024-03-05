@@ -19,7 +19,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "roles")
@@ -44,14 +44,14 @@ public class Role {
     private String description;
 
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
-    private List<User> users;
+    private Set<User> users;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "Role_Permission",
             joinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false)},
             inverseJoinColumns = {@JoinColumn(name = "Permission_id", referencedColumnName = "id")})
-    private List<Permission> permissions;
+    private Set<Permission> permissions;
 
     @Column(name = "created_at")
     @JsonIgnore

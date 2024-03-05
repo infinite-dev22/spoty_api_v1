@@ -13,7 +13,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class AdjustmentDetailServiceImpl implements AdjustmentDetailService {
@@ -56,7 +59,7 @@ public class AdjustmentDetailServiceImpl implements AdjustmentDetailService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> saveMultiple(ArrayList<AdjustmentDetail> adjustmentDetailList) {
+    public ResponseEntity<ObjectNode> saveMultiple(List<AdjustmentDetail> adjustmentDetailList) {
         return null;
     }
 
@@ -107,7 +110,7 @@ public class AdjustmentDetailServiceImpl implements AdjustmentDetailService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) throws NotFoundException {
+    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException {
         try {
             adjustmentDetailRepo.deleteAllById(idList);
             return spotyResponseImpl.ok();

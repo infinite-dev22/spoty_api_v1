@@ -24,8 +24,7 @@ import org.hibernate.annotations.CascadeType;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "adjustment_masters")
@@ -46,8 +45,7 @@ public class AdjustmentMaster implements Serializable {
 
     @OneToMany(mappedBy = "adjustment", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
-    @Builder.Default
-    private List<AdjustmentDetail> adjustmentDetails = new LinkedList<>();
+    private Set<AdjustmentDetail> adjustmentDetails;
 
     private String notes;
 

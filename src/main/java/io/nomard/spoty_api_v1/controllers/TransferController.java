@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -57,7 +56,7 @@ public class TransferController {
     }
 
     @DeleteMapping("/masters/delete")
-    public ResponseEntity<ObjectNode> deleteMasters(@RequestBody ArrayList<Long> idList) {
+    public ResponseEntity<ObjectNode> deleteMasters(@RequestBody List<Long> idList) {
         return transferMasterService.deleteMultiple(idList);
     }
 
@@ -94,7 +93,7 @@ public class TransferController {
     }
 
     @DeleteMapping("/details/delete")
-    public ResponseEntity<ObjectNode> deleteDetails(@RequestBody ArrayList<Long> idList) throws NotFoundException {
+    public ResponseEntity<ObjectNode> deleteDetails(@RequestBody List<Long> idList) throws NotFoundException {
         return transferDetailService.deleteMultiple(idList);
     }
 }

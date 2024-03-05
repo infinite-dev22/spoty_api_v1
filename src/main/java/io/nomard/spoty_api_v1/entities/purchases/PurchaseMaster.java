@@ -25,7 +25,7 @@ import org.hibernate.annotations.CascadeType;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "purchase_masters")
@@ -51,7 +51,7 @@ public class PurchaseMaster implements Serializable {
 
     @OneToMany(mappedBy = "purchase", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
-    private List<PurchaseDetail> purchaseDetails;
+    private Set<PurchaseDetail> purchaseDetails;
 
     private double taxRate;
     private double netTax;

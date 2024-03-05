@@ -25,8 +25,7 @@ import org.hibernate.annotations.CascadeType;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "requisition_masters")
@@ -58,8 +57,7 @@ public class RequisitionMaster implements Serializable {
 
     @OneToMany(mappedBy = "requisition", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
-    @Builder.Default
-    private List<RequisitionDetail> requisitionDetails = new LinkedList<>();
+    private Set<RequisitionDetail> requisitionDetails;
 
     private String shipVia;
     private String shipMethod;

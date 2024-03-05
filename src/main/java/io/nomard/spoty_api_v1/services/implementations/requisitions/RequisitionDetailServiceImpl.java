@@ -13,7 +13,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class RequisitionDetailServiceImpl implements RequisitionDetailService {
@@ -56,7 +59,7 @@ public class RequisitionDetailServiceImpl implements RequisitionDetailService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> saveMultiple(ArrayList<RequisitionDetail> requisitionDetailList) {
+    public ResponseEntity<ObjectNode> saveMultiple(List<RequisitionDetail> requisitionDetailList) {
         return null;
     }
 
@@ -123,7 +126,7 @@ public class RequisitionDetailServiceImpl implements RequisitionDetailService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) throws NotFoundException {
+    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException {
         try {
             requisitionDetailRepo.deleteAllById(idList);
             return spotyResponseImpl.ok();
