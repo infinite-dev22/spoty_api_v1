@@ -21,7 +21,7 @@ public class PaySlipTypeController {
 
     @GetMapping("/all")
     public List<PaySlipType> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                             @RequestParam(defaultValue = "20") Integer pageSize) {
+                             @RequestParam(defaultValue = "50") Integer pageSize) {
         return paySlipTypeService.getAll(pageNo, pageSize);
     }
 

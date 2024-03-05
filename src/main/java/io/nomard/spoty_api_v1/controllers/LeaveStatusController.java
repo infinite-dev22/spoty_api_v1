@@ -21,7 +21,7 @@ public class LeaveStatusController {
 
     @GetMapping("/all")
     public List<LeaveStatus> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                    @RequestParam(defaultValue = "20") Integer pageSize) {
+                                    @RequestParam(defaultValue = "50") Integer pageSize) {
         return leaveStatusService.getAll(pageNo, pageSize);
     }
 

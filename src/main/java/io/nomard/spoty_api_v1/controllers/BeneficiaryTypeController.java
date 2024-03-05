@@ -21,7 +21,7 @@ public class BeneficiaryTypeController {
 
     @GetMapping("/all")
     public List<BeneficiaryType> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                             @RequestParam(defaultValue = "20") Integer pageSize) {
+                             @RequestParam(defaultValue = "50") Integer pageSize) {
         return beneficiaryTypeService.getAll(pageNo, pageSize);
     }
 

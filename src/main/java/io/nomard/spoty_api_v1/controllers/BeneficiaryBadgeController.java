@@ -21,7 +21,7 @@ public class BeneficiaryBadgeController {
 
     @GetMapping("/all")
     public List<BeneficiaryBadge> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                             @RequestParam(defaultValue = "20") Integer pageSize) {
+                             @RequestParam(defaultValue = "50") Integer pageSize) {
         return beneficiaryBadgeService.getAll(pageNo, pageSize);
     }
 

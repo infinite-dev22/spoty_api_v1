@@ -23,7 +23,7 @@ public class CustomerController {
 
     @GetMapping("/all")
     public List<Customer> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                 @RequestParam(defaultValue = "20") Integer pageSize) {
+                                 @RequestParam(defaultValue = "50") Integer pageSize) {
         return customerService.getAll(pageNo, pageSize);
     }
 

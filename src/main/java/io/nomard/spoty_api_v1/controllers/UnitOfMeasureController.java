@@ -22,7 +22,7 @@ public class UnitOfMeasureController {
 
     @GetMapping("/all")
     public List<UnitOfMeasure> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                      @RequestParam(defaultValue = "20") Integer pageSize) {
+                                      @RequestParam(defaultValue = "50") Integer pageSize) {
         return unit_of_measureService.getAll(pageNo, pageSize);
     }
 

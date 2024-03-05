@@ -26,7 +26,7 @@ public class AdjustmentController {
     // ADJUSTMENT MASTERS.
     @GetMapping("/masters")
     public List<AdjustmentMaster> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
-                                                @RequestParam(defaultValue = "20") Integer pageSize) {
+                                                @RequestParam(defaultValue = "50") Integer pageSize) {
         return adjustmentMasterService.getAll(pageNo, pageSize);
     }
 
@@ -63,7 +63,7 @@ public class AdjustmentController {
     // ADJUSTMENT DETAILS.
     @GetMapping("/details")
     public List<AdjustmentDetail> getAllDetails(@RequestParam(defaultValue = "0") Integer pageNo,
-                                                @RequestParam(defaultValue = "20") Integer pageSize) {
+                                                @RequestParam(defaultValue = "50") Integer pageSize) {
         return adjustmentDetailService.getAll(pageNo, pageSize);
     }
 

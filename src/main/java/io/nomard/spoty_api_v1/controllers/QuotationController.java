@@ -26,7 +26,7 @@ public class QuotationController {
     // ADJUSTMENT MASTERS.
     @GetMapping("/masters")
     public List<QuotationMaster> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
-                                               @RequestParam(defaultValue = "20") Integer pageSize) {
+                                               @RequestParam(defaultValue = "50") Integer pageSize) {
         return quotationMasterService.getAll(pageNo, pageSize);
     }
 
@@ -63,7 +63,7 @@ public class QuotationController {
     // ADJUSTMENT DETAILS.
     @GetMapping("/details")
     public List<QuotationDetail> getAllDetails(@RequestParam(defaultValue = "0") Integer pageNo,
-                                               @RequestParam(defaultValue = "20") Integer pageSize) {
+                                               @RequestParam(defaultValue = "50") Integer pageSize) {
         return quotationDetailService.getAll(pageNo, pageSize);
     }
 

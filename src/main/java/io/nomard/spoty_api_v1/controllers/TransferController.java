@@ -26,7 +26,7 @@ public class TransferController {
     // ADJUSTMENT MASTERS.
     @GetMapping("/masters")
     public List<TransferMaster> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
-                                              @RequestParam(defaultValue = "20") Integer pageSize) {
+                                              @RequestParam(defaultValue = "50") Integer pageSize) {
         return transferMasterService.getAll(pageNo, pageSize);
     }
 
@@ -63,7 +63,7 @@ public class TransferController {
     // ADJUSTMENT DETAILS.
     @GetMapping("/details")
     public List<TransferDetail> getAllDetails(@RequestParam(defaultValue = "0") Integer pageNo,
-                                              @RequestParam(defaultValue = "20") Integer pageSize) {
+                                              @RequestParam(defaultValue = "50") Integer pageSize) {
         return transferDetailService.getAll(pageNo, pageSize);
     }
 

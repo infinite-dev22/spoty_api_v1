@@ -21,7 +21,7 @@ public class EmploymentStatusController {
 
     @GetMapping("/all")
     public List<EmploymentStatus> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                         @RequestParam(defaultValue = "20") Integer pageSize) {
+                                         @RequestParam(defaultValue = "50") Integer pageSize) {
         return designationService.getAll(pageNo, pageSize);
     }
 
