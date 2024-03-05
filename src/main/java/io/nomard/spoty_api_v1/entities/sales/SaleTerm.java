@@ -21,7 +21,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "sale_terms")
@@ -44,7 +44,7 @@ public class SaleTerm {
             joinColumns = {@JoinColumn(name = "sale_term_id")},
             inverseJoinColumns = {@JoinColumn(name = "branch_id")}
     )
-    private List<Branch> branches;
+    private Set<Branch> branches;
 
     @Column(nullable = false)
     private String description;

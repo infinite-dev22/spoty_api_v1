@@ -1,32 +1,31 @@
-package io.nomard.spoty_api_v1.entities;
+package io.nomard.spoty_api_v1.entities.hrm.hrm;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.nomard.spoty_api_v1.entities.Branch;
+import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
 
 @Entity
-@Table(name = "salaries")
+@Table(name = "designations")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Salary {
+public class Designation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Branch branch;
-    @Column(name = "salary_month")
-    private String salaryMonth;
 
-    @Column(name = "employee_name")
-    private String employeeName;
+    private String name;
 
-    private Double salary;
+    private String description;
 
     @Column(name = "created_at")
     @JsonIgnore

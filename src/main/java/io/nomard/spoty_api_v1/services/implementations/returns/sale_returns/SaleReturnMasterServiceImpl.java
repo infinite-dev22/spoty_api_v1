@@ -13,7 +13,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class SaleReturnMasterServiceImpl implements SaleReturnMasterService {
@@ -153,7 +156,7 @@ public class SaleReturnMasterServiceImpl implements SaleReturnMasterService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) {
+    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) {
         try {
             saleReturnMasterRepo.deleteAllById(idList);
             return spotyResponseImpl.ok();

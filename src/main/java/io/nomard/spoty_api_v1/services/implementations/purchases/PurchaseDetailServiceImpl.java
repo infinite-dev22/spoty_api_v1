@@ -13,7 +13,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class PurchaseDetailServiceImpl implements PurchaseDetailService {
@@ -56,7 +59,7 @@ public class PurchaseDetailServiceImpl implements PurchaseDetailService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> saveMultiple(ArrayList<PurchaseDetail> purchaseDetailList) {
+    public ResponseEntity<ObjectNode> saveMultiple(List<PurchaseDetail> purchaseDetailSet) {
         return null;
     }
 
@@ -127,9 +130,9 @@ public class PurchaseDetailServiceImpl implements PurchaseDetailService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) throws NotFoundException {
+    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idSet) throws NotFoundException {
         try {
-            purchaseDetailRepo.deleteAllById(idList);
+            purchaseDetailRepo.deleteAllById(idSet);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

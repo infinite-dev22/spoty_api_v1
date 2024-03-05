@@ -1,10 +1,12 @@
 package io.nomard.spoty_api_v1.principals;
 
+import io.nomard.spoty_api_v1.entities.Role;
 import io.nomard.spoty_api_v1.entities.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Set;
 
 public class SpotyUserPrincipal implements UserDetails {
     private final User user;
@@ -21,6 +23,10 @@ public class SpotyUserPrincipal implements UserDetails {
     @Override
     public String getPassword() {
         return user.getPassword();
+    }
+
+    public Set<Role> getRoles() {
+        return user.getRoles();
     }
 
     @Override

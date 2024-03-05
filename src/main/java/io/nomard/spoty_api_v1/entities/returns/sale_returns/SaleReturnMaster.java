@@ -25,7 +25,7 @@ import org.hibernate.annotations.CascadeType;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "sale_return_masters")
@@ -57,7 +57,7 @@ public class SaleReturnMaster implements Serializable {
 
     @OneToMany(mappedBy = "saleReturn", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
-    private List<SaleReturnDetail> saleReturnDetails;
+    private Set<SaleReturnDetail> saleReturnDetails;
 
     private double taxRate;
     private double netTax;

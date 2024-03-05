@@ -22,7 +22,7 @@ public class BrandController {
 
     @GetMapping("/all")
     public List<Brand> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                              @RequestParam(defaultValue = "20") Integer pageSize) {
+                              @RequestParam(defaultValue = "50") Integer pageSize) {
         return brandService.getAll(pageNo, pageSize);
     }
 

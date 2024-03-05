@@ -19,7 +19,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "permissions")
@@ -43,7 +43,7 @@ public class Permission {
     private String description;
 
     @ManyToMany(mappedBy = "permissions")
-    private List<Role> roles;
+    private Set<Role> roles;
 
     @Column(name = "created_at")
     @JsonIgnore

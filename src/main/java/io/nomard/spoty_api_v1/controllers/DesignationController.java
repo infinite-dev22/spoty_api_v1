@@ -1,10 +1,10 @@
 package io.nomard.spoty_api_v1.controllers;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Designation;
+import io.nomard.spoty_api_v1.entities.hrm.hrm.Designation;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
-import io.nomard.spoty_api_v1.services.implementations.DesignationServiceImpl;
+import io.nomard.spoty_api_v1.services.implementations.hrm.hrm.DesignationServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,7 @@ public class DesignationController {
 
     @GetMapping("/all")
     public List<Designation> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                    @RequestParam(defaultValue = "20") Integer pageSize) {
+                                    @RequestParam(defaultValue = "50") Integer pageSize) {
         return designationService.getAll(pageNo, pageSize);
     }
 

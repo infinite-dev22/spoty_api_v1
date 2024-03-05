@@ -5,7 +5,6 @@ import io.nomard.spoty_api_v1.entities.quotations.QuotationDetail;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface QuotationDetailService {
@@ -15,11 +14,11 @@ public interface QuotationDetailService {
 
     ResponseEntity<ObjectNode> save(QuotationDetail quotationDetail);
 
-    ResponseEntity<ObjectNode> saveMultiple(ArrayList<QuotationDetail> quotationDetailList);
+    ResponseEntity<ObjectNode> saveMultiple(List<QuotationDetail> quotationDetailList);
 
     ResponseEntity<ObjectNode> update(QuotationDetail quotationDetail) throws NotFoundException;
 
     ResponseEntity<ObjectNode> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) throws NotFoundException;
+    ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException;
 }

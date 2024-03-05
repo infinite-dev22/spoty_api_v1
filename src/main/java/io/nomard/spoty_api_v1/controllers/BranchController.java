@@ -23,7 +23,7 @@ public class BranchController {
 
     @GetMapping("/all")
     public List<Branch> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                               @RequestParam(defaultValue = "20") Integer pageSize) {
+                               @RequestParam(defaultValue = "50") Integer pageSize) {
         return branchService.getAll(pageNo, pageSize);
     }
 

@@ -19,8 +19,7 @@ import io.nomard.spoty_api_v1.entities.Role;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -34,8 +33,7 @@ public class UserModel implements Serializable {
     private String otherName;
     private String email;
     private String phone;
-    @Builder.Default
-    private List<Role> roles = new ArrayList<>();
+    private Set<Role> roles;
     private Branch branch;
     @Builder.Default
     private boolean active = true;

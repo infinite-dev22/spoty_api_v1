@@ -5,7 +5,6 @@ import io.nomard.spoty_api_v1.entities.adjustments.AdjustmentDetail;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface AdjustmentDetailService {
@@ -15,11 +14,11 @@ public interface AdjustmentDetailService {
 
     ResponseEntity<ObjectNode> save(AdjustmentDetail adjustmentDetail);
 
-    ResponseEntity<ObjectNode> saveMultiple(ArrayList<AdjustmentDetail> adjustmentDetailList);
+    ResponseEntity<ObjectNode> saveMultiple(List<AdjustmentDetail> adjustmentDetailList);
 
     ResponseEntity<ObjectNode> update(AdjustmentDetail adjustmentDetail) throws NotFoundException;
 
     ResponseEntity<ObjectNode> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) throws NotFoundException;
+    ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException;
 }

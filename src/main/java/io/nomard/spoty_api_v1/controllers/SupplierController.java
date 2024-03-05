@@ -23,7 +23,7 @@ public class SupplierController {
 
     @GetMapping("/all")
     public List<Supplier> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                 @RequestParam(defaultValue = "20") Integer pageSize) {
+                                 @RequestParam(defaultValue = "50") Integer pageSize) {
         return supplierService.getAll(pageNo, pageSize);
     }
 

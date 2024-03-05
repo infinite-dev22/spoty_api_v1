@@ -21,7 +21,7 @@ public class ZenServiceController {
 
     @GetMapping("/all")
     public List<ZenService> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                   @RequestParam(defaultValue = "20") Integer pageSize) {
+                                   @RequestParam(defaultValue = "50") Integer pageSize) {
         return serviceService.getAll(pageNo, pageSize);
     }
 

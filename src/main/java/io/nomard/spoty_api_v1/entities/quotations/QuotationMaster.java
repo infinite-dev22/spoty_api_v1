@@ -25,8 +25,7 @@ import org.hibernate.annotations.CascadeType;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "quotation_masters")
@@ -59,8 +58,7 @@ public class QuotationMaster implements Serializable {
 
     @OneToMany(mappedBy = "quotation", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
-    @Builder.Default
-    private List<QuotationDetail> quotationDetails = new LinkedList<>();
+    private Set<QuotationDetail> quotationDetails;
 
     @Column(nullable = false)
     @Builder.Default

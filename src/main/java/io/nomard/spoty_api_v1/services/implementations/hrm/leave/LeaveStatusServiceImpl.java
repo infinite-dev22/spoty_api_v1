@@ -1,12 +1,12 @@
-package io.nomard.spoty_api_v1.services.implementations;
+package io.nomard.spoty_api_v1.services.implementations.hrm.leave;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Salary;
+import io.nomard.spoty_api_v1.entities.hrm.leave.LeaveStatus;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
-import io.nomard.spoty_api_v1.repositories.SalaryRepository;
+import io.nomard.spoty_api_v1.repositories.hrm.leave.LeaveStatusRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
-import io.nomard.spoty_api_v1.services.interfaces.SalaryService;
+import io.nomard.spoty_api_v1.services.interfaces.hrm.leave.LeaveStatusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,39 +18,39 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class SalaryServiceImpl implements SalaryService {
+public class LeaveStatusServiceImpl implements LeaveStatusService {
     @Autowired
-    private SalaryRepository salaryRepo;
+    private LeaveStatusRepository leaveStatusRepo;
     @Autowired
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Salary> getAll(int pageNo, int pageSize) {
+    public List<LeaveStatus> getAll(int pageNo, int pageSize) {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<Salary> page = salaryRepo.findAll(pageRequest);
+        Page<LeaveStatus> page = leaveStatusRepo.findAll(pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
 
     @Override
-    public Salary getById(Long id) throws NotFoundException {
-        Optional<Salary> salary = salaryRepo.findById(id);
-        if (salary.isEmpty()) {
+    public LeaveStatus getById(Long id) throws NotFoundException {
+        Optional<LeaveStatus> leaveStatus = leaveStatusRepo.findById(id);
+        if (leaveStatus.isEmpty()) {
             throw new NotFoundException();
         }
-        return salary.get();
+        return leaveStatus.get();
     }
 
     @Override
-    public ResponseEntity<ObjectNode> save(Salary salary) {
+    public ResponseEntity<ObjectNode> save(LeaveStatus leaveStatus) {
         try {
-            salary.setCreatedBy(authService.authUser());
-            salary.setCreatedAt(new Date());
-            salaryRepo.saveAndFlush(salary);
+            leaveStatus.setCreatedBy(authService.authUser());
+            leaveStatus.setCreatedAt(new Date());
+            leaveStatusRepo.saveAndFlush(leaveStatus);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -58,51 +58,51 @@ public class SalaryServiceImpl implements SalaryService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> update(Salary data) throws NotFoundException {
-        var opt = salaryRepo.findById(data.getId());
+    public ResponseEntity<ObjectNode> update(LeaveStatus data) throws NotFoundException {
+        var opt = leaveStatusRepo.findById(data.getId());
 
         if (opt.isEmpty()) {
             throw new NotFoundException();
         }
-        var salary = opt.get();
+        var leaveStatus = opt.get();
 
 //        if (Objects.nonNull(data.getProduct())) {
-//            salary.setProduct(data.getProduct());
+//            leaveStatus.setProduct(data.getProduct());
 //        }
 
-//        if (!Objects.equals(data.getNetTax(), salary.getNetTax())) {
-//            salary.setNetTax(data.getNetTax());
+//        if (!Objects.equals(data.getNetTax(), leaveStatus.getNetTax())) {
+//            leaveStatus.setNetTax(data.getNetTax());
 //        }
 //
 //        if (Objects.nonNull(data.getTaxType()) && !"".equalsIgnoreCase(data.getTaxType())) {
-//            salary.setTaxType(data.getTaxType());
+//            leaveStatus.setTaxType(data.getTaxType());
 //        }
 //
-//        if (!Objects.equals(data.getDiscount(), salary.getDiscount())) {
-//            salary.setDiscount(data.getDiscount());
+//        if (!Objects.equals(data.getDiscount(), leaveStatus.getDiscount())) {
+//            leaveStatus.setDiscount(data.getDiscount());
 //        }
 //
 //        if (Objects.nonNull(data.getDiscountType()) && !"".equalsIgnoreCase(data.getDiscountType())) {
-//            salary.setDiscountType(data.getDiscountType());
+//            leaveStatus.setDiscountType(data.getDiscountType());
 //        }
 //
 //        if (Objects.nonNull(data.getSerialNumber()) && !"".equalsIgnoreCase(data.getSerialNumber())) {
-//            salary.setSerialNumber(data.getSerialNumber());
+//            leaveStatus.setSerialNumber(data.getSerialNumber());
 //        }
 //
-//        if (!Objects.equals(data.getTotal(), salary.getTotal())) {
-//            salary.setTotal(data.getTotal());
+//        if (!Objects.equals(data.getTotal(), leaveStatus.getTotal())) {
+//            leaveStatus.setTotal(data.getTotal());
 //        }
 
-//        if (!Objects.equals(data.getQuantity(), salary.getQuantity())) {
-//            salary.setQuantity(data.getQuantity());
+//        if (!Objects.equals(data.getQuantity(), leaveStatus.getQuantity())) {
+//            leaveStatus.setQuantity(data.getQuantity());
 //        }
 
-        salary.setUpdatedBy(authService.authUser());
-        salary.setUpdatedAt(new Date());
+        leaveStatus.setUpdatedBy(authService.authUser());
+        leaveStatus.setUpdatedAt(new Date());
 
         try {
-            salaryRepo.saveAndFlush(salary);
+            leaveStatusRepo.saveAndFlush(leaveStatus);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -112,7 +112,7 @@ public class SalaryServiceImpl implements SalaryService {
     @Override
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
-            salaryRepo.deleteById(id);
+            leaveStatusRepo.deleteById(id);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

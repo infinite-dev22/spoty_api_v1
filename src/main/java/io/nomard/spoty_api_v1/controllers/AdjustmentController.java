@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -27,7 +26,7 @@ public class AdjustmentController {
     // ADJUSTMENT MASTERS.
     @GetMapping("/masters")
     public List<AdjustmentMaster> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
-                                                @RequestParam(defaultValue = "20") Integer pageSize) {
+                                                @RequestParam(defaultValue = "50") Integer pageSize) {
         return adjustmentMasterService.getAll(pageNo, pageSize);
     }
 
@@ -57,14 +56,14 @@ public class AdjustmentController {
     }
 
     @DeleteMapping("/masters/delete")
-    public ResponseEntity<ObjectNode> deleteMasters(@RequestBody ArrayList<Long> idList) {
+    public ResponseEntity<ObjectNode> deleteMasters(@RequestBody List<Long> idList) {
         return adjustmentMasterService.deleteMultiple(idList);
     }
 
     // ADJUSTMENT DETAILS.
     @GetMapping("/details")
     public List<AdjustmentDetail> getAllDetails(@RequestParam(defaultValue = "0") Integer pageNo,
-                                                @RequestParam(defaultValue = "20") Integer pageSize) {
+                                                @RequestParam(defaultValue = "50") Integer pageSize) {
         return adjustmentDetailService.getAll(pageNo, pageSize);
     }
 
@@ -94,7 +93,7 @@ public class AdjustmentController {
     }
 
     @DeleteMapping("/details/delete")
-    public ResponseEntity<ObjectNode> deleteDetails(@RequestBody ArrayList<Long> idList) throws NotFoundException {
+    public ResponseEntity<ObjectNode> deleteDetails(@RequestBody List<Long> idList) throws NotFoundException {
         return adjustmentDetailService.deleteMultiple(idList);
     }
 }

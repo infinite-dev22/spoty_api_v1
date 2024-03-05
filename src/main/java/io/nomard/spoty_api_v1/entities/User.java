@@ -20,9 +20,8 @@ import lombok.*;
 import org.hibernate.annotations.Cascade;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -50,9 +49,8 @@ public class User implements Serializable {
             name = "users_roles",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
-    @Builder.Default
     @JsonIgnore
-    private List<Role> roles = new ArrayList<>();
+    private Set<Role> roles;
 
     @ManyToOne(targetEntity = Branch.class)
     @Cascade(org.hibernate.annotations.CascadeType.ALL)

@@ -22,7 +22,7 @@ public class OrganisationController {
 
     @GetMapping("/all")
     public List<Organisation> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                     @RequestParam(defaultValue = "20") Integer pageSize) {
+                                     @RequestParam(defaultValue = "50") Integer pageSize) {
         return organisationService.getAll(pageNo, pageSize);
     }
 

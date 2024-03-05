@@ -4,6 +4,9 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.JWTVerifier;
+import io.nomard.spoty_api_v1.entities.User;
+import io.nomard.spoty_api_v1.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +18,8 @@ import java.time.Instant;
 
 @Service
 public class SpotyTokenService {
+    @Autowired
+    private UserRepository userRepo;
 
     private static final Duration JWT_TOKEN_VALIDITY = Duration.ofHours(15);
 
@@ -27,10 +32,12 @@ public class SpotyTokenService {
     }
 
     public String generateToken(final UserDetails userDetails) {
+        var user = userRepo.findUserByEmail(userDetails.getUsername());
         final Instant now = Instant.now();
         return JWT.create()
                 .withSubject(userDetails.getUsername())
-                .withIssuer("app")
+                .withIssuer("SpotyApi")
+                .withClaim("roles", user.getRoles().toString())
                 .withIssuedAt(now)
                 .withExpiresAt(now.plusMillis(JWT_TOKEN_VALIDITY.toMillis()))
                 .sign(this.hmac512);
@@ -38,7 +45,18 @@ public class SpotyTokenService {
 
     public String validateTokenAndGetUsername(final String token) {
         try {
-            return verifier.verify(token).getSubject();
+            var verifiedToken = verifier.verify(token);
+            var subject = verifiedToken.getSubject();
+            var roles = verifiedToken.getClaim("roles");
+            System.out.print("ROLES: " + roles);
+//            roles = roles.replace("[", "").replace("]", "");
+//            String[] roleNames = roles.split(",");
+//
+//            for (String aRoleName : roleNames) {
+//                userDetails.addRole(new Role(aRoleName));
+//            }
+
+            return subject;
         } catch (final JWTVerificationException verificationEx) {
             throw new ResponseStatusException(
                     HttpStatus.UNAUTHORIZED, "{" +

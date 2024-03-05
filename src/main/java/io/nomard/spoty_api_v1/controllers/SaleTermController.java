@@ -22,7 +22,7 @@ public class SaleTermController {
 
     @GetMapping("/all")
     public List<SaleTerm> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                 @RequestParam(defaultValue = "20") Integer pageSize) {
+                                 @RequestParam(defaultValue = "50") Integer pageSize) {
         return saleTermService.getAll(pageNo, pageSize);
     }
 

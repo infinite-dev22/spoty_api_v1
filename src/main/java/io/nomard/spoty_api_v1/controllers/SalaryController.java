@@ -1,10 +1,10 @@
 package io.nomard.spoty_api_v1.controllers;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Salary;
+import io.nomard.spoty_api_v1.entities.hrm.pay_roll.Salary;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
-import io.nomard.spoty_api_v1.services.implementations.SalaryServiceImpl;
+import io.nomard.spoty_api_v1.services.implementations.hrm.pay_roll.SalaryServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,7 @@ public class SalaryController {
 
     @GetMapping("/all")
     public List<Salary> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                               @RequestParam(defaultValue = "20") Integer pageSize) {
+                               @RequestParam(defaultValue = "50") Integer pageSize) {
         return salaryService.getAll(pageNo, pageSize);
     }
 

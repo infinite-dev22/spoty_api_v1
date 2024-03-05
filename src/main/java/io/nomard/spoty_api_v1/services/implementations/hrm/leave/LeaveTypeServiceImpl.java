@@ -1,12 +1,12 @@
-package io.nomard.spoty_api_v1.services.implementations;
+package io.nomard.spoty_api_v1.services.implementations.hrm.leave;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Designation;
+import io.nomard.spoty_api_v1.entities.hrm.leave.LeaveType;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
-import io.nomard.spoty_api_v1.repositories.DesignationRepository;
+import io.nomard.spoty_api_v1.repositories.hrm.leave.LeaveTypeRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
-import io.nomard.spoty_api_v1.services.interfaces.DesignationService;
+import io.nomard.spoty_api_v1.services.interfaces.hrm.leave.LeaveTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,39 +18,39 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class DesignationServiceImpl implements DesignationService {
+public class LeaveTypeServiceImpl implements LeaveTypeService {
     @Autowired
-    private DesignationRepository designationRepo;
+    private LeaveTypeRepository leaveTypeRepo;
     @Autowired
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Designation> getAll(int pageNo, int pageSize) {
+    public List<LeaveType> getAll(int pageNo, int pageSize) {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<Designation> page = designationRepo.findAll(pageRequest);
+        Page<LeaveType> page = leaveTypeRepo.findAll(pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
 
     @Override
-    public Designation getById(Long id) throws NotFoundException {
-        Optional<Designation> designation = designationRepo.findById(id);
-        if (designation.isEmpty()) {
+    public LeaveType getById(Long id) throws NotFoundException {
+        Optional<LeaveType> leaveType = leaveTypeRepo.findById(id);
+        if (leaveType.isEmpty()) {
             throw new NotFoundException();
         }
-        return designation.get();
+        return leaveType.get();
     }
 
     @Override
-    public ResponseEntity<ObjectNode> save(Designation designation) {
+    public ResponseEntity<ObjectNode> save(LeaveType leaveType) {
         try {
-            designation.setCreatedBy(authService.authUser());
-            designation.setCreatedAt(new Date());
-            designationRepo.saveAndFlush(designation);
+            leaveType.setCreatedBy(authService.authUser());
+            leaveType.setCreatedAt(new Date());
+            leaveTypeRepo.saveAndFlush(leaveType);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -58,51 +58,51 @@ public class DesignationServiceImpl implements DesignationService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> update(Designation data) throws NotFoundException {
-        var opt = designationRepo.findById(data.getId());
+    public ResponseEntity<ObjectNode> update(LeaveType data) throws NotFoundException {
+        var opt = leaveTypeRepo.findById(data.getId());
 
         if (opt.isEmpty()) {
             throw new NotFoundException();
         }
-        var designation = opt.get();
+        var leaveType = opt.get();
 
 //        if (Objects.nonNull(data.getProduct())) {
-//            designation.setProduct(data.getProduct());
+//            leaveType.setProduct(data.getProduct());
 //        }
 
-//        if (!Objects.equals(data.getNetTax(), designation.getNetTax())) {
-//            designation.setNetTax(data.getNetTax());
+//        if (!Objects.equals(data.getNetTax(), leaveType.getNetTax())) {
+//            leaveType.setNetTax(data.getNetTax());
 //        }
 //
 //        if (Objects.nonNull(data.getTaxType()) && !"".equalsIgnoreCase(data.getTaxType())) {
-//            designation.setTaxType(data.getTaxType());
+//            leaveType.setTaxType(data.getTaxType());
 //        }
 //
-//        if (!Objects.equals(data.getDiscount(), designation.getDiscount())) {
-//            designation.setDiscount(data.getDiscount());
+//        if (!Objects.equals(data.getDiscount(), leaveType.getDiscount())) {
+//            leaveType.setDiscount(data.getDiscount());
 //        }
 //
 //        if (Objects.nonNull(data.getDiscountType()) && !"".equalsIgnoreCase(data.getDiscountType())) {
-//            designation.setDiscountType(data.getDiscountType());
+//            leaveType.setDiscountType(data.getDiscountType());
 //        }
 //
 //        if (Objects.nonNull(data.getSerialNumber()) && !"".equalsIgnoreCase(data.getSerialNumber())) {
-//            designation.setSerialNumber(data.getSerialNumber());
+//            leaveType.setSerialNumber(data.getSerialNumber());
 //        }
 //
-//        if (!Objects.equals(data.getTotal(), designation.getTotal())) {
-//            designation.setTotal(data.getTotal());
+//        if (!Objects.equals(data.getTotal(), leaveType.getTotal())) {
+//            leaveType.setTotal(data.getTotal());
 //        }
 
-//        if (!Objects.equals(data.getQuantity(), designation.getQuantity())) {
-//            designation.setQuantity(data.getQuantity());
+//        if (!Objects.equals(data.getQuantity(), leaveType.getQuantity())) {
+//            leaveType.setQuantity(data.getQuantity());
 //        }
 
-        designation.setUpdatedBy(authService.authUser());
-        designation.setUpdatedAt(new Date());
+        leaveType.setUpdatedBy(authService.authUser());
+        leaveType.setUpdatedAt(new Date());
 
         try {
-            designationRepo.saveAndFlush(designation);
+            leaveTypeRepo.saveAndFlush(leaveType);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -112,7 +112,7 @@ public class DesignationServiceImpl implements DesignationService {
     @Override
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
-            designationRepo.deleteById(id);
+            leaveTypeRepo.deleteById(id);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
