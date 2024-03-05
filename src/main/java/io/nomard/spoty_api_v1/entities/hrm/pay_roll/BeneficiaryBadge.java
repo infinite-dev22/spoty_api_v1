@@ -1,4 +1,4 @@
-package io.nomard.spoty_api_v1.entities.hrm.hrm;
+package io.nomard.spoty_api_v1.entities.hrm.pay_roll;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Branch;
@@ -10,27 +10,29 @@ import java.util.Date;
 import java.util.Set;
 
 @Entity
-@Table(name = "employment_statuses")
+@Table(name = "beneficiary_badges")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class EmploymentStatus {
+public class BeneficiaryBadge {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    private String color;
-    private String description;
 
     @ManyToMany(fetch = FetchType.LAZY, targetEntity = Branch.class)
     @JoinTable(
-            name = "employment_statuses_branches",
+            name = "beneficiary_badges_branches",
             joinColumns = {@JoinColumn(name = "employment_status_id")},
             inverseJoinColumns = {@JoinColumn(name = "branch_id")})
     private Set<Branch> branches;
-    private boolean active;
+    private String name;
+    @ManyToOne
+    @JoinColumn(name = "beneficiary_type_id")
+    private BeneficiaryType beneficiaryType;
+    private String color;
+    private String description;
 
     @Column(name = "created_at")
     @JsonIgnore

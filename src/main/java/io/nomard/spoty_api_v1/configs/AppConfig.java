@@ -5,6 +5,7 @@ import io.nomard.spoty_api_v1.entities.*;
 import io.nomard.spoty_api_v1.entities.adjustments.AdjustmentDetail;
 import io.nomard.spoty_api_v1.entities.adjustments.AdjustmentMaster;
 import io.nomard.spoty_api_v1.entities.hrm.hrm.Designation;
+import io.nomard.spoty_api_v1.entities.hrm.pay_roll.SalaryAdvance;
 import io.nomard.spoty_api_v1.entities.purchases.PurchaseDetail;
 import io.nomard.spoty_api_v1.entities.purchases.PurchaseMaster;
 import io.nomard.spoty_api_v1.entities.quotations.QuotationDetail;

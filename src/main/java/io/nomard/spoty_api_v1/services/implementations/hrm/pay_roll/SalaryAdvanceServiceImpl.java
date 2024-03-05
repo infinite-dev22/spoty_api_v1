@@ -1,12 +1,12 @@
-package io.nomard.spoty_api_v1.services.implementations;
+package io.nomard.spoty_api_v1.services.implementations.hrm.pay_roll;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.SalaryAdvance;
+import io.nomard.spoty_api_v1.entities.hrm.pay_roll.SalaryAdvance;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
-import io.nomard.spoty_api_v1.repositories.SalaryAdvanceRepository;
+import io.nomard.spoty_api_v1.repositories.hrm.pay_roll.SalaryAdvanceRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
-import io.nomard.spoty_api_v1.services.interfaces.SalaryAdvanceService;
+import io.nomard.spoty_api_v1.services.interfaces.hrm.pay_roll.SalaryAdvanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

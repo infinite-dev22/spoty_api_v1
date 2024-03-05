@@ -1,7 +1,7 @@
-package io.nomard.spoty_api_v1.services.interfaces;
+package io.nomard.spoty_api_v1.services.interfaces.hrm.pay_roll;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Salary;
+import io.nomard.spoty_api_v1.entities.hrm.pay_roll.Salary;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import org.springframework.http.ResponseEntity;
 

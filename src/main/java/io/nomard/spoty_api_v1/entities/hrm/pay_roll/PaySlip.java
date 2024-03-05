@@ -1,4 +1,4 @@
-package io.nomard.spoty_api_v1.entities.hrm.hrm;
+package io.nomard.spoty_api_v1.entities.hrm.pay_roll;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Branch;
@@ -10,27 +10,34 @@ import java.util.Date;
 import java.util.Set;
 
 @Entity
-@Table(name = "employment_statuses")
+@Table(name = "pay_slip_types")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class EmploymentStatus {
+public class PaySlip {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    private String color;
-    private String description;
 
     @ManyToMany(fetch = FetchType.LAZY, targetEntity = Branch.class)
     @JoinTable(
-            name = "employment_statuses_branches",
+            name = "pay_slip_types_branches",
             joinColumns = {@JoinColumn(name = "employment_status_id")},
             inverseJoinColumns = {@JoinColumn(name = "branch_id")})
     private Set<Branch> branches;
-    private boolean active;
+    @ManyToOne
+    @JoinColumn(name = "pay_slip_type_id")
+    private PaySlipType paySlipType;
+    @Column(name = "start_date")
+    private Date startDate;
+    @Column(name = "end_date")
+    private Date endDate;
+    @Column(name = "salaries_quantity")
+    private int salariesQuantity;
+    private char status;  // P - Pending, R - Rejected, A - Approved, E - Returned, V - Viewed, G - Generated, g - Generating, S - Sent
+    private String message;
 
     @Column(name = "created_at")
     @JsonIgnore
