@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/product_categories")
+@RequestMapping("/product/categories")
 public class ProductCategoryController {
     @Autowired
     private ProductCategoryServiceImpl productCategoryService;

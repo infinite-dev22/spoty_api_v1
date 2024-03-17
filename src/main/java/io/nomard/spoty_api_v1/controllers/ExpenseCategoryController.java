@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/expense_categories")
+@RequestMapping("/expense/categories")
 public class ExpenseCategoryController {
     @Autowired
     private ExpenseCategoryServiceImpl expenseCategoryService;
