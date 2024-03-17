@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("leave_status")
+@RequestMapping("leave/statuses")
 public class LeaveStatusController {
     @Autowired
     private LeaveStatusServiceImpl leaveStatusService;

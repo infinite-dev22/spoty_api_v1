@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("service_invoices")
+@RequestMapping("service/invoices")
 public class ServiceInvoiceController {
     @Autowired
     private ServiceInvoiceServiceImpl serviceInvoiceService;
