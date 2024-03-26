@@ -42,7 +42,8 @@ services:
       PMA_HOST: db
       PMA_PASSWORD: '${MYSQLDB_ROOT_PASSWORD}'
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     links:
       - db
     ports:
