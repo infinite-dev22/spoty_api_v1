@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jdk-jammy
+FROM eclipse-temurin:21-jdk-jammy
 ENV JAR_NAME=app.jar
 ENV APP_HOME=/usr/app/
 WORKDIR $APP_HOME
