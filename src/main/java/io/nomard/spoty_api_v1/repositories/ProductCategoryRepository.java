@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface ProductCategoryRepository extends PagingAndSortingRepository<ProductCategory, Long>, JpaRepository<ProductCategory, Long> {
-    List<ProductCategory> searchAllByNameContainingIgnoreCaseOrCodeContainingIgnoreCase(String name, String code);
+    List<ProductCategory> searchAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String name, String code);
 }

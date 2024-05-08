@@ -52,12 +52,6 @@ public class User implements Serializable {
     @JsonIgnore
     private Set<Role> roles;
 
-    @ManyToOne(targetEntity = Branch.class)
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
-    @JoinColumn(name = "branch_id")
-    @JsonIgnore
-    private Branch branch;
-
     @Column(nullable = false)
     @Builder.Default
     @JsonIgnore

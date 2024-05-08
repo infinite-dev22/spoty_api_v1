@@ -32,11 +32,10 @@ public class ProductCategory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String code;
-
     @Column(nullable = false)
     private String name;
 
+    private String description;
 
     @Column(name = "created_at")
     @JsonIgnore

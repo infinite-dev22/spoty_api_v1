@@ -48,7 +48,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     @Override
     public List<ProductCategory> getByContains(String search) {
-        return productCategoryRepo.searchAllByNameContainingIgnoreCaseOrCodeContainingIgnoreCase(
+        return productCategoryRepo.searchAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
                 search.toLowerCase(),
                 search.toLowerCase()
         );
@@ -79,8 +79,8 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
             productCategory.setName(data.getName());
         }
 
-        if (Objects.nonNull(data.getCode()) && !"".equalsIgnoreCase(data.getCode())) {
-            productCategory.setCode(data.getCode());
+        if (Objects.nonNull(data.getDescription()) && !"".equalsIgnoreCase(data.getDescription())) {
+            productCategory.setDescription(data.getDescription());
         }
 
         productCategory.setUpdatedBy(authService.authUser());
