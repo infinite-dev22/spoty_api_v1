@@ -23,8 +23,10 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "transfer_masters")
@@ -38,8 +40,6 @@ public class TransferMaster implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User user_detail;
     private String ref;
 
     @Column(nullable = false)
@@ -55,7 +55,8 @@ public class TransferMaster implements Serializable {
 
     @OneToMany(mappedBy = "transfer", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
-    private Set<TransferDetail> transferDetails;
+    @Builder.Default
+    private List<TransferDetail> transferDetails = Collections.synchronizedList(new ArrayList<>());
 
     private String shipping;
 
@@ -64,17 +65,6 @@ public class TransferMaster implements Serializable {
 
     @Column(nullable = false)
     private String status;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "approved_by_id")
-    private User approvedBy;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "received_by_id")
-    private User receivedBy;
-
-    private Date approvalDate;
-    private Date receiveDate;
     private String notes;
 
     @Column(name = "created_at")

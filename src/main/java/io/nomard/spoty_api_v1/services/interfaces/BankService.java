@@ -5,6 +5,7 @@ import io.nomard.spoty_api_v1.entities.Bank;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface BankService {
@@ -12,11 +13,13 @@ public interface BankService {
 
     Bank getById(Long id) throws NotFoundException;
 
+    List<Bank> getByContains(String search);
+
     ResponseEntity<ObjectNode> save(Bank bank);
 
     ResponseEntity<ObjectNode> update(Bank bank) throws NotFoundException;
 
     ResponseEntity<ObjectNode> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException;
+    ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) throws NotFoundException;
 }

@@ -79,15 +79,15 @@ public class RequisitionMasterServiceImpl implements RequisitionMasterService {
             requisitionMaster.setRef(data.getRef());
         }
 
-        if (Objects.nonNull(data.getDate())) {
+        if (Objects.nonNull(data.getDate()) && !Objects.equals(data.getDate(), requisitionMaster.getDate())) {
             requisitionMaster.setDate(data.getDate());
         }
 
-//        if (Objects.nonNull(data.getCustomer())) {
-//            requisitionMaster.setCustomer(data.getCustomer());
-//        }
+        if (Objects.nonNull(data.getSupplier()) && !Objects.equals(data.getSupplier(), requisitionMaster.getSupplier())) {
+            requisitionMaster.setSupplier(data.getSupplier());
+        }
 
-        if (Objects.nonNull(data.getBranch())) {
+        if (Objects.nonNull(data.getBranch()) && !Objects.equals(data.getBranch(), requisitionMaster.getBranch())) {
             requisitionMaster.setBranch(data.getBranch());
         }
 
@@ -95,44 +95,41 @@ public class RequisitionMasterServiceImpl implements RequisitionMasterService {
             requisitionMaster.setRequisitionDetails(data.getRequisitionDetails());
         }
 
-//        if (!Objects.equals(data.getTaxRate(), requisitionMaster.getTaxRate())) {
-//            requisitionMaster.setTaxRate(data.getTaxRate());
-//        }
-//
-//        if (!Objects.equals(data.getNetTax(), requisitionMaster.getNetTax())) {
-//            requisitionMaster.setNetTax(data.getNetTax());
-//        }
-//
-//        if (!Objects.equals(data.getDiscount(), requisitionMaster.getDiscount())) {
-//            requisitionMaster.setDiscount(data.getDiscount());
-//        }
+        if (!requisitionMaster.getRequisitionDetails().isEmpty()) {
+            requisitionMaster.getRequisitionDetails().forEach(
+                    requisitionDetail -> {
+                        if (Objects.isNull(requisitionDetail.getRequisition())) {
+                            requisitionDetail.setRequisition(requisitionMaster);
+                        }
+                    });
+        }
 
-//        if (Objects.nonNull(data.getShipping()) && !"".equalsIgnoreCase(data.getShipping())) {
-//            requisitionMaster.setShipping(data.getShipping());
-//        }
+        if (Objects.nonNull(data.getShipVia()) && !"".equalsIgnoreCase(data.getShipVia())) {
+            requisitionMaster.setShipVia(data.getShipVia());
+        }
 
-//        if (!Objects.equals(data.getPaid(), requisitionMaster.getPaid())) {
-//            requisitionMaster.setPaid(data.getPaid());
-//        }
-//
-//        if (!Objects.equals(data.getTotal(), requisitionMaster.getTotal())) {
-//            requisitionMaster.setTotal(data.getTotal());
-//        }
-//
-//        if (!Objects.equals(data.getDue(), requisitionMaster.getDue())) {
-//            requisitionMaster.setDue(data.getDue());
-//        }
-//
-//        if (Objects.nonNull(data.getStatus()) && !"".equalsIgnoreCase(data.getStatus())) {
-//            requisitionMaster.setStatus(data.getStatus());
-//        }
-//
-//        if (Objects.nonNull(data.getPaymentStatus()) && !"".equalsIgnoreCase(data.getPaymentStatus())) {
-//            requisitionMaster.setPaymentStatus(data.getPaymentStatus());
-//        }
+        if (Objects.nonNull(data.getShipMethod()) && !"".equalsIgnoreCase(data.getShipMethod())) {
+            requisitionMaster.setShipMethod(data.getShipMethod());
+        }
+
+        if (Objects.nonNull(data.getShippingTerms()) && !"".equalsIgnoreCase(data.getShippingTerms())) {
+            requisitionMaster.setShippingTerms(data.getShippingTerms());
+        }
+
+        if (Objects.nonNull(data.getDeliveryDate()) && !Objects.equals(data.getDeliveryDate(), requisitionMaster.getDeliveryDate())) {
+            requisitionMaster.setDeliveryDate(data.getDeliveryDate());
+        }
 
         if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
             requisitionMaster.setNotes(data.getNotes());
+        }
+
+        if (Objects.nonNull(data.getStatus()) && !"".equalsIgnoreCase(data.getStatus())) {
+            requisitionMaster.setStatus(data.getStatus());
+        }
+
+        if (!Objects.equals(data.getTotalCost(), requisitionMaster.getTotalCost())) {
+            requisitionMaster.setTotalCost(data.getTotalCost());
         }
 
         requisitionMaster.setUpdatedBy(authService.authUser());

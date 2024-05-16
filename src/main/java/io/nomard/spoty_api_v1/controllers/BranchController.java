@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -39,18 +39,21 @@ public class BranchController {
 
     @PostMapping("/add")
     public ResponseEntity<ObjectNode> save(@Valid @RequestBody Branch branch) {
-        branch.setCreatedAt(new Date());
         return branchService.save(branch);
     }
 
     @PutMapping("/update")
     public ResponseEntity<ObjectNode> update(@Valid @RequestBody Branch branch) throws NotFoundException {
-        branch.setUpdatedAt(new Date());
         return branchService.update(branch);
     }
 
     @DeleteMapping("/single/delete")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return branchService.delete(findModel.getId());
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> idList) {
+        return branchService.deleteMultiple(idList);
     }
 }

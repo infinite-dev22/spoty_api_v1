@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -19,7 +20,6 @@ import java.util.List;
 public class CurrencyController {
     @Autowired
     private CurrencyServiceImpl currencyService;
-
 
     @GetMapping("/all")
     public List<Currency> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
@@ -51,5 +51,10 @@ public class CurrencyController {
     @DeleteMapping("/single/delete")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return currencyService.delete(findModel.getId());
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<ObjectNode> delete(@RequestBody ArrayList<Long> idList) {
+        return currencyService.deleteMultiple(idList);
     }
 }

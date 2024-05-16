@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.hrm.pay_roll.Salary;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
+import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.hrm.pay_roll.SalaryServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -30,10 +32,10 @@ public class SalaryController {
         return salaryService.getById(findModel.getId());
     }
 
-//    @GetMapping("/search")
-//    public List<Salary> getByContains(@RequestBody SearchModel searchModel) {
-//        return salaryService.getByContains(searchModel.getSearch());
-//    }
+    @GetMapping("/search")
+    public List<Salary> getByContains(@RequestBody SearchModel searchModel) {
+        return salaryService.getByContains(searchModel.getSearch());
+    }
 
     @PostMapping("/add")
     public ResponseEntity<ObjectNode> save(@Valid @RequestBody Salary salary) {
@@ -48,5 +50,10 @@ public class SalaryController {
     @DeleteMapping("/single/delete")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return salaryService.delete(findModel.getId());
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> idList) {
+        return salaryService.deleteMultiple(idList);
     }
 }

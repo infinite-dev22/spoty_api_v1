@@ -17,7 +17,6 @@ package io.nomard.spoty_api_v1.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Cascade;
 
 import java.io.Serializable;
 import java.util.Date;

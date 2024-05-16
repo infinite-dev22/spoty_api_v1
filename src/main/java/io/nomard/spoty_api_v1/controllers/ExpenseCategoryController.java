@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -51,5 +52,10 @@ public class ExpenseCategoryController {
     @DeleteMapping("/single/delete")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return expenseCategoryService.delete(findModel.getId());
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> idList) {
+        return expenseCategoryService.deleteMultiple(idList);
     }
 }

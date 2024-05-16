@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface QuotationMasterRepository extends PagingAndSortingRepository<QuotationMaster, Long>, JpaRepository<QuotationMaster, Long> {
-    List<QuotationMaster> searchAllByRefContainingIgnoreCaseOrShippingContainingIgnoreCaseOrStatusContainingIgnoreCase(String ref, String shipping, String status);
+    List<QuotationMaster> searchAllByRefContainingIgnoreCaseOrStatusContainingIgnoreCase(String ref, String status);
 }

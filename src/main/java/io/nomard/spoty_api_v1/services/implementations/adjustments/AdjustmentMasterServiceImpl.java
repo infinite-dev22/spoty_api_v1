@@ -26,6 +26,8 @@ public class AdjustmentMasterServiceImpl implements AdjustmentMasterService {
     @Autowired
     private AdjustmentMasterRepository adjustmentMasterRepo;
     @Autowired
+    private AdjustmentTransactionServiceImpl adjustmentTransactionService;
+    @Autowired
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
@@ -63,6 +65,11 @@ public class AdjustmentMasterServiceImpl implements AdjustmentMasterService {
     @Override
     public ResponseEntity<ObjectNode> save(AdjustmentMaster adjustmentMaster) {
         try {
+            for (int i = 0; i < adjustmentMaster.getAdjustmentDetails().size(); i++) {
+                adjustmentMaster.getAdjustmentDetails().get(i).setAdjustment(adjustmentMaster);
+                adjustmentTransactionService.save(adjustmentMaster.getAdjustmentDetails().get(i));
+            }
+
             adjustmentMaster.setCreatedBy(authService.authUser());
             adjustmentMaster.setCreatedAt(new Date());
             adjustmentMasterRepo.saveAndFlush(adjustmentMaster);
@@ -92,6 +99,17 @@ public class AdjustmentMasterServiceImpl implements AdjustmentMasterService {
 
         if (Objects.nonNull(data.getAdjustmentDetails()) && !data.getAdjustmentDetails().isEmpty()) {
             adjustmentMaster.setAdjustmentDetails(data.getAdjustmentDetails());
+        }
+
+        if (!adjustmentMaster.getAdjustmentDetails().isEmpty()) {
+            for (int i = 0; i < adjustmentMaster.getAdjustmentDetails().size(); i++) {
+                adjustmentMaster.getAdjustmentDetails().get(i).setAdjustment(adjustmentMaster);
+                try {
+                    adjustmentTransactionService.update(adjustmentMaster.getAdjustmentDetails().get(i));
+                } catch (NotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
 
         if (Objects.nonNull(data.getRef()) && !"".equalsIgnoreCase(data.getRef())) {

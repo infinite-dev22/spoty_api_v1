@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -66,37 +67,33 @@ public class PaySlipServiceImpl implements PaySlipService {
         }
         var paySlip = opt.get();
 
-//        if (Objects.nonNull(data.getProduct())) {
-//            paySlip.setProduct(data.getProduct());
-//        }
+        if (Objects.nonNull(data.getBranches()) && !data.getBranches().isEmpty()) {
+            paySlip.setBranches(data.getBranches());
+        }
 
-//        if (!Objects.equals(data.getNetTax(), paySlip.getNetTax())) {
-//            paySlip.setNetTax(data.getNetTax());
-//        }
-//
-//        if (Objects.nonNull(data.getTax()) && !"".equalsIgnoreCase(data.getTax())) {
-//            paySlip.setTax(data.getTax());
-//        }
-//
-//        if (!Objects.equals(data.getDiscount(), paySlip.getDiscount())) {
-//            paySlip.setDiscount(data.getDiscount());
-//        }
-//
-//        if (Objects.nonNull(data.getDiscount()) && !"".equalsIgnoreCase(data.getDiscount())) {
-//            paySlip.setDiscount(data.getDiscount());
-//        }
-//
-//        if (Objects.nonNull(data.getSerialNumber()) && !"".equalsIgnoreCase(data.getSerialNumber())) {
-//            paySlip.setSerialNumber(data.getSerialNumber());
-//        }
-//
-//        if (!Objects.equals(data.getTotal(), paySlip.getTotal())) {
-//            paySlip.setTotal(data.getTotal());
-//        }
+        if (Objects.nonNull(data.getPaySlipType())) {
+            paySlip.setPaySlipType(data.getPaySlipType());
+        }
 
-//        if (!Objects.equals(data.getQuantity(), paySlip.getQuantity())) {
-//            paySlip.setQuantity(data.getQuantity());
-//        }
+        if (Objects.nonNull(data.getStartDate()) && !Objects.equals(data.getStartDate(), paySlip.getStartDate())) {
+            paySlip.setStartDate(data.getStartDate());
+        }
+
+        if (Objects.nonNull(data.getEndDate()) && !Objects.equals(data.getEndDate(), paySlip.getEndDate())) {
+            paySlip.setEndDate(data.getEndDate());
+        }
+
+        if (!Objects.equals(data.getSalariesQuantity(), paySlip.getSalariesQuantity())) {
+            paySlip.setSalariesQuantity(data.getSalariesQuantity());
+        }
+
+        if (data.getStatus() != '\0') {
+            paySlip.setStatus(data.getStatus());
+        }
+
+        if (Objects.nonNull(data.getMessage()) && !"".equalsIgnoreCase(data.getMessage())) {
+            paySlip.setMessage(data.getMessage());
+        }
 
         paySlip.setUpdatedBy(authService.authUser());
         paySlip.setUpdatedAt(new Date());

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -66,37 +67,21 @@ public class LeaveTypeServiceImpl implements LeaveTypeService {
         }
         var leaveType = opt.get();
 
-//        if (Objects.nonNull(data.getProduct())) {
-//            leaveType.setProduct(data.getProduct());
-//        }
+        if (Objects.nonNull(data.getBranches()) && !data.getBranches().isEmpty()) {
+            leaveType.setBranches(data.getBranches());
+        }
 
-//        if (!Objects.equals(data.getNetTax(), leaveType.getNetTax())) {
-//            leaveType.setNetTax(data.getNetTax());
-//        }
-//
-//        if (Objects.nonNull(data.getTaxType()) && !"".equalsIgnoreCase(data.getTaxType())) {
-//            leaveType.setTaxType(data.getTaxType());
-//        }
-//
-//        if (!Objects.equals(data.getDiscount(), leaveType.getDiscount())) {
-//            leaveType.setDiscount(data.getDiscount());
-//        }
-//
-//        if (Objects.nonNull(data.getDiscountType()) && !"".equalsIgnoreCase(data.getDiscountType())) {
-//            leaveType.setDiscountType(data.getDiscountType());
-//        }
-//
-//        if (Objects.nonNull(data.getSerialNumber()) && !"".equalsIgnoreCase(data.getSerialNumber())) {
-//            leaveType.setSerialNumber(data.getSerialNumber());
-//        }
-//
-//        if (!Objects.equals(data.getTotal(), leaveType.getTotal())) {
-//            leaveType.setTotal(data.getTotal());
-//        }
+        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+            leaveType.setName(data.getName());
+        }
 
-//        if (!Objects.equals(data.getQuantity(), leaveType.getQuantity())) {
-//            leaveType.setQuantity(data.getQuantity());
-//        }
+        if (Objects.nonNull(data.getDescription()) && !"".equalsIgnoreCase(data.getDescription())) {
+            leaveType.setDescription(data.getDescription());
+        }
+
+        if (Objects.nonNull(data.getColor()) && !"".equalsIgnoreCase(data.getColor())) {
+            leaveType.setColor(data.getColor());
+        }
 
         leaveType.setUpdatedBy(authService.authUser());
         leaveType.setUpdatedAt(new Date());
@@ -120,7 +105,12 @@ public class LeaveTypeServiceImpl implements LeaveTypeService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException {
-        return null;
+    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) {
+        try {
+            leaveTypeRepo.deleteAllById(idList);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
     }
 }

@@ -8,10 +8,13 @@ import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.sales.SaleMasterService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -23,11 +26,15 @@ public class SaleMasterServiceImpl implements SaleMasterService {
     @Autowired
     private SaleMasterRepository saleMasterRepo;
     @Autowired
+    private SaleTransactionServiceImpl saleTransactionService;
+    @Autowired
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
+    @Cacheable("sale_masters")
+    @Transactional(readOnly = true)
     public List<SaleMaster> getAll(int pageNo, int pageSize) {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
@@ -38,6 +45,8 @@ public class SaleMasterServiceImpl implements SaleMasterService {
     }
 
     @Override
+    @Cacheable("sale_masters")
+    @Transactional(readOnly = true)
     public SaleMaster getById(Long id) throws NotFoundException {
         Optional<SaleMaster> saleMaster = saleMasterRepo.findById(id);
         if (saleMaster.isEmpty()) {
@@ -47,6 +56,8 @@ public class SaleMasterServiceImpl implements SaleMasterService {
     }
 
     @Override
+    @Cacheable("sale_masters")
+    @Transactional(readOnly = true)
     public List<SaleMaster> getByContains(String search) {
         return saleMasterRepo.searchAllByRefContainingIgnoreCase(
                 search.toLowerCase()
@@ -56,6 +67,11 @@ public class SaleMasterServiceImpl implements SaleMasterService {
     @Override
     public ResponseEntity<ObjectNode> save(SaleMaster saleMaster) {
         try {
+            for (int i = 0; i < saleMaster.getSaleDetails().size(); i++) {
+                saleMaster.getSaleDetails().get(i).setSale(saleMaster);
+                saleTransactionService.save(saleMaster.getSaleDetails().get(i));
+            }
+
             saleMaster.setCreatedBy(authService.authUser());
             saleMaster.setCreatedAt(new Date());
             saleMasterRepo.saveAndFlush(saleMaster);
@@ -66,6 +82,7 @@ public class SaleMasterServiceImpl implements SaleMasterService {
     }
 
     @Override
+    @CacheEvict(value = "sale_masters", key = "#data.id")
     public ResponseEntity<ObjectNode> update(SaleMaster data) throws NotFoundException {
         var opt = saleMasterRepo.findById(data.getId());
 
@@ -74,19 +91,19 @@ public class SaleMasterServiceImpl implements SaleMasterService {
         }
         var saleMaster = opt.get();
 
+        if (!Objects.equals(saleMaster.getDate(), data.getDate()) && Objects.nonNull(data.getDate())) {
+            saleMaster.setDate(data.getDate());
+        }
+
         if (Objects.nonNull(data.getRef()) && !"".equalsIgnoreCase(data.getRef())) {
             saleMaster.setRef(data.getRef());
         }
 
-        if (Objects.nonNull(data.getDate())) {
-            saleMaster.setDate(data.getDate());
+        if (!Objects.equals(saleMaster.getCustomer(), data.getCustomer()) && Objects.nonNull(data.getCustomer())) {
+            saleMaster.setCustomer(data.getCustomer());
         }
 
-//        if (Objects.nonNull(data.getCustomer())) {
-//            saleMaster.setCustomer(data.getCustomer());
-//        }
-
-        if (Objects.nonNull(data.getBranch())) {
+        if (!Objects.equals(saleMaster.getBranch(), data.getBranch()) && Objects.nonNull(data.getBranch())) {
             saleMaster.setBranch(data.getBranch());
         }
 
@@ -94,41 +111,48 @@ public class SaleMasterServiceImpl implements SaleMasterService {
             saleMaster.setSaleDetails(data.getSaleDetails());
         }
 
-//        if (!Objects.equals(data.getTaxRate(), saleMaster.getTaxRate())) {
-//            saleMaster.setTaxRate(data.getTaxRate());
-//        }
-//
-//        if (!Objects.equals(data.getNetTax(), saleMaster.getNetTax())) {
-//            saleMaster.setNetTax(data.getNetTax());
-//        }
-//
-//        if (!Objects.equals(data.getDiscount(), saleMaster.getDiscount())) {
-//            saleMaster.setDiscount(data.getDiscount());
-//        }
+        if (!saleMaster.getSaleDetails().isEmpty()) {
+            for (int i = 0; i < saleMaster.getSaleDetails().size(); i++) {
+                saleMaster.getSaleDetails().get(i).setSale(saleMaster);
+                try {
+                    saleTransactionService.update(saleMaster.getSaleDetails().get(i));
+                } catch (NotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
 
-//        if (Objects.nonNull(data.getShipping()) && !"".equalsIgnoreCase(data.getShipping())) {
-//            saleMaster.setShipping(data.getShipping());
-//        }
+        if (!Objects.equals(data.getTaxRate(), saleMaster.getTaxRate())) {
+            saleMaster.setTaxRate(data.getTaxRate());
+        }
 
-//        if (!Objects.equals(data.getPaid(), saleMaster.getPaid())) {
-//            saleMaster.setPaid(data.getPaid());
-//        }
-//
-//        if (!Objects.equals(data.getTotal(), saleMaster.getTotal())) {
-//            saleMaster.setTotal(data.getTotal());
-//        }
-//
-//        if (!Objects.equals(data.getDue(), saleMaster.getDue())) {
-//            saleMaster.setDue(data.getDue());
-//        }
-//
-//        if (Objects.nonNull(data.getStatus()) && !"".equalsIgnoreCase(data.getStatus())) {
-//            saleMaster.setStatus(data.getStatus());
-//        }
-//
-//        if (Objects.nonNull(data.getPaymentStatus()) && !"".equalsIgnoreCase(data.getPaymentStatus())) {
-//            saleMaster.setPaymentStatus(data.getPaymentStatus());
-//        }
+        if (!Objects.equals(data.getNetTax(), saleMaster.getNetTax())) {
+            saleMaster.setNetTax(data.getNetTax());
+        }
+
+        if (!Objects.equals(data.getDiscount(), saleMaster.getDiscount())) {
+            saleMaster.setDiscount(data.getDiscount());
+        }
+
+        if (!Objects.equals(data.getTotal(), saleMaster.getTotal())) {
+            saleMaster.setTotal(data.getTotal());
+        }
+
+        if (!Objects.equals(data.getAmountPaid(), saleMaster.getAmountPaid())) {
+            saleMaster.setAmountPaid(data.getAmountPaid());
+        }
+
+        if (!Objects.equals(data.getAmountDue(), saleMaster.getAmountDue())) {
+            saleMaster.setAmountDue(data.getAmountDue());
+        }
+
+        if (Objects.nonNull(data.getPaymentStatus()) && !"".equalsIgnoreCase(data.getPaymentStatus())) {
+            saleMaster.setPaymentStatus(data.getPaymentStatus());
+        }
+
+        if (Objects.nonNull(data.getSaleStatus()) && !"".equalsIgnoreCase(data.getSaleStatus())) {
+            saleMaster.setSaleStatus(data.getSaleStatus());
+        }
 
         if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
             saleMaster.setNotes(data.getNotes());

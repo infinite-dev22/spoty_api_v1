@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -48,5 +49,10 @@ public class LeaveTypeController {
     @DeleteMapping("/single/delete")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return leaveTypeService.delete(findModel.getId());
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> idList) {
+        return leaveTypeService.deleteMultiple(idList);
     }
 }

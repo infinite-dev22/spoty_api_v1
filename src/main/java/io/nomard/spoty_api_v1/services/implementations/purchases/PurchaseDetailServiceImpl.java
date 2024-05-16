@@ -49,6 +49,7 @@ public class PurchaseDetailServiceImpl implements PurchaseDetailService {
     @Override
     public ResponseEntity<ObjectNode> save(PurchaseDetail purchaseDetail) {
         try {
+            purchaseDetail.setSubTotalCost(purchaseDetail.getCost() * purchaseDetail.getQuantity());
             purchaseDetail.setCreatedBy(authService.authUser());
             purchaseDetail.setCreatedAt(new Date());
             purchaseDetailRepo.saveAndFlush(purchaseDetail);
@@ -74,34 +75,15 @@ public class PurchaseDetailServiceImpl implements PurchaseDetailService {
 
         if (!Objects.equals(data.getCost(), purchaseDetail.getCost())) {
             purchaseDetail.setCost(data.getCost());
+            purchaseDetail.setSubTotalCost(purchaseDetail.getCost() * purchaseDetail.getQuantity());
         }
 
         if (Objects.nonNull(data.getProduct())) {
             purchaseDetail.setProduct(data.getProduct());
         }
 
-        if (!Objects.equals(data.getNetTax(), purchaseDetail.getNetTax())) {
-            purchaseDetail.setNetTax(data.getNetTax());
-        }
-
-        if (Objects.nonNull(data.getTaxType()) && !"".equalsIgnoreCase(data.getTaxType())) {
-            purchaseDetail.setTaxType(data.getTaxType());
-        }
-
-        if (!Objects.equals(data.getDiscount(), purchaseDetail.getDiscount())) {
-            purchaseDetail.setDiscount(data.getDiscount());
-        }
-
-        if (Objects.nonNull(data.getDiscountType()) && !"".equalsIgnoreCase(data.getDiscountType())) {
-            purchaseDetail.setDiscountType(data.getDiscountType());
-        }
-
-        if (Objects.nonNull(data.getSerialNumber()) && !"".equalsIgnoreCase(data.getSerialNumber())) {
-            purchaseDetail.setSerialNumber(data.getSerialNumber());
-        }
-
-        if (!Objects.equals(data.getTotal(), purchaseDetail.getTotal())) {
-            purchaseDetail.setTotal(data.getTotal());
+        if (!Objects.equals(data.getPurchase(), purchaseDetail.getPurchase())) {
+            purchaseDetail.setPurchase(data.getPurchase());
         }
 
         if (!Objects.equals(data.getQuantity(), purchaseDetail.getQuantity())) {

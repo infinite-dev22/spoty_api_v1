@@ -24,8 +24,10 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "requisition_masters")
@@ -44,9 +46,6 @@ public class RequisitionMaster implements Serializable {
     @Column(nullable = false)
     private Date date;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User user_detail;
-
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "supplier_id")
     private Supplier supplier;
@@ -57,7 +56,8 @@ public class RequisitionMaster implements Serializable {
 
     @OneToMany(mappedBy = "requisition", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
-    private Set<RequisitionDetail> requisitionDetails;
+    @Builder.Default
+    private List<RequisitionDetail> requisitionDetails = Collections.synchronizedList(new ArrayList<>());
 
     private String shipVia;
     private String shipMethod;

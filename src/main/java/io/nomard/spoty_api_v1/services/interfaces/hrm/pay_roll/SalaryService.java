@@ -5,12 +5,15 @@ import io.nomard.spoty_api_v1.entities.hrm.pay_roll.Salary;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface SalaryService {
     List<Salary> getAll(int pageNo, int pageSize);
 
     Salary getById(Long id) throws NotFoundException;
+
+    ArrayList<Salary> getByContains(String search);
 
     ResponseEntity<ObjectNode> save(Salary salary);
 

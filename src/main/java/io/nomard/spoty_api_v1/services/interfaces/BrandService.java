@@ -5,6 +5,7 @@ import io.nomard.spoty_api_v1.entities.Brand;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface BrandService {
@@ -19,4 +20,6 @@ public interface BrandService {
     ResponseEntity<ObjectNode> update(Brand data) throws NotFoundException;
 
     ResponseEntity<ObjectNode> delete(Long id);
+
+    ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList);
 }

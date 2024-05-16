@@ -8,10 +8,7 @@ import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -26,6 +23,16 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<ObjectNode> login(@Valid @RequestBody LoginModel loginDetails) {
+        return authService.login(loginDetails);
+    }
+
+    @PutMapping("/reset")
+    public ResponseEntity<ObjectNode> reset(@Valid @RequestBody LoginModel loginDetails) {
+        return authService.login(loginDetails);
+    }
+
+    @PostMapping("/request/reset")
+    public ResponseEntity<ObjectNode> requestReset(@Valid @RequestBody LoginModel loginDetails) {
         return authService.login(loginDetails);
     }
 }

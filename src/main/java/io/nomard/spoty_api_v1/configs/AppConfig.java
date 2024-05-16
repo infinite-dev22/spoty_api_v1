@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nomard.spoty_api_v1.entities.*;
 import io.nomard.spoty_api_v1.entities.adjustments.AdjustmentDetail;
 import io.nomard.spoty_api_v1.entities.adjustments.AdjustmentMaster;
+import io.nomard.spoty_api_v1.entities.adjustments.AdjustmentTransaction;
 import io.nomard.spoty_api_v1.entities.hrm.hrm.Designation;
 import io.nomard.spoty_api_v1.entities.hrm.pay_roll.Salary;
-import io.nomard.spoty_api_v1.entities.hrm.pay_roll.SalaryAdvance;
 import io.nomard.spoty_api_v1.entities.purchases.PurchaseDetail;
 import io.nomard.spoty_api_v1.entities.purchases.PurchaseMaster;
 import io.nomard.spoty_api_v1.entities.quotations.QuotationDetail;
@@ -19,10 +19,12 @@ import io.nomard.spoty_api_v1.entities.returns.sale_returns.SaleReturnDetail;
 import io.nomard.spoty_api_v1.entities.returns.sale_returns.SaleReturnMaster;
 import io.nomard.spoty_api_v1.entities.sales.SaleDetail;
 import io.nomard.spoty_api_v1.entities.sales.SaleMaster;
+import io.nomard.spoty_api_v1.entities.sales.SaleTransaction;
 import io.nomard.spoty_api_v1.entities.stock_ins.StockInDetail;
 import io.nomard.spoty_api_v1.entities.stock_ins.StockInMaster;
 import io.nomard.spoty_api_v1.entities.transfers.TransferDetail;
 import io.nomard.spoty_api_v1.entities.transfers.TransferMaster;
+import io.nomard.spoty_api_v1.entities.transfers.TransferTransaction;
 import io.nomard.spoty_api_v1.filters.SpotyRequestFilter;
 import io.nomard.spoty_api_v1.security.SpotyAuthEntryPoint;
 import io.nomard.spoty_api_v1.services.auth.SpotyTokenService;
@@ -196,11 +198,6 @@ public class AppConfig {
     }
 
     @Bean
-    public Attendance attendance() {
-        return new Attendance();
-    }
-
-    @Bean
     public Bank bank() {
         return new Bank();
     }
@@ -211,11 +208,6 @@ public class AppConfig {
     }
 
     @Bean
-    public SalaryAdvance salaryAdvance() {
-        return new SalaryAdvance();
-    }
-
-    @Bean
     public Salary salary() {
         return new Salary();
     }
@@ -223,16 +215,6 @@ public class AppConfig {
     @Bean
     public SaleTermAndCondition saleTermAndCondition() {
         return new SaleTermAndCondition();
-    }
-
-    @Bean
-    public ServiceInvoice serviceInvoice() {
-        return new ServiceInvoice();
-    }
-
-    @Bean
-    public ZenService service() {
-        return new ZenService();
     }
 
     @Bean
@@ -258,5 +240,20 @@ public class AppConfig {
     @Bean
     public SpotyRequestFilter spotyRequestFilter() {
         return new SpotyRequestFilter();
+    }
+
+    @Bean
+    public AdjustmentTransaction adjustmentTransaction() {
+        return new AdjustmentTransaction();
+    }
+
+    @Bean
+    public SaleTransaction saleTransaction() {
+        return new SaleTransaction();
+    }
+
+    @Bean
+    public TransferTransaction transferTransaction() {
+        return new TransferTransaction();
     }
 }

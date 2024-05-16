@@ -24,8 +24,10 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "purchase_masters")
@@ -45,22 +47,23 @@ public class PurchaseMaster implements Serializable {
     @JoinColumn(nullable = false, name = "supplier_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Supplier supplier;
-    @JoinColumn(nullable = false, name = "branch_id")
+    @JoinColumn(name = "branch_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Branch branch;
 
     @OneToMany(mappedBy = "purchase", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
-    private Set<PurchaseDetail> purchaseDetails;
+    @Builder.Default
+    private List<PurchaseDetail> purchaseDetails = Collections.synchronizedList(new ArrayList<>());
 
     private double taxRate;
     private double netTax;
     private double discount;
-    private String shipping;
-    private double paid;
+    private double amountPaid;
     private double total;
-    private double due;
-    private String status;
+    private double subTotal;
+    private double amountDue;
+    private String purchaseStatus;
     private String paymentStatus;
     private String notes;
 

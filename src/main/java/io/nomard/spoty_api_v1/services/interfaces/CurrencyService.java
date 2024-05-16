@@ -5,6 +5,7 @@ import io.nomard.spoty_api_v1.entities.Currency;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface CurrencyService {
@@ -19,4 +20,6 @@ public interface CurrencyService {
     ResponseEntity<ObjectNode> update(Currency currency) throws NotFoundException;
 
     ResponseEntity<ObjectNode> delete(Long id);
+
+    ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList);
 }

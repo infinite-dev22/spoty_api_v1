@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.hrm.pay_roll.BeneficiaryBadge;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
+import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.hrm.pay_roll.BeneficiaryBadgeServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -21,7 +23,7 @@ public class BeneficiaryBadgeController {
 
     @GetMapping("/all")
     public List<BeneficiaryBadge> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                             @RequestParam(defaultValue = "50") Integer pageSize) {
+                                         @RequestParam(defaultValue = "50") Integer pageSize) {
         return beneficiaryBadgeService.getAll(pageNo, pageSize);
     }
 
@@ -30,10 +32,10 @@ public class BeneficiaryBadgeController {
         return beneficiaryBadgeService.getById(findModel.getId());
     }
 
-//    @GetMapping("/search")
-//    public List<BeneficiaryBadge> getByContains(@RequestBody SearchModel searchModel) {
-//        return beneficiaryBadgeService.getByContains(searchModel.getSearch());
-//    }
+    @GetMapping("/search")
+    public List<BeneficiaryBadge> getByContains(@RequestBody SearchModel searchModel) {
+        return beneficiaryBadgeService.getByContains(searchModel.getSearch());
+    }
 
     @PostMapping("/add")
     public ResponseEntity<ObjectNode> save(@Valid @RequestBody BeneficiaryBadge beneficiaryBadge) {
@@ -48,5 +50,10 @@ public class BeneficiaryBadgeController {
     @DeleteMapping("/single/delete")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return beneficiaryBadgeService.delete(findModel.getId());
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> idList) throws NotFoundException {
+        return beneficiaryBadgeService.deleteMultiple(idList);
     }
 }

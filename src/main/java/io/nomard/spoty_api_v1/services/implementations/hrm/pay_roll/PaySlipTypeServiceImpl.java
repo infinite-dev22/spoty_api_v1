@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -66,37 +67,21 @@ public class PaySlipTypeServiceImpl implements PaySlipTypeService {
         }
         var paySlipType = opt.get();
 
-//        if (Objects.nonNull(data.getProduct())) {
-//            paySlipType.setProduct(data.getProduct());
-//        }
+        if (Objects.nonNull(data.getBranches()) && !data.getBranches().isEmpty()) {
+            paySlipType.setBranches(data.getBranches());
+        }
 
-//        if (!Objects.equals(data.getNetTax(), paySlipType.getNetTax())) {
-//            paySlipType.setNetTax(data.getNetTax());
-//        }
-//
-//        if (Objects.nonNull(data.getTaxType()) && !"".equalsIgnoreCase(data.getTaxType())) {
-//            paySlipType.setTaxType(data.getTaxType());
-//        }
-//
-//        if (!Objects.equals(data.getDiscount(), paySlipType.getDiscount())) {
-//            paySlipType.setDiscount(data.getDiscount());
-//        }
-//
-//        if (Objects.nonNull(data.getDiscountType()) && !"".equalsIgnoreCase(data.getDiscountType())) {
-//            paySlipType.setDiscountType(data.getDiscountType());
-//        }
-//
-//        if (Objects.nonNull(data.getSerialNumber()) && !"".equalsIgnoreCase(data.getSerialNumber())) {
-//            paySlipType.setSerialNumber(data.getSerialNumber());
-//        }
-//
-//        if (!Objects.equals(data.getTotal(), paySlipType.getTotal())) {
-//            paySlipType.setTotal(data.getTotal());
-//        }
+        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+            paySlipType.setName(data.getName());
+        }
 
-//        if (!Objects.equals(data.getQuantity(), paySlipType.getQuantity())) {
-//            paySlipType.setQuantity(data.getQuantity());
-//        }
+        if (Objects.nonNull(data.getDescription()) && !"".equalsIgnoreCase(data.getDescription())) {
+            paySlipType.setDescription(data.getDescription());
+        }
+
+        if (Objects.nonNull(data.getColor()) && !"".equalsIgnoreCase(data.getColor())) {
+            paySlipType.setColor(data.getColor());
+        }
 
         paySlipType.setUpdatedBy(authService.authUser());
         paySlipType.setUpdatedAt(new Date());

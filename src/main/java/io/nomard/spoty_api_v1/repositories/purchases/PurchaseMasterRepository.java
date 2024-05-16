@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface PurchaseMasterRepository extends PagingAndSortingRepository<PurchaseMaster, Long>, JpaRepository<PurchaseMaster, Long> {
-    List<PurchaseMaster> searchAllByRefContainingIgnoreCaseOrShippingContainingIgnoreCaseOrStatusContainingIgnoreCaseOrPaymentStatusContainsIgnoreCase(String ref, String shipping, String status, String paymentStatus);
+    List<PurchaseMaster> searchAllByRefContainingIgnoreCaseOrPurchaseStatusContainingIgnoreCaseOrPaymentStatusContainsIgnoreCase(String ref, String purchaseStatus, String paymentStatus);
 }

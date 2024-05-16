@@ -24,8 +24,10 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "quotation_masters")
@@ -58,11 +60,8 @@ public class QuotationMaster implements Serializable {
 
     @OneToMany(mappedBy = "quotation", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
-    private Set<QuotationDetail> quotationDetails;
-
-    @Column(nullable = false)
     @Builder.Default
-    private String shipping = "";
+    private List<QuotationDetail> quotationDetails = Collections.synchronizedList(new ArrayList<>());
 
     @Column(nullable = false)
     @Builder.Default

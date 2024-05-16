@@ -8,10 +8,13 @@ import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.transfers.TransferMasterService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -23,11 +26,15 @@ public class TransferMasterServiceImpl implements TransferMasterService {
     @Autowired
     private TransferMasterRepository transferMasterRepo;
     @Autowired
+    private TransferTransactionServiceImpl transferTransactionService;
+    @Autowired
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
+    @Cacheable("transfer_masters")
+    @Transactional(readOnly = true)
     public List<TransferMaster> getAll(int pageNo, int pageSize) {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
@@ -38,6 +45,8 @@ public class TransferMasterServiceImpl implements TransferMasterService {
     }
 
     @Override
+    @Cacheable("transfer_masters")
+    @Transactional(readOnly = true)
     public TransferMaster getById(Long id) throws NotFoundException {
         Optional<TransferMaster> transferMaster = transferMasterRepo.findById(id);
         if (transferMaster.isEmpty()) {
@@ -47,6 +56,8 @@ public class TransferMasterServiceImpl implements TransferMasterService {
     }
 
     @Override
+    @Cacheable("transfer_masters")
+    @Transactional(readOnly = true)
     public List<TransferMaster> getByContains(String search) {
         return transferMasterRepo.searchAllByRefContainingIgnoreCase(
                 search.toLowerCase()
@@ -56,6 +67,11 @@ public class TransferMasterServiceImpl implements TransferMasterService {
     @Override
     public ResponseEntity<ObjectNode> save(TransferMaster transferMaster) {
         try {
+            for (int i = 0; i < transferMaster.getTransferDetails().size(); i++) {
+                transferMaster.getTransferDetails().get(i).setTransfer(transferMaster);
+                transferTransactionService.save(transferMaster.getTransferDetails().get(i));
+            }
+
             transferMaster.setCreatedBy(authService.authUser());
             transferMaster.setCreatedAt(new Date());
             transferMasterRepo.saveAndFlush(transferMaster);
@@ -66,6 +82,7 @@ public class TransferMasterServiceImpl implements TransferMasterService {
     }
 
     @Override
+    @CacheEvict(value = "transfer_masters", key = "#data.id")
     public ResponseEntity<ObjectNode> update(TransferMaster data) throws NotFoundException {
         var opt = transferMasterRepo.findById(data.getId());
 
@@ -78,19 +95,15 @@ public class TransferMasterServiceImpl implements TransferMasterService {
             transferMaster.setRef(data.getRef());
         }
 
-        if (Objects.nonNull(data.getDate())) {
+        if (!Objects.equals(transferMaster.getDate(), data.getDate()) && Objects.nonNull(data.getDate())) {
             transferMaster.setDate(data.getDate());
         }
 
-//        if (Objects.nonNull(data.getCustomer())) {
-//            transferMaster.setCustomer(data.getCustomer());
-//        }
-
-        if (Objects.nonNull(data.getFromBranch())) {
+        if (!Objects.equals(transferMaster.getFromBranch(), data.getFromBranch()) && Objects.nonNull(data.getFromBranch())) {
             transferMaster.setFromBranch(data.getFromBranch());
         }
 
-        if (Objects.nonNull(data.getToBranch())) {
+        if (!Objects.equals(transferMaster.getToBranch(), data.getToBranch()) && Objects.nonNull(data.getToBranch())) {
             transferMaster.setToBranch(data.getToBranch());
         }
 
@@ -98,41 +111,32 @@ public class TransferMasterServiceImpl implements TransferMasterService {
             transferMaster.setTransferDetails(data.getTransferDetails());
         }
 
-//        if (!Objects.equals(data.getTaxRate(), transferMaster.getTaxRate())) {
-//            transferMaster.setTaxRate(data.getTaxRate());
-//        }
-//
-//        if (!Objects.equals(data.getNetTax(), transferMaster.getNetTax())) {
-//            transferMaster.setNetTax(data.getNetTax());
-//        }
-//
-//        if (!Objects.equals(data.getDiscount(), transferMaster.getDiscount())) {
-//            transferMaster.setDiscount(data.getDiscount());
-//        }
+        if (!transferMaster.getTransferDetails().isEmpty()) {
+            for (int i = 0; i < transferMaster.getTransferDetails().size(); i++) {
+                transferMaster.getTransferDetails().get(i).setTransfer(transferMaster);
+                try {
+                    transferTransactionService.update(transferMaster.getTransferDetails().get(i));
+                } catch (NotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
 
-//        if (Objects.nonNull(data.getShipping()) && !"".equalsIgnoreCase(data.getShipping())) {
-//            transferMaster.setShipping(data.getShipping());
-//        }
+        if (Objects.nonNull(data.getShipping()) && !"".equalsIgnoreCase(data.getShipping())) {
+            transferMaster.setShipping(data.getShipping());
+        }
 
-//        if (!Objects.equals(data.getPaid(), transferMaster.getPaid())) {
-//            transferMaster.setPaid(data.getPaid());
-//        }
-//
-//        if (!Objects.equals(data.getTotal(), transferMaster.getTotal())) {
-//            transferMaster.setTotal(data.getTotal());
-//        }
-//
-//        if (!Objects.equals(data.getDue(), transferMaster.getDue())) {
-//            transferMaster.setDue(data.getDue());
-//        }
-//
-//        if (Objects.nonNull(data.getStatus()) && !"".equalsIgnoreCase(data.getStatus())) {
-//            transferMaster.setStatus(data.getStatus());
-//        }
-//
-//        if (Objects.nonNull(data.getPaymentStatus()) && !"".equalsIgnoreCase(data.getPaymentStatus())) {
-//            transferMaster.setPaymentStatus(data.getPaymentStatus());
-//        }
+        if (!Objects.equals(data.getTotal(), transferMaster.getTotal())) {
+            transferMaster.setTotal(data.getTotal());
+        }
+
+        if (Objects.nonNull(data.getStatus()) && !"".equalsIgnoreCase(data.getStatus())) {
+            transferMaster.setStatus(data.getStatus());
+        }
+
+        if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
+            transferMaster.setNotes(data.getNotes());
+        }
 
         if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
             transferMaster.setNotes(data.getNotes());

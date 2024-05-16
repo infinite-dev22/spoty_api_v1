@@ -13,9 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class BeneficiaryTypeServiceImpl implements BeneficiaryTypeService {
@@ -46,6 +44,14 @@ public class BeneficiaryTypeServiceImpl implements BeneficiaryTypeService {
     }
 
     @Override
+    public ArrayList<BeneficiaryType> getByContains(String search) {
+        return beneficiaryTypeRepo.searchAllByNameContainingIgnoreCaseOrColorContainingIgnoreCase(
+                search,
+                search
+        );
+    }
+
+    @Override
     public ResponseEntity<ObjectNode> save(BeneficiaryType beneficiaryType) {
         try {
             beneficiaryType.setCreatedBy(authService.authUser());
@@ -66,37 +72,21 @@ public class BeneficiaryTypeServiceImpl implements BeneficiaryTypeService {
         }
         var beneficiaryType = opt.get();
 
-//        if (Objects.nonNull(data.getProduct())) {
-//            beneficiaryType.setProduct(data.getProduct());
-//        }
+        if (!Objects.equals(data.getBranches(), beneficiaryType.getBranches())) {
+            beneficiaryType.setBranches(data.getBranches());
+        }
 
-//        if (!Objects.equals(data.getNetTax(), beneficiaryType.getNetTax())) {
-//            beneficiaryType.setNetTax(data.getNetTax());
-//        }
-//
-//        if (Objects.nonNull(data.getTaxType()) && !"".equalsIgnoreCase(data.getTaxType())) {
-//            beneficiaryType.setTaxType(data.getTaxType());
-//        }
-//
-//        if (!Objects.equals(data.getDiscount(), beneficiaryType.getDiscount())) {
-//            beneficiaryType.setDiscount(data.getDiscount());
-//        }
-//
-//        if (Objects.nonNull(data.getDiscountType()) && !"".equalsIgnoreCase(data.getDiscountType())) {
-//            beneficiaryType.setDiscountType(data.getDiscountType());
-//        }
-//
-//        if (Objects.nonNull(data.getSerialNumber()) && !"".equalsIgnoreCase(data.getSerialNumber())) {
-//            beneficiaryType.setSerialNumber(data.getSerialNumber());
-//        }
-//
-//        if (!Objects.equals(data.getTotal(), beneficiaryType.getTotal())) {
-//            beneficiaryType.setTotal(data.getTotal());
-//        }
+        if (!Objects.equals(data.getName(), beneficiaryType.getName())) {
+            beneficiaryType.setName(data.getName());
+        }
 
-//        if (!Objects.equals(data.getQuantity(), beneficiaryType.getQuantity())) {
-//            beneficiaryType.setQuantity(data.getQuantity());
-//        }
+        if (Objects.nonNull(data.getColor()) && !"".equalsIgnoreCase(data.getColor())) {
+            beneficiaryType.setColor(data.getColor());
+        }
+
+        if (!Objects.equals(data.getDescription(), beneficiaryType.getDescription())) {
+            beneficiaryType.setDescription(data.getDescription());
+        }
 
         beneficiaryType.setUpdatedBy(authService.authUser());
         beneficiaryType.setUpdatedAt(new Date());
@@ -120,7 +110,12 @@ public class BeneficiaryTypeServiceImpl implements BeneficiaryTypeService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException {
-        return null;
+    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) {
+        try {
+            beneficiaryTypeRepo.deleteAllById(idList);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
     }
 }

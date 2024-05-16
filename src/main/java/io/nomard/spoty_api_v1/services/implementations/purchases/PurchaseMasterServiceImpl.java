@@ -48,8 +48,7 @@ public class PurchaseMasterServiceImpl implements PurchaseMasterService {
 
     @Override
     public List<PurchaseMaster> getByContains(String search) {
-        return purchaseMasterRepo.searchAllByRefContainingIgnoreCaseOrShippingContainingIgnoreCaseOrStatusContainingIgnoreCaseOrPaymentStatusContainsIgnoreCase(
-                search.toLowerCase(),
+        return purchaseMasterRepo.searchAllByRefContainingIgnoreCaseOrPurchaseStatusContainingIgnoreCaseOrPaymentStatusContainsIgnoreCase(
                 search.toLowerCase(),
                 search.toLowerCase(),
                 search.toLowerCase()
@@ -59,6 +58,11 @@ public class PurchaseMasterServiceImpl implements PurchaseMasterService {
     @Override
     public ResponseEntity<ObjectNode> save(PurchaseMaster purchaseMaster) {
         try {
+            if (!purchaseMaster.getPurchaseDetails().isEmpty()) {
+                for (int i = 0; i < purchaseMaster.getPurchaseDetails().size(); i++) {
+                    purchaseMaster.getPurchaseDetails().get(i).setPurchase(purchaseMaster);
+                }
+            }
             purchaseMaster.setCreatedBy(authService.authUser());
             purchaseMaster.setCreatedAt(new Date());
             purchaseMasterRepo.saveAndFlush(purchaseMaster);
@@ -97,6 +101,12 @@ public class PurchaseMasterServiceImpl implements PurchaseMasterService {
             purchaseMaster.setPurchaseDetails(data.getPurchaseDetails());
         }
 
+        if (!purchaseMaster.getPurchaseDetails().isEmpty()) {
+            for (int i = 0; i < purchaseMaster.getPurchaseDetails().size(); i++) {
+                purchaseMaster.getPurchaseDetails().get(i).setPurchase(purchaseMaster);
+            }
+        }
+
         if (!Objects.equals(data.getTaxRate(), purchaseMaster.getTaxRate())) {
             purchaseMaster.setTaxRate(data.getTaxRate());
         }
@@ -109,24 +119,24 @@ public class PurchaseMasterServiceImpl implements PurchaseMasterService {
             purchaseMaster.setDiscount(data.getDiscount());
         }
 
-        if (Objects.nonNull(data.getShipping()) && !"".equalsIgnoreCase(data.getShipping())) {
-            purchaseMaster.setShipping(data.getShipping());
-        }
-
-        if (!Objects.equals(data.getPaid(), purchaseMaster.getPaid())) {
-            purchaseMaster.setPaid(data.getPaid());
+        if (!Objects.equals(data.getAmountPaid(), purchaseMaster.getAmountPaid())) {
+            purchaseMaster.setAmountPaid(data.getAmountPaid());
         }
 
         if (!Objects.equals(data.getTotal(), purchaseMaster.getTotal())) {
             purchaseMaster.setTotal(data.getTotal());
         }
 
-        if (!Objects.equals(data.getDue(), purchaseMaster.getDue())) {
-            purchaseMaster.setDue(data.getDue());
+        if (!Objects.equals(data.getSubTotal(), purchaseMaster.getSubTotal())) {
+            purchaseMaster.setSubTotal(data.getSubTotal());
         }
 
-        if (Objects.nonNull(data.getStatus()) && !"".equalsIgnoreCase(data.getStatus())) {
-            purchaseMaster.setStatus(data.getStatus());
+        if (!Objects.equals(data.getAmountDue(), purchaseMaster.getAmountDue())) {
+            purchaseMaster.setAmountDue(data.getAmountDue());
+        }
+
+        if (Objects.nonNull(data.getPurchaseStatus()) && !"".equalsIgnoreCase(data.getPurchaseStatus())) {
+            purchaseMaster.setPurchaseStatus(data.getPurchaseStatus());
         }
 
         if (Objects.nonNull(data.getPaymentStatus()) && !"".equalsIgnoreCase(data.getPaymentStatus())) {

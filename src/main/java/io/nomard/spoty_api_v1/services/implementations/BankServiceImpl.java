@@ -13,9 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class BankServiceImpl implements BankService {
@@ -46,6 +44,13 @@ public class BankServiceImpl implements BankService {
     }
 
     @Override
+    public List<Bank> getByContains(String search) {
+        return bankRepo.searchAllByBankNameContainingIgnoreCaseOrAccountNameContainingIgnoreCaseOrAccountNumberContainsIgnoreCase(
+                search, search, search
+        );
+    }
+
+    @Override
     public ResponseEntity<ObjectNode> save(Bank bank) {
         try {
             bank.setCreatedBy(authService.authUser());
@@ -66,37 +71,30 @@ public class BankServiceImpl implements BankService {
         }
         var bank = opt.get();
 
-//        if (Objects.nonNull(data.getProduct())) {
-//            bank.setProduct(data.getProduct());
-//        }
+        if (Objects.nonNull(data.getBranch())) {
+            bank.setBranch(data.getBranch());
+        }
 
-//        if (!Objects.equals(data.getNetTax(), bank.getNetTax())) {
-//            bank.setNetTax(data.getNetTax());
-//        }
-//
-//        if (Objects.nonNull(data.getTaxType()) && !"".equalsIgnoreCase(data.getTaxType())) {
-//            bank.setTaxType(data.getTaxType());
-//        }
-//
-//        if (!Objects.equals(data.getDiscount(), bank.getDiscount())) {
-//            bank.setDiscount(data.getDiscount());
-//        }
-//
-//        if (Objects.nonNull(data.getDiscountType()) && !"".equalsIgnoreCase(data.getDiscountType())) {
-//            bank.setDiscountType(data.getDiscountType());
-//        }
-//
-//        if (Objects.nonNull(data.getSerialNumber()) && !"".equalsIgnoreCase(data.getSerialNumber())) {
-//            bank.setSerialNumber(data.getSerialNumber());
-//        }
-//
-//        if (!Objects.equals(data.getTotal(), bank.getTotal())) {
-//            bank.setTotal(data.getTotal());
-//        }
+        if (Objects.nonNull(data.getBankName()) && !"".equalsIgnoreCase(data.getBankName())) {
+            bank.setBankName(data.getBankName());
+        }
 
-//        if (!Objects.equals(data.getQuantity(), bank.getQuantity())) {
-//            bank.setQuantity(data.getQuantity());
-//        }
+        if (Objects.nonNull(data.getAccountName()) && !"".equalsIgnoreCase(data.getAccountName())) {
+            bank.setAccountName(data.getAccountName());
+        }
+
+        if (Objects.nonNull(data.getAccountNumber()) && !"".equalsIgnoreCase(data.getAccountNumber())) {
+            bank.setAccountNumber(data.getAccountNumber());
+        }
+
+        if (Objects.nonNull(data.getBalance()) && !"".equalsIgnoreCase(data.getBalance())) {
+            bank.setBalance(data.getBalance());
+        }
+
+        // TODO: Add image url only after successful upload of image in case any is provided.
+        if (Objects.nonNull(data.getLogo()) && !"".equalsIgnoreCase(data.getLogo())) {
+            bank.setLogo(data.getLogo());
+        }
 
         bank.setUpdatedBy(authService.authUser());
         bank.setUpdatedAt(new Date());
@@ -120,7 +118,12 @@ public class BankServiceImpl implements BankService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException {
-        return null;
+    public ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) throws NotFoundException {
+        try {
+            bankRepo.deleteAllById(idList);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
     }
 }

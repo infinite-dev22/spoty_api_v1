@@ -5,6 +5,7 @@ import io.nomard.spoty_api_v1.entities.Customer;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface CustomerService {
@@ -19,4 +20,6 @@ public interface CustomerService {
     ResponseEntity<ObjectNode> update(Customer customer) throws NotFoundException;
 
     ResponseEntity<ObjectNode> delete(Long id);
+
+    ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList);
 }

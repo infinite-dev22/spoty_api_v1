@@ -48,8 +48,7 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
 
     @Override
     public List<QuotationMaster> getByContains(String search) {
-        return quotationMasterRepo.searchAllByRefContainingIgnoreCaseOrShippingContainingIgnoreCaseOrStatusContainingIgnoreCase(
-                search.toLowerCase(),
+        return quotationMasterRepo.searchAllByRefContainingIgnoreCaseOrStatusContainingIgnoreCase(
                 search.toLowerCase(),
                 search.toLowerCase()
         );
@@ -58,6 +57,11 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
     @Override
     public ResponseEntity<ObjectNode> save(QuotationMaster quotationMaster) {
         try {
+            if (!quotationMaster.getQuotationDetails().isEmpty()) {
+                for (int i = 0; i < quotationMaster.getQuotationDetails().size(); i++) {
+                    quotationMaster.getQuotationDetails().get(i).setQuotation(quotationMaster);
+                }
+            }
             quotationMaster.setCreatedBy(authService.authUser());
             quotationMaster.setCreatedAt(new Date());
             quotationMasterRepo.saveAndFlush(quotationMaster);
@@ -80,15 +84,15 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
             quotationMaster.setRef(data.getRef());
         }
 
-        if (Objects.nonNull(data.getDate())) {
+        if (Objects.nonNull(data.getDate()) && !Objects.equals(data.getDate(), quotationMaster.getDate())) {
             quotationMaster.setDate(data.getDate());
         }
 
-        if (Objects.nonNull(data.getCustomer())) {
+        if (Objects.nonNull(data.getCustomer()) && !Objects.equals(data.getCustomer(), quotationMaster.getCustomer())) {
             quotationMaster.setCustomer(data.getCustomer());
         }
 
-        if (Objects.nonNull(data.getBranch())) {
+        if (Objects.nonNull(data.getBranch()) && !Objects.equals(data.getBranch(), quotationMaster.getBranch())) {
             quotationMaster.setBranch(data.getBranch());
         }
 
@@ -96,41 +100,22 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
             quotationMaster.setQuotationDetails(data.getQuotationDetails());
         }
 
-//        if (!Objects.equals(data.getTaxRate(), quotationMaster.getTaxRate())) {
-//            quotationMaster.setTaxRate(data.getTaxRate());
-//        }
-//
-//        if (!Objects.equals(data.getNetTax(), quotationMaster.getNetTax())) {
-//            quotationMaster.setNetTax(data.getNetTax());
-//        }
-//
-//        if (!Objects.equals(data.getDiscount(), quotationMaster.getDiscount())) {
-//            quotationMaster.setDiscount(data.getDiscount());
-//        }
-
-        if (Objects.nonNull(data.getShipping()) && !"".equalsIgnoreCase(data.getShipping())) {
-            quotationMaster.setShipping(data.getShipping());
+        if (!quotationMaster.getQuotationDetails().isEmpty()) {
+            quotationMaster.getQuotationDetails().forEach(
+                    quotationDetail -> {
+                        if (Objects.isNull(quotationDetail.getQuotation())) {
+                            quotationDetail.setQuotation(quotationMaster);
+                        }
+                    });
         }
 
-//        if (!Objects.equals(data.getPaid(), quotationMaster.getPaid())) {
-//            quotationMaster.setPaid(data.getPaid());
-//        }
-//
-//        if (!Objects.equals(data.getTotal(), quotationMaster.getTotal())) {
-//            quotationMaster.setTotal(data.getTotal());
-//        }
-//
-//        if (!Objects.equals(data.getDue(), quotationMaster.getDue())) {
-//            quotationMaster.setDue(data.getDue());
-//        }
-//
-//        if (Objects.nonNull(data.getStatus()) && !"".equalsIgnoreCase(data.getStatus())) {
-//            quotationMaster.setStatus(data.getStatus());
-//        }
-//
-//        if (Objects.nonNull(data.getPaymentStatus()) && !"".equalsIgnoreCase(data.getPaymentStatus())) {
-//            quotationMaster.setPaymentStatus(data.getPaymentStatus());
-//        }
+        if (Objects.nonNull(data.getTotal()) && !Objects.equals(data.getTotal(), quotationMaster.getTotal())) {
+            quotationMaster.setTotal(data.getTotal());
+        }
+
+        if (Objects.nonNull(data.getStatus()) && !"".equalsIgnoreCase(data.getStatus())) {
+            quotationMaster.setStatus(data.getStatus());
+        }
 
         if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
             quotationMaster.setNotes(data.getNotes());

@@ -4,7 +4,6 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.JWTVerifier;
-import io.nomard.spoty_api_v1.entities.User;
 import io.nomard.spoty_api_v1.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,13 +17,11 @@ import java.time.Instant;
 
 @Service
 public class SpotyTokenService {
-    @Autowired
-    private UserRepository userRepo;
-
     private static final Duration JWT_TOKEN_VALIDITY = Duration.ofHours(15);
-
     private final Algorithm hmac512;
     private final JWTVerifier verifier;
+    @Autowired
+    private UserRepository userRepo;
 
     public SpotyTokenService(@Value("${jwt.secret}") final String secret) {
         this.hmac512 = Algorithm.HMAC512(secret);

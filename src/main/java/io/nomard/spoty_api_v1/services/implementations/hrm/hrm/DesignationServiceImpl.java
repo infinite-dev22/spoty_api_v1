@@ -13,9 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class DesignationServiceImpl implements DesignationService {
@@ -46,6 +44,14 @@ public class DesignationServiceImpl implements DesignationService {
     }
 
     @Override
+    public ArrayList<Designation> getByContains(String search) {
+        return designationRepo.searchAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
+                search,
+                search
+        );
+    }
+
+    @Override
     public ResponseEntity<ObjectNode> save(Designation designation) {
         try {
             designation.setCreatedBy(authService.authUser());
@@ -66,37 +72,17 @@ public class DesignationServiceImpl implements DesignationService {
         }
         var designation = opt.get();
 
-//        if (Objects.nonNull(data.getProduct())) {
-//            designation.setProduct(data.getProduct());
-//        }
+        if (Objects.nonNull(data.getBranch())) {
+            designation.setBranch(data.getBranch());
+        }
 
-//        if (!Objects.equals(data.getNetTax(), designation.getNetTax())) {
-//            designation.setNetTax(data.getNetTax());
-//        }
-//
-//        if (Objects.nonNull(data.getTaxType()) && !"".equalsIgnoreCase(data.getTaxType())) {
-//            designation.setTaxType(data.getTaxType());
-//        }
-//
-//        if (!Objects.equals(data.getDiscount(), designation.getDiscount())) {
-//            designation.setDiscount(data.getDiscount());
-//        }
-//
-//        if (Objects.nonNull(data.getDiscountType()) && !"".equalsIgnoreCase(data.getDiscountType())) {
-//            designation.setDiscountType(data.getDiscountType());
-//        }
-//
-//        if (Objects.nonNull(data.getSerialNumber()) && !"".equalsIgnoreCase(data.getSerialNumber())) {
-//            designation.setSerialNumber(data.getSerialNumber());
-//        }
-//
-//        if (!Objects.equals(data.getTotal(), designation.getTotal())) {
-//            designation.setTotal(data.getTotal());
-//        }
+        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+            designation.setName(data.getName());
+        }
 
-//        if (!Objects.equals(data.getQuantity(), designation.getQuantity())) {
-//            designation.setQuantity(data.getQuantity());
-//        }
+        if (Objects.nonNull(data.getDescription()) && !"".equalsIgnoreCase(data.getDescription())) {
+            designation.setDescription(data.getDescription());
+        }
 
         designation.setUpdatedBy(authService.authUser());
         designation.setUpdatedAt(new Date());
@@ -120,7 +106,12 @@ public class DesignationServiceImpl implements DesignationService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException {
-        return null;
+    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) {
+        try {
+            designationRepo.deleteAllById(idList);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
     }
 }

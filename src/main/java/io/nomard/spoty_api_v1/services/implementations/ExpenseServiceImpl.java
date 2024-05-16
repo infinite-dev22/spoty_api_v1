@@ -13,10 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ExpenseServiceImpl implements ExpenseService {
@@ -84,7 +81,7 @@ public class ExpenseServiceImpl implements ExpenseService {
             expense.setDetails(data.getDetails());
         }
 
-        if (Objects.nonNull(data.getAmount()) && !(data.getAmount() == 0)) {
+        if (!(data.getAmount() == 0)) {
             expense.setAmount(data.getAmount());
         }
 
@@ -115,6 +112,15 @@ public class ExpenseServiceImpl implements ExpenseService {
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             expenseRepo.deleteById(id);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
+    }
+
+    public ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) {
+        try {
+            expenseRepo.deleteAllById(idList);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

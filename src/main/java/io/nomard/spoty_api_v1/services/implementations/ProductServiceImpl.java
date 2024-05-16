@@ -16,10 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -169,6 +166,16 @@ public class ProductServiceImpl implements ProductService {
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             productRepo.deleteById(id);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
+    }
+
+    @Override
+    public ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) {
+        try {
+            productRepo.deleteAllById(idList);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

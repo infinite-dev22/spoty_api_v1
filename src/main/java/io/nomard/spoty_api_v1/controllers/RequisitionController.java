@@ -6,6 +6,7 @@ import io.nomard.spoty_api_v1.entities.requisitions.RequisitionDetail;
 import io.nomard.spoty_api_v1.entities.requisitions.RequisitionMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
+import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.requisitions.RequisitionDetailServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.requisitions.RequisitionMasterServiceImpl;
 import jakarta.validation.Valid;
@@ -35,10 +36,10 @@ public class RequisitionController {
         return requisitionMasterService.getById(findModel.getId());
     }
 
-//    @GetMapping("/masters/search")
-//    public List<RequisitionMaster> getMastersByContains(@RequestBody SearchModel searchModel) {
-//        return requisitionMasterService.getByContains(searchModel.getSearch());
-//    }
+    @GetMapping("/masters/search")
+    public List<RequisitionMaster> getMastersByContains(@RequestBody SearchModel searchModel) {
+        return requisitionMasterService.getByContains(searchModel.getSearch());
+    }
 
     @PostMapping("/master/add")
     public ResponseEntity<ObjectNode> saveMaster(@Valid @RequestBody RequisitionMaster requisitionMaster) {

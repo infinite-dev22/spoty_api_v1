@@ -38,22 +38,15 @@ public class PurchaseDetail implements Serializable {
     private Long id;
 
     private double cost;
+    @Column(name = "sub_total_cost")
+    private double subTotalCost;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "purchaseMaster_id", nullable = false)  // TODO: Change column name.
     @JsonIgnore
     private PurchaseMaster purchase;
 
-    private double netTax;
-    private String taxType;
-    private double discount;
-    private String discountType;
-
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Product product;
-
-    private String serialNumber;
-    private double total;
     private int quantity;
 
     @Column(name = "created_at")

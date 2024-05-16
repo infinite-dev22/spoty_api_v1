@@ -5,12 +5,15 @@ import io.nomard.spoty_api_v1.entities.hrm.hrm.Designation;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface DesignationService {
     List<Designation> getAll(int pageNo, int pageSize);
 
     Designation getById(Long id) throws NotFoundException;
+
+    ArrayList<Designation> getByContains(String search);
 
     ResponseEntity<ObjectNode> save(Designation designation);
 

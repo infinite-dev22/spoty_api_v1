@@ -13,10 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
@@ -90,7 +87,7 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
             uom.setOperator(data.getOperator());
         }
 
-        if (Objects.nonNull(data.getOperatorValue()) && !Objects.equals(data.getOperatorValue(), 0)) {
+        if (!Objects.equals(data.getOperatorValue(), 0)) {
             uom.setOperatorValue(data.getOperatorValue());
         }
 
@@ -114,7 +111,16 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             uomRepo.deleteById(id);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
+    }
 
+    @Override
+    public ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) {
+        try {
+            uomRepo.deleteAllById(idList);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

@@ -13,10 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -125,6 +122,16 @@ public class CustomerServiceImpl implements CustomerService {
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             customerRepo.deleteById(id);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
+    }
+
+    @Override
+    public ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) {
+        try {
+            customerRepo.deleteAllById(idList);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

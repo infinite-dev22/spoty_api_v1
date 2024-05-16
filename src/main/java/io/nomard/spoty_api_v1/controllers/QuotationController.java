@@ -6,6 +6,7 @@ import io.nomard.spoty_api_v1.entities.quotations.QuotationDetail;
 import io.nomard.spoty_api_v1.entities.quotations.QuotationMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
+import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.quotations.QuotationDetailServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.quotations.QuotationMasterServiceImpl;
 import jakarta.validation.Valid;
@@ -35,10 +36,10 @@ public class QuotationController {
         return quotationMasterService.getById(findModel.getId());
     }
 
-//    @GetMapping("/masters/search")
-//    public List<QuotationMaster> getMastersByContains(@RequestBody SearchModel searchModel) {
-//        return quotationMasterService.getByContains(searchModel.getSearch());
-//    }
+    @GetMapping("/masters/search")
+    public List<QuotationMaster> getMastersByContains(@RequestBody SearchModel searchModel) {
+        return quotationMasterService.getByContains(searchModel.getSearch());
+    }
 
     @PostMapping("/master/add")
     public ResponseEntity<ObjectNode> saveMaster(@Valid @RequestBody QuotationMaster quotationMaster) {
@@ -92,7 +93,7 @@ public class QuotationController {
         return quotationDetailService.delete(findModel.getId());
     }
 
-    @DeleteMapping("/details/delete")
+    @DeleteMapping("/delete")
     public ResponseEntity<ObjectNode> deleteDetails(@RequestBody List<Long> idList) throws NotFoundException {
         return quotationDetailService.deleteMultiple(idList);
     }

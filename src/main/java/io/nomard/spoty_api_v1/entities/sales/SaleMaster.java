@@ -24,8 +24,10 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "sale_masters")
@@ -38,9 +40,6 @@ public class SaleMaster implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User user_detail;
 
     @Column(nullable = false)
     private Date date;
@@ -57,7 +56,8 @@ public class SaleMaster implements Serializable {
 
     @OneToMany(mappedBy = "sale", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
-    private Set<SaleDetail> saleDetails;
+    @Builder.Default
+    private List<SaleDetail> saleDetails = Collections.synchronizedList(new ArrayList<>());
 
     @Column(name = "tax_rate")
     private double taxRate;

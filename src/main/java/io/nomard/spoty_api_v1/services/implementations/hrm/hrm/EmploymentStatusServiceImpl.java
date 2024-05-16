@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -46,6 +47,15 @@ public class EmploymentStatusServiceImpl implements EmploymentStatusService {
     }
 
     @Override
+    public List<EmploymentStatus> getByContains(String search) {
+        return employmentStatusRepo.searchAllByNameContainingIgnoreCaseOrColorContainingIgnoreCaseOrDescriptionContainsIgnoreCase(
+                search,
+                search,
+                search
+        );
+    }
+
+    @Override
     public ResponseEntity<ObjectNode> save(EmploymentStatus employmentStatus) {
         try {
             employmentStatus.setCreatedBy(authService.authUser());
@@ -66,37 +76,17 @@ public class EmploymentStatusServiceImpl implements EmploymentStatusService {
         }
         var employmentStatus = opt.get();
 
-//        if (Objects.nonNull(data.getProduct())) {
-//            employmentStatus.setProduct(data.getProduct());
-//        }
+        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+            employmentStatus.setName(data.getName());
+        }
 
-//        if (!Objects.equals(data.getNetTax(), employmentStatus.getNetTax())) {
-//            employmentStatus.setNetTax(data.getNetTax());
-//        }
-//
-//        if (Objects.nonNull(data.getTaxType()) && !"".equalsIgnoreCase(data.getTaxType())) {
-//            employmentStatus.setTaxType(data.getTaxType());
-//        }
-//
-//        if (!Objects.equals(data.getDiscount(), employmentStatus.getDiscount())) {
-//            employmentStatus.setDiscount(data.getDiscount());
-//        }
-//
-//        if (Objects.nonNull(data.getDiscountType()) && !"".equalsIgnoreCase(data.getDiscountType())) {
-//            employmentStatus.setDiscountType(data.getDiscountType());
-//        }
-//
-//        if (Objects.nonNull(data.getSerialNumber()) && !"".equalsIgnoreCase(data.getSerialNumber())) {
-//            employmentStatus.setSerialNumber(data.getSerialNumber());
-//        }
-//
-//        if (!Objects.equals(data.getTotal(), employmentStatus.getTotal())) {
-//            employmentStatus.setTotal(data.getTotal());
-//        }
+        if (Objects.nonNull(data.getColor()) && !"".equalsIgnoreCase(data.getColor())) {
+            employmentStatus.setColor(data.getColor());
+        }
 
-//        if (!Objects.equals(data.getQuantity(), employmentStatus.getQuantity())) {
-//            employmentStatus.setQuantity(data.getQuantity());
-//        }
+        if (Objects.nonNull(data.getDescription()) && !"".equalsIgnoreCase(data.getDescription())) {
+            employmentStatus.setDescription(data.getDescription());
+        }
 
         employmentStatus.setUpdatedBy(authService.authUser());
         employmentStatus.setUpdatedAt(new Date());
@@ -120,7 +110,12 @@ public class EmploymentStatusServiceImpl implements EmploymentStatusService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException {
-        return null;
+    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) {
+        try {
+            employmentStatusRepo.deleteAllById(idList);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -18,7 +19,6 @@ import java.util.List;
 public class BrandController {
     @Autowired
     private BrandServiceImpl brandService;
-
 
     @GetMapping("/all")
     public List<Brand> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
@@ -49,5 +49,10 @@ public class BrandController {
     @DeleteMapping("/single/delete")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return brandService.delete(findModel.getId());
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<ObjectNode> delete(@RequestBody ArrayList<Long> idList) {
+        return brandService.deleteMultiple(idList);
     }
 }

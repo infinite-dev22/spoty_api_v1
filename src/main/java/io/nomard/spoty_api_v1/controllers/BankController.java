@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Bank;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
+import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.BankServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -30,10 +32,10 @@ public class BankController {
         return bankService.getById(findModel.getId());
     }
 
-//    @GetMapping("/search")
-//    public List<Bank> getByContains(@RequestBody SearchModel searchModel) {
-//        return bankService.getByContains(searchModel.getSearch());
-//    }
+    @GetMapping("/search")
+    public List<Bank> getByContains(@RequestBody SearchModel searchModel) {
+        return bankService.getByContains(searchModel.getSearch());
+    }
 
     @PostMapping("/add")
     public ResponseEntity<ObjectNode> save(@Valid @RequestBody Bank bank) {
@@ -48,5 +50,10 @@ public class BankController {
     @DeleteMapping("/single/delete")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return bankService.delete(findModel.getId());
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> ids) throws NotFoundException {
+        return bankService.deleteMultiple(ids);
     }
 }

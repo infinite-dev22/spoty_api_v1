@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +44,11 @@ public class SalaryServiceImpl implements SalaryService {
             throw new NotFoundException();
         }
         return salary.get();
+    }
+
+    @Override
+    public ArrayList<Salary> getByContains(String search) {
+        return null;
     }
 
     @Override
@@ -120,7 +126,12 @@ public class SalaryServiceImpl implements SalaryService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException {
-        return null;
+    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) {
+        try {
+            salaryRepo.deleteAllById(idList);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
     }
 }

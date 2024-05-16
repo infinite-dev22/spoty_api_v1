@@ -5,6 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface EmploymentStatusRepository extends PagingAndSortingRepository<EmploymentStatus, Long>, JpaRepository<EmploymentStatus, Long> {
+    List<EmploymentStatus> searchAllByNameContainingIgnoreCaseOrColorContainingIgnoreCaseOrDescriptionContainsIgnoreCase(String name, String color, String description);
 }

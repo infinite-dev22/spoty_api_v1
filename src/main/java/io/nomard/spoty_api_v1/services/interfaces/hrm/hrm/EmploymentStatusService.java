@@ -12,11 +12,13 @@ public interface EmploymentStatusService {
 
     EmploymentStatus getById(Long id) throws NotFoundException;
 
+    List<EmploymentStatus> getByContains(String search);
+
     ResponseEntity<ObjectNode> save(EmploymentStatus employmentStatus);
 
     ResponseEntity<ObjectNode> update(EmploymentStatus employmentStatus) throws NotFoundException;
 
     ResponseEntity<ObjectNode> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException;
+    ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList);
 }

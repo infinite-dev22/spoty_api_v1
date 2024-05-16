@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -66,37 +67,17 @@ public class SaleTermAndConditionServiceImpl implements SaleTermAndConditionServ
         }
         var saleTermAndCondition = opt.get();
 
-//        if (Objects.nonNull(data.getProduct())) {
-//            saleTermAndCondition.setProduct(data.getProduct());
-//        }
+        if (Objects.nonNull(data.getBranch()) && !Objects.equals(data.getBranch(), saleTermAndCondition.getBranch())) {
+            saleTermAndCondition.setBranch(data.getBranch());
+        }
 
-//        if (!Objects.equals(data.getNetTax(), saleTermAndCondition.getNetTax())) {
-//            saleTermAndCondition.setNetTax(data.getNetTax());
-//        }
-//
-//        if (Objects.nonNull(data.getTaxType()) && !"".equalsIgnoreCase(data.getTaxType())) {
-//            saleTermAndCondition.setTaxType(data.getTaxType());
-//        }
-//
-//        if (!Objects.equals(data.getDiscount(), saleTermAndCondition.getDiscount())) {
-//            saleTermAndCondition.setDiscount(data.getDiscount());
-//        }
-//
-//        if (Objects.nonNull(data.getDiscountType()) && !"".equalsIgnoreCase(data.getDiscountType())) {
-//            saleTermAndCondition.setDiscountType(data.getDiscountType());
-//        }
-//
-//        if (Objects.nonNull(data.getSerialNumber()) && !"".equalsIgnoreCase(data.getSerialNumber())) {
-//            saleTermAndCondition.setSerialNumber(data.getSerialNumber());
-//        }
-//
-//        if (!Objects.equals(data.getTotal(), saleTermAndCondition.getTotal())) {
-//            saleTermAndCondition.setTotal(data.getTotal());
-//        }
+        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+            saleTermAndCondition.setName(data.getName());
+        }
 
-//        if (!Objects.equals(data.getQuantity(), saleTermAndCondition.getQuantity())) {
-//            saleTermAndCondition.setQuantity(data.getQuantity());
-//        }
+        if (!Objects.equals(data.isActive(), saleTermAndCondition.isActive())) {
+            saleTermAndCondition.setActive(data.isActive());
+        }
 
         saleTermAndCondition.setUpdatedBy(authService.authUser());
         saleTermAndCondition.setUpdatedAt(new Date());
@@ -120,7 +101,12 @@ public class SaleTermAndConditionServiceImpl implements SaleTermAndConditionServ
     }
 
     @Override
-    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException {
-        return null;
+    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) {
+        try {
+            saleTermAndConditionRepo.deleteAllById(idList);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
     }
 }

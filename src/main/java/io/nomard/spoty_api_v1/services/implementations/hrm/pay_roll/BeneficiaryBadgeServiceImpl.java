@@ -13,9 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class BeneficiaryBadgeServiceImpl implements BeneficiaryBadgeService {
@@ -46,6 +44,11 @@ public class BeneficiaryBadgeServiceImpl implements BeneficiaryBadgeService {
     }
 
     @Override
+    public List<BeneficiaryBadge> getByContains(String search) {
+        return beneficiaryBadgeRepo.searchAllByNameContainingIgnoreCaseOrColorContainingIgnoreCase(search, search);
+    }
+
+    @Override
     public ResponseEntity<ObjectNode> save(BeneficiaryBadge beneficiaryBadge) {
         try {
             beneficiaryBadge.setCreatedBy(authService.authUser());
@@ -66,37 +69,25 @@ public class BeneficiaryBadgeServiceImpl implements BeneficiaryBadgeService {
         }
         var beneficiaryBadge = opt.get();
 
-//        if (Objects.nonNull(data.getProduct())) {
-//            beneficiaryBadge.setProduct(data.getProduct());
-//        }
+        if (!Objects.equals(data.getBranches(), beneficiaryBadge.getBranches())) {
+            beneficiaryBadge.setBranches(data.getBranches());
+        }
 
-//        if (!Objects.equals(data.getNetTax(), beneficiaryBadge.getNetTax())) {
-//            beneficiaryBadge.setNetTax(data.getNetTax());
-//        }
-//
-//        if (Objects.nonNull(data.getTaxType()) && !"".equalsIgnoreCase(data.getTaxType())) {
-//            beneficiaryBadge.setTaxType(data.getTaxType());
-//        }
-//
-//        if (!Objects.equals(data.getDiscount(), beneficiaryBadge.getDiscount())) {
-//            beneficiaryBadge.setDiscount(data.getDiscount());
-//        }
-//
-//        if (Objects.nonNull(data.getDiscountType()) && !"".equalsIgnoreCase(data.getDiscountType())) {
-//            beneficiaryBadge.setDiscountType(data.getDiscountType());
-//        }
-//
-//        if (Objects.nonNull(data.getSerialNumber()) && !"".equalsIgnoreCase(data.getSerialNumber())) {
-//            beneficiaryBadge.setSerialNumber(data.getSerialNumber());
-//        }
-//
-//        if (!Objects.equals(data.getTotal(), beneficiaryBadge.getTotal())) {
-//            beneficiaryBadge.setTotal(data.getTotal());
-//        }
+        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+            beneficiaryBadge.setName(data.getName());
+        }
 
-//        if (!Objects.equals(data.getQuantity(), beneficiaryBadge.getQuantity())) {
-//            beneficiaryBadge.setQuantity(data.getQuantity());
-//        }
+        if (Objects.nonNull(data.getBeneficiaryType())) {
+            beneficiaryBadge.setBeneficiaryType(data.getBeneficiaryType());
+        }
+
+        if (Objects.nonNull(data.getColor()) && !"".equalsIgnoreCase(data.getColor())) {
+            beneficiaryBadge.setColor(data.getColor());
+        }
+
+        if (Objects.nonNull(data.getDescription()) && !"".equalsIgnoreCase(data.getDescription())) {
+            beneficiaryBadge.setDescription(data.getDescription());
+        }
 
         beneficiaryBadge.setUpdatedBy(authService.authUser());
         beneficiaryBadge.setUpdatedAt(new Date());
@@ -120,7 +111,12 @@ public class BeneficiaryBadgeServiceImpl implements BeneficiaryBadgeService {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException {
-        return null;
+    public ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) throws NotFoundException {
+        try {
+            beneficiaryBadgeRepo.deleteAllById(idList);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
     }
 }

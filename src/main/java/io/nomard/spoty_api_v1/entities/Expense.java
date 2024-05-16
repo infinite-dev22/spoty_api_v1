@@ -51,7 +51,7 @@ public class Expense implements Serializable {
     private ExpenseCategory expenseCategory;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, name = "branch_id")
+    @JoinColumn(name = "branch_id")
     private Branch branch;
 
     private String details;

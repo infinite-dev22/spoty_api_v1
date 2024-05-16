@@ -6,8 +6,10 @@ import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "beneficiary_types")
@@ -26,7 +28,8 @@ public class BeneficiaryType {
             name = "beneficiary_types_branches",
             joinColumns = {@JoinColumn(name = "employment_status_id")},
             inverseJoinColumns = {@JoinColumn(name = "branch_id")})
-    private Set<Branch> branches;
+    @Builder.Default
+    private List<Branch> branches = Collections.synchronizedList(new ArrayList<>());
     private String name;
     private String color;
     private String description;

@@ -23,8 +23,10 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "adjustment_masters")
@@ -45,7 +47,8 @@ public class AdjustmentMaster implements Serializable {
 
     @OneToMany(mappedBy = "adjustment", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
-    private Set<AdjustmentDetail> adjustmentDetails;
+    @Builder.Default
+    private List<AdjustmentDetail> adjustmentDetails = Collections.synchronizedList(new ArrayList<>());
 
     private String notes;
 
