@@ -20,7 +20,6 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -34,26 +33,30 @@ public class User implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(targetEntity = UserProfile.class, mappedBy = "user")
-    @JsonIgnore
+    @OneToOne(optional = false, targetEntity = UserProfile.class, orphanRemoval = true, fetch = FetchType.LAZY)
     private UserProfile userProfile;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "organisation_id", nullable = false)
+    @JsonIgnore
+    private Tenant tenant;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "branch_id", nullable = false)
+    @JsonIgnore
+    private Branch branch;
 
     @JsonIgnore
     private String email;
     @JsonIgnore
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "users_roles",
-            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
-    @JsonIgnore
-    private Set<Role> roles;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
 
     @Column(nullable = false)
     @Builder.Default
-    @JsonIgnore
     private boolean active = true;
 
     @Column(nullable = false)

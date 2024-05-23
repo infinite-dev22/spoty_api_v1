@@ -69,12 +69,16 @@ public class SaleMasterServiceImpl implements SaleMasterService {
         try {
             for (int i = 0; i < saleMaster.getSaleDetails().size(); i++) {
                 saleMaster.getSaleDetails().get(i).setSale(saleMaster);
-                saleTransactionService.save(saleMaster.getSaleDetails().get(i));
             }
 
             saleMaster.setCreatedBy(authService.authUser());
             saleMaster.setCreatedAt(new Date());
             saleMasterRepo.saveAndFlush(saleMaster);
+
+            for (int i = 0; i < saleMaster.getSaleDetails().size(); i++) {
+                saleTransactionService.save(saleMaster.getSaleDetails().get(i));
+            }
+
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -109,9 +113,7 @@ public class SaleMasterServiceImpl implements SaleMasterService {
 
         if (Objects.nonNull(data.getSaleDetails()) && !data.getSaleDetails().isEmpty()) {
             saleMaster.setSaleDetails(data.getSaleDetails());
-        }
 
-        if (!saleMaster.getSaleDetails().isEmpty()) {
             for (int i = 0; i < saleMaster.getSaleDetails().size(); i++) {
                 saleMaster.getSaleDetails().get(i).setSale(saleMaster);
                 try {

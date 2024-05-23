@@ -67,12 +67,16 @@ public class AdjustmentMasterServiceImpl implements AdjustmentMasterService {
         try {
             for (int i = 0; i < adjustmentMaster.getAdjustmentDetails().size(); i++) {
                 adjustmentMaster.getAdjustmentDetails().get(i).setAdjustment(adjustmentMaster);
-                adjustmentTransactionService.save(adjustmentMaster.getAdjustmentDetails().get(i));
             }
 
             adjustmentMaster.setCreatedBy(authService.authUser());
             adjustmentMaster.setCreatedAt(new Date());
             adjustmentMasterRepo.saveAndFlush(adjustmentMaster);
+
+            for (int i = 0; i < adjustmentMaster.getAdjustmentDetails().size(); i++) {
+                adjustmentTransactionService.save(adjustmentMaster.getAdjustmentDetails().get(i));
+            }
+
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -89,19 +93,13 @@ public class AdjustmentMasterServiceImpl implements AdjustmentMasterService {
         }
         var adjustmentMaster = opt.get();
 
-        if (Objects.nonNull(data.getDate())) {
-            adjustmentMaster.setDate(data.getDate());
-        }
-
         if (Objects.nonNull(data.getBranch())) {
             adjustmentMaster.setBranch(data.getBranch());
         }
 
         if (Objects.nonNull(data.getAdjustmentDetails()) && !data.getAdjustmentDetails().isEmpty()) {
             adjustmentMaster.setAdjustmentDetails(data.getAdjustmentDetails());
-        }
 
-        if (!adjustmentMaster.getAdjustmentDetails().isEmpty()) {
             for (int i = 0; i < adjustmentMaster.getAdjustmentDetails().size(); i++) {
                 adjustmentMaster.getAdjustmentDetails().get(i).setAdjustment(adjustmentMaster);
                 try {

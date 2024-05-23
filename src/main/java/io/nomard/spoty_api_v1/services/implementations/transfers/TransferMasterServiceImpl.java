@@ -69,12 +69,16 @@ public class TransferMasterServiceImpl implements TransferMasterService {
         try {
             for (int i = 0; i < transferMaster.getTransferDetails().size(); i++) {
                 transferMaster.getTransferDetails().get(i).setTransfer(transferMaster);
-                transferTransactionService.save(transferMaster.getTransferDetails().get(i));
             }
 
             transferMaster.setCreatedBy(authService.authUser());
             transferMaster.setCreatedAt(new Date());
             transferMasterRepo.saveAndFlush(transferMaster);
+
+            for (int i = 0; i < transferMaster.getTransferDetails().size(); i++) {
+                transferTransactionService.save(transferMaster.getTransferDetails().get(i));
+            }
+
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -109,9 +113,7 @@ public class TransferMasterServiceImpl implements TransferMasterService {
 
         if (Objects.nonNull(data.getTransferDetails()) && !data.getTransferDetails().isEmpty()) {
             transferMaster.setTransferDetails(data.getTransferDetails());
-        }
 
-        if (!transferMaster.getTransferDetails().isEmpty()) {
             for (int i = 0; i < transferMaster.getTransferDetails().size(); i++) {
                 transferMaster.getTransferDetails().get(i).setTransfer(transferMaster);
                 try {

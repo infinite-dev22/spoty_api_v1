@@ -1,15 +1,20 @@
 package io.nomard.spoty_api_v1.principals;
 
-import io.nomard.spoty_api_v1.entities.Role;
 import io.nomard.spoty_api_v1.entities.User;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class SpotyUserPrincipal implements UserDetails {
     private final User user;
+
+    private List<GrantedAuthority> permissions;
+    private ArrayList<String> permissionNames;
 
     public SpotyUserPrincipal(User user) {
         this.user = user;
@@ -17,7 +22,7 @@ public class SpotyUserPrincipal implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return this.permissions;
     }
 
     @Override
@@ -25,8 +30,10 @@ public class SpotyUserPrincipal implements UserDetails {
         return user.getPassword();
     }
 
-    public Set<Role> getRoles() {
-        return user.getRoles();
+    public List<GrantedAuthority> getPermissions() {
+        user.getRole().getPermissions().forEach(permission -> permissionNames.add(permission.getName()));
+        this.permissions = permissionNames.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+        return this.permissions;
     }
 
     @Override

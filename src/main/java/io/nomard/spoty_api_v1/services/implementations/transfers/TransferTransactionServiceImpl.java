@@ -49,7 +49,7 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
         if (transferDetail.getProduct().getQuantity() > 0 && transferDetail.getProduct().getQuantity() > transferDetail.getQuantity()) {
             try {
                 var productQuantity =
-                        transferDetail.getProduct().getQuantity() - transferDetail.getQuantity();
+                        productService.getById(transferDetail.getProduct().getId()).getQuantity() - transferDetail.getQuantity();
 
                 var product = transferDetail.getProduct();
                 product.setQuantity(productQuantity);
@@ -84,18 +84,18 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
         }
         var transferTransaction = opt.get();
 
-        if (Objects.equals(transferTransaction.getFromBranch(), data.getTransfer().getFromBranch()) && Objects.nonNull(data.getTransfer().getFromBranch())) {
+        if (!Objects.equals(transferTransaction.getFromBranch(), data.getTransfer().getFromBranch()) && Objects.nonNull(data.getTransfer().getFromBranch())) {
             transferTransaction.setFromBranch(data.getTransfer().getFromBranch());
         }
 
-        if (Objects.equals(transferTransaction.getToBranch(), data.getTransfer().getToBranch()) && Objects.nonNull(data.getTransfer().getToBranch())) {
+        if (!Objects.equals(transferTransaction.getToBranch(), data.getTransfer().getToBranch()) && Objects.nonNull(data.getTransfer().getToBranch())) {
             transferTransaction.setToBranch(data.getTransfer().getToBranch());
         }
 
-        if (Objects.equals(transferTransaction.getProduct(), data.getProduct()) && Objects.nonNull(data.getProduct())) {
+        if (!Objects.equals(transferTransaction.getProduct(), data.getProduct()) && Objects.nonNull(data.getProduct())) {
             if (data.getProduct().getQuantity() > 0 && data.getProduct().getQuantity() > data.getQuantity()) {
                 var adjustQuantity = transferTransaction.getTransferQuantity();
-                var currentProductQuantity = data.getProduct().getQuantity();
+                var currentProductQuantity = productService.getById(data.getProduct().getId()).getQuantity();
                 var productQuantity =
                         (currentProductQuantity - adjustQuantity) + data.getQuantity();
 
@@ -107,15 +107,15 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
             transferTransaction.setProduct(data.getProduct());
         }
 
-        if (Objects.equals(transferTransaction.getTransferDetail(), data)) {
+        if (!Objects.equals(transferTransaction.getTransferDetail(), data)) {
             transferTransaction.setTransferDetail(data);
         }
 
-        if (Objects.equals(transferTransaction.getTransferDetail().getCreatedAt(), data.getCreatedAt()) && Objects.nonNull(data.getCreatedAt())) {
+        if (!Objects.equals(transferTransaction.getTransferDetail().getCreatedAt(), data.getCreatedAt()) && Objects.nonNull(data.getCreatedAt())) {
             transferTransaction.setDate(data.getCreatedAt());
         }
 
-        if (Objects.equals(transferTransaction.getTransferQuantity(), data.getQuantity())) {
+        if (!Objects.equals(transferTransaction.getTransferQuantity(), data.getQuantity())) {
             transferTransaction.setTransferQuantity(data.getQuantity());
         }
 

@@ -32,12 +32,10 @@ import io.nomard.spoty_api_v1.services.auth.SpotyUserDetailsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
 @Configuration
-@EnableWebSecurity
 public class AppConfig {
     @Value("jwt.secret")
     private String secret;
@@ -73,8 +71,8 @@ public class AppConfig {
     }
 
     @Bean
-    public Organisation organisation() {
-        return new Organisation();
+    public Tenant organisation() {
+        return new Tenant();
     }
 
     @Bean
@@ -255,5 +253,15 @@ public class AppConfig {
     @Bean
     public TransferTransaction transferTransaction() {
         return new TransferTransaction();
+    }
+
+    @Bean
+    public Role role() {
+        return new Role();
+    }
+
+    @Bean
+    public Permission permission() {
+        return new Permission();
     }
 }

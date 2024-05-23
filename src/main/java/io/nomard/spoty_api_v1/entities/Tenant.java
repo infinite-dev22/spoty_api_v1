@@ -20,14 +20,14 @@ import lombok.*;
 
 import java.util.Date;
 
-@Table(name = "organisations")
+@Table(name = "tenants")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Entity
-public class Organisation {
+public class Tenant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,16 +35,16 @@ public class Organisation {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private String city;
+    @Column(nullable = false, name = "subscription_end_date")
+    private Date subscriptionEndDate;
 
-    @Column(nullable = false)
-    private String phone;
-
-    private String email;
-
-    @Column(nullable = false)
-    private String country;
+    @Builder.Default
+    private boolean trial = false;
+    @Column(name = "trial_end_date")
+    private Date trialEndDate;
+    @Column(name = "new_tenancy")
+    @Builder.Default
+    private boolean newTenancy = true;
 
     @Column(name = "created_at")
     @JsonIgnore

@@ -22,17 +22,17 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ObjectNode> login(@Valid @RequestBody LoginModel loginDetails) {
+    public ResponseEntity<ObjectNode> login(@Valid @RequestBody LoginModel loginDetails) throws NotFoundException {
         return authService.login(loginDetails);
     }
 
     @PutMapping("/reset")
-    public ResponseEntity<ObjectNode> reset(@Valid @RequestBody LoginModel loginDetails) {
+    public ResponseEntity<ObjectNode> reset(@Valid @RequestBody LoginModel loginDetails) throws NotFoundException {
         return authService.login(loginDetails);
     }
 
     @PostMapping("/request/reset")
-    public ResponseEntity<ObjectNode> requestReset(@Valid @RequestBody LoginModel loginDetails) {
+    public ResponseEntity<ObjectNode> requestReset(@Valid @RequestBody LoginModel loginDetails) throws NotFoundException {
         return authService.login(loginDetails);
     }
 }

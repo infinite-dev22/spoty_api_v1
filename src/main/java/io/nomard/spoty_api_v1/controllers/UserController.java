@@ -5,6 +5,7 @@ import io.nomard.spoty_api_v1.entities.User;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
+import io.nomard.spoty_api_v1.models.UserModel;
 import io.nomard.spoty_api_v1.services.implementations.UserServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,13 +37,13 @@ public class UserController {
     }
 
     @PostMapping("/add")
-    public ObjectNode save(@Valid @RequestBody User user) throws NotFoundException {
-        return userService.add(user).getBody();
+    public ObjectNode save(@Valid @RequestBody UserModel userModel) throws NotFoundException {
+        return userService.add(userModel).getBody();
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ObjectNode> update(@Valid @RequestBody User user) throws NotFoundException {
-        return userService.update(user);
+    public ResponseEntity<ObjectNode> update(@Valid @RequestBody UserModel userModel) throws NotFoundException {
+        return userService.update(userModel);
     }
 
     @DeleteMapping("/single/delete")

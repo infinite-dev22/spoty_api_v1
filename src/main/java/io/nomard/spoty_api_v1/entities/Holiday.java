@@ -37,7 +37,7 @@ public class Holiday implements Serializable {
     private String title;
     @JoinColumn(nullable = false, name = "company_id")
     @ManyToOne(fetch = FetchType.LAZY)
-    private Organisation organisation;
+    private Tenant tenant;
 
     @Column(name = "start_date")
     private Date startDate;

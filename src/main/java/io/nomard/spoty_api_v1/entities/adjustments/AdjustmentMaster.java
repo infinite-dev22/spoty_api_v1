@@ -40,7 +40,6 @@ public class AdjustmentMaster implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Date date;
     private String ref;
     @ManyToOne(fetch = FetchType.LAZY)
     private Branch branch;

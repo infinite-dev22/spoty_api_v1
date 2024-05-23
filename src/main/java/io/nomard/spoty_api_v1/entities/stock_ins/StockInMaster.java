@@ -23,8 +23,10 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "stock_in_masters")
@@ -38,12 +40,7 @@ public class StockInMaster implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User user_detail;
     private String ref;
-
-    @Column(nullable = false)
-    private Date date;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "branch_id")
@@ -51,26 +48,9 @@ public class StockInMaster implements Serializable {
 
     @OneToMany(mappedBy = "stockIn", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
-    private Set<StockInDetail> stockInDetails;
+    @Builder.Default
+    private List<StockInDetail> stockInDetails = Collections.synchronizedList(new ArrayList<>());
 
-    private String shipping;
-
-    @Column(nullable = false)
-    private double totalCost;
-
-    @Column(nullable = false)
-    private String status;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "approved_by_id")
-    private User approvedBy;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recorded_by_id")
-    private User recordedBy;
-
-    private Date approvalDate;
-    private Date recordDate;
     private String notes;
 
     @Column(name = "created_at")

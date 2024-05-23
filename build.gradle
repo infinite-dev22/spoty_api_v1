@@ -33,6 +33,7 @@ bootJar {
 }
 
 dependencies {
+    implementation 'com.flutterwave:f4b-java:3.0.1F'
     implementation 'org.realityforge.org.jetbrains.annotations:org.jetbrains.annotations:1.7.0'
     implementation 'com.auth0:java-jwt:4.4.0'
     implementation 'org.springframework.boot:spring-boot-starter-validation'

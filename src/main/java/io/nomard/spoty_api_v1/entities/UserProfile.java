@@ -33,9 +33,6 @@ public class UserProfile implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(optional = false, targetEntity = User.class, orphanRemoval = true, fetch = FetchType.LAZY)
-    private User user;
-
     @Column(name = "first_name")
     private String firstName;
 
@@ -46,7 +43,6 @@ public class UserProfile implements Serializable {
     private String otherName;
 
     private String phone;
-    private String email;
 
     @Column(unique = true)
     private String avatar;

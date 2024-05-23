@@ -98,15 +98,10 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
 
         if (Objects.nonNull(data.getQuotationDetails()) && !data.getQuotationDetails().isEmpty()) {
             quotationMaster.setQuotationDetails(data.getQuotationDetails());
-        }
 
-        if (!quotationMaster.getQuotationDetails().isEmpty()) {
-            quotationMaster.getQuotationDetails().forEach(
-                    quotationDetail -> {
-                        if (Objects.isNull(quotationDetail.getQuotation())) {
-                            quotationDetail.setQuotation(quotationMaster);
-                        }
-                    });
+            for (int i = 0; i < quotationMaster.getQuotationDetails().size(); i++) {
+                quotationMaster.getQuotationDetails().get(i).setQuotation(quotationMaster);
+            }
         }
 
         if (Objects.nonNull(data.getTotal()) && !Objects.equals(data.getTotal(), quotationMaster.getTotal())) {

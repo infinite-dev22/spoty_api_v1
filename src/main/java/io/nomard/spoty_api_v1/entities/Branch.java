@@ -48,6 +48,9 @@ public class Branch {
 
     private String zipCode;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Tenant tenant;
+
     @Column(name = "created_at")
     @JsonIgnore
     private Date createdAt;

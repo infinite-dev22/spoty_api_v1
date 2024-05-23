@@ -50,10 +50,10 @@ public class AdjustmentTransactionServiceImpl implements AdjustmentTransactionSe
 
             if (adjustmentDetail.getAdjustmentType().equalsIgnoreCase("INCREMENT")) {
                 productQuantity =
-                        adjustmentDetail.getProduct().getQuantity() + adjustmentDetail.getQuantity();
+                        productService.getById(adjustmentDetail.getProduct().getId()).getQuantity() + adjustmentDetail.getQuantity();
             } else if (adjustmentDetail.getAdjustmentType().equalsIgnoreCase("DECREMENT")) {
                 productQuantity =
-                        adjustmentDetail.getProduct().getQuantity() - adjustmentDetail.getQuantity();
+                        productService.getById(adjustmentDetail.getProduct().getId()).getQuantity() - adjustmentDetail.getQuantity();
             }
 
             var product = adjustmentDetail.getProduct();
@@ -87,13 +87,13 @@ public class AdjustmentTransactionServiceImpl implements AdjustmentTransactionSe
         }
         var adjustmentTransaction = opt.get();
 
-        if (Objects.equals(adjustmentTransaction.getBranch(), data.getAdjustment().getBranch()) && Objects.nonNull(data.getAdjustment().getBranch())) {
+        if (!Objects.equals(adjustmentTransaction.getBranch(), data.getAdjustment().getBranch()) && Objects.nonNull(data.getAdjustment().getBranch())) {
             adjustmentTransaction.setBranch(data.getAdjustment().getBranch());
         }
 
-        if (Objects.equals(adjustmentTransaction.getProduct(), data.getProduct()) && Objects.nonNull(data.getProduct())) {
+        if (!Objects.equals(adjustmentTransaction.getProduct(), data.getProduct()) && Objects.nonNull(data.getProduct())) {
             var productQuantity = 0L;
-            var currentProductQuantity = data.getProduct().getQuantity();
+            var currentProductQuantity = productService.getById(data.getProduct().getId()).getQuantity();
 
             var adjustQuantity = adjustmentTransaction.getAdjustQuantity();
 
@@ -116,15 +116,15 @@ public class AdjustmentTransactionServiceImpl implements AdjustmentTransactionSe
             adjustmentTransaction.setProduct(data.getProduct());
         }
 
-        if (Objects.equals(adjustmentTransaction.getAdjustmentDetail(), data)) {
+        if (!Objects.equals(adjustmentTransaction.getAdjustmentDetail(), data)) {
             adjustmentTransaction.setAdjustmentDetail(data);
         }
 
-        if (Objects.equals(adjustmentTransaction.getAdjustmentDetail().getCreatedAt(), data.getCreatedAt()) && Objects.nonNull(data.getCreatedAt())) {
+        if (!Objects.equals(adjustmentTransaction.getAdjustmentDetail().getCreatedAt(), data.getCreatedAt()) && Objects.nonNull(data.getCreatedAt())) {
             adjustmentTransaction.setDate(data.getCreatedAt());
         }
 
-        if (Objects.equals(adjustmentTransaction.getAdjustQuantity(), data.getQuantity())) {
+        if (!Objects.equals(adjustmentTransaction.getAdjustQuantity(), data.getQuantity())) {
             adjustmentTransaction.setAdjustQuantity(data.getQuantity());
         }
 

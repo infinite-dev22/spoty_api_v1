@@ -57,6 +57,12 @@ public class RequisitionMasterServiceImpl implements RequisitionMasterService {
     @Override
     public ResponseEntity<ObjectNode> save(RequisitionMaster requisitionMaster) {
         try {
+            if (!requisitionMaster.getRequisitionDetails().isEmpty()) {
+                for (int i = 0; i < requisitionMaster.getRequisitionDetails().size(); i++) {
+                    requisitionMaster.getRequisitionDetails().get(i).setRequisition(requisitionMaster);
+                }
+            }
+
             requisitionMaster.setCreatedBy(authService.authUser());
             requisitionMaster.setCreatedAt(new Date());
             requisitionMasterRepo.saveAndFlush(requisitionMaster);
@@ -93,15 +99,10 @@ public class RequisitionMasterServiceImpl implements RequisitionMasterService {
 
         if (Objects.nonNull(data.getRequisitionDetails()) && !data.getRequisitionDetails().isEmpty()) {
             requisitionMaster.setRequisitionDetails(data.getRequisitionDetails());
-        }
 
-        if (!requisitionMaster.getRequisitionDetails().isEmpty()) {
-            requisitionMaster.getRequisitionDetails().forEach(
-                    requisitionDetail -> {
-                        if (Objects.isNull(requisitionDetail.getRequisition())) {
-                            requisitionDetail.setRequisition(requisitionMaster);
-                        }
-                    });
+            for (int i = 0; i < requisitionMaster.getRequisitionDetails().size(); i++) {
+                requisitionMaster.getRequisitionDetails().get(i).setRequisition(requisitionMaster);
+            }
         }
 
         if (Objects.nonNull(data.getShipVia()) && !"".equalsIgnoreCase(data.getShipVia())) {

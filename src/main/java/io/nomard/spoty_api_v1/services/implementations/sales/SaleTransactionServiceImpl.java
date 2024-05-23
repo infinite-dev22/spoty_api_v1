@@ -49,7 +49,7 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
         if (saleDetail.getProduct().getQuantity() > 0 && saleDetail.getProduct().getQuantity() > saleDetail.getQuantity()) {
             try {
                 var productQuantity =
-                        saleDetail.getProduct().getQuantity() - saleDetail.getQuantity();
+                        productService.getById(saleDetail.getProduct().getId()).getQuantity() - saleDetail.getQuantity();
 
                 var product = saleDetail.getProduct();
                 product.setQuantity(productQuantity);
@@ -83,14 +83,14 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
         }
         var saleTransaction = opt.get();
 
-        if (Objects.equals(saleTransaction.getBranch(), data.getSale().getBranch()) && Objects.nonNull(data.getSale().getBranch())) {
+        if (!Objects.equals(saleTransaction.getBranch(), data.getSale().getBranch()) && Objects.nonNull(data.getSale().getBranch())) {
             saleTransaction.setBranch(data.getSale().getBranch());
         }
 
-        if (Objects.equals(saleTransaction.getProduct(), data.getProduct()) && Objects.nonNull(data.getProduct())) {
+        if (!Objects.equals(saleTransaction.getProduct(), data.getProduct()) && Objects.nonNull(data.getProduct())) {
             if (data.getProduct().getQuantity() > 0 && data.getProduct().getQuantity() > data.getQuantity()) {
                 var adjustQuantity = saleTransaction.getSaleQuantity();
-                var currentProductQuantity = data.getProduct().getQuantity();
+                var currentProductQuantity = productService.getById(data.getProduct().getId()).getQuantity();
                 var productQuantity =
                         (currentProductQuantity + adjustQuantity) - data.getQuantity();
 
@@ -102,15 +102,15 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
             saleTransaction.setProduct(data.getProduct());
         }
 
-        if (Objects.equals(saleTransaction.getSaleDetail(), data)) {
+        if (!Objects.equals(saleTransaction.getSaleDetail(), data)) {
             saleTransaction.setSaleDetail(data);
         }
 
-        if (Objects.equals(saleTransaction.getSaleDetail().getCreatedAt(), data.getCreatedAt()) && Objects.nonNull(data.getCreatedAt())) {
+        if (!Objects.equals(saleTransaction.getSaleDetail().getCreatedAt(), data.getCreatedAt()) && Objects.nonNull(data.getCreatedAt())) {
             saleTransaction.setDate(data.getCreatedAt());
         }
 
-        if (Objects.equals(saleTransaction.getSaleQuantity(), data.getQuantity())) {
+        if (!Objects.equals(saleTransaction.getSaleQuantity(), data.getQuantity())) {
             saleTransaction.setSaleQuantity(data.getQuantity());
         }
 

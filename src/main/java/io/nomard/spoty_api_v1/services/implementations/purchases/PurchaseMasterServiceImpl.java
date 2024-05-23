@@ -99,9 +99,7 @@ public class PurchaseMasterServiceImpl implements PurchaseMasterService {
 
         if (Objects.nonNull(data.getPurchaseDetails()) && !data.getPurchaseDetails().isEmpty()) {
             purchaseMaster.setPurchaseDetails(data.getPurchaseDetails());
-        }
 
-        if (!purchaseMaster.getPurchaseDetails().isEmpty()) {
             for (int i = 0; i < purchaseMaster.getPurchaseDetails().size(); i++) {
                 purchaseMaster.getPurchaseDetails().get(i).setPurchase(purchaseMaster);
             }

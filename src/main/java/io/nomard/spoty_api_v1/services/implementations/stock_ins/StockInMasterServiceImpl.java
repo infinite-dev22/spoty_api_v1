@@ -23,6 +23,8 @@ public class StockInMasterServiceImpl implements StockInMasterService {
     @Autowired
     private StockInMasterRepository stockInMasterRepo;
     @Autowired
+    private StockInTransactionServiceImpl stockInTransactionService;
+    @Autowired
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
@@ -56,9 +58,21 @@ public class StockInMasterServiceImpl implements StockInMasterService {
     @Override
     public ResponseEntity<ObjectNode> save(StockInMaster stockInMaster) {
         try {
+            if (!stockInMaster.getStockInDetails().isEmpty()) {
+                for (int i = 0; i < stockInMaster.getStockInDetails().size(); i++) {
+                    stockInMaster.getStockInDetails().get(i).setStockIn(stockInMaster);
+                }
+            }
+
             stockInMaster.setCreatedBy(authService.authUser());
             stockInMaster.setCreatedAt(new Date());
             stockInMasterRepo.saveAndFlush(stockInMaster);
+
+            if (!stockInMaster.getStockInDetails().isEmpty()) {
+                for (int i = 0; i < stockInMaster.getStockInDetails().size(); i++) {
+                    stockInTransactionService.save(stockInMaster.getStockInDetails().get(i));
+                }
+            }
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -78,57 +92,22 @@ public class StockInMasterServiceImpl implements StockInMasterService {
             stockInMaster.setRef(data.getRef());
         }
 
-        if (Objects.nonNull(data.getDate())) {
-            stockInMaster.setDate(data.getDate());
-        }
-
-//        if (Objects.nonNull(data.getCustomer())) {
-//            stockInMaster.setCustomer(data.getCustomer());
-//        }
-
-        if (Objects.nonNull(data.getBranch())) {
+        if (!Objects.equals(stockInMaster.getBranch(), data.getBranch()) && Objects.nonNull(data.getBranch())) {
             stockInMaster.setBranch(data.getBranch());
         }
 
         if (Objects.nonNull(data.getStockInDetails()) && !data.getStockInDetails().isEmpty()) {
             stockInMaster.setStockInDetails(data.getStockInDetails());
+
+            for (int i = 0; i < stockInMaster.getStockInDetails().size(); i++) {
+                stockInMaster.getStockInDetails().get(i).setStockIn(stockInMaster);
+                try {
+                    stockInTransactionService.update(stockInMaster.getStockInDetails().get(i));
+                } catch (NotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
-
-//        if (!Objects.equals(data.getTaxRate(), stockInMaster.getTaxRate())) {
-//            stockInMaster.setTaxRate(data.getTaxRate());
-//        }
-//
-//        if (!Objects.equals(data.getNetTax(), stockInMaster.getNetTax())) {
-//            stockInMaster.setNetTax(data.getNetTax());
-//        }
-//
-//        if (!Objects.equals(data.getDiscount(), stockInMaster.getDiscount())) {
-//            stockInMaster.setDiscount(data.getDiscount());
-//        }
-
-//        if (Objects.nonNull(data.getShipping()) && !"".equalsIgnoreCase(data.getShipping())) {
-//            stockInMaster.setShipping(data.getShipping());
-//        }
-
-//        if (!Objects.equals(data.getPaid(), stockInMaster.getPaid())) {
-//            stockInMaster.setPaid(data.getPaid());
-//        }
-//
-//        if (!Objects.equals(data.getTotal(), stockInMaster.getTotal())) {
-//            stockInMaster.setTotal(data.getTotal());
-//        }
-//
-//        if (!Objects.equals(data.getDue(), stockInMaster.getDue())) {
-//            stockInMaster.setDue(data.getDue());
-//        }
-//
-//        if (Objects.nonNull(data.getStatus()) && !"".equalsIgnoreCase(data.getStatus())) {
-//            stockInMaster.setStatus(data.getStatus());
-//        }
-//
-//        if (Objects.nonNull(data.getPaymentStatus()) && !"".equalsIgnoreCase(data.getPaymentStatus())) {
-//            stockInMaster.setPaymentStatus(data.getPaymentStatus());
-//        }
 
         if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
             stockInMaster.setNotes(data.getNotes());

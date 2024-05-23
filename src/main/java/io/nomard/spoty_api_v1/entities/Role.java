@@ -17,9 +17,12 @@ package io.nomard.spoty_api_v1.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "roles")
@@ -38,20 +41,12 @@ public class Role {
 
     private String label;
 
-    @Column(nullable = false)
-    private boolean status;
-
     private String description;
 
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
-    private Set<User> users;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "Role_Permission",
-            joinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false)},
-            inverseJoinColumns = {@JoinColumn(name = "Permission_id", referencedColumnName = "id")})
-    private Set<Permission> permissions;
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @Cascade({org.hibernate.annotations.CascadeType.ALL})
+    @Builder.Default
+    private List<Permission> permissions = Collections.synchronizedList(new ArrayList<>());
 
     @Column(name = "created_at")
     @JsonIgnore

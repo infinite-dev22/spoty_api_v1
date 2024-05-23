@@ -16,10 +16,10 @@ package io.nomard.spoty_api_v1.models;
 
 import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Role;
+import io.nomard.spoty_api_v1.entities.Tenant;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -28,13 +28,14 @@ import java.util.Set;
 @Builder
 public class UserModel implements Serializable {
     private Long id;
+    private Tenant tenant;
+    private Branch branch;
     private String firstName;
     private String lastName;
     private String otherName;
     private String email;
     private String phone;
-    private Set<Role> roles;
-    private Branch branch;
+    private Role role;
     @Builder.Default
     private boolean active = true;
     @Builder.Default
