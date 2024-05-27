@@ -37,6 +37,11 @@ public class TenantController {
         return tenantService.save(tenant);
     }
 
+    @PutMapping("/start/trial")
+    public ResponseEntity<ObjectNode> startTrial(@RequestBody FindModel findModel) throws NotFoundException {
+        return tenantService.startTrial(findModel.getId());
+    }
+
     @PutMapping("/update")
     public ResponseEntity<ObjectNode> update(@Valid @RequestBody Tenant tenant) throws NotFoundException {
         return tenantService.update(tenant);

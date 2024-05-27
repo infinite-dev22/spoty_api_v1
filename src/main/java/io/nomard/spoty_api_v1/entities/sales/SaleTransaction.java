@@ -17,6 +17,7 @@ package io.nomard.spoty_api_v1.entities.sales;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Product;
+import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -38,6 +39,9 @@ public class SaleTransaction {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "branch_id", nullable = false)
     private Branch branch;
+    @JoinColumn(nullable = false, name = "company_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Tenant tenant;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "product_id")

@@ -16,6 +16,7 @@ package io.nomard.spoty_api_v1.entities.adjustments;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Branch;
+import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -43,6 +44,9 @@ public class AdjustmentMaster implements Serializable {
     private String ref;
     @ManyToOne(fetch = FetchType.LAZY)
     private Branch branch;
+    @JoinColumn(nullable = false, name = "company_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Tenant tenant;
 
     @OneToMany(mappedBy = "adjustment", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})

@@ -17,6 +17,7 @@ package io.nomard.spoty_api_v1.entities.purchases;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Supplier;
+import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -50,6 +51,9 @@ public class PurchaseMaster implements Serializable {
     @JoinColumn(name = "branch_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Branch branch;
+    @JoinColumn(nullable = false, name = "company_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Tenant tenant;
 
     @OneToMany(mappedBy = "purchase", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})

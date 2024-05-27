@@ -17,6 +17,7 @@ package io.nomard.spoty_api_v1.entities.quotations;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Customer;
+import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -55,8 +56,11 @@ public class QuotationMaster implements Serializable {
     private Customer customer;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, name = "branch_id")
+    @JoinColumn(name = "branch_id", nullable = false)
     private Branch branch;
+    @JoinColumn(nullable = false, name = "company_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Tenant tenant;
 
     @OneToMany(mappedBy = "quotation", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})

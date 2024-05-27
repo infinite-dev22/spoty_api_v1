@@ -34,7 +34,7 @@ public class ProductServiceImpl implements ProductService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<Product> page = productRepo.findAll(pageRequest);
+        Page<Product> page = productRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -61,12 +61,13 @@ public class ProductServiceImpl implements ProductService {
     @Cacheable("products")
     @Transactional(readOnly = true)
     public List<Product> getWarning() {
-        return productRepo.findAllByQuantityIsLessThanEqualStockAlert();
+        return productRepo.findAllByTenantIdByQuantityIsLessThanEqualStockAlert();
     }
 
     @Override
     public ResponseEntity<ObjectNode> save(Product product) {
         try {
+            product.setTenant(authService.authUser().getTenant());
             product.setCreatedBy(authService.authUser());
             product.setCreatedAt(new Date());
             productRepo.saveAndFlush(product);

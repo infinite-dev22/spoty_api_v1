@@ -32,7 +32,7 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<QuotationMaster> page = quotationMasterRepo.findAll(pageRequest);
+        Page<QuotationMaster> page = quotationMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -62,6 +62,7 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
                     quotationMaster.getQuotationDetails().get(i).setQuotation(quotationMaster);
                 }
             }
+            quotationMaster.setTenant(authService.authUser().getTenant());
             quotationMaster.setCreatedBy(authService.authUser());
             quotationMaster.setCreatedAt(new Date());
             quotationMasterRepo.saveAndFlush(quotationMaster);

@@ -29,7 +29,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<Expense> page = expenseRepo.findAll(pageRequest);
+        Page<Expense> page = expenseRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -51,6 +51,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     public ResponseEntity<ObjectNode> save(Expense expense) {
         try {
+            expense.setTenant(authService.authUser().getTenant());
             expense.setCreatedBy(authService.authUser());
             expense.setCreatedAt(new Date());
             expenseRepo.saveAndFlush(expense);

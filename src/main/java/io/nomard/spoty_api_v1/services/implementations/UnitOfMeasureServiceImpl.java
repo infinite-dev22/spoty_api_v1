@@ -29,7 +29,7 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<UnitOfMeasure> page = uomRepo.findAll(pageRequest);
+        Page<UnitOfMeasure> page = uomRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -53,10 +53,10 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
 
     @Override
     public ResponseEntity<ObjectNode> save(UnitOfMeasure uom) {
+        uom.setTenant(authService.authUser().getTenant());
         uom.setCreatedBy(authService.authUser());
         uom.setCreatedAt(new Date());
         uomRepo.saveAndFlush(uom);
-
         try {
             uomRepo.saveAndFlush(uom);
 

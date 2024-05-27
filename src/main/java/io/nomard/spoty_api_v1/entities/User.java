@@ -38,7 +38,6 @@ public class User implements Serializable {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "organisation_id", nullable = false)
-    @JsonIgnore
     private Tenant tenant;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)

@@ -32,7 +32,7 @@ public class PurchaseReturnMasterServiceImpl implements PurchaseReturnMasterServ
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<PurchaseReturnMaster> page = purchaseReturnMasterRepo.findAll(pageRequest);
+        Page<PurchaseReturnMaster> page = purchaseReturnMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -59,6 +59,7 @@ public class PurchaseReturnMasterServiceImpl implements PurchaseReturnMasterServ
     @Override
     public ResponseEntity<ObjectNode> save(PurchaseReturnMaster purchaseReturnMaster) {
         try {
+            purchaseReturnMaster.setTenant(authService.authUser().getTenant());
             purchaseReturnMaster.setCreatedBy(authService.authUser());
             purchaseReturnMaster.setCreatedAt(new Date());
             purchaseReturnMasterRepo.saveAndFlush(purchaseReturnMaster);

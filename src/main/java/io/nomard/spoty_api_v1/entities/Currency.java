@@ -40,6 +40,10 @@ public class Currency {
 
     private String symbol;
 
+    @JoinColumn(nullable = false, name = "company_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Tenant tenant;
+
     @Column(name = "created_at")
     @JsonIgnore
     private Date createdAt;

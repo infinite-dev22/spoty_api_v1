@@ -19,7 +19,11 @@ public interface TenantService {
 
     boolean isTrial(Long id) throws NotFoundException;
 
+    boolean canTry(Long id) throws NotFoundException;
+
     boolean isNewTenancy(Long id) throws NotFoundException;
+
+    ResponseEntity<ObjectNode> startTrial(Long tenantId) throws NotFoundException;
 
     ResponseEntity<ObjectNode> save(Tenant tenant);
 

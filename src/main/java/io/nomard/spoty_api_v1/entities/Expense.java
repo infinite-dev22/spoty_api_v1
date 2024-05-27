@@ -40,6 +40,10 @@ public class Expense implements Serializable {
 
     private String ref;
 
+    @JoinColumn(nullable = false, name = "company_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Tenant tenant;
+
     @Column(nullable = false)
     private String name;
     // TODO: Add not nullable when the user system works.

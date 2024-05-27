@@ -49,6 +49,9 @@ public class Product implements Serializable {
 
     @ManyToOne(targetEntity = Branch.class, fetch = FetchType.LAZY)
     private Branch branch;
+    @JoinColumn(nullable = false, name = "company_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Tenant tenant;
 
     @Column(name = "barcode_type")
     private String barcodeType;

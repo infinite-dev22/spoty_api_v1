@@ -34,7 +34,7 @@ public class StockInMasterServiceImpl implements StockInMasterService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<StockInMaster> page = stockInMasterRepo.findAll(pageRequest);
+        Page<StockInMaster> page = stockInMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -63,7 +63,7 @@ public class StockInMasterServiceImpl implements StockInMasterService {
                     stockInMaster.getStockInDetails().get(i).setStockIn(stockInMaster);
                 }
             }
-
+            stockInMaster.setTenant(authService.authUser().getTenant());
             stockInMaster.setCreatedBy(authService.authUser());
             stockInMaster.setCreatedAt(new Date());
             stockInMasterRepo.saveAndFlush(stockInMaster);

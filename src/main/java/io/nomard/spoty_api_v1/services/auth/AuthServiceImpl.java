@@ -75,6 +75,7 @@ public class AuthServiceImpl implements AuthService {
             if (tenantService.isTrial(userRepo.findUserByEmail(loginDetails.getEmail()).getId()) && tenantService.getTrialEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date())) {
                 response.put("status", 401);
                 response.put("trial", tenantService.isTrial(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
+                response.put("canTry", tenantService.canTry(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
                 response.put("newTenancy", tenantService.isNewTenancy(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
                 response.put("message", "Subscription required");
                 return new ResponseEntity<>(response, HttpStatus.OK);
@@ -83,6 +84,7 @@ public class AuthServiceImpl implements AuthService {
             if (tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date(subscriptionWarningDate.toEpochDay()))) {
                 response.put("status", 401);
                 response.put("trial", tenantService.isTrial(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
+                response.put("canTry", tenantService.canTry(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
                 response.put("newTenancy", tenantService.isNewTenancy(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
                 response.put("activeTenancy", !tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date(subscriptionWarningDate.toEpochDay())));
                 response.put("message", "Subscription required");
@@ -94,6 +96,7 @@ public class AuthServiceImpl implements AuthService {
             response.putPOJO("user", userRepo.findUserByEmail(loginDetails.getEmail()));
             response.putPOJO("role", userRepo.findUserByEmail(loginDetails.getEmail()).getRole());
             response.put("trial", tenantService.isTrial(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
+            response.put("canTry", tenantService.canTry(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
             response.put("newTenancy", tenantService.isNewTenancy(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
             response.put("activeTenancy", !tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date(subscriptionWarningDate.toEpochDay())));
             // Check if subscription is about to expire(7 days before).
@@ -131,6 +134,7 @@ public class AuthServiceImpl implements AuthService {
         tenant.setName(signUpDetails.getFirstName() + " " + signUpDetails.getLastName() + " " + signUpDetails.getOtherName());
 //        tenant.setSubscriptionEndDate(new Date(LocalDate.now().minusMonths(1).toEpochDay()));
         tenant.setSubscriptionEndDate(new Date(LocalDate.now().minusMonths(1).toEpochDay()));
+        tenant.setTrialEndDate(new Date(LocalDate.now().minusMonths(1).toEpochDay()));
 
         var branch = new Branch();
         branch.setName("Default Branch");
@@ -145,6 +149,7 @@ public class AuthServiceImpl implements AuthService {
         userProfile.setLastName(signUpDetails.getLastName());
         userProfile.setOtherName(signUpDetails.getOtherName());
         userProfile.setPhone(signUpDetails.getPhone());
+        userProfile.setTenant(tenant);
 
         user.setUserProfile(userProfile);
         user.setTenant(tenant);
@@ -152,7 +157,7 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(signUpDetails.getEmail());
         user.setPassword(passwordEncoder.encode(signUpDetails.getPassword()));
         user.setRole(roleRepo.searchAllByNameContainingIgnoreCase("admin").get(0));
-
+        user.setTenant(tenant);
 
         try {
             tenantRepo.saveAndFlush(tenant);

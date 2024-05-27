@@ -37,9 +37,12 @@ public class Tenant {
 
     @Column(nullable = false, name = "subscription_end_date")
     private Date subscriptionEndDate;
-
+    @Column
     @Builder.Default
     private boolean trial = false;
+    @Column
+    @Builder.Default
+    private boolean canTry = true;
     @Column(name = "trial_end_date")
     private Date trialEndDate;
     @Column(name = "new_tenancy")

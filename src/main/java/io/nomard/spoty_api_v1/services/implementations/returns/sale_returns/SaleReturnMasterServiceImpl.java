@@ -32,7 +32,7 @@ public class SaleReturnMasterServiceImpl implements SaleReturnMasterService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<SaleReturnMaster> page = saleReturnMasterRepo.findAll(pageRequest);
+        Page<SaleReturnMaster> page = saleReturnMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -56,6 +56,7 @@ public class SaleReturnMasterServiceImpl implements SaleReturnMasterService {
     @Override
     public ResponseEntity<ObjectNode> save(SaleReturnMaster saleReturnMaster) {
         try {
+            saleReturnMaster.setTenant(authService.authUser().getTenant());
             saleReturnMaster.setCreatedBy(authService.authUser());
             saleReturnMaster.setCreatedAt(new Date());
             saleReturnMasterRepo.saveAndFlush(saleReturnMaster);

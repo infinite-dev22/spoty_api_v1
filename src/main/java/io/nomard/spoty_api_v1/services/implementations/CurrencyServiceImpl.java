@@ -29,7 +29,7 @@ public class CurrencyServiceImpl implements CurrencyService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<Currency> page = currencyRepo.findAll(pageRequest);
+        Page<Currency> page = currencyRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -55,6 +55,7 @@ public class CurrencyServiceImpl implements CurrencyService {
     @Override
     public ResponseEntity<ObjectNode> save(Currency currency) {
         try {
+            currency.setTenant(authService.authUser().getTenant());
             currency.setCreatedBy(authService.authUser());
             currency.setCreatedAt(new Date());
             currencyRepo.saveAndFlush(currency);

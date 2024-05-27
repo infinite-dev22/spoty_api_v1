@@ -16,6 +16,7 @@ package io.nomard.spoty_api_v1.entities.transfers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Branch;
+import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -52,6 +53,9 @@ public class TransferMaster implements Serializable {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "to_branch_id")
     private Branch toBranch;
+    @JoinColumn(nullable = false, name = "company_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Tenant tenant;
 
     @OneToMany(mappedBy = "transfer", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})

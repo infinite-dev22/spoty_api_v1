@@ -29,7 +29,7 @@ public class BeneficiaryBadgeServiceImpl implements BeneficiaryBadgeService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<BeneficiaryBadge> page = beneficiaryBadgeRepo.findAll(pageRequest);
+        Page<BeneficiaryBadge> page = beneficiaryBadgeRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -51,6 +51,7 @@ public class BeneficiaryBadgeServiceImpl implements BeneficiaryBadgeService {
     @Override
     public ResponseEntity<ObjectNode> save(BeneficiaryBadge beneficiaryBadge) {
         try {
+            beneficiaryBadge.setTenant(authService.authUser().getTenant());
             beneficiaryBadge.setCreatedBy(authService.authUser());
             beneficiaryBadge.setCreatedAt(new Date());
             beneficiaryBadgeRepo.saveAndFlush(beneficiaryBadge);

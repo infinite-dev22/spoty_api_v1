@@ -1,9 +1,12 @@
 package io.nomard.spoty_api_v1.repositories;
 
 import io.nomard.spoty_api_v1.entities.Supplier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -23,4 +26,7 @@ public interface SupplierRepository extends PagingAndSortingRepository<Supplier,
     List<Supplier> searchAllByNameContainingIgnoreCaseOrCodeContainingIgnoreCaseOrAddressContainingIgnoreCaseOrCityContainingIgnoreCaseOrCountryContainingIgnoreCaseOrEmailContainingIgnoreCaseOrPhoneContainingIgnoreCase(String name, String code, String address, String city, String country, String email, String phone);
 
     Supplier findSupplierByEmail(String email);
+
+    @Query("select p from Supplier p where p.tenant.id = :id")
+    Page<Supplier> findAllByTenantId(@Param("id") Long id, Pageable pageable);
 }

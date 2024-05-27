@@ -2,6 +2,7 @@ package io.nomard.spoty_api_v1.entities.hrm.hrm;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Branch;
+import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -30,6 +31,9 @@ public class EmploymentStatus {
             joinColumns = {@JoinColumn(name = "employment_status_id")},
             inverseJoinColumns = {@JoinColumn(name = "branch_id")})
     private Set<Branch> branches;
+    @JoinColumn(nullable = false, name = "company_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Tenant tenant;
     private boolean active;
 
     @Column(name = "created_at")

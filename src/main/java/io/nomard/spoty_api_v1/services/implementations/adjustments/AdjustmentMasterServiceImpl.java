@@ -39,7 +39,7 @@ public class AdjustmentMasterServiceImpl implements AdjustmentMasterService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<AdjustmentMaster> page = adjustmentMasterRepo.findAll(pageRequest);
+        Page<AdjustmentMaster> page = adjustmentMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -69,6 +69,7 @@ public class AdjustmentMasterServiceImpl implements AdjustmentMasterService {
                 adjustmentMaster.getAdjustmentDetails().get(i).setAdjustment(adjustmentMaster);
             }
 
+            adjustmentMaster.setTenant(authService.authUser().getTenant());
             adjustmentMaster.setCreatedBy(authService.authUser());
             adjustmentMaster.setCreatedAt(new Date());
             adjustmentMasterRepo.saveAndFlush(adjustmentMaster);

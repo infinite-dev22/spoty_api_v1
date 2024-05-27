@@ -16,6 +16,7 @@ package io.nomard.spoty_api_v1.entities.sales;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Branch;
+import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -45,6 +46,9 @@ public class SaleTerm {
             inverseJoinColumns = {@JoinColumn(name = "branch_id")}
     )
     private Set<Branch> branches;
+    @JoinColumn(nullable = false, name = "company_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Tenant tenant;
 
     @Column(nullable = false)
     private String description;

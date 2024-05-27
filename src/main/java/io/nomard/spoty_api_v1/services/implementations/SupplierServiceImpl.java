@@ -29,7 +29,7 @@ public class SupplierServiceImpl implements SupplierService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<Supplier> page = supplierRepo.findAll(pageRequest);
+        Page<Supplier> page = supplierRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -51,6 +51,7 @@ public class SupplierServiceImpl implements SupplierService {
     @Override
     public ResponseEntity<ObjectNode> save(Supplier supplier) {
         try {
+            supplier.setTenant(authService.authUser().getTenant());
             supplier.setCreatedBy(authService.authUser());
             supplier.setCreatedAt(new Date());
             supplierRepo.saveAndFlush(supplier);

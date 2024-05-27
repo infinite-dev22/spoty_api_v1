@@ -32,7 +32,7 @@ public class PurchaseMasterServiceImpl implements PurchaseMasterService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<PurchaseMaster> page = purchaseMasterRepo.findAll(pageRequest);
+        Page<PurchaseMaster> page = purchaseMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -63,6 +63,7 @@ public class PurchaseMasterServiceImpl implements PurchaseMasterService {
                     purchaseMaster.getPurchaseDetails().get(i).setPurchase(purchaseMaster);
                 }
             }
+            purchaseMaster.setTenant(authService.authUser().getTenant());
             purchaseMaster.setCreatedBy(authService.authUser());
             purchaseMaster.setCreatedAt(new Date());
             purchaseMasterRepo.saveAndFlush(purchaseMaster);

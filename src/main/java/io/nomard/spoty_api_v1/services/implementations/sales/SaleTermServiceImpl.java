@@ -37,7 +37,7 @@ public class SaleTermServiceImpl implements SaleTermService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<SaleTerm> page = saleTermRepo.findAll(pageRequest);
+        Page<SaleTerm> page = saleTermRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -56,6 +56,7 @@ public class SaleTermServiceImpl implements SaleTermService {
     @Override
     public ResponseEntity<ObjectNode> save(SaleTerm saleTerm) {
         try {
+            saleTerm.setTenant(authService.authUser().getTenant());
             saleTerm.setCreatedBy(authService.authUser());
             saleTerm.setCreatedAt(new Date());
             saleTermRepo.saveAndFlush(saleTerm);

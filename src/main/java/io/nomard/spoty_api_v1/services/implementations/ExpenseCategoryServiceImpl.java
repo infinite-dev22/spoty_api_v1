@@ -29,7 +29,7 @@ public class ExpenseCategoryServiceImpl implements ExpenseCategoryService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<ExpenseCategory> page = expenseCategoryRepo.findAll(pageRequest);
+        Page<ExpenseCategory> page = expenseCategoryRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -51,6 +51,7 @@ public class ExpenseCategoryServiceImpl implements ExpenseCategoryService {
     @Override
     public ResponseEntity<ObjectNode> save(ExpenseCategory expenseCategory) {
         try {
+            expenseCategory.setTenant(authService.authUser().getTenant());
             expenseCategory.setCreatedBy(authService.authUser());
             expenseCategory.setCreatedAt(new Date());
             expenseCategoryRepo.saveAndFlush(expenseCategory);

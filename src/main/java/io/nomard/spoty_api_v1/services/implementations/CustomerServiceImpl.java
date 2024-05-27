@@ -29,7 +29,7 @@ public class CustomerServiceImpl implements CustomerService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<Customer> page = customerRepo.findAll(pageRequest);
+        Page<Customer> page = customerRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -57,6 +57,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public ResponseEntity<ObjectNode> save(Customer customer) {
         try {
+            customer.setTenant(authService.authUser().getTenant());
             customer.setCreatedBy(authService.authUser());
             customer.setCreatedAt(new Date());
             customerRepo.saveAndFlush(customer);

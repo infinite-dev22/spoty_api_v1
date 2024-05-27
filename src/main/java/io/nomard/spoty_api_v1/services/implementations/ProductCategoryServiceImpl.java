@@ -29,7 +29,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<ProductCategory> page = productCategoryRepo.findAll(pageRequest);
+        Page<ProductCategory> page = productCategoryRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -54,6 +54,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     @Override
     public ResponseEntity<ObjectNode> save(ProductCategory productCategory) {
         try {
+            productCategory.setTenant(authService.authUser().getTenant());
             productCategory.setCreatedBy(authService.authUser());
             productCategory.setCreatedAt(new Date());
             productCategoryRepo.saveAndFlush(productCategory);

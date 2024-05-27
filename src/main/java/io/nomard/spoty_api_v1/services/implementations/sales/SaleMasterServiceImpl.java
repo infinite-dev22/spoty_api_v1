@@ -39,7 +39,7 @@ public class SaleMasterServiceImpl implements SaleMasterService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<SaleMaster> page = saleMasterRepo.findAll(pageRequest);
+        Page<SaleMaster> page = saleMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -71,6 +71,7 @@ public class SaleMasterServiceImpl implements SaleMasterService {
                 saleMaster.getSaleDetails().get(i).setSale(saleMaster);
             }
 
+            saleMaster.setTenant(authService.authUser().getTenant());
             saleMaster.setCreatedBy(authService.authUser());
             saleMaster.setCreatedAt(new Date());
             saleMasterRepo.saveAndFlush(saleMaster);

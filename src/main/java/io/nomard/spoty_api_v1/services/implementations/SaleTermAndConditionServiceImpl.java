@@ -32,7 +32,7 @@ public class SaleTermAndConditionServiceImpl implements SaleTermAndConditionServ
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<SaleTermAndCondition> page = saleTermAndConditionRepo.findAll(pageRequest);
+        Page<SaleTermAndCondition> page = saleTermAndConditionRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -49,6 +49,7 @@ public class SaleTermAndConditionServiceImpl implements SaleTermAndConditionServ
     @Override
     public ResponseEntity<ObjectNode> save(SaleTermAndCondition saleTermAndCondition) {
         try {
+            saleTermAndCondition.setTenant(authService.authUser().getTenant());
             saleTermAndCondition.setCreatedBy(authService.authUser());
             saleTermAndCondition.setCreatedAt(new Date());
             saleTermAndConditionRepo.saveAndFlush(saleTermAndCondition);

@@ -32,7 +32,7 @@ public class LeaveServiceImpl implements LeaveService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<Leave> page = leaveStatusRepo.findAll(pageRequest);
+        Page<Leave> page = leaveStatusRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -49,6 +49,7 @@ public class LeaveServiceImpl implements LeaveService {
     @Override
     public ResponseEntity<ObjectNode> save(Leave leave) {
         try {
+            leave.setTenant(authService.authUser().getTenant());
             leave.setCreatedBy(authService.authUser());
             leave.setCreatedAt(new Date());
             leaveStatusRepo.saveAndFlush(leave);

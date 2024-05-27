@@ -29,7 +29,7 @@ public class DesignationServiceImpl implements DesignationService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<Designation> page = designationRepo.findAll(pageRequest);
+        Page<Designation> page = designationRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -54,6 +54,7 @@ public class DesignationServiceImpl implements DesignationService {
     @Override
     public ResponseEntity<ObjectNode> save(Designation designation) {
         try {
+            designation.setTenant(authService.authUser().getTenant());
             designation.setCreatedBy(authService.authUser());
             designation.setCreatedAt(new Date());
             designationRepo.saveAndFlush(designation);

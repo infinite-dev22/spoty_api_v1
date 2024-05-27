@@ -32,7 +32,7 @@ public class EmploymentStatusServiceImpl implements EmploymentStatusService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<EmploymentStatus> page = employmentStatusRepo.findAll(pageRequest);
+        Page<EmploymentStatus> page = employmentStatusRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -58,6 +58,7 @@ public class EmploymentStatusServiceImpl implements EmploymentStatusService {
     @Override
     public ResponseEntity<ObjectNode> save(EmploymentStatus employmentStatus) {
         try {
+            employmentStatus.setTenant(authService.authUser().getTenant());
             employmentStatus.setCreatedBy(authService.authUser());
             employmentStatus.setCreatedAt(new Date());
             employmentStatusRepo.saveAndFlush(employmentStatus);

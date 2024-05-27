@@ -34,6 +34,11 @@ public class Supplier {
 
     @Column(nullable = false)
     private String name;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Branch branch;
+    @JoinColumn(nullable = false, name = "company_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Tenant tenant;
 
     private String code;
     private String email;

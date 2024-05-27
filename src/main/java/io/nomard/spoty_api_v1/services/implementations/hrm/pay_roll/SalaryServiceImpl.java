@@ -32,7 +32,7 @@ public class SalaryServiceImpl implements SalaryService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<Salary> page = salaryRepo.findAll(pageRequest);
+        Page<Salary> page = salaryRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -54,6 +54,7 @@ public class SalaryServiceImpl implements SalaryService {
     @Override
     public ResponseEntity<ObjectNode> save(Salary salary) {
         try {
+            salary.setTenant(authService.authUser().getTenant());
             salary.setCreatedBy(authService.authUser());
             salary.setCreatedAt(new Date());
             salaryRepo.saveAndFlush(salary);

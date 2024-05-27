@@ -33,7 +33,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public List<Role> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
-        Page<Role> page = roleRepo.findAll(pageRequest);
+        Page<Role> page = roleRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         return page.getContent();
     }
 
@@ -58,7 +58,7 @@ public class RoleServiceImpl implements RoleService {
             // Fetch permissions based on IDs
             List<Permission> permissions = permissionRepo.findAllById(role.getPermissions().stream().map(Permission::getId).collect(Collectors.toList()));
             role.setPermissions(permissions); // Set the fetched permissions
-
+            role.setTenant(authService.authUser().getTenant());
             role.setCreatedBy(authService.authUser());
             role.setCreatedAt(new Date());
             roleRepo.saveAndFlush(role);

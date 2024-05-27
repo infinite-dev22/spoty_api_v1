@@ -32,7 +32,7 @@ public class PaySlipServiceImpl implements PaySlipService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<PaySlip> page = paySlipRepo.findAll(pageRequest);
+        Page<PaySlip> page = paySlipRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -49,6 +49,7 @@ public class PaySlipServiceImpl implements PaySlipService {
     @Override
     public ResponseEntity<ObjectNode> save(PaySlip paySlip) {
         try {
+            paySlip.setTenant(authService.authUser().getTenant());
             paySlip.setCreatedBy(authService.authUser());
             paySlip.setCreatedAt(new Date());
             paySlipRepo.saveAndFlush(paySlip);

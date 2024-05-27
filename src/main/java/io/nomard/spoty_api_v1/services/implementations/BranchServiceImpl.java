@@ -29,7 +29,7 @@ public class BranchServiceImpl implements BranchService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<Branch> page = branchRepo.findAll(pageRequest);
+        Page<Branch> page = branchRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -53,6 +53,7 @@ public class BranchServiceImpl implements BranchService {
     @Override
     public ResponseEntity<ObjectNode> save(Branch branch) {
         try {
+            branch.setTenant(authService.authUser().getTenant());
             branch.setCreatedBy(authService.authUser());
             branch.setCreatedAt(new Date());
             branchRepo.saveAndFlush(branch);

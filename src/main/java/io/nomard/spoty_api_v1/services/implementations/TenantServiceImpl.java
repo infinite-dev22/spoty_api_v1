@@ -6,6 +6,7 @@ import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.TenantRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.interfaces.TenantService;
+import io.nomard.spoty_api_v1.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -71,6 +72,15 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
+    public boolean canTry(Long id) throws NotFoundException {
+        Optional<Tenant> tenant = tenantRepo.findById(id);
+        if (tenant.isEmpty()) {
+            throw new NotFoundException();
+        }
+        return tenant.get().isCanTry();
+    }
+
+    @Override
     public boolean isNewTenancy(Long id) throws NotFoundException {
         Optional<Tenant> tenant = tenantRepo.findById(id);
         if (tenant.isEmpty()) {
@@ -85,6 +95,25 @@ public class TenantServiceImpl implements TenantService {
             tenant.setCreatedAt(new Date());
             tenantRepo.saveAndFlush(tenant);
             return spotyResponseImpl.created();
+        } catch (Exception e) {
+            return spotyResponseImpl.error(e);
+        }
+    }
+
+    @Override
+    public ResponseEntity<ObjectNode> startTrial(Long tenantId) throws NotFoundException {
+        var opt = tenantRepo.findById(tenantId);
+        if (opt.isEmpty()) {
+            throw new NotFoundException();
+        }
+        var tenant = opt.get();
+        tenant.setTrial(true);
+        tenant.setTrialEndDate(DateUtils.addDays(7));
+        tenant.setCanTry(false);
+        tenant.setUpdatedAt(new Date());
+        try {
+            tenantRepo.saveAndFlush(tenant);
+            return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
         }

@@ -31,7 +31,7 @@ public class StockReportServiceImpl implements StockReportService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<StockReport> page = stockReportRepo.findAll(pageRequest);
+        Page<StockReport> page = stockReportRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -48,6 +48,7 @@ public class StockReportServiceImpl implements StockReportService {
     @Override
     public ResponseEntity<ObjectNode> save(StockReport stockReport) {
         try {
+            stockReport.setTenant(authService.authUser().getTenant());
             stockReport.setCreatedBy(authService.authUser());
             stockReport.setCreatedAt(new Date());
             stockReportRepo.saveAndFlush(stockReport);

@@ -68,6 +68,7 @@ public class AdjustmentTransactionServiceImpl implements AdjustmentTransactionSe
             adjustmentTransaction.setAdjustQuantity(adjustmentDetail.getQuantity());
             adjustmentTransaction.setAdjustmentType(adjustmentDetail.getAdjustmentType());
 
+            adjustmentTransaction.setTenant(authService.authUser().getTenant());
             adjustmentTransaction.setCreatedBy(authService.authUser());
             adjustmentTransaction.setCreatedAt(new Date());
             adjustmentTransactionRepo.saveAndFlush(adjustmentTransaction);

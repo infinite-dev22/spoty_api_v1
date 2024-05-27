@@ -35,6 +35,11 @@ public class ExpenseCategory implements Serializable {
 
     @Column(nullable = false)
     private String name;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Branch branch;
+    @JoinColumn(nullable = false, name = "company_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Tenant tenant;
 
     private String description;
 

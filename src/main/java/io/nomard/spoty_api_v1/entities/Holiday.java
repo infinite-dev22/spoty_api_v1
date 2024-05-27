@@ -38,6 +38,8 @@ public class Holiday implements Serializable {
     @JoinColumn(nullable = false, name = "company_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Branch branch;
 
     @Column(name = "start_date")
     private Date startDate;

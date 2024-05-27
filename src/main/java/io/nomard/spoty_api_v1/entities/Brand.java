@@ -37,6 +37,11 @@ public class Brand {
 
     private String description;
     private String image;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Branch branch;
+    @JoinColumn(nullable = false, name = "company_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Tenant tenant;
 
     @Column(name = "created_at")
     @JsonIgnore

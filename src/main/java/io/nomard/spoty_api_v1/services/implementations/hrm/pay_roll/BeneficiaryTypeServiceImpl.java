@@ -29,7 +29,7 @@ public class BeneficiaryTypeServiceImpl implements BeneficiaryTypeService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<BeneficiaryType> page = beneficiaryTypeRepo.findAll(pageRequest);
+        Page<BeneficiaryType> page = beneficiaryTypeRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -54,6 +54,7 @@ public class BeneficiaryTypeServiceImpl implements BeneficiaryTypeService {
     @Override
     public ResponseEntity<ObjectNode> save(BeneficiaryType beneficiaryType) {
         try {
+            beneficiaryType.setTenant(authService.authUser().getTenant());
             beneficiaryType.setCreatedBy(authService.authUser());
             beneficiaryType.setCreatedAt(new Date());
             beneficiaryTypeRepo.saveAndFlush(beneficiaryType);

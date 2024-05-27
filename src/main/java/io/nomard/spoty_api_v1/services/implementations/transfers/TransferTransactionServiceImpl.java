@@ -62,7 +62,7 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
                 transferTransaction.setTransferDetail(transferDetail);
                 transferTransaction.setDate(new Date());
                 transferTransaction.setTransferQuantity(transferDetail.getQuantity());
-
+                transferTransaction.setTenant(authService.authUser().getTenant());
                 transferTransaction.setCreatedBy(authService.authUser());
                 transferTransaction.setCreatedAt(new Date());
                 transferTransactionRepo.saveAndFlush(transferTransaction);

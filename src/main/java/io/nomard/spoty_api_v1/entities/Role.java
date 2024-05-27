@@ -43,6 +43,10 @@ public class Role {
 
     private String description;
 
+    @JoinColumn(name = "company_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Tenant tenant;
+
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @Builder.Default

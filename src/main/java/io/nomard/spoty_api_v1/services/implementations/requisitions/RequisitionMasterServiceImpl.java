@@ -32,7 +32,7 @@ public class RequisitionMasterServiceImpl implements RequisitionMasterService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<RequisitionMaster> page = requisitionMasterRepo.findAll(pageRequest);
+        Page<RequisitionMaster> page = requisitionMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -62,7 +62,7 @@ public class RequisitionMasterServiceImpl implements RequisitionMasterService {
                     requisitionMaster.getRequisitionDetails().get(i).setRequisition(requisitionMaster);
                 }
             }
-
+            requisitionMaster.setTenant(authService.authUser().getTenant());
             requisitionMaster.setCreatedBy(authService.authUser());
             requisitionMaster.setCreatedAt(new Date());
             requisitionMasterRepo.saveAndFlush(requisitionMaster);

@@ -29,7 +29,7 @@ public class BankServiceImpl implements BankService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<Bank> page = bankRepo.findAll(pageRequest);
+        Page<Bank> page = bankRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -53,6 +53,7 @@ public class BankServiceImpl implements BankService {
     @Override
     public ResponseEntity<ObjectNode> save(Bank bank) {
         try {
+            bank.setTenant(authService.authUser().getTenant());
             bank.setCreatedBy(authService.authUser());
             bank.setCreatedAt(new Date());
             bankRepo.saveAndFlush(bank);

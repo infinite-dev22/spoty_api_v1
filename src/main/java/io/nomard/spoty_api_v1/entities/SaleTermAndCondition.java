@@ -22,6 +22,9 @@ public class SaleTermAndCondition {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Branch branch;
+    @JoinColumn(nullable = false, name = "company_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Tenant tenant;
 
     @Builder.Default
     private boolean active = true;

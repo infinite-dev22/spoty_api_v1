@@ -29,7 +29,7 @@ public class BrandServiceImpl implements BrandService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<Brand> page = brandRepo.findAll(pageRequest);
+        Page<Brand> page = brandRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -53,6 +53,7 @@ public class BrandServiceImpl implements BrandService {
     @Override
     public ResponseEntity<ObjectNode> save(Brand brand) {
         try {
+            brand.setTenant(authService.authUser().getTenant());
             brand.setCreatedBy(authService.authUser());
             brand.setCreatedAt(new Date());
             brandRepo.saveAndFlush(brand);

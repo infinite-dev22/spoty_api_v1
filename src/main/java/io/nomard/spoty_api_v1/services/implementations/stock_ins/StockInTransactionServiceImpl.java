@@ -59,7 +59,7 @@ public class StockInTransactionServiceImpl implements StockInTransactionService 
             stockInTransaction.setStockInDetail(stockInDetail);
             stockInTransaction.setDate(new Date());
             stockInTransaction.setStockInQuantity(stockInDetail.getQuantity());
-
+            stockInTransaction.setTenant(authService.authUser().getTenant());
             stockInTransaction.setCreatedBy(authService.authUser());
             stockInTransaction.setCreatedAt(new Date());
             stockInTransactionRepo.saveAndFlush(stockInTransaction);

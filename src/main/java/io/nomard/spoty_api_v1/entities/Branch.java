@@ -48,6 +48,7 @@ public class Branch {
 
     private String zipCode;
 
+    @JoinColumn(nullable = false, name = "company_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;
 

@@ -61,7 +61,7 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
                 saleTransaction.setSaleDetail(saleDetail);
                 saleTransaction.setDate(new Date());
                 saleTransaction.setSaleQuantity(saleDetail.getQuantity());
-
+                saleTransaction.setTenant(authService.authUser().getTenant());
                 saleTransaction.setCreatedBy(authService.authUser());
                 saleTransaction.setCreatedAt(new Date());
                 saleTransactionRepo.saveAndFlush(saleTransaction);

@@ -2,6 +2,7 @@ package io.nomard.spoty_api_v1.entities.hrm.pay_roll;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Branch;
+import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -30,6 +31,8 @@ public class PaySlipType {
             inverseJoinColumns = {@JoinColumn(name = "branch_id")})
     @Builder.Default
     private List<Branch> branches = Collections.synchronizedList(new ArrayList<>());
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Tenant tenant;
     private String name;
     private String color;
     private String description;

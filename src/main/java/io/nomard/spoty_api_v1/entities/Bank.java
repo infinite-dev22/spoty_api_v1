@@ -20,6 +20,9 @@ public class Bank {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Branch branch;
+    @JoinColumn(nullable = false, name = "company_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Tenant tenant;
 
     @Column(name = "bank_name")
     private String bankName;

@@ -26,6 +26,7 @@ import io.nomard.spoty_api_v1.entities.transfers.TransferDetail;
 import io.nomard.spoty_api_v1.entities.transfers.TransferMaster;
 import io.nomard.spoty_api_v1.entities.transfers.TransferTransaction;
 import io.nomard.spoty_api_v1.filters.SpotyRequestFilter;
+import io.nomard.spoty_api_v1.payments.Payments;
 import io.nomard.spoty_api_v1.security.SpotyAuthEntryPoint;
 import io.nomard.spoty_api_v1.services.auth.SpotyTokenService;
 import io.nomard.spoty_api_v1.services.auth.SpotyUserDetailsService;
@@ -263,5 +264,15 @@ public class AppConfig {
     @Bean
     public Permission permission() {
         return new Permission();
+    }
+
+    @Bean
+    public Payments payments() {
+        return new Payments();
+    }
+
+    @Bean
+    public PaymentTransaction paymentTransaction() {
+        return new PaymentTransaction();
     }
 }

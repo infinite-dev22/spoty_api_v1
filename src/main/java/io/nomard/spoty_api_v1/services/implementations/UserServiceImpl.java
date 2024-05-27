@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<User> page = userRepo.findAll(pageRequest);
+        Page<User> page = userRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -164,6 +164,9 @@ public class UserServiceImpl implements UserService {
         userProfile.setOtherName(data.getOtherName());
         userProfile.setPhone(data.getPhone());
         userProfile.setAvatar(data.getAvatar());
+        userProfile.setTenant(authService.authUser().getTenant());
+        userProfile.setCreatedBy(authService.authUser());
+        userProfile.setCreatedAt(new Date());
 
         user.setUserProfile(userProfile);
         user.setTenant(data.getTenant());
@@ -174,6 +177,7 @@ public class UserServiceImpl implements UserService {
         user.setActive(data.isActive());
         user.setLocked(data.isLocked());
         user.setAccessAllBranches(data.isAccessAllBranches());
+        user.setTenant(authService.authUser().getTenant());
         user.setCreatedBy(authService.authUser());
         user.setCreatedAt(new Date());
 

@@ -39,7 +39,7 @@ public class TransferMasterServiceImpl implements TransferMasterService {
         //create page request object
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
         //pass it to repos
-        Page<TransferMaster> page = transferMasterRepo.findAll(pageRequest);
+        Page<TransferMaster> page = transferMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
@@ -70,7 +70,7 @@ public class TransferMasterServiceImpl implements TransferMasterService {
             for (int i = 0; i < transferMaster.getTransferDetails().size(); i++) {
                 transferMaster.getTransferDetails().get(i).setTransfer(transferMaster);
             }
-
+            transferMaster.setTenant(authService.authUser().getTenant());
             transferMaster.setCreatedBy(authService.authUser());
             transferMaster.setCreatedAt(new Date());
             transferMasterRepo.saveAndFlush(transferMaster);
