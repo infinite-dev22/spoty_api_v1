@@ -72,10 +72,6 @@ public class BankServiceImpl implements BankService {
         }
         var bank = opt.get();
 
-        if (Objects.nonNull(data.getBranch())) {
-            bank.setBranch(data.getBranch());
-        }
-
         if (Objects.nonNull(data.getBankName()) && !"".equalsIgnoreCase(data.getBankName())) {
             bank.setBankName(data.getBankName());
         }

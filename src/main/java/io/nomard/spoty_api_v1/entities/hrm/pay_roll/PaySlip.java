@@ -24,13 +24,9 @@ public class PaySlip {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToMany(fetch = FetchType.LAZY, targetEntity = Branch.class)
-    @JoinTable(
-            name = "pay_slip_types_branches",
-            joinColumns = {@JoinColumn(name = "employment_status_id")},
-            inverseJoinColumns = {@JoinColumn(name = "branch_id")})
-    @Builder.Default
-    private List<Branch> branches = Collections.synchronizedList(new ArrayList<>());
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "branch_id", nullable = false)
+    private Branch branch;
     @JoinColumn(nullable = false, name = "company_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;

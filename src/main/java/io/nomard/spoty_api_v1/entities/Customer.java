@@ -44,9 +44,10 @@ public class Customer {
     private String city;
     private String address;
     private String taxNumber;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = Branch.class, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Branch branch;
-    @JoinColumn(nullable = false, name = "company_id")
+    @JoinColumn(name = "company_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;
 

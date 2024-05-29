@@ -50,6 +50,9 @@ public class LeaveServiceImpl implements LeaveService {
     public ResponseEntity<ObjectNode> save(Leave leave) {
         try {
             leave.setTenant(authService.authUser().getTenant());
+            if (Objects.isNull(leave.getBranch())) {
+                leave.setBranch(authService.authUser().getBranch());
+            }
             leave.setCreatedBy(authService.authUser());
             leave.setCreatedAt(new Date());
             leaveStatusRepo.saveAndFlush(leave);

@@ -50,6 +50,9 @@ public class PaySlipServiceImpl implements PaySlipService {
     public ResponseEntity<ObjectNode> save(PaySlip paySlip) {
         try {
             paySlip.setTenant(authService.authUser().getTenant());
+            if (Objects.isNull(paySlip.getBranch())) {
+                paySlip.setBranch(authService.authUser().getBranch());
+            }
             paySlip.setCreatedBy(authService.authUser());
             paySlip.setCreatedAt(new Date());
             paySlipRepo.saveAndFlush(paySlip);
@@ -67,10 +70,6 @@ public class PaySlipServiceImpl implements PaySlipService {
             throw new NotFoundException();
         }
         var paySlip = opt.get();
-
-        if (Objects.nonNull(data.getBranches()) && !data.getBranches().isEmpty()) {
-            paySlip.setBranches(data.getBranches());
-        }
 
         if (Objects.nonNull(data.getPaySlipType())) {
             paySlip.setPaySlipType(data.getPaySlipType());

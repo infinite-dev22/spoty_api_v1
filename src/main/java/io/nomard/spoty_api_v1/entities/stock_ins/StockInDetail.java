@@ -36,7 +36,7 @@ public class StockInDetail implements Serializable {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "stockIn_id", nullable = false)
+    @JoinColumn(name = "stock_in_id", nullable = false)
     @JsonIgnore
     private StockInMaster stockIn;
 

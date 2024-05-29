@@ -40,7 +40,5 @@ public class UserModel implements Serializable {
     private boolean active = true;
     @Builder.Default
     private boolean locked = false;
-    @Builder.Default
-    private boolean accessAllBranches = false;
     private String avatar;
 }

@@ -46,7 +46,7 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
 
     @Override
     public ResponseEntity<ObjectNode> save(SaleDetail saleDetail) {
-        if (saleDetail.getProduct().getQuantity() > 0 && saleDetail.getProduct().getQuantity() > saleDetail.getQuantity()) {
+        if (saleDetail.getProduct().getQuantity() > 0 && saleDetail.getProduct().getQuantity() >= saleDetail.getQuantity()) {
             try {
                 var productQuantity =
                         productService.getById(saleDetail.getProduct().getId()).getQuantity() - saleDetail.getQuantity();
@@ -62,6 +62,7 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
                 saleTransaction.setDate(new Date());
                 saleTransaction.setSaleQuantity(saleDetail.getQuantity());
                 saleTransaction.setTenant(authService.authUser().getTenant());
+                saleTransaction.setBranch(authService.authUser().getBranch());
                 saleTransaction.setCreatedBy(authService.authUser());
                 saleTransaction.setCreatedAt(new Date());
                 saleTransactionRepo.saveAndFlush(saleTransaction);
@@ -88,7 +89,7 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
         }
 
         if (!Objects.equals(saleTransaction.getProduct(), data.getProduct()) && Objects.nonNull(data.getProduct())) {
-            if (data.getProduct().getQuantity() > 0 && data.getProduct().getQuantity() > data.getQuantity()) {
+            if (data.getProduct().getQuantity() > 0 && data.getProduct().getQuantity() >= data.getQuantity()) {
                 var adjustQuantity = saleTransaction.getSaleQuantity();
                 var currentProductQuantity = productService.getById(data.getProduct().getId()).getQuantity();
                 var productQuantity =

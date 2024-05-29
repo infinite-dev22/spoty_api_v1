@@ -52,6 +52,9 @@ public class SupplierServiceImpl implements SupplierService {
     public ResponseEntity<ObjectNode> save(Supplier supplier) {
         try {
             supplier.setTenant(authService.authUser().getTenant());
+            if (Objects.isNull(supplier.getBranch())) {
+                supplier.setBranch(authService.authUser().getBranch());
+            }
             supplier.setCreatedBy(authService.authUser());
             supplier.setCreatedAt(new Date());
             supplierRepo.saveAndFlush(supplier);

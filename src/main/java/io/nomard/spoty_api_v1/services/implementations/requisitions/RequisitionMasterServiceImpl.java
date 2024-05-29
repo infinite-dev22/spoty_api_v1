@@ -63,6 +63,9 @@ public class RequisitionMasterServiceImpl implements RequisitionMasterService {
                 }
             }
             requisitionMaster.setTenant(authService.authUser().getTenant());
+            if (Objects.isNull(requisitionMaster.getBranch())) {
+                requisitionMaster.setBranch(authService.authUser().getBranch());
+            }
             requisitionMaster.setCreatedBy(authService.authUser());
             requisitionMaster.setCreatedAt(new Date());
             requisitionMasterRepo.saveAndFlush(requisitionMaster);

@@ -40,7 +40,7 @@ public class Currency {
 
     private String symbol;
 
-    @JoinColumn(nullable = false, name = "company_id")
+    @JoinColumn(name = "company_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;
 

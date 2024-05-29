@@ -55,6 +55,9 @@ public class DesignationServiceImpl implements DesignationService {
     public ResponseEntity<ObjectNode> save(Designation designation) {
         try {
             designation.setTenant(authService.authUser().getTenant());
+            if (Objects.isNull(designation.getBranch())) {
+                designation.setBranch(authService.authUser().getBranch());
+            }
             designation.setCreatedBy(authService.authUser());
             designation.setCreatedAt(new Date());
             designationRepo.saveAndFlush(designation);

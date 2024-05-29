@@ -60,6 +60,9 @@ public class PurchaseReturnMasterServiceImpl implements PurchaseReturnMasterServ
     public ResponseEntity<ObjectNode> save(PurchaseReturnMaster purchaseReturnMaster) {
         try {
             purchaseReturnMaster.setTenant(authService.authUser().getTenant());
+            if (Objects.isNull(purchaseReturnMaster.getBranch())) {
+                purchaseReturnMaster.setBranch(authService.authUser().getBranch());
+            }
             purchaseReturnMaster.setCreatedBy(authService.authUser());
             purchaseReturnMaster.setCreatedAt(new Date());
             purchaseReturnMasterRepo.saveAndFlush(purchaseReturnMaster);

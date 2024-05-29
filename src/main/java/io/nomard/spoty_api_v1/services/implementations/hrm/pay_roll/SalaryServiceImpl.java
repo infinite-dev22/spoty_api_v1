@@ -13,10 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class SalaryServiceImpl implements SalaryService {
@@ -55,6 +52,9 @@ public class SalaryServiceImpl implements SalaryService {
     public ResponseEntity<ObjectNode> save(Salary salary) {
         try {
             salary.setTenant(authService.authUser().getTenant());
+            if (Objects.isNull(salary.getBranch())) {
+                salary.setBranch(authService.authUser().getBranch());
+            }
             salary.setCreatedBy(authService.authUser());
             salary.setCreatedAt(new Date());
             salaryRepo.saveAndFlush(salary);

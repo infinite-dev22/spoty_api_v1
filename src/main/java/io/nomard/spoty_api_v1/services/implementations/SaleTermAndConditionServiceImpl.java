@@ -68,10 +68,6 @@ public class SaleTermAndConditionServiceImpl implements SaleTermAndConditionServ
         }
         var saleTermAndCondition = opt.get();
 
-        if (Objects.nonNull(data.getBranch()) && !Objects.equals(data.getBranch(), saleTermAndCondition.getBranch())) {
-            saleTermAndCondition.setBranch(data.getBranch());
-        }
-
         if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
             saleTermAndCondition.setName(data.getName());
         }

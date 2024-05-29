@@ -70,6 +70,9 @@ public class AdjustmentMasterServiceImpl implements AdjustmentMasterService {
             }
 
             adjustmentMaster.setTenant(authService.authUser().getTenant());
+            if (Objects.isNull(adjustmentMaster.getBranch())) {
+                adjustmentMaster.setBranch(authService.authUser().getBranch());
+            }
             adjustmentMaster.setCreatedBy(authService.authUser());
             adjustmentMaster.setCreatedAt(new Date());
             adjustmentMasterRepo.saveAndFlush(adjustmentMaster);

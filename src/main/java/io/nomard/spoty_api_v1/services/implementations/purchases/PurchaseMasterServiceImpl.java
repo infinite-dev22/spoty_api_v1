@@ -64,6 +64,9 @@ public class PurchaseMasterServiceImpl implements PurchaseMasterService {
                 }
             }
             purchaseMaster.setTenant(authService.authUser().getTenant());
+            if (Objects.isNull(purchaseMaster.getBranch())) {
+                purchaseMaster.setBranch(authService.authUser().getBranch());
+            }
             purchaseMaster.setCreatedBy(authService.authUser());
             purchaseMaster.setCreatedAt(new Date());
             purchaseMasterRepo.saveAndFlush(purchaseMaster);

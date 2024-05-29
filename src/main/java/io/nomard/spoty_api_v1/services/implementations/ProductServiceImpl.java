@@ -68,6 +68,9 @@ public class ProductServiceImpl implements ProductService {
     public ResponseEntity<ObjectNode> save(Product product) {
         try {
             product.setTenant(authService.authUser().getTenant());
+            if (Objects.isNull(product.getBranch())) {
+                product.setBranch(authService.authUser().getBranch());
+            }
             product.setCreatedBy(authService.authUser());
             product.setCreatedAt(new Date());
             productRepo.saveAndFlush(product);

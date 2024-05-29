@@ -63,6 +63,9 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
                 }
             }
             quotationMaster.setTenant(authService.authUser().getTenant());
+            if (Objects.isNull(quotationMaster.getBranch())) {
+                quotationMaster.setBranch(authService.authUser().getBranch());
+            }
             quotationMaster.setCreatedBy(authService.authUser());
             quotationMaster.setCreatedAt(new Date());
             quotationMasterRepo.saveAndFlush(quotationMaster);

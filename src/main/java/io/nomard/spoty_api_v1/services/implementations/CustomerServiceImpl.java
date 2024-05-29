@@ -58,6 +58,9 @@ public class CustomerServiceImpl implements CustomerService {
     public ResponseEntity<ObjectNode> save(Customer customer) {
         try {
             customer.setTenant(authService.authUser().getTenant());
+            if (Objects.isNull(customer.getBranch())) {
+                customer.setBranch(authService.authUser().getBranch());
+            }
             customer.setCreatedBy(authService.authUser());
             customer.setCreatedAt(new Date());
             customerRepo.saveAndFlush(customer);

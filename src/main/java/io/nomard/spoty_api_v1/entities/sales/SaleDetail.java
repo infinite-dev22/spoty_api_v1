@@ -57,7 +57,7 @@ public class SaleDetail implements Serializable {
     private String discountType;
 
     @Column(nullable = false)
-    private double total;
+    private double subTotalPrice;
 
     @Column(nullable = false)
     private int quantity;

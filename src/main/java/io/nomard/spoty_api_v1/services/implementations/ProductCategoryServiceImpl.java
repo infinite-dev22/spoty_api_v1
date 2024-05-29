@@ -55,6 +55,9 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     public ResponseEntity<ObjectNode> save(ProductCategory productCategory) {
         try {
             productCategory.setTenant(authService.authUser().getTenant());
+            if (Objects.isNull(productCategory.getBranch())) {
+                productCategory.setBranch(authService.authUser().getBranch());
+            }
             productCategory.setCreatedBy(authService.authUser());
             productCategory.setCreatedAt(new Date());
             productCategoryRepo.saveAndFlush(productCategory);

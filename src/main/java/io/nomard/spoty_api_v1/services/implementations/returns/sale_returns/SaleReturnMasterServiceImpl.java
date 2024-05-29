@@ -57,6 +57,9 @@ public class SaleReturnMasterServiceImpl implements SaleReturnMasterService {
     public ResponseEntity<ObjectNode> save(SaleReturnMaster saleReturnMaster) {
         try {
             saleReturnMaster.setTenant(authService.authUser().getTenant());
+            if (Objects.isNull(saleReturnMaster.getBranch())) {
+                saleReturnMaster.setBranch(authService.authUser().getBranch());
+            }
             saleReturnMaster.setCreatedBy(authService.authUser());
             saleReturnMaster.setCreatedAt(new Date());
             saleReturnMasterRepo.saveAndFlush(saleReturnMaster);

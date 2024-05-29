@@ -52,6 +52,9 @@ public class ExpenseServiceImpl implements ExpenseService {
     public ResponseEntity<ObjectNode> save(Expense expense) {
         try {
             expense.setTenant(authService.authUser().getTenant());
+            if (Objects.isNull(expense.getBranch())) {
+                expense.setBranch(authService.authUser().getBranch());
+            }
             expense.setCreatedBy(authService.authUser());
             expense.setCreatedAt(new Date());
             expenseRepo.saveAndFlush(expense);

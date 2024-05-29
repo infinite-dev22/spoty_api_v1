@@ -42,9 +42,6 @@ public class SaleMaster implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Date date;
-
     private String ref;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -64,19 +61,38 @@ public class SaleMaster implements Serializable {
     private List<SaleDetail> saleDetails = Collections.synchronizedList(new ArrayList<>());
 
     @Column(name = "tax_rate")
-    private double taxRate;
+    @Builder.Default
+    private double taxRate = 0.0;
 
-    private double netTax;
-    private double discount;
+    @Builder.Default
+    private double netTax = 0.0;
 
-    @Column(nullable = false)
-    private double total;
+    @Builder.Default
+    private double discount = 0.0;
 
-    @Column(nullable = false)
-    private double amountPaid;
+    @Column
+    @Builder.Default
+    private double total = 0.0;
 
-    @Column(nullable = false)
-    private double amountDue;
+    @Column
+    @Builder.Default
+    private double subTotal = 0.0;
+
+    @Column
+    @Builder.Default
+    private double amountPaid = 0.0;
+
+    @Column
+    @Builder.Default
+    private double amountDue = 0.0;
+
+    @Column
+    @Builder.Default
+    private double changeAmount = 0.0;
+
+    @Column
+    @Builder.Default
+    private double shippingFee = 0.0;
 
     @Column(nullable = false)
     private String paymentStatus;
@@ -87,7 +103,6 @@ public class SaleMaster implements Serializable {
     private String notes;
 
     @Column(name = "created_at")
-    @JsonIgnore
     private Date createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)

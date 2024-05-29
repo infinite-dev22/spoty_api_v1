@@ -116,10 +116,6 @@ public class UserServiceImpl implements UserService {
             user.setLocked(data.isLocked());
         }
 
-        if (!Objects.equals(user.isAccessAllBranches(), data.isAccessAllBranches())) {
-            user.setAccessAllBranches(data.isAccessAllBranches());
-        }
-
         if (Objects.nonNull(data.getAvatar()) && !"".equalsIgnoreCase(data.getAvatar())) {
             userProfile.setAvatar(data.getAvatar());
         }
@@ -176,7 +172,9 @@ public class UserServiceImpl implements UserService {
         user.setRole(data.getRole());
         user.setActive(data.isActive());
         user.setLocked(data.isLocked());
-        user.setAccessAllBranches(data.isAccessAllBranches());
+        if (Objects.isNull(user.getBranch())) {
+            user.setBranch(authService.authUser().getBranch());
+        }
         user.setTenant(authService.authUser().getTenant());
         user.setCreatedBy(authService.authUser());
         user.setCreatedAt(new Date());

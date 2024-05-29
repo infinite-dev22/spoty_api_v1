@@ -22,7 +22,8 @@ public class PaymentTransaction {
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = Branch.class, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Branch branch;
 
     @Column(name = "transaction_reference")

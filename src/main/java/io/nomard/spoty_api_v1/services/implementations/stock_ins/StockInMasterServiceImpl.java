@@ -64,6 +64,9 @@ public class StockInMasterServiceImpl implements StockInMasterService {
                 }
             }
             stockInMaster.setTenant(authService.authUser().getTenant());
+            if (Objects.isNull(stockInMaster.getBranch())) {
+                stockInMaster.setBranch(authService.authUser().getBranch());
+            }
             stockInMaster.setCreatedBy(authService.authUser());
             stockInMaster.setCreatedAt(new Date());
             stockInMasterRepo.saveAndFlush(stockInMaster);

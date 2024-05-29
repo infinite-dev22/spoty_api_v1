@@ -71,22 +71,19 @@ public class AuthServiceImpl implements AuthService {
             var gracePeriodEnd = subscriptionEndDate.plusDays(getGracePeriodDays());
             var subscriptionWarningDate = subscriptionEndDate.minusDays(getGracePeriodDays());
             var response = objectMapper.createObjectNode();
+            response.put("trial", tenantService.isTrial(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
+            response.put("canTry", tenantService.canTry(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
+            response.put("newTenancy", tenantService.isNewTenancy(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
+            response.put("activeTenancy", !tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date(subscriptionWarningDate.toEpochDay())));
             // Check if trial is expired.
             if (tenantService.isTrial(userRepo.findUserByEmail(loginDetails.getEmail()).getId()) && tenantService.getTrialEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date())) {
                 response.put("status", 401);
-                response.put("trial", tenantService.isTrial(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
-                response.put("canTry", tenantService.canTry(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
-                response.put("newTenancy", tenantService.isNewTenancy(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
                 response.put("message", "Subscription required");
                 return new ResponseEntity<>(response, HttpStatus.OK);
             }
             // Check if subscription is expired.
             if (tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date(subscriptionWarningDate.toEpochDay()))) {
                 response.put("status", 401);
-                response.put("trial", tenantService.isTrial(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
-                response.put("canTry", tenantService.canTry(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
-                response.put("newTenancy", tenantService.isNewTenancy(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
-                response.put("activeTenancy", !tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date(subscriptionWarningDate.toEpochDay())));
                 response.put("message", "Subscription required");
                 return new ResponseEntity<>(response, HttpStatus.OK);
             }
@@ -94,11 +91,6 @@ public class AuthServiceImpl implements AuthService {
             response.put("status", 200);
             response.put("token", "Bearer " + spotyTokenService.generateToken(userDetails));
             response.putPOJO("user", userRepo.findUserByEmail(loginDetails.getEmail()));
-            response.putPOJO("role", userRepo.findUserByEmail(loginDetails.getEmail()).getRole());
-            response.put("trial", tenantService.isTrial(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
-            response.put("canTry", tenantService.canTry(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
-            response.put("newTenancy", tenantService.isNewTenancy(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
-            response.put("activeTenancy", !tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date(subscriptionWarningDate.toEpochDay())));
             // Check if subscription is about to expire(7 days before).
             if (tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date(subscriptionWarningDate.toEpochDay()))
                     && !tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date())) {

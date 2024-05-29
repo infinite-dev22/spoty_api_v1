@@ -45,7 +45,6 @@ public class User implements Serializable {
     @JsonIgnore
     private Branch branch;
 
-    @JsonIgnore
     private String email;
     @JsonIgnore
     private String password;
@@ -62,11 +61,6 @@ public class User implements Serializable {
     @Builder.Default
     @JsonIgnore
     private boolean locked = false;
-
-    @Column(name = "access_all_branches", nullable = false)
-    @Builder.Default
-    @JsonIgnore
-    private boolean accessAllBranches = false;
 
     @Column(name = "created_at")
     @JsonIgnore

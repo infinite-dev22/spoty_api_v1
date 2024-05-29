@@ -64,6 +64,10 @@ public class QuotationDetail implements Serializable {
 
     @Column(nullable = false)
     @Builder.Default
+    private double subTotalPrice = 0;
+
+    @Column(nullable = false)
+    @Builder.Default
     private int quantity = 0;
 
     private String serialNumber;

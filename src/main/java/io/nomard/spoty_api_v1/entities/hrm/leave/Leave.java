@@ -1,6 +1,7 @@
 package io.nomard.spoty_api_v1.entities.hrm.leave;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.User;
 import io.nomard.spoty_api_v1.entities.hrm.hrm.Designation;
@@ -24,6 +25,10 @@ public class Leave {
     @OneToOne
     @JoinColumn(name = "employee_id")
     private User employee;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "branch_id", nullable = false)
+    private Branch branch;
     @JoinColumn(nullable = false, name = "company_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;

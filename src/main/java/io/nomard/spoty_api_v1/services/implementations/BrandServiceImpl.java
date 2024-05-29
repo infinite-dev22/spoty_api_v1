@@ -54,6 +54,9 @@ public class BrandServiceImpl implements BrandService {
     public ResponseEntity<ObjectNode> save(Brand brand) {
         try {
             brand.setTenant(authService.authUser().getTenant());
+            if (Objects.isNull(brand.getBranch())) {
+                brand.setBranch(authService.authUser().getBranch());
+            }
             brand.setCreatedBy(authService.authUser());
             brand.setCreatedAt(new Date());
             brandRepo.saveAndFlush(brand);

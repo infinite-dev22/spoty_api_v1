@@ -48,6 +48,7 @@ public class Product implements Serializable {
     private Brand brand;
 
     @ManyToOne(targetEntity = Branch.class, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Branch branch;
     @JoinColumn(nullable = false, name = "company_id")
     @ManyToOne(fetch = FetchType.LAZY)
