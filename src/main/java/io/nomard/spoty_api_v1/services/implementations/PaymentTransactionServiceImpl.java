@@ -58,12 +58,12 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
     @Transactional
     public ResponseEntity<ObjectNode> payCard(CardModel payload) {
         try {
-            payments.initialize();
-            if (payload.isRecurring()) {
-                payments.tokenizeCard(payload, "flw-t1nf-f9b3bf384cd30d6fca42b6df9d27bd2f-m03k");
-            }
-//            payments.preAuth(payload);
-            payments.cardPayment(payload);
+//            payments.initialize();
+//            if (payload.isRecurring()) {
+//                payments.tokenizeCard(payload, "flw-t1nf-f9b3bf384cd30d6fca42b6df9d27bd2f-m03k");
+//            }
+////            payments.preAuth(payload);
+//            payments.cardPayment(payload);
 
             paymentTransaction.setTenant(authService.authUser().getTenant());
             paymentTransaction.setBranch(authService.authUser().getBranch());
@@ -88,8 +88,8 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
     @Transactional
     public ResponseEntity<ObjectNode> payMoMo(MoMoModel momoModel) {
         try {
-            payments.initialize();
-            payments.momoPay("flw-t1nf-f9b3bf384cd30d6fca42b6df9d27bd2f-m03k", momoModel);
+//            payments.initialize();
+//            payments.momoPay("flw-t1nf-f9b3bf384cd30d6fca42b6df9d27bd2f-m03k", momoModel);
 
             paymentTransaction.setTenant(authService.authUser().getTenant());
             paymentTransaction.setBranch(authService.authUser().getBranch());
