@@ -23,7 +23,7 @@ public class SpotyRequestFilter extends OncePerRequestFilter {
     @Autowired
     public SpotyTokenService spotyTokenService;
     @Autowired
-    public SpotyUserDetailsService userDetailsService;
+    public SpotyUserDetailsService spotyUserDetailsService;
 
     @Override
     protected void doFilterInternal(final @NotNull HttpServletRequest request, final @NotNull HttpServletResponse response,
@@ -44,12 +44,16 @@ public class SpotyRequestFilter extends OncePerRequestFilter {
         }
 
         // set user details on spring security context
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+//        try {
+        final UserDetails userDetails = spotyUserDetailsService.loadUserByUsername(username);
         final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities());
-
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authentication);
+//        } catch (RuntimeException e) {
+//            response.setStatus(401);
+//        }
+
 
         // continue with authenticated user
         chain.doFilter(request, response);

@@ -6,6 +6,7 @@ import io.nomard.spoty_api_v1.entities.transfers.TransferDetail;
 import io.nomard.spoty_api_v1.entities.transfers.TransferMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
+import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.transfers.TransferDetailServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.transfers.TransferMasterServiceImpl;
 import jakarta.validation.Valid;
@@ -19,81 +20,41 @@ import java.util.List;
 @RequestMapping("transfers")
 public class TransferController {
     @Autowired
-    private TransferDetailServiceImpl transferDetailService;
-    @Autowired
     private TransferMasterServiceImpl transferMasterService;
 
-    // ADJUSTMENT MASTERS.
-    @GetMapping("/masters")
+    @GetMapping("/all")
     public List<TransferMaster> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
                                               @RequestParam(defaultValue = "50") Integer pageSize) {
         return transferMasterService.getAll(pageNo, pageSize);
     }
 
-    @GetMapping("/master")
+    @GetMapping("/single")
     public TransferMaster getMastersById(@RequestBody FindModel findModel) throws NotFoundException {
         return transferMasterService.getById(findModel.getId());
     }
 
-//    @GetMapping("/masters/search")
-//    public List<TransferMaster> getMastersByContains(@RequestBody SearchModel searchModel) {
-//        return transferMasterService.getByContains(searchModel.getSearch());
-//    }
+    @GetMapping("/search")
+    public List<TransferMaster> getMastersByContains(@RequestBody SearchModel searchModel) {
+        return transferMasterService.getByContains(searchModel.getSearch());
+    }
 
-    @PostMapping("/master/add")
+    @PostMapping("/add")
     public ResponseEntity<ObjectNode> saveMaster(@Valid @RequestBody TransferMaster transferMaster) {
         return transferMasterService.save(transferMaster);
     }
 
-    @PutMapping("/master/update")
+    @PutMapping("/update")
     public ResponseEntity<ObjectNode> updateMaster(@Valid @RequestBody TransferMaster transferMaster) throws NotFoundException {
         return transferMasterService.update(transferMaster);
     }
 
-    @DeleteMapping("/master/delete")
+    @DeleteMapping("/delete/single")
     public ResponseEntity<ObjectNode> deleteMaster(@RequestBody FindModel findModel) {
         return transferMasterService.delete(findModel.getId());
     }
 
-    @DeleteMapping("/masters/delete")
+    @DeleteMapping("/delete/multiple")
     public ResponseEntity<ObjectNode> deleteMasters(@RequestBody List<Long> idList) {
         return transferMasterService.deleteMultiple(idList);
-    }
-
-    // ADJUSTMENT DETAILS.
-    @GetMapping("/details")
-    public List<TransferDetail> getAllDetails(@RequestParam(defaultValue = "0") Integer pageNo,
-                                              @RequestParam(defaultValue = "50") Integer pageSize) {
-        return transferDetailService.getAll(pageNo, pageSize);
-    }
-
-    @GetMapping("/detail")
-    public TransferDetail getDetailById(@RequestBody FindModel findModel) throws NotFoundException {
-        return transferDetailService.getById(findModel.getId());
-    }
-
-//    @GetMapping("/details/search")
-//    public List<TransferDetail> getByContains(@RequestBody SearchModel searchModel) {
-//        return transferDetailService.getByContains(searchModel.getSearch());
-//    }
-
-    @PostMapping("/detail/add")
-    public ResponseEntity<ObjectNode> saveDetail(@Valid @RequestBody TransferDetail transferDetail) {
-        return transferDetailService.save(transferDetail);
-    }
-
-    @PutMapping("/detail/update")
-    public ResponseEntity<ObjectNode> updateDetail(@Valid @RequestBody TransferDetail transferDetail) throws NotFoundException {
-        return transferDetailService.update(transferDetail);
-    }
-
-    @DeleteMapping("/detail/delete")
-    public ResponseEntity<ObjectNode> deleteDetail(@RequestBody FindModel findModel) {
-        return transferDetailService.delete(findModel.getId());
-    }
-
-    @DeleteMapping("/details/delete")
-    public ResponseEntity<ObjectNode> deleteDetails(@RequestBody List<Long> idList) throws NotFoundException {
-        return transferDetailService.deleteMultiple(idList);
     }
 }

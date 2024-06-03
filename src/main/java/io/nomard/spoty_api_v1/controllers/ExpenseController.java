@@ -21,7 +21,6 @@ public class ExpenseController {
     @Autowired
     private ExpenseServiceImpl expenseService;
 
-
     @GetMapping("/all")
     public List<Expense> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                 @RequestParam(defaultValue = "50") Integer pageSize) {
@@ -49,12 +48,12 @@ public class ExpenseController {
         return expenseService.update(expense);
     }
 
-    @DeleteMapping("/single/delete")
+    @DeleteMapping("/delete/single")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return expenseService.delete(findModel.getId());
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/multiple")
     public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> idList) {
         return expenseService.deleteMultiple(idList);
     }

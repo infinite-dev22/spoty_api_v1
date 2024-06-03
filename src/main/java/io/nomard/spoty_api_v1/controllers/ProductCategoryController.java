@@ -21,7 +21,6 @@ public class ProductCategoryController {
     @Autowired
     private ProductCategoryServiceImpl productCategoryService;
 
-
     @GetMapping("/all")
     public List<ProductCategory> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                         @RequestParam(defaultValue = "50") Integer pageSize) {
@@ -49,12 +48,12 @@ public class ProductCategoryController {
         return productCategoryService.update(productCategory);
     }
 
-    @DeleteMapping("/single/delete")
+    @DeleteMapping("/delete/single")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return productCategoryService.delete(findModel.getId());
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/multiple")
     public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> idList) {
         return productCategoryService.deleteMultiple(idList);
     }

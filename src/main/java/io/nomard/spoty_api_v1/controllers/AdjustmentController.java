@@ -2,10 +2,10 @@ package io.nomard.spoty_api_v1.controllers;
 
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.adjustments.AdjustmentDetail;
 import io.nomard.spoty_api_v1.entities.adjustments.AdjustmentMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
+import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.adjustments.AdjustmentDetailServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.adjustments.AdjustmentMasterServiceImpl;
 import jakarta.validation.Valid;
@@ -19,81 +19,42 @@ import java.util.List;
 @RequestMapping("adjustments")
 public class AdjustmentController {
     @Autowired
-    private AdjustmentDetailServiceImpl adjustmentDetailService;
-    @Autowired
     private AdjustmentMasterServiceImpl adjustmentMasterService;
 
     // ADJUSTMENT MASTERS.
-    @GetMapping("/masters")
+    @GetMapping("/all")
     public List<AdjustmentMaster> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
                                                 @RequestParam(defaultValue = "50") Integer pageSize) {
         return adjustmentMasterService.getAll(pageNo, pageSize);
     }
 
-    @GetMapping("/master")
+    @GetMapping("/single")
     public AdjustmentMaster getMastersById(@RequestBody FindModel findModel) throws NotFoundException {
         return adjustmentMasterService.getById(findModel.getId());
     }
 
-//    @GetMapping("/masters/search")
-//    public List<AdjustmentMaster> getMastersByContains(@RequestBody SearchModel searchModel) {
-//        return adjustmentMasterService.getByContains(searchModel.getSearch());
-//    }
+    @GetMapping("/search")
+    public List<AdjustmentMaster> getMastersByContains(@RequestBody SearchModel searchModel) {
+        return adjustmentMasterService.getByContains(searchModel.getSearch());
+    }
 
-    @PostMapping("/master/add")
+    @PostMapping("/add")
     public ResponseEntity<ObjectNode> saveMaster(@Valid @RequestBody AdjustmentMaster adjustmentMaster) {
         return adjustmentMasterService.save(adjustmentMaster);
     }
 
-    @PutMapping("/master/update")
+    @PutMapping("/update")
     public ResponseEntity<ObjectNode> updateMaster(@Valid @RequestBody AdjustmentMaster adjustmentMaster) throws NotFoundException {
         return adjustmentMasterService.update(adjustmentMaster);
     }
 
-    @DeleteMapping("/master/delete")
+    @DeleteMapping("/delete/single")
     public ResponseEntity<ObjectNode> deleteMaster(@RequestBody FindModel findModel) {
         return adjustmentMasterService.delete(findModel.getId());
     }
 
-    @DeleteMapping("/masters/delete")
+    @DeleteMapping("/delete/multiple")
     public ResponseEntity<ObjectNode> deleteMasters(@RequestBody List<Long> idList) {
         return adjustmentMasterService.deleteMultiple(idList);
-    }
-
-    // ADJUSTMENT DETAILS.
-    @GetMapping("/details")
-    public List<AdjustmentDetail> getAllDetails(@RequestParam(defaultValue = "0") Integer pageNo,
-                                                @RequestParam(defaultValue = "50") Integer pageSize) {
-        return adjustmentDetailService.getAll(pageNo, pageSize);
-    }
-
-    @GetMapping("/detail")
-    public AdjustmentDetail getDetailById(@RequestBody FindModel findModel) throws NotFoundException {
-        return adjustmentDetailService.getById(findModel.getId());
-    }
-
-//    @GetMapping("/details/search")
-//    public List<AdjustmentDetail> getByContains(@RequestBody SearchModel searchModel) {
-//        return adjustmentDetailService.getByContains(searchModel.getSearch());
-//    }
-
-    @PostMapping("/detail/add")
-    public ResponseEntity<ObjectNode> saveDetail(@Valid @RequestBody AdjustmentDetail adjustmentDetail) {
-        return adjustmentDetailService.save(adjustmentDetail);
-    }
-
-    @PutMapping("/detail/update")
-    public ResponseEntity<ObjectNode> updateDetail(@Valid @RequestBody AdjustmentDetail adjustmentDetail) throws NotFoundException {
-        return adjustmentDetailService.update(adjustmentDetail);
-    }
-
-    @DeleteMapping("/detail/delete")
-    public ResponseEntity<ObjectNode> deleteDetail(@RequestBody FindModel findModel) {
-        return adjustmentDetailService.delete(findModel.getId());
-    }
-
-    @DeleteMapping("/details/delete")
-    public ResponseEntity<ObjectNode> deleteDetails(@RequestBody List<Long> idList) throws NotFoundException {
-        return adjustmentDetailService.deleteMultiple(idList);
     }
 }

@@ -20,76 +20,41 @@ import java.util.List;
 @RequestMapping("purchases")
 public class PurchaseController {
     @Autowired
-    private PurchaseDetailServiceImpl purchaseDetailService;
-    @Autowired
     private PurchaseMasterServiceImpl purchaseMasterService;
 
-    // ADJUSTMENT MASTERS.
-    @GetMapping("/masters")
+    @GetMapping("/all")
     public List<PurchaseMaster> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
                                               @RequestParam(defaultValue = "50") Integer pageSize) {
         return purchaseMasterService.getAll(pageNo, pageSize);
     }
 
-    @GetMapping("/master")
+    @GetMapping("/single")
     public PurchaseMaster getMastersById(@RequestBody FindModel findModel) throws NotFoundException {
         return purchaseMasterService.getById(findModel.getId());
     }
 
-    @GetMapping("/masters/search")
+    @GetMapping("/search")
     public List<PurchaseMaster> getMastersByContains(@RequestBody SearchModel searchModel) {
         return purchaseMasterService.getByContains(searchModel.getSearch());
     }
 
-    @PostMapping("/master/add")
+    @PostMapping("/add")
     public ResponseEntity<ObjectNode> saveMaster(@Valid @RequestBody PurchaseMaster purchaseMaster) {
         return purchaseMasterService.save(purchaseMaster);
     }
 
-    @PutMapping("/master/update")
+    @PutMapping("/update")
     public ResponseEntity<ObjectNode> updateMaster(@Valid @RequestBody PurchaseMaster purchaseMaster) throws NotFoundException {
         return purchaseMasterService.update(purchaseMaster);
     }
 
-    @DeleteMapping("/master/delete")
+    @DeleteMapping("/delete/single")
     public ResponseEntity<ObjectNode> deleteMaster(@RequestBody FindModel findModel) {
         return purchaseMasterService.delete(findModel.getId());
     }
 
-    @DeleteMapping("/masters/delete")
+    @DeleteMapping("/delete/multiple")
     public ResponseEntity<ObjectNode> deleteMasters(@RequestBody List<Long> idList) {
         return purchaseMasterService.deleteMultiple(idList);
-    }
-
-    // ADJUSTMENT DETAILS.
-    @GetMapping("/details")
-    public List<PurchaseDetail> getAllDetails(@RequestParam(defaultValue = "0") Integer pageNo,
-                                              @RequestParam(defaultValue = "50") Integer pageSize) {
-        return purchaseDetailService.getAll(pageNo, pageSize);
-    }
-
-    @GetMapping("/detail")
-    public PurchaseDetail getDetailById(@RequestBody FindModel findModel) throws NotFoundException {
-        return purchaseDetailService.getById(findModel.getId());
-    }
-
-    @PostMapping("/detail/add")
-    public ResponseEntity<ObjectNode> saveDetail(@Valid @RequestBody PurchaseDetail purchaseDetail) {
-        return purchaseDetailService.save(purchaseDetail);
-    }
-
-    @PutMapping("/detail/update")
-    public ResponseEntity<ObjectNode> updateDetail(@Valid @RequestBody PurchaseDetail purchaseDetail) throws NotFoundException {
-        return purchaseDetailService.update(purchaseDetail);
-    }
-
-    @DeleteMapping("/detail/delete")
-    public ResponseEntity<ObjectNode> deleteDetail(@RequestBody FindModel findModel) {
-        return purchaseDetailService.delete(findModel.getId());
-    }
-
-    @DeleteMapping("/details/delete")
-    public ResponseEntity<ObjectNode> deleteDetails(@RequestBody List<Long> idList) throws NotFoundException {
-        return purchaseDetailService.deleteMultiple(idList);
     }
 }

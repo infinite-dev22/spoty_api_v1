@@ -48,12 +48,12 @@ public class CurrencyController {
         return currencyService.update(currency);
     }
 
-    @DeleteMapping("/single/delete")
+    @DeleteMapping("/delete/single")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return currencyService.delete(findModel.getId());
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/multiple")
     public ResponseEntity<ObjectNode> delete(@RequestBody ArrayList<Long> idList) {
         return currencyService.deleteMultiple(idList);
     }

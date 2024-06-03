@@ -46,12 +46,12 @@ public class DesignationController {
         return designationService.update(designation);
     }
 
-    @DeleteMapping("/single/delete")
+    @DeleteMapping("/delete/single")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return designationService.delete(findModel.getId());
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/multiple")
     public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> idList) {
         return designationService.deleteMultiple(idList);
     }

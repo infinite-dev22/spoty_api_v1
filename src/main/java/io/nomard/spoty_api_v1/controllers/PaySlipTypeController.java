@@ -18,7 +18,6 @@ public class PaySlipTypeController {
     @Autowired
     private PaySlipTypeServiceImpl paySlipTypeService;
 
-
     @GetMapping("/all")
     public List<PaySlipType> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                     @RequestParam(defaultValue = "50") Integer pageSize) {
@@ -45,7 +44,7 @@ public class PaySlipTypeController {
         return paySlipTypeService.update(paySlipType);
     }
 
-    @DeleteMapping("/single/delete")
+    @DeleteMapping("/delete/single")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return paySlipTypeService.delete(findModel.getId());
     }

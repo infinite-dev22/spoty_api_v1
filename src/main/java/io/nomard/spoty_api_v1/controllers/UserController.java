@@ -46,7 +46,7 @@ public class UserController {
         return userService.update(userModel);
     }
 
-    @DeleteMapping("/single/delete")
+    @DeleteMapping("/delete/single")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return userService.delete(findModel.getId());
     }

@@ -19,7 +19,6 @@ public class TenantController {
     @Autowired
     private TenantServiceImpl tenantService;
 
-
     @GetMapping("/all")
     public List<Tenant> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                @RequestParam(defaultValue = "50") Integer pageSize) {
@@ -47,7 +46,7 @@ public class TenantController {
         return tenantService.update(tenant);
     }
 
-    @DeleteMapping("/single/delete")
+    @DeleteMapping("/delete/single")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return tenantService.delete(findModel.getId());
     }

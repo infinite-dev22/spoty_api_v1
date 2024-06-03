@@ -20,7 +20,6 @@ public class SalaryController {
     @Autowired
     private SalaryServiceImpl salaryService;
 
-
     @GetMapping("/all")
     public List<Salary> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                @RequestParam(defaultValue = "50") Integer pageSize) {
@@ -47,12 +46,12 @@ public class SalaryController {
         return salaryService.update(salary);
     }
 
-    @DeleteMapping("/single/delete")
+    @DeleteMapping("/delete/single")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return salaryService.delete(findModel.getId());
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/multiple")
     public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> idList) {
         return salaryService.deleteMultiple(idList);
     }

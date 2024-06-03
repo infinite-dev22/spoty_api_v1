@@ -19,7 +19,6 @@ public class LeaveTypeController {
     @Autowired
     private LeaveTypeServiceImpl leaveTypeService;
 
-
     @GetMapping("/all")
     public List<LeaveType> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                   @RequestParam(defaultValue = "50") Integer pageSize) {
@@ -46,12 +45,12 @@ public class LeaveTypeController {
         return leaveTypeService.update(leaveType);
     }
 
-    @DeleteMapping("/single/delete")
+    @DeleteMapping("/delete/single")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return leaveTypeService.delete(findModel.getId());
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/multiple")
     public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> idList) {
         return leaveTypeService.deleteMultiple(idList);
     }

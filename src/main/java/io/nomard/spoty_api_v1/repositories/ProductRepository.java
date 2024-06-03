@@ -17,13 +17,12 @@ public interface ProductRepository extends PagingAndSortingRepository<Product, L
             "trim(lower(p.unit.name))," +
             "trim(lower(p.category.name))," +
             "trim(lower(p.barcodeType))," +
-            "trim(lower(p.productType))," +
             "trim(lower(p.name))," +
-            "trim(lower(p.taxType))," +
+            "trim(lower(p.brand.name))," +
+            "trim(lower(p.tax.name))," +
+            "trim(lower(p.discount.name))," +
             "trim(lower(p.serialNumber))) like %:search%")
     List<Product> searchAll(@Param("search") String search);
-
-    List<Product> searchAllByNameContainingIgnoreCaseOrTaxTypeContainingIgnoreCaseOrBarcodeTypeContainingIgnoreCaseOrProductTypeContainingIgnoreCaseOrSerialNumberContainingIgnoreCase(String name, String taxType, String barcodeType, String productType, String serialNumber);
 
     @Query("select p from Product p where p.quantity <= p.stockAlert")
     List<Product> findAllByTenantIdByQuantityIsLessThanEqualStockAlert();

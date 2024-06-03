@@ -1,6 +1,8 @@
 package io.nomard.spoty_api_v1.configs;
 
 import io.nomard.spoty_api_v1.filters.SpotyRequestFilter;
+import io.nomard.spoty_api_v1.security.SpotyAuthEntryPoint;
+import io.nomard.spoty_api_v1.services.auth.SpotyUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,10 +16,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -29,7 +29,7 @@ public class SecurityConfig {
     public static final String[] WHITE_LIST_URL = {"/auth/**", "/error/**", "/error"};
 
     @Autowired
-    private AuthenticationEntryPoint unauthorizedHandler;
+    private SpotyAuthEntryPoint spotyAuthEntryPoint;
 
     @Autowired
     private SpotyRequestFilter spotyRequestFilter;
@@ -40,9 +40,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(UserDetailsService userDetailsService, PasswordEncoder encoder) {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService);
+    public AuthenticationManager authenticationManager(SpotyUserDetailsService spotyUserDetailsService, PasswordEncoder encoder) {
+        var provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(spotyUserDetailsService);
         provider.setPasswordEncoder(encoder);
         return new ProviderManager(provider);
     }
@@ -53,7 +53,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(unauthorizedHandler))
+                        .authenticationEntryPoint(spotyAuthEntryPoint))
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers(WHITE_LIST_URL)
                                 .permitAll()

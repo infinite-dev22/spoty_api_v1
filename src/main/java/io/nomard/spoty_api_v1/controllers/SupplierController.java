@@ -21,7 +21,6 @@ public class SupplierController {
     @Autowired
     private SupplierServiceImpl supplierService;
 
-
     @GetMapping("/all")
     public List<Supplier> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                  @RequestParam(defaultValue = "50") Integer pageSize) {
@@ -49,12 +48,12 @@ public class SupplierController {
         return supplierService.update(supplier);
     }
 
-    @DeleteMapping("/single/delete")
+    @DeleteMapping("/delete/single")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return supplierService.delete(findModel.getId());
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/multiple")
     public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> idList) {
         return supplierService.deleteMultiple(idList);
     }

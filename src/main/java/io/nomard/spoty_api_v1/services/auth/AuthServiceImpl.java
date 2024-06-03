@@ -19,19 +19,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import java.time.*;
 import java.util.Date;
 import java.util.Objects;
 
 @Service
 public class AuthServiceImpl implements AuthService {
     @Autowired
-    public UserDetailsService userDetailsService;
+    public SpotyUserDetailsService spotyUserDetailsService;
     @Autowired
     public SpotyTokenService spotyTokenService;
     @Autowired
@@ -63,27 +62,27 @@ public class AuthServiceImpl implements AuthService {
                             loginDetails.getEmail(),
                             loginDetails.getPassword()
                     ));
-            final var userDetails = userDetailsService.loadUserByUsername(loginDetails.getEmail());
+            final var userDetails = spotyUserDetailsService.loadUserByUsername(loginDetails.getEmail());
             // Set authenticated user into context.
             SecurityContextHolder.getContext().setAuthentication(authentication);
             // Get subscription end date.
-            var subscriptionEndDate = LocalDate.ofEpochDay(tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).getTime());
+            var subscriptionEndDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).getTime()), ZoneId.systemDefault());
             var gracePeriodEnd = subscriptionEndDate.plusDays(getGracePeriodDays());
             var subscriptionWarningDate = subscriptionEndDate.minusDays(getGracePeriodDays());
             var response = objectMapper.createObjectNode();
             response.put("trial", tenantService.isTrial(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
             response.put("canTry", tenantService.canTry(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
             response.put("newTenancy", tenantService.isNewTenancy(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
-            response.put("activeTenancy", !tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date(subscriptionWarningDate.toEpochDay())));
+            response.put("activeTenancy", Date.from(subscriptionEndDate.toInstant(ZoneOffset.UTC)).before(Date.from(subscriptionEndDate.plusDays(getGracePeriodDays()).toInstant(ZoneOffset.UTC))));
             // Check if trial is expired.
             if (tenantService.isTrial(userRepo.findUserByEmail(loginDetails.getEmail()).getId()) && tenantService.getTrialEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date())) {
-                response.put("status", 401);
+                response.put("status", 200);
                 response.put("message", "Subscription required");
                 return new ResponseEntity<>(response, HttpStatus.OK);
             }
             // Check if subscription is expired.
-            if (tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date(subscriptionWarningDate.toEpochDay()))) {
-                response.put("status", 401);
+            if (tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date(subscriptionWarningDate.toEpochSecond(ZoneOffset.UTC)))) {
+                response.put("status", 200);
                 response.put("message", "Subscription required");
                 return new ResponseEntity<>(response, HttpStatus.OK);
             }
@@ -92,7 +91,7 @@ public class AuthServiceImpl implements AuthService {
             response.put("token", "Bearer " + spotyTokenService.generateToken(userDetails));
             response.putPOJO("user", userRepo.findUserByEmail(loginDetails.getEmail()));
             // Check if subscription is about to expire(7 days before).
-            if (tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date(subscriptionWarningDate.toEpochDay()))
+            if (tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date(subscriptionWarningDate.toEpochSecond(ZoneOffset.UTC)))
                     && !tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date())) {
                 // send email warning about days left for subscription to expire.
                 response.put("message", "Subscription is about to expire, please renew");
@@ -100,7 +99,7 @@ public class AuthServiceImpl implements AuthService {
             }
             // Check if subscription has expired but in grace period(7 days after).
             if (tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date())
-                    && !tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date(gracePeriodEnd.toEpochDay()))) {
+                    && !tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date(gracePeriodEnd.toEpochSecond(ZoneOffset.UTC)))) {
                 // send email warning about days left for account to be locked.
                 response.put("message", "Subscription expired, please renew");
                 return new ResponseEntity<>(response, HttpStatus.OK);
@@ -108,7 +107,8 @@ public class AuthServiceImpl implements AuthService {
             response.put("message", "Process successfully completed");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
-            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            throw new RuntimeException(e);
+//            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 

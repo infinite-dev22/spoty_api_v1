@@ -49,7 +49,6 @@ public class UnitOfMeasure {
     @Column(name = "operator_value")
     private double operatorValue;
 
-
     @Column(name = "created_at")
     @JsonIgnore
     private Date createdAt;

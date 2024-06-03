@@ -20,7 +20,6 @@ public class UnitOfMeasureController {
     @Autowired
     private UnitOfMeasureServiceImpl unit_of_measureService;
 
-
     @GetMapping("/all")
     public List<UnitOfMeasure> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                       @RequestParam(defaultValue = "50") Integer pageSize) {
@@ -47,12 +46,12 @@ public class UnitOfMeasureController {
         return unit_of_measureService.update(unit_of_measure);
     }
 
-    @DeleteMapping("/single/delete")
+    @DeleteMapping("/delete/single")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return unit_of_measureService.delete(findModel.getId());
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/multiple")
     public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> idList) {
         return unit_of_measureService.deleteMultiple(idList);
     }

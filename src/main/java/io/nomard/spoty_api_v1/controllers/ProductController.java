@@ -21,7 +21,6 @@ public class ProductController {
     @Autowired
     private ProductServiceImpl productService;
 
-
     @GetMapping("/all")
     public List<Product> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                 @RequestParam(defaultValue = "50") Integer pageSize) {
@@ -54,12 +53,12 @@ public class ProductController {
         return productService.update(product);
     }
 
-    @DeleteMapping("/single/delete")
+    @DeleteMapping("/delete/single")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return productService.delete(findModel.getId());
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/multiple")
     public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> idList) {
         return productService.deleteMultiple(idList);
     }

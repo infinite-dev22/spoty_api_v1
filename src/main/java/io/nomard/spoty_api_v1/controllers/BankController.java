@@ -20,7 +20,6 @@ public class BankController {
     @Autowired
     private BankServiceImpl bankService;
 
-
     @GetMapping("/all")
     public List<Bank> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                              @RequestParam(defaultValue = "50") Integer pageSize) {
@@ -47,12 +46,12 @@ public class BankController {
         return bankService.update(bank);
     }
 
-    @DeleteMapping("/single/delete")
+    @DeleteMapping("/delete/single")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return bankService.delete(findModel.getId());
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/multiple")
     public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> ids) throws NotFoundException {
         return bankService.deleteMultiple(ids);
     }

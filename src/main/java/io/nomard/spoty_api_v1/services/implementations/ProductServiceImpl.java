@@ -110,10 +110,6 @@ public class ProductServiceImpl implements ProductService {
             product.setBarcodeType(data.getBarcodeType());
         }
 
-        if (Objects.nonNull(data.getProductType()) && !"".equalsIgnoreCase(data.getProductType())) {
-            product.setProductType(data.getProductType());
-        }
-
         if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
             product.setName(data.getName());
         }
@@ -122,24 +118,20 @@ public class ProductServiceImpl implements ProductService {
             product.setQuantity(data.getQuantity());
         }
 
-        if (!Objects.equals(data.getCost(), 0)) {
-            product.setCost(data.getCost());
+        if (!Objects.equals(data.getCostPrice(), 0)) {
+            product.setCostPrice(data.getCostPrice());
         }
 
-        if (!Objects.equals(data.getPrice(), 0)) {
-            product.setPrice(data.getPrice());
+        if (!Objects.equals(data.getSalePrice(), 0)) {
+            product.setSalePrice(data.getSalePrice());
         }
 
-        if (!Objects.equals(data.getDiscount(), 0)) {
+        if (!Objects.equals(product.getDiscount(), data.getDiscount()) && Objects.nonNull(data.getDiscount())) {
             product.setDiscount(data.getDiscount());
         }
 
-        if (!Objects.equals(data.getNetTax(), 0)) {
-            product.setNetTax(data.getNetTax());
-        }
-
-        if (Objects.nonNull(data.getTaxType()) && !"".equalsIgnoreCase(data.getTaxType())) {
-            product.setTaxType(data.getTaxType());
+        if (!Objects.equals(product.getTax(), data.getTax()) && Objects.nonNull(data.getTax())) {
+            product.setTax(data.getTax());
         }
 
         if (!Objects.equals(data.getStockAlert(), 0)) {

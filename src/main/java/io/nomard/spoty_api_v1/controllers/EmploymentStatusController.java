@@ -20,7 +20,6 @@ public class EmploymentStatusController {
     @Autowired
     private EmploymentStatusServiceImpl employmentStatusService;
 
-
     @GetMapping("/all")
     public List<EmploymentStatus> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                          @RequestParam(defaultValue = "50") Integer pageSize) {
@@ -47,12 +46,12 @@ public class EmploymentStatusController {
         return employmentStatusService.update(employmentStatus);
     }
 
-    @DeleteMapping("/single/delete")
+    @DeleteMapping("/delete/single")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return employmentStatusService.delete(findModel.getId());
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/multiple")
     public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> idList) throws NotFoundException {
         return employmentStatusService.deleteMultiple(idList);
     }

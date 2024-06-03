@@ -21,7 +21,6 @@ public class BeneficiaryTypeController {
     @Autowired
     private BeneficiaryTypeServiceImpl beneficiaryTypeService;
 
-
     @GetMapping("/all")
     public List<BeneficiaryType> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                         @RequestParam(defaultValue = "50") Integer pageSize) {
@@ -48,12 +47,12 @@ public class BeneficiaryTypeController {
         return beneficiaryTypeService.update(beneficiaryType);
     }
 
-    @DeleteMapping("/single/delete")
+    @DeleteMapping("/delete/single")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return beneficiaryTypeService.delete(findModel.getId());
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/multiple")
     public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> idList) {
         return beneficiaryTypeService.deleteMultiple(idList);
     }

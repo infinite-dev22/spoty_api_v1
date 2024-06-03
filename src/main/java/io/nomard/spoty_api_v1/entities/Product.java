@@ -15,6 +15,8 @@
 package io.nomard.spoty_api_v1.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.nomard.spoty_api_v1.entities.deductions.Discount;
+import io.nomard.spoty_api_v1.entities.deductions.Tax;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -56,51 +58,38 @@ public class Product implements Serializable {
 
     @Column(name = "barcode_type")
     private String barcodeType;
-
-    @Column(name = "product_type")
-    private String productType;
-
     @NotBlank(message = "name can't be blank")
     @Column(nullable = false)
     private String name;
     @Column
     private long quantity;
     @Column
-    private double cost;
-    @NotNull(message = "price can't be blank")
+    private double costPrice;
+    @NotNull(message = "Sale price can't be blank")
     @Column(nullable = false)
-    private double price;
-    @Column
-    private double discount;
-
-    @Column(name = "net_tax")
-    private double netTax;
-
-    @Column(name = "tax_type")
-    private String taxType;
-
+    private double salePrice;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "discount_id")
+    private Discount discount;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tax_id")
+    private Tax tax;
     @Column(name = "stock_alert")
     private long stockAlert;
-
     @Column(name = "serial_number")
     private String serialNumber;
-
     @Column
     private String image;
-
     @Column(name = "created_at")
     @JsonIgnore
     private Date createdAt;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "created_by")
     @JsonIgnore
     private User createdBy;
-
     @Column(name = "updated_at")
     @JsonIgnore
     private Date updatedAt;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")
     @JsonIgnore

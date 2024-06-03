@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -20,7 +19,6 @@ import java.util.List;
 public class PaymentTransactionController {
     @Autowired
     private PaymentTransactionServiceImpl paymentTransactionService;
-
 
     @GetMapping("/all")
     public List<PaymentTransaction> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
@@ -38,8 +36,13 @@ public class PaymentTransactionController {
         return paymentTransactionService.payCard(cardModel);
     }
 
-    @PostMapping("/pay/momo")
-    public ResponseEntity<ObjectNode> payMoMo(@Valid @RequestBody MoMoModel momoModel) {
+    @PostMapping("/pay/mtn")
+    public ResponseEntity<ObjectNode> payMTN(@Valid @RequestBody MoMoModel momoModel) {
+        return paymentTransactionService.payMoMo(momoModel);
+    }
+
+    @PostMapping("/pay/airtel")
+    public ResponseEntity<ObjectNode> payAirtel(@Valid @RequestBody MoMoModel momoModel) {
         return paymentTransactionService.payMoMo(momoModel);
     }
 }

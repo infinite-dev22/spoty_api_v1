@@ -19,7 +19,6 @@ public class SaleTermAndConditionController {
     @Autowired
     private SaleTermAndConditionServiceImpl saleTermAndConditionService;
 
-
     @GetMapping("/all")
     public List<SaleTermAndCondition> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                              @RequestParam(defaultValue = "50") Integer pageSize) {
@@ -31,11 +30,6 @@ public class SaleTermAndConditionController {
         return saleTermAndConditionService.getById(findModel.getId());
     }
 
-//    @GetMapping("/search")
-//    public List<SaleTermAndCondition> getByContains(@RequestBody SearchModel searchModel) {
-//        return saleTermAndConditionService.getByContains(searchModel.getSearch());
-//    }
-
     @PostMapping("/add")
     public ResponseEntity<ObjectNode> save(@Valid @RequestBody SaleTermAndCondition saleTermAndCondition) {
         return saleTermAndConditionService.save(saleTermAndCondition);
@@ -46,12 +40,12 @@ public class SaleTermAndConditionController {
         return saleTermAndConditionService.update(saleTermAndCondition);
     }
 
-    @DeleteMapping("/single/delete")
+    @DeleteMapping("/delete/single")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return saleTermAndConditionService.delete(findModel.getId());
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/multiple")
     public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> idList) {
         return saleTermAndConditionService.deleteMultiple(idList);
     }

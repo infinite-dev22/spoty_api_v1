@@ -23,7 +23,6 @@ public class RoleController {
     @Autowired
     private RoleServiceImpl roleService;
 
-    // ADJUSTMENT MASTERS.
     @GetMapping("/all")
     public List<Role> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
                                     @RequestParam(defaultValue = "50") Integer pageSize) {
@@ -45,12 +44,11 @@ public class RoleController {
         return roleService.update(role);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("delete/multiple")
     public ResponseEntity<ObjectNode> deleteMaster(@RequestBody FindModel findModel) {
         return roleService.delete(findModel.getId());
     }
 
-    // ADJUSTMENT DETAILS.
     @GetMapping("/permissions")
     public List<Permission> getAllDetails(@RequestParam(defaultValue = "0") Integer pageNo,
                                           @RequestParam(defaultValue = "50") Integer pageSize) {

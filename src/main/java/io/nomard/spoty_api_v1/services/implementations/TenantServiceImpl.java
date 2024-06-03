@@ -109,6 +109,7 @@ public class TenantServiceImpl implements TenantService {
         var tenant = opt.get();
         tenant.setTrial(true);
         tenant.setTrialEndDate(DateUtils.addDays(7));
+        tenant.setSubscriptionEndDate(DateUtils.addDays(7));
         tenant.setCanTry(false);
         tenant.setUpdatedAt(new Date());
         try {

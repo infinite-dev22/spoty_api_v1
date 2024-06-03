@@ -46,12 +46,12 @@ public class BrandController {
         return brandService.update(brand);
     }
 
-    @DeleteMapping("/single/delete")
+    @DeleteMapping("/delete/single")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return brandService.delete(findModel.getId());
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/multiple")
     public ResponseEntity<ObjectNode> delete(@RequestBody ArrayList<Long> idList) {
         return brandService.deleteMultiple(idList);
     }

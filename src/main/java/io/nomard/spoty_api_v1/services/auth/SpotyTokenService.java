@@ -30,7 +30,6 @@ public class SpotyTokenService {
     }
 
     public String generateToken(final UserDetails userDetails) {
-        var user = userRepo.findUserByEmail(userDetails.getUsername());
         final Instant now = Instant.now();
         return JWT.create()
                 .withSubject(userDetails.getUsername())

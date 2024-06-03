@@ -20,7 +20,6 @@ public class BranchController {
     @Autowired
     private BranchServiceImpl branchService;
 
-
     @GetMapping("/all")
     public List<Branch> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                @RequestParam(defaultValue = "50") Integer pageSize) {
@@ -47,12 +46,12 @@ public class BranchController {
         return branchService.update(branch);
     }
 
-    @DeleteMapping("/single/delete")
+    @DeleteMapping("/delete/single")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return branchService.delete(findModel.getId());
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/multiple")
     public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> idList) {
         return branchService.deleteMultiple(idList);
     }

@@ -61,7 +61,6 @@ public class TransferTransaction {
     @Column(name = "transfer_quantity")
     private long transferQuantity;
 
-
     @Column(name = "created_at")
     @JsonIgnore
     private Date createdAt;

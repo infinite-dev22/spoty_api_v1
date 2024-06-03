@@ -5,6 +5,8 @@ import io.nomard.spoty_api_v1.entities.*;
 import io.nomard.spoty_api_v1.entities.adjustments.AdjustmentDetail;
 import io.nomard.spoty_api_v1.entities.adjustments.AdjustmentMaster;
 import io.nomard.spoty_api_v1.entities.adjustments.AdjustmentTransaction;
+import io.nomard.spoty_api_v1.entities.deductions.Discount;
+import io.nomard.spoty_api_v1.entities.deductions.Tax;
 import io.nomard.spoty_api_v1.entities.hrm.hrm.Designation;
 import io.nomard.spoty_api_v1.entities.hrm.pay_roll.Salary;
 import io.nomard.spoty_api_v1.entities.purchases.PurchaseDetail;
@@ -33,7 +35,6 @@ import io.nomard.spoty_api_v1.services.auth.SpotyUserDetailsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
 @Configuration
@@ -227,7 +228,7 @@ public class AppConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
+    public SpotyUserDetailsService spotyUserDetailsService() {
         return new SpotyUserDetailsService();
     }
 
@@ -274,5 +275,15 @@ public class AppConfig {
     @Bean
     public PaymentTransaction paymentTransaction() {
         return new PaymentTransaction();
+    }
+
+    @Bean
+    public Discount discount() {
+        return new Discount();
+    }
+
+    @Bean
+    public Tax tax() {
+        return new Tax();
     }
 }
