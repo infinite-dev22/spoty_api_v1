@@ -24,10 +24,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "adjustment_masters")
@@ -52,7 +49,7 @@ public class AdjustmentMaster implements Serializable {
     @OneToMany(orphanRemoval = true, mappedBy = "adjustment", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
     @Builder.Default
-    private List<AdjustmentDetail> adjustmentDetails = Collections.synchronizedList(new ArrayList<>());
+    private List<AdjustmentDetail> adjustmentDetails = new LinkedList<>();
 
     private String notes;
 

@@ -25,10 +25,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "sale_masters")
@@ -59,7 +56,7 @@ public class SaleMaster implements Serializable {
     @OneToMany(orphanRemoval = true, mappedBy = "sale", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
     @Builder.Default
-    private List<SaleDetail> saleDetails = Collections.synchronizedList(new ArrayList<>());
+    private List<SaleDetail> saleDetails = new LinkedList<>();
 
     @Column(name = "tax_rate")
     @Builder.Default

@@ -25,10 +25,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "quotation_masters")
@@ -66,7 +63,7 @@ public class QuotationMaster implements Serializable {
     @OneToMany(orphanRemoval = true, mappedBy = "quotation", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
     @Builder.Default
-    private List<QuotationDetail> quotationDetails = Collections.synchronizedList(new ArrayList<>());
+    private List<QuotationDetail> quotationDetails = new LinkedList<>();
 
     @Column(nullable = false)
     @Builder.Default

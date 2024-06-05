@@ -25,10 +25,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "requisition_masters")
@@ -61,7 +58,7 @@ public class RequisitionMaster implements Serializable {
     @OneToMany(orphanRemoval = true, mappedBy = "requisition", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
     @Builder.Default
-    private List<RequisitionDetail> requisitionDetails = Collections.synchronizedList(new ArrayList<>());
+    private List<RequisitionDetail> requisitionDetails = new LinkedList<>();
 
     private String shipVia;
     private String shipMethod;

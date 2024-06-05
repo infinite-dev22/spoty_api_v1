@@ -24,10 +24,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "stock_in_masters")
@@ -54,7 +51,7 @@ public class StockInMaster implements Serializable {
     @OneToMany(orphanRemoval = true, mappedBy = "stockIn", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
     @Builder.Default
-    private List<StockInDetail> stockInDetails = Collections.synchronizedList(new ArrayList<>());
+    private List<StockInDetail> stockInDetails = new LinkedList<>();
 
     private String notes;
 

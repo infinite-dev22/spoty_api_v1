@@ -19,10 +19,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Cascade;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "roles")
@@ -51,7 +48,7 @@ public class Role {
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @Builder.Default
-    private List<Permission> permissions = Collections.synchronizedList(new ArrayList<>());
+    private List<Permission> permissions = new LinkedList<>();
 
     @Column(name = "created_at")
     @JsonIgnore

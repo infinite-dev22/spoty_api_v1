@@ -22,12 +22,11 @@ import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "purchase_masters")
@@ -59,7 +58,8 @@ public class PurchaseMaster implements Serializable {
     @OneToMany(orphanRemoval = true, mappedBy = "purchase", fetch = FetchType.LAZY)
     @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @Builder.Default
-    private List<PurchaseDetail> purchaseDetails = Collections.synchronizedList(new ArrayList<>());
+    @LazyCollection(LazyCollectionOption.FALSE)
+    private List<PurchaseDetail> purchaseDetails = new LinkedList<>();
 
     private double taxRate;
     private double netTax;

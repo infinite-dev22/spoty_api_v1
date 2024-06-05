@@ -24,10 +24,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "transfer_masters")
@@ -61,7 +58,7 @@ public class TransferMaster implements Serializable {
     @OneToMany(orphanRemoval = true, mappedBy = "transfer", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
     @Builder.Default
-    private List<TransferDetail> transferDetails = Collections.synchronizedList(new ArrayList<>());
+    private List<TransferDetail> transferDetails = new LinkedList<>();
 
     private String shipping;
 

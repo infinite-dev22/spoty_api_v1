@@ -7,10 +7,7 @@ import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "pay_slip_types")
@@ -31,7 +28,7 @@ public class PaySlipType {
             joinColumns = {@JoinColumn(name = "employment_status_id")},
             inverseJoinColumns = {@JoinColumn(name = "branch_id")})
     @Builder.Default
-    private List<Branch> branches = Collections.synchronizedList(new ArrayList<>());
+    private List<Branch> branches = new LinkedList<>();
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;
     private String name;
