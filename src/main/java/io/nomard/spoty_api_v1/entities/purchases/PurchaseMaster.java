@@ -54,7 +54,7 @@ public class PurchaseMaster implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;
 
-    @OneToMany(orphanRemoval = true, mappedBy = "purchase", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "purchase", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default
     private List<PurchaseDetail> purchaseDetails = new LinkedList<>();
 
