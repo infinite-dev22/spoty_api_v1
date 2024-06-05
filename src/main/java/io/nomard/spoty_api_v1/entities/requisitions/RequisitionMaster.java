@@ -21,8 +21,6 @@ import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 
 import java.io.Serializable;
 import java.util.*;
@@ -55,8 +53,7 @@ public class RequisitionMaster implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;
 
-    @OneToMany(orphanRemoval = true, mappedBy = "requisition", fetch = FetchType.LAZY)
-    @Cascade({CascadeType.ALL})
+    @OneToMany(orphanRemoval = true, mappedBy = "requisition", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default
     private List<RequisitionDetail> requisitionDetails = new LinkedList<>();
 

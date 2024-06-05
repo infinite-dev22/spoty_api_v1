@@ -21,12 +21,11 @@ import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 @Entity
 @Table(name = "purchase_masters")
@@ -55,10 +54,8 @@ public class PurchaseMaster implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;
 
-    @OneToMany(orphanRemoval = true, mappedBy = "purchase", fetch = FetchType.LAZY)
-    @Cascade({org.hibernate.annotations.CascadeType.ALL})
+    @OneToMany(orphanRemoval = true, mappedBy = "purchase", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default
-    @LazyCollection(LazyCollectionOption.FALSE)
     private List<PurchaseDetail> purchaseDetails = new LinkedList<>();
 
     private double taxRate;
