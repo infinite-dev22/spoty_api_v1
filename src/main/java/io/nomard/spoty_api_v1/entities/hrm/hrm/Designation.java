@@ -16,6 +16,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode
 public class Designation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -58,7 +58,7 @@ public class RequisitionMaster implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;
 
-    @OneToMany(mappedBy = "requisition", fetch = FetchType.LAZY)
+    @OneToMany(orphanRemoval = true, mappedBy = "requisition", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
     @Builder.Default
     private List<RequisitionDetail> requisitionDetails = Collections.synchronizedList(new ArrayList<>());

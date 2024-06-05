@@ -27,6 +27,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 @Entity
+@EqualsAndHashCode
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

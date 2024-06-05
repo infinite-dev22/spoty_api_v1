@@ -30,6 +30,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode
 public class TransferDetail implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -37,6 +37,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode
 public class QuotationMaster implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -62,7 +63,7 @@ public class QuotationMaster implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;
 
-    @OneToMany(mappedBy = "quotation", fetch = FetchType.LAZY)
+    @OneToMany(orphanRemoval = true, mappedBy = "quotation", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
     @Builder.Default
     private List<QuotationDetail> quotationDetails = Collections.synchronizedList(new ArrayList<>());

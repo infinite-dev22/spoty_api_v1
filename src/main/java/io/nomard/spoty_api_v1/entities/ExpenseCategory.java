@@ -28,6 +28,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 @Entity
+@EqualsAndHashCode
 public class ExpenseCategory implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

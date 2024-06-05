@@ -31,6 +31,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode
 public class SaleReturnDetail implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

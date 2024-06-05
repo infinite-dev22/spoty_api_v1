@@ -35,6 +35,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode
 public class PurchaseReturnMaster implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -58,7 +59,7 @@ public class PurchaseReturnMaster implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;
 
-    @OneToMany(mappedBy = "purchaseReturn", fetch = FetchType.LAZY)
+    @OneToMany(orphanRemoval = true, mappedBy = "purchaseReturn", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
     private Set<PurchaseReturnDetail> purchaseReturnDetails;
 

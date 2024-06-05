@@ -26,6 +26,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode
 public class UserModel implements Serializable {
     private Long id;
     private Tenant tenant;

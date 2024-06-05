@@ -37,6 +37,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode
 public class SaleMaster implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -55,7 +56,7 @@ public class SaleMaster implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;
 
-    @OneToMany(mappedBy = "sale", fetch = FetchType.LAZY)
+    @OneToMany(orphanRemoval = true, mappedBy = "sale", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
     @Builder.Default
     private List<SaleDetail> saleDetails = Collections.synchronizedList(new ArrayList<>());

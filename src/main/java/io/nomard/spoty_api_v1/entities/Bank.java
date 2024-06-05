@@ -13,6 +13,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode
 public class Bank {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

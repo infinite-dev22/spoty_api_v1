@@ -19,6 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode
 public class BeneficiaryBadge {
     @ManyToMany(fetch = FetchType.LAZY, targetEntity = Branch.class)
     @JoinTable(

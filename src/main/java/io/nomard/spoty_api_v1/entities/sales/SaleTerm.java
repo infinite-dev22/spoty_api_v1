@@ -31,6 +31,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode
 public class SaleTerm {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

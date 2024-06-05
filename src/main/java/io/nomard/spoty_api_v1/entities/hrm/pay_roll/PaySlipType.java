@@ -19,6 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode
 public class PaySlipType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -22,7 +22,6 @@ import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -37,6 +36,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode
 public class PurchaseMaster implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,8 +56,8 @@ public class PurchaseMaster implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;
 
-    @OneToMany(mappedBy = "purchase", fetch = FetchType.LAZY)
-    @Cascade({CascadeType.ALL})
+    @OneToMany(orphanRemoval = true, mappedBy = "purchase", fetch = FetchType.LAZY)
+    @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @Builder.Default
     private List<PurchaseDetail> purchaseDetails = Collections.synchronizedList(new ArrayList<>());
 

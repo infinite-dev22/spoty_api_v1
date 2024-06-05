@@ -18,6 +18,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode
 public class Leave {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

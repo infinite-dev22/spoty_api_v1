@@ -49,7 +49,7 @@ public class AdjustmentMaster implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;
 
-    @OneToMany(mappedBy = "adjustment", fetch = FetchType.LAZY)
+    @OneToMany(orphanRemoval = true, mappedBy = "adjustment", fetch = FetchType.LAZY)
     @Cascade({CascadeType.ALL})
     @Builder.Default
     private List<AdjustmentDetail> adjustmentDetails = Collections.synchronizedList(new ArrayList<>());

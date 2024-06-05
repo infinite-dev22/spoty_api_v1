@@ -31,6 +31,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode
 public class TransferTransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -16,6 +16,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode
 public class Tax {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

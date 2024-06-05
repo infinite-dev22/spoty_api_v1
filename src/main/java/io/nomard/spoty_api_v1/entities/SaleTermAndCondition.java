@@ -13,6 +13,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode
 public class SaleTermAndCondition {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

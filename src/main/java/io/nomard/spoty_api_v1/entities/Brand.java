@@ -27,6 +27,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode
 public class Brand {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
