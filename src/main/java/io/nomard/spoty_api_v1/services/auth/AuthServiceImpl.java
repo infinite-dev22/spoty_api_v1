@@ -67,42 +67,48 @@ public class AuthServiceImpl implements AuthService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             // Get subscription end date.
             var subscriptionEndDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).getTime()), ZoneId.systemDefault());
+            var nowDateWithGracePeriod = LocalDateTime.ofInstant(Instant.ofEpochMilli(new Date().getTime()), ZoneId.systemDefault());
             var gracePeriodEnd = subscriptionEndDate.plusDays(getGracePeriodDays());
             var subscriptionWarningDate = subscriptionEndDate.minusDays(getGracePeriodDays());
+            var trial = tenantService.isTrial(userRepo.findUserByEmail(loginDetails.getEmail()).getId());
+            var canTry = tenantService.canTry(userRepo.findUserByEmail(loginDetails.getEmail()).getId());
+            var newTenancy = tenantService.isNewTenancy(userRepo.findUserByEmail(loginDetails.getEmail()).getId());
+            var activeTenancy = Date.from(subscriptionEndDate.toInstant(ZoneOffset.UTC)).after(new Date());
+            var activeTenancyWarning = Date.from(subscriptionEndDate.toInstant(ZoneOffset.UTC)).after(Date.from(subscriptionEndDate.minusDays(getGracePeriodDays()).toInstant(ZoneOffset.UTC)));
+            var inActiveTenancyWarning = Date.from(subscriptionEndDate.toInstant(ZoneOffset.UTC)).after(Date.from(nowDateWithGracePeriod.toInstant(ZoneOffset.UTC)));
             var response = objectMapper.createObjectNode();
-            response.put("trial", tenantService.isTrial(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
-            response.put("canTry", tenantService.canTry(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
-            response.put("newTenancy", tenantService.isNewTenancy(userRepo.findUserByEmail(loginDetails.getEmail()).getId()));
-            response.put("activeTenancy", Date.from(subscriptionEndDate.toInstant(ZoneOffset.UTC)).before(Date.from(subscriptionEndDate.plusDays(getGracePeriodDays()).toInstant(ZoneOffset.UTC))));
+            response.put("status", 200);
+            response.put("trial", trial);
+            response.put("canTry", canTry);
+            response.put("newTenancy", newTenancy);
+            response.put("activeTenancy", activeTenancy);
+            response.put("activeTenancyWarning", activeTenancyWarning);
+            response.put("inActiveTenancyWarning", inActiveTenancyWarning);
+            response.put("token", "Bearer " + spotyTokenService.generateToken(userDetails));
+            response.putPOJO("user", userRepo.findUserByEmail(loginDetails.getEmail()));
+            System.out.println("Subscription End: " + Date.from(subscriptionEndDate.toInstant(ZoneOffset.UTC)) + "Subscription End Date With Grace Date: " + new Date());
+            System.out.println("Subscription End: " + Date.from(subscriptionEndDate.toInstant(ZoneOffset.UTC)) + "Subscription End Date With Grace Date: " + Date.from(subscriptionEndDate.minusDays(getGracePeriodDays()).toInstant(ZoneOffset.UTC)));
+            System.out.println("Subscription End: " + Date.from(subscriptionEndDate.toInstant(ZoneOffset.UTC)) + "Subscription End Date With Grace Date: " + Date.from(nowDateWithGracePeriod.toInstant(ZoneOffset.UTC)));
             // Check if trial is expired.
             if (tenantService.isTrial(userRepo.findUserByEmail(loginDetails.getEmail()).getId()) && tenantService.getTrialEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date())) {
-                response.put("status", 200);
                 response.put("message", "Subscription required");
-                return new ResponseEntity<>(response, HttpStatus.OK);
             }
             // Check if subscription is expired.
             if (tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date(subscriptionWarningDate.toEpochSecond(ZoneOffset.UTC)))) {
-                response.put("status", 200);
                 response.put("message", "Subscription required");
-                return new ResponseEntity<>(response, HttpStatus.OK);
             }
 
-            response.put("status", 200);
-            response.put("token", "Bearer " + spotyTokenService.generateToken(userDetails));
-            response.putPOJO("user", userRepo.findUserByEmail(loginDetails.getEmail()));
             // Check if subscription is about to expire(7 days before).
             if (tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date(subscriptionWarningDate.toEpochSecond(ZoneOffset.UTC)))
                     && !tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date())) {
                 // send email warning about days left for subscription to expire.
                 response.put("message", "Subscription is about to expire, please renew");
-                return new ResponseEntity<>(response, HttpStatus.OK);
             }
             // Check if subscription has expired but in grace period(7 days after).
             if (tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date())
                     && !tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date(gracePeriodEnd.toEpochSecond(ZoneOffset.UTC)))) {
                 // send email warning about days left for account to be locked.
                 response.put("message", "Subscription expired, please renew");
-                return new ResponseEntity<>(response, HttpStatus.OK);
             }
             response.put("message", "Process successfully completed");
             return new ResponseEntity<>(response, HttpStatus.OK);
