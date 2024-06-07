@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -65,6 +66,7 @@ public class SaleMasterServiceImpl implements SaleMasterService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> save(SaleMaster saleMaster) {
         try {
             for (int i = 0; i < saleMaster.getSaleDetails().size(); i++) {
@@ -152,6 +154,7 @@ public class SaleMasterServiceImpl implements SaleMasterService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             saleMasterRepo.deleteById(id);

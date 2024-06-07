@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -45,6 +46,7 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> save(TransferDetail transferDetail) {
         if (transferDetail.getProduct().getQuantity() > 0 && transferDetail.getProduct().getQuantity() > transferDetail.getQuantity()) {
             try {
@@ -131,6 +133,7 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             transferTransactionRepo.deleteById(id);

@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -47,6 +48,7 @@ public class QuotationDetailServiceImpl implements QuotationDetailService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> save(QuotationDetail quotationDetail) {
         try {
             quotationDetail.setCreatedBy(authService.authUser());
@@ -64,6 +66,7 @@ public class QuotationDetailServiceImpl implements QuotationDetailService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> update(QuotationDetail data) throws NotFoundException {
         var opt = quotationDetailRepo.findById(data.getId());
 
@@ -76,20 +79,12 @@ public class QuotationDetailServiceImpl implements QuotationDetailService {
             quotationDetail.setProduct(data.getProduct());
         }
 
-        if (!Objects.equals(data.getNetTax(), quotationDetail.getNetTax())) {
-            quotationDetail.setNetTax(data.getNetTax());
+        if (!Objects.equals(data.getTax(), quotationDetail.getTax()) && Objects.nonNull(data.getTax())) {
+            quotationDetail.setTax(data.getTax());
         }
 
-        if (Objects.nonNull(data.getTaxType()) && !"".equalsIgnoreCase(data.getTaxType())) {
-            quotationDetail.setTaxType(data.getTaxType());
-        }
-
-        if (!Objects.equals(data.getDiscount(), quotationDetail.getDiscount())) {
+        if (!Objects.equals(data.getDiscount(), quotationDetail.getDiscount()) && Objects.nonNull(data.getDiscount())) {
             quotationDetail.setDiscount(data.getDiscount());
-        }
-
-        if (Objects.nonNull(data.getDiscountType()) && !"".equalsIgnoreCase(data.getDiscountType())) {
-            quotationDetail.setDiscountType(data.getDiscountType());
         }
 
         if (Objects.nonNull(data.getSerialNumber()) && !"".equalsIgnoreCase(data.getSerialNumber())) {
@@ -116,6 +111,7 @@ public class QuotationDetailServiceImpl implements QuotationDetailService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             quotationDetailRepo.deleteById(id);

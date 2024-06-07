@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -51,6 +52,7 @@ public class BranchServiceImpl implements BranchService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> save(Branch branch) {
         try {
             branch.setTenant(authService.authUser().getTenant());
@@ -64,6 +66,7 @@ public class BranchServiceImpl implements BranchService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> update(Branch data) throws NotFoundException {
         var opt = branchRepo.findById(data.getId());
         if (opt.isEmpty()) {
@@ -106,6 +109,7 @@ public class BranchServiceImpl implements BranchService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             branchRepo.deleteById(id);

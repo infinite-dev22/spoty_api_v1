@@ -58,7 +58,7 @@ public class QuotationMaster implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;
 
-    @OneToMany(orphanRemoval = true, mappedBy = "quotation", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "quotation", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default
     private List<QuotationDetail> quotationDetails = new LinkedList<>();
 
@@ -98,7 +98,7 @@ public class QuotationMaster implements Serializable {
     @Builder.Default
     private double shippingFee = 0;
 
-    @Column(nullable = false)
+    @Column
     private String status;
 
     private String notes;

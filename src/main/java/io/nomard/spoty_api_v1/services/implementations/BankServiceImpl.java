@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -51,6 +52,7 @@ public class BankServiceImpl implements BankService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> save(Bank bank) {
         try {
             bank.setTenant(authService.authUser().getTenant());
@@ -64,6 +66,7 @@ public class BankServiceImpl implements BankService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> update(Bank data) throws NotFoundException {
         var opt = bankRepo.findById(data.getId());
 
@@ -105,6 +108,7 @@ public class BankServiceImpl implements BankService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             bankRepo.deleteById(id);

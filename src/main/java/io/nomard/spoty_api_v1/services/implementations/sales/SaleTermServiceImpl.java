@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -54,6 +55,7 @@ public class SaleTermServiceImpl implements SaleTermService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> save(SaleTerm saleTerm) {
         try {
             saleTerm.setTenant(authService.authUser().getTenant());

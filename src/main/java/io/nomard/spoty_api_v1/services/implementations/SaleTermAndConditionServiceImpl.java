@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -47,6 +48,7 @@ public class SaleTermAndConditionServiceImpl implements SaleTermAndConditionServ
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> save(SaleTermAndCondition saleTermAndCondition) {
         try {
             saleTermAndCondition.setTenant(authService.authUser().getTenant());
@@ -60,6 +62,7 @@ public class SaleTermAndConditionServiceImpl implements SaleTermAndConditionServ
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> update(SaleTermAndCondition data) throws NotFoundException {
         var opt = saleTermAndConditionRepo.findById(data.getId());
 
@@ -88,6 +91,7 @@ public class SaleTermAndConditionServiceImpl implements SaleTermAndConditionServ
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             saleTermAndConditionRepo.deleteById(id);

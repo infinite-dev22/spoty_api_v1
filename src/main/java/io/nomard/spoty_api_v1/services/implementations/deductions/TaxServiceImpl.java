@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -44,6 +45,7 @@ public class TaxServiceImpl implements TaxService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> save(Tax tax) {
         try {
             tax.setTenant(authService.authUser().getTenant());
@@ -58,6 +60,7 @@ public class TaxServiceImpl implements TaxService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> update(Tax data) throws NotFoundException {
         var opt = taxRepo.findById(data.getId());
         if (opt.isEmpty()) {
@@ -81,6 +84,7 @@ public class TaxServiceImpl implements TaxService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             taxRepo.deleteById(id);

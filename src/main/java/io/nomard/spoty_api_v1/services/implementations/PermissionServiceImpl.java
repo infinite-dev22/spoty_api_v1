@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -44,6 +45,7 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> save(Permission permission) {
         try {
             permission.setCreatedBy(authService.authUser());
@@ -56,6 +58,7 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> update(Permission data) throws NotFoundException {
         var opt = permissionRepo.findById(data.getId());
 
@@ -88,6 +91,7 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             permissionRepo.deleteById(id);

@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -63,6 +64,7 @@ public class AdjustmentMasterServiceImpl implements AdjustmentMasterService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> save(AdjustmentMaster adjustmentMaster) {
         try {
             for (int i = 0; i < adjustmentMaster.getAdjustmentDetails().size(); i++) {
@@ -134,6 +136,7 @@ public class AdjustmentMasterServiceImpl implements AdjustmentMasterService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             adjustmentMasterRepo.deleteById(id);

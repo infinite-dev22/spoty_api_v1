@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -47,6 +48,7 @@ public class PaySlipTypeServiceImpl implements PaySlipTypeService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> save(PaySlipType paySlipType) {
         try {
             paySlipType.setTenant(authService.authUser().getTenant());
@@ -60,6 +62,7 @@ public class PaySlipTypeServiceImpl implements PaySlipTypeService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> update(PaySlipType data) throws NotFoundException {
         var opt = paySlipTypeRepo.findById(data.getId());
 
@@ -96,6 +99,7 @@ public class PaySlipTypeServiceImpl implements PaySlipTypeService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             paySlipTypeRepo.deleteById(id);

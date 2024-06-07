@@ -18,6 +18,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Product;
 import io.nomard.spoty_api_v1.entities.UnitOfMeasure;
 import io.nomard.spoty_api_v1.entities.User;
+import io.nomard.spoty_api_v1.entities.deductions.Discount;
+import io.nomard.spoty_api_v1.entities.deductions.Tax;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -49,15 +51,16 @@ public class QuotationDetail implements Serializable {
     @JoinColumn(nullable = false, name = "product_id")
     private Product product;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "quotation_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "quotation_id")
     @JsonIgnore
     private QuotationMaster quotation;
-
-    private double netTax;
-    private String taxType;
-    private double discount;
-    private String discountType;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tax_id")
+    private Tax tax;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "discount_id")
+    private Discount discount;
 
     @Column(nullable = false)
     @Builder.Default
@@ -65,7 +68,7 @@ public class QuotationDetail implements Serializable {
 
     @Column(nullable = false)
     @Builder.Default
-    private double subTotalPrice = 0;
+    private double subTotal = 0;
 
     @Column(nullable = false)
     @Builder.Default

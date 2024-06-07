@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -90,6 +91,7 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> save(Tenant tenant) {
         try {
             tenant.setCreatedAt(new Date());
@@ -121,6 +123,7 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> update(Tenant data) throws NotFoundException {
         var opt = tenantRepo.findById(data.getId());
 
@@ -156,6 +159,7 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             tenantRepo.deleteById(id);

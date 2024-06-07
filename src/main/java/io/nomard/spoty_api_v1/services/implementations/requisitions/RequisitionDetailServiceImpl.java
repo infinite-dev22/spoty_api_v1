@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -47,6 +48,7 @@ public class RequisitionDetailServiceImpl implements RequisitionDetailService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> save(RequisitionDetail requisitionDetail) {
         try {
             requisitionDetail.setCreatedBy(authService.authUser());
@@ -64,6 +66,7 @@ public class RequisitionDetailServiceImpl implements RequisitionDetailService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> update(RequisitionDetail data) throws NotFoundException {
         var opt = requisitionDetailRepo.findById(data.getId());
 
@@ -116,6 +119,7 @@ public class RequisitionDetailServiceImpl implements RequisitionDetailService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             requisitionDetailRepo.deleteById(id);

@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -55,6 +57,7 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> save(QuotationMaster quotationMaster) {
         try {
             if (!quotationMaster.getQuotationDetails().isEmpty()) {
@@ -76,6 +79,7 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> update(QuotationMaster data) throws NotFoundException {
         var opt = quotationMasterRepo.findById(data.getId());
 
@@ -104,11 +108,13 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
             quotationMaster.setQuotationDetails(data.getQuotationDetails());
 
             for (int i = 0; i < quotationMaster.getQuotationDetails().size(); i++) {
-                quotationMaster.getQuotationDetails().get(i).setQuotation(quotationMaster);
+                if (Objects.isNull(quotationMaster.getQuotationDetails().get(i).getQuotation())) {
+                    quotationMaster.getQuotationDetails().get(i).setQuotation(quotationMaster);
+                }
             }
         }
 
-        if (Objects.nonNull(data.getTotal()) && !Objects.equals(data.getTotal(), quotationMaster.getTotal())) {
+        if (!Objects.equals(data.getTotal(), quotationMaster.getTotal())) {
             quotationMaster.setTotal(data.getTotal());
         }
 
@@ -132,6 +138,7 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             quotationMasterRepo.deleteById(id);

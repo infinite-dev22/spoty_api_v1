@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -52,6 +53,7 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> save(UnitOfMeasure uom) {
         uom.setTenant(authService.authUser().getTenant());
         uom.setCreatedBy(authService.authUser());
@@ -67,6 +69,7 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> update(UnitOfMeasure data) throws NotFoundException {
         var opt = uomRepo.findById(data.getId());
 
@@ -108,6 +111,7 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             uomRepo.deleteById(id);

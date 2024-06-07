@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -47,6 +48,7 @@ public class AdjustmentDetailServiceImpl implements AdjustmentDetailService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> save(AdjustmentDetail adjustmentDetail) {
         try {
             adjustmentDetail.setCreatedBy(authService.authUser());
@@ -64,6 +66,7 @@ public class AdjustmentDetailServiceImpl implements AdjustmentDetailService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> update(AdjustmentDetail data) throws NotFoundException {
         var opt = adjustmentDetailRepo.findById(data.getId());
 
@@ -100,6 +103,7 @@ public class AdjustmentDetailServiceImpl implements AdjustmentDetailService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             adjustmentDetailRepo.deleteById(id);

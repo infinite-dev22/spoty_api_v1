@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -57,6 +58,7 @@ public class PurchaseReturnMasterServiceImpl implements PurchaseReturnMasterServ
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> save(PurchaseReturnMaster purchaseReturnMaster) {
         try {
             purchaseReturnMaster.setTenant(authService.authUser().getTenant());
@@ -73,6 +75,7 @@ public class PurchaseReturnMasterServiceImpl implements PurchaseReturnMasterServ
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> update(PurchaseReturnMaster data) throws NotFoundException {
         var opt = purchaseReturnMasterRepo.findById(data.getId());
 
@@ -153,6 +156,7 @@ public class PurchaseReturnMasterServiceImpl implements PurchaseReturnMasterServ
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             purchaseReturnMasterRepo.deleteById(id);

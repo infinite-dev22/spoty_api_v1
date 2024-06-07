@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -52,6 +53,7 @@ public class BeneficiaryTypeServiceImpl implements BeneficiaryTypeService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> save(BeneficiaryType beneficiaryType) {
         try {
             beneficiaryType.setTenant(authService.authUser().getTenant());
@@ -65,6 +67,7 @@ public class BeneficiaryTypeServiceImpl implements BeneficiaryTypeService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> update(BeneficiaryType data) throws NotFoundException {
         var opt = beneficiaryTypeRepo.findById(data.getId());
 
@@ -101,6 +104,7 @@ public class BeneficiaryTypeServiceImpl implements BeneficiaryTypeService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             beneficiaryTypeRepo.deleteById(id);

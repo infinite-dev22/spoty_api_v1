@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -52,6 +53,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> save(ProductCategory productCategory) {
         try {
             productCategory.setTenant(authService.authUser().getTenant());
@@ -68,6 +70,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> update(ProductCategory data) throws NotFoundException {
         var opt = productCategoryRepo.findById(data.getId());
 
@@ -96,6 +99,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             productCategoryRepo.deleteById(id);

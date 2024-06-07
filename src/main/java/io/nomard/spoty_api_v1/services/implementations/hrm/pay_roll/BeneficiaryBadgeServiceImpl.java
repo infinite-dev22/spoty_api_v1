@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -49,6 +50,7 @@ public class BeneficiaryBadgeServiceImpl implements BeneficiaryBadgeService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> save(BeneficiaryBadge beneficiaryBadge) {
         try {
             beneficiaryBadge.setTenant(authService.authUser().getTenant());
@@ -62,6 +64,7 @@ public class BeneficiaryBadgeServiceImpl implements BeneficiaryBadgeService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> update(BeneficiaryBadge data) throws NotFoundException {
         var opt = beneficiaryBadgeRepo.findById(data.getId());
 
@@ -102,6 +105,7 @@ public class BeneficiaryBadgeServiceImpl implements BeneficiaryBadgeService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             beneficiaryBadgeRepo.deleteById(id);
