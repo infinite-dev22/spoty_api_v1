@@ -15,7 +15,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -116,13 +115,10 @@ public class SaleMasterServiceImpl implements SaleMasterService {
                 }
             }
         }
-        if (!Objects.equals(data.getTaxRate(), saleMaster.getTaxRate())) {
-            saleMaster.setTaxRate(data.getTaxRate());
+        if (!Objects.equals(data.getTax(), saleMaster.getTax()) && Objects.nonNull(data.getTax())) {
+            saleMaster.setTax(data.getTax());
         }
-        if (!Objects.equals(data.getNetTax(), saleMaster.getNetTax())) {
-            saleMaster.setNetTax(data.getNetTax());
-        }
-        if (!Objects.equals(data.getDiscount(), saleMaster.getDiscount())) {
+        if (!Objects.equals(data.getDiscount(), saleMaster.getDiscount()) && Objects.nonNull(data.getDiscount())) {
             saleMaster.setDiscount(data.getDiscount());
         }
         if (!Objects.equals(data.getTotal(), saleMaster.getTotal())) {

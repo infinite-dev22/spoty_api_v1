@@ -19,11 +19,15 @@ import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Customer;
 import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.User;
+import io.nomard.spoty_api_v1.entities.deductions.Discount;
+import io.nomard.spoty_api_v1.entities.deductions.Tax;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 @Entity
 @Table(name = "sale_masters")
@@ -55,15 +59,13 @@ public class SaleMaster implements Serializable {
     @Builder.Default
     private List<SaleDetail> saleDetails = new LinkedList<>();
 
-    @Column(name = "tax_rate")
-    @Builder.Default
-    private double taxRate = 0.0;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tax_id")
+    private Tax tax;
 
-    @Builder.Default
-    private double netTax = 0.0;
-
-    @Builder.Default
-    private double discount = 0.0;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "discount_id")
+    private Discount discount;
 
     @Column
     @Builder.Default
