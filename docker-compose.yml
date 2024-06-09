@@ -29,13 +29,6 @@ services:
       MYSQL_DATABASE: '${MYSQLDB_DATABASE}'
     volumes:
       - 'db_data:/var/lib/mysql'
-    healthcheck:
-      test:
-        - CMD
-        - pg_isready
-      interval: 10s
-      timeout: 5s
-      retries: 5
   phpmyadmin:
     image: 'phpmyadmin:latest'
     environment:
