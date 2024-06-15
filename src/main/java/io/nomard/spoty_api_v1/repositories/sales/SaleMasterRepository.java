@@ -1,6 +1,9 @@
 package io.nomard.spoty_api_v1.repositories.sales;
 
 import io.nomard.spoty_api_v1.entities.sales.SaleMaster;
+import io.nomard.spoty_api_v1.models.DashboardKPIModel;
+import io.nomard.spoty_api_v1.models.LineChartModel;
+import io.nomard.spoty_api_v1.models.ProductSalesModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +16,46 @@ import java.util.List;
 
 @Repository
 public interface SaleMasterRepository extends PagingAndSortingRepository<SaleMaster, Long>, JpaRepository<SaleMaster, Long> {
+    @Query("SELECT DATE_FORMAT(e.createdAt, '%Y') AS period, SUM(e.amountPaid) AS totalValue " +
+            "FROM SaleMaster e " +
+            "WHERE e.tenant.id = :id " +
+            "GROUP BY period " +
+            "ORDER BY DATE_FORMAT(e.createdAt, '%Y')")
+    List<LineChartModel> yearlyIncomes(@Param("id") Long id);
+
+    @Query("SELECT DATE_FORMAT(e.createdAt, '%Y-%m') AS period, SUM(e.amountPaid) AS totalValue " +
+            "FROM SaleMaster e " +
+            "WHERE e.tenant.id = :id " +
+            "GROUP BY period " +
+            "ORDER BY DATE_FORMAT(e.createdAt, '%Y-%m')")
+    List<LineChartModel> monthlyIncomes(@Param("id") Long id);
+
+    @Query("SELECT DATE_FORMAT(e.createdAt, '%Y-%m-%u') AS period, SUM(e.amountPaid) AS totalValue " +
+            "FROM SaleMaster e " +
+            "WHERE e.tenant.id = :id " +
+            "GROUP BY period " +
+            "ORDER BY DATE_FORMAT(e.createdAt, '%Y-%m-%u')")
+    List<LineChartModel> weeklyIncomes(@Param("id") Long id);
+
+    @Query("SELECT new io.nomard.spoty_api_v1.models.ProductSalesModel(p.name, SUM(sd.quantity), p.salePrice, p.costPrice) " +
+            "FROM SaleDetail sd " +
+            "JOIN sd.product p " +
+            "JOIN sd.sale s " +
+            "WHERE s.tenant.id = :id " +
+            "GROUP BY p.id, p.name, p.salePrice, p.costPrice " +
+            "ORDER BY SUM(sd.quantity) DESC")
+    List<ProductSalesModel> findTopProductsSold(@Param("id") Long id, Pageable pageable);
+
+//    @Query("SELECT new io.nomard.spoty_api_v1.models.DashboardKPIModel('Total Orders', COUNT(s)) " +
+//            "FROM SaleMaster s " +
+//            "WHERE s.tenant.id = :id")
+//    DashboardKPIModel countOrders(@Param("id") Long id);
+
+    @Query("SELECT new io.nomard.spoty_api_v1.models.DashboardKPIModel('Total Earnings', SUM(s.amountPaid)) " +
+            "FROM SaleMaster s " +
+            "WHERE s.tenant.id = :id ")
+    DashboardKPIModel totalEarnings(@Param("id") Long id);
+
     List<SaleMaster> searchAllByRefContainingIgnoreCase(String ref);
 
     @Query("select p from SaleMaster p where p.tenant.id = :id")
