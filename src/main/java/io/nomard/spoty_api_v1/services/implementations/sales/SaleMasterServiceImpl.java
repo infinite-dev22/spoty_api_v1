@@ -99,6 +99,8 @@ public class SaleMasterServiceImpl implements SaleMasterService {
     @CacheEvict(value = "sale_masters", key = "#data.id")
     public ResponseEntity<ObjectNode> update(SaleMaster data) throws NotFoundException {
         var opt = saleMasterRepo.findById(data.getId());
+        var subTotal = 0.00;
+        var total = 0.00;
         if (opt.isEmpty()) {
             throw new NotFoundException();
         }
@@ -114,19 +116,17 @@ public class SaleMasterServiceImpl implements SaleMasterService {
         }
         if (Objects.nonNull(data.getSaleDetails()) && !data.getSaleDetails().isEmpty()) {
             saleMaster.setSaleDetails(data.getSaleDetails());
-            var subTotal = 0.00;
-            var total = 0.00;
             if (!Objects.equals(saleMaster.getTax().getPercentage(), data.getTax().getPercentage()) && saleMaster.getTax().getPercentage() > 0.0) {
-                total += subTotal * (saleMaster.getTax().getPercentage() / 100);
+                total += subTotal * (data.getTax().getPercentage() / 100);
             }
             if (!Objects.equals(saleMaster.getDiscount().getPercentage(), data.getDiscount().getPercentage()) && saleMaster.getTax().getPercentage() > 0.0) {
-                total += subTotal * (saleMaster.getDiscount().getPercentage() / 100);
+                total += subTotal * (data.getDiscount().getPercentage() / 100);
             }
-            saleMaster.setSubTotal(subTotal);
-            saleMaster.setTotal(total);
-            for (int i = 0; i < saleMaster.getSaleDetails().size(); i++) {
-                saleMaster.getSaleDetails().get(i).setSale(saleMaster);
-                subTotal += saleMaster.getSaleDetails().get(i).getSubTotalPrice();
+            for (int i = 0; i < data.getSaleDetails().size(); i++) {
+                if (Objects.isNull(data.getSaleDetails().get(i).getSale())) {
+                    data.getSaleDetails().get(i).setSale(saleMaster);
+                }
+                subTotal += data.getSaleDetails().get(i).getSubTotalPrice();
                 try {
                     saleTransactionService.update(saleMaster.getSaleDetails().get(i));
                 } catch (NotFoundException e) {
@@ -141,7 +141,10 @@ public class SaleMasterServiceImpl implements SaleMasterService {
             saleMaster.setDiscount(data.getDiscount());
         }
         if (!Objects.equals(data.getTotal(), saleMaster.getTotal())) {
-            saleMaster.setTotal(data.getTotal());
+            saleMaster.setTotal(total);
+        }
+        if (!Objects.equals(data.getSubTotal(), saleMaster.getSubTotal())) {
+            saleMaster.setSubTotal(subTotal);
         }
         if (!Objects.equals(data.getAmountPaid(), saleMaster.getAmountPaid())) {
             saleMaster.setAmountPaid(data.getAmountPaid());
