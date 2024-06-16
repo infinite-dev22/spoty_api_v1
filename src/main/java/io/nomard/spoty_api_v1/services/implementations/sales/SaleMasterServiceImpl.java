@@ -36,11 +36,8 @@ public class SaleMasterServiceImpl implements SaleMasterService {
     @Cacheable("sale_masters")
     @Transactional(readOnly = true)
     public List<SaleMaster> getAll(int pageNo, int pageSize) {
-        //create page request object
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
-        //pass it to repos
+        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
         Page<SaleMaster> page = saleMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
 
@@ -67,16 +64,27 @@ public class SaleMasterServiceImpl implements SaleMasterService {
     @Override
     @Transactional
     public ResponseEntity<ObjectNode> save(SaleMaster saleMaster) {
+        var subTotal = 0.00;
+        var total = 0.00;
+        for (int i = 0; i < saleMaster.getSaleDetails().size(); i++) {
+            saleMaster.getSaleDetails().get(i).setSale(saleMaster);
+            subTotal += saleMaster.getSaleDetails().get(i).getSubTotalPrice();
+        }
+        if (saleMaster.getTax().getPercentage() > 0.0) {
+            total += subTotal * (saleMaster.getTax().getPercentage() / 100);
+        }
+        if (saleMaster.getTax().getPercentage() > 0.0) {
+            total += subTotal * (saleMaster.getDiscount().getPercentage() / 100);
+        }
+        saleMaster.setSubTotal(subTotal);
+        saleMaster.setTotal(total);
+        saleMaster.setTenant(authService.authUser().getTenant());
+        if (Objects.isNull(saleMaster.getBranch())) {
+            saleMaster.setBranch(authService.authUser().getBranch());
+        }
+        saleMaster.setCreatedBy(authService.authUser());
+        saleMaster.setCreatedAt(new Date());
         try {
-            for (int i = 0; i < saleMaster.getSaleDetails().size(); i++) {
-                saleMaster.getSaleDetails().get(i).setSale(saleMaster);
-            }
-            saleMaster.setTenant(authService.authUser().getTenant());
-            if (Objects.isNull(saleMaster.getBranch())) {
-                saleMaster.setBranch(authService.authUser().getBranch());
-            }
-            saleMaster.setCreatedBy(authService.authUser());
-            saleMaster.setCreatedAt(new Date());
             saleMasterRepo.saveAndFlush(saleMaster);
             for (int i = 0; i < saleMaster.getSaleDetails().size(); i++) {
                 saleTransactionService.save(saleMaster.getSaleDetails().get(i));
@@ -106,8 +114,19 @@ public class SaleMasterServiceImpl implements SaleMasterService {
         }
         if (Objects.nonNull(data.getSaleDetails()) && !data.getSaleDetails().isEmpty()) {
             saleMaster.setSaleDetails(data.getSaleDetails());
+            var subTotal = 0.00;
+            var total = 0.00;
+            if (!Objects.equals(saleMaster.getTax().getPercentage(), data.getTax().getPercentage()) && saleMaster.getTax().getPercentage() > 0.0) {
+                total += subTotal * (saleMaster.getTax().getPercentage() / 100);
+            }
+            if (!Objects.equals(saleMaster.getDiscount().getPercentage(), data.getDiscount().getPercentage()) && saleMaster.getTax().getPercentage() > 0.0) {
+                total += subTotal * (saleMaster.getDiscount().getPercentage() / 100);
+            }
+            saleMaster.setSubTotal(subTotal);
+            saleMaster.setTotal(total);
             for (int i = 0; i < saleMaster.getSaleDetails().size(); i++) {
                 saleMaster.getSaleDetails().get(i).setSale(saleMaster);
+                subTotal += saleMaster.getSaleDetails().get(i).getSubTotalPrice();
                 try {
                     saleTransactionService.update(saleMaster.getSaleDetails().get(i));
                 } catch (NotFoundException e) {
