@@ -32,11 +32,8 @@ public class StockInMasterServiceImpl implements StockInMasterService {
 
     @Override
     public List<StockInMaster> getAll(int pageNo, int pageSize) {
-        //create page request object
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
-        //pass it to repos
+        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
         Page<StockInMaster> page = stockInMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
 

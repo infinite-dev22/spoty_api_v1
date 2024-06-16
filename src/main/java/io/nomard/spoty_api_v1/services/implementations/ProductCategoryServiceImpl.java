@@ -27,11 +27,8 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     @Override
     public List<ProductCategory> getAll(int pageNo, int pageSize) {
-        //create page request object
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
-        //pass it to repos
+        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
         Page<ProductCategory> page = productCategoryRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
 

@@ -27,11 +27,8 @@ public class BankServiceImpl implements BankService {
 
     @Override
     public List<Bank> getAll(int pageNo, int pageSize) {
-        //create page request object
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
-        //pass it to repos
+        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
         Page<Bank> page = bankRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
 

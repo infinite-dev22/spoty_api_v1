@@ -30,11 +30,8 @@ public class AdjustmentDetailServiceImpl implements AdjustmentDetailService {
 
     @Override
     public List<AdjustmentDetail> getAll(int pageNo, int pageSize) {
-        //create page request object
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
-        //pass it to repos
+        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
         Page<AdjustmentDetail> page = adjustmentDetailRepo.findAll(pageRequest);
-        //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
 

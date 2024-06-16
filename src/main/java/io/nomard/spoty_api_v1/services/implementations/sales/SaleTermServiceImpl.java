@@ -35,11 +35,8 @@ public class SaleTermServiceImpl implements SaleTermService {
     @Cacheable("sale_terms")
     @Transactional(readOnly = true)
     public List<SaleTerm> getAll(int pageNo, int pageSize) {
-        //create page request object
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
-        //pass it to repos
+        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
         Page<SaleTerm> page = saleTermRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
 

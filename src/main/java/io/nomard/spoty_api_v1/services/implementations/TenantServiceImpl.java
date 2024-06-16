@@ -28,11 +28,8 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public List<Tenant> getAll(int pageNo, int pageSize) {
-        //create page request object
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
-        //pass it to repos
+        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
         Page<Tenant> page = tenantRepo.findAll(pageRequest);
-        //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
 

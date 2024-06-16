@@ -30,11 +30,8 @@ public class TransferDetailServiceImpl implements TransferDetailService {
 
     @Override
     public List<TransferDetail> getAll(int pageNo, int pageSize) {
-        //create page request object
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize/*, Sort.by("createdAt").descending()*/);
-        //pass it to repos
+        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
         Page<TransferDetail> page = transferDetailRepo.findAll(pageRequest);
-        //page.hasContent(); -- to check pages are there or not
         return page.getContent();
     }
 
