@@ -84,14 +84,6 @@ public class QuotationDetailServiceImpl implements QuotationDetailService {
             quotationDetail.setDiscount(data.getDiscount());
         }
 
-        if (Objects.nonNull(data.getSerialNumber()) && !"".equalsIgnoreCase(data.getSerialNumber())) {
-            quotationDetail.setSerialNumber(data.getSerialNumber());
-        }
-
-        if (!Objects.equals(data.getTotal(), quotationDetail.getTotal())) {
-            quotationDetail.setTotal(data.getTotal());
-        }
-
         if (!Objects.equals(data.getQuantity(), quotationDetail.getQuantity())) {
             quotationDetail.setQuantity(data.getQuantity());
         }
