@@ -64,17 +64,11 @@ public class QuotationDetail implements Serializable {
 
     @Column(nullable = false)
     @Builder.Default
-    private double total = 0;
-
-    @Column(nullable = false)
-    @Builder.Default
     private double subTotal = 0;
 
     @Column(nullable = false)
     @Builder.Default
     private int quantity = 0;
-
-    private String serialNumber;
 
     @Column(name = "created_at")
     @JsonIgnore

@@ -68,31 +68,11 @@ public class QuotationMaster implements Serializable {
 
     @Column(nullable = false)
     @Builder.Default
-    private double taxRate = 0;
-
-    @Column(nullable = false)
-    @Builder.Default
     private double netTax = 0;
 
     @Column(nullable = false)
     @Builder.Default
     private double discount = 0;
-
-    @Column(nullable = false)
-    @Builder.Default
-    private double subTotal = 0;
-
-    @Column(nullable = false)
-    @Builder.Default
-    private double amountPaid = 0;
-
-    @Column(nullable = false)
-    @Builder.Default
-    private double amountDue = 0;
-
-    @Column(nullable = false)
-    @Builder.Default
-    private double changeAmount = 0;
 
     @Column(nullable = false)
     @Builder.Default
