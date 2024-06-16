@@ -36,8 +36,6 @@ public class SaleDetail implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String ref;
-
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "saleMaster_id", nullable = false)
     @JsonIgnore
@@ -46,16 +44,6 @@ public class SaleDetail implements Serializable {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "product_id")
     private Product product;
-
-    private String serialNumber;
-
-    @Column(nullable = false)
-    private double price;
-
-    private double netTax;
-    private String taxType;
-    private double discount;
-    private String discountType;
 
     @Column(nullable = false)
     private double subTotalPrice;
