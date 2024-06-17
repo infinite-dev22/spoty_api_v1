@@ -65,10 +65,10 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
                 var quotationDetail = quotationMaster.getQuotationDetails().get(i);
                 quotationDetail.setQuotation(quotationMaster);
                 total += quotationDetail.getSubTotal();
-                if (quotationDetail.getTax().getPercentage() > 0.0) {
+                if (Objects.nonNull(quotationDetail.getTax()) && quotationDetail.getTax().getPercentage() > 0.0) {
                     tax += quotationDetail.getTax().getPercentage();
                 }
-                if (quotationDetail.getDiscount().getPercentage() > 0.0) {
+                if (Objects.nonNull(quotationDetail.getDiscount()) && quotationDetail.getDiscount().getPercentage() > 0.0) {
                     discount += quotationDetail.getDiscount().getPercentage();
                 }
             }
@@ -132,10 +132,10 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
                     quotationDetail.setQuotation(quotationMaster);
                 }
                 total += quotationDetail.getSubTotal();
-                if (quotationDetail.getTax().getPercentage() > 0.0) {
+                if (Objects.nonNull(quotationDetail.getTax()) && quotationDetail.getTax().getPercentage() > 0.0) {
                     tax += quotationDetail.getTax().getPercentage();
                 }
-                if (quotationDetail.getDiscount().getPercentage() > 0.0) {
+                if (Objects.nonNull(quotationDetail.getDiscount()) && quotationDetail.getDiscount().getPercentage() > 0.0) {
                     discount += quotationDetail.getDiscount().getPercentage();
                 }
             }
