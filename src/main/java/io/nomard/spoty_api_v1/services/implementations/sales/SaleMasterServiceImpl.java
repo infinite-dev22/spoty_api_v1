@@ -70,10 +70,10 @@ public class SaleMasterServiceImpl implements SaleMasterService {
             saleMaster.getSaleDetails().get(i).setSale(saleMaster);
             subTotal += saleMaster.getSaleDetails().get(i).getSubTotalPrice();
         }
-        if (saleMaster.getTax().getPercentage() > 0.0) {
+        if (Objects.nonNull(saleMaster.getTax()) && saleMaster.getTax().getPercentage() > 0.0) {
             total += subTotal * (saleMaster.getTax().getPercentage() / 100);
         }
-        if (saleMaster.getTax().getPercentage() > 0.0) {
+        if (Objects.nonNull(saleMaster.getDiscount()) && saleMaster.getDiscount().getPercentage() > 0.0) {
             total += subTotal * (saleMaster.getDiscount().getPercentage() / 100);
         }
         saleMaster.setSubTotal(subTotal);
@@ -116,10 +116,14 @@ public class SaleMasterServiceImpl implements SaleMasterService {
         }
         if (Objects.nonNull(data.getSaleDetails()) && !data.getSaleDetails().isEmpty()) {
             saleMaster.setSaleDetails(data.getSaleDetails());
-            if (!Objects.equals(saleMaster.getTax().getPercentage(), data.getTax().getPercentage()) && saleMaster.getTax().getPercentage() > 0.0) {
+            if (Objects.nonNull(data.getTax())
+                    && !Objects.equals(saleMaster.getTax().getPercentage(), data.getTax().getPercentage())
+                    && saleMaster.getTax().getPercentage() > 0.0) {
                 total += subTotal * (data.getTax().getPercentage() / 100);
             }
-            if (!Objects.equals(saleMaster.getDiscount().getPercentage(), data.getDiscount().getPercentage()) && saleMaster.getTax().getPercentage() > 0.0) {
+            if (Objects.nonNull(data.getDiscount())
+                    && !Objects.equals(saleMaster.getDiscount().getPercentage(), data.getDiscount().getPercentage())
+                    && saleMaster.getTax().getPercentage() > 0.0) {
                 total += subTotal * (data.getDiscount().getPercentage() / 100);
             }
             for (int i = 0; i < data.getSaleDetails().size(); i++) {
