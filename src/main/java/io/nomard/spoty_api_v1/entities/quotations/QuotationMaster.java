@@ -41,10 +41,6 @@ public class QuotationMaster implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user_detail;
 
-    @Column(nullable = false)
-    @Builder.Default
-    private Date date = new Date();
-
     private String ref;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)

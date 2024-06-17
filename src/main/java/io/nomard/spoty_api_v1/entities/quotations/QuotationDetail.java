@@ -39,10 +39,6 @@ public class QuotationDetail implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn(nullable = false)
-    @Builder.Default
-    private double price = 0;
-
     @JoinColumn(name = "sale_unit_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private UnitOfMeasure saleUnit;

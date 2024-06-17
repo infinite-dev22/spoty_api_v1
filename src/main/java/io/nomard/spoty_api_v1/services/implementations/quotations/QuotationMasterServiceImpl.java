@@ -53,7 +53,7 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
     }
 
     @Override
-    @Transactional
+//    @Transactional
     public ResponseEntity<ObjectNode> save(QuotationMaster quotationMaster) {
         var total = 0.00;
         var tax = 0.00;
@@ -109,10 +109,6 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
 
         if (Objects.nonNull(data.getRef()) && !"".equalsIgnoreCase(data.getRef())) {
             quotationMaster.setRef(data.getRef());
-        }
-
-        if (Objects.nonNull(data.getDate()) && !Objects.equals(data.getDate(), quotationMaster.getDate())) {
-            quotationMaster.setDate(data.getDate());
         }
 
         if (Objects.nonNull(data.getCustomer()) && !Objects.equals(data.getCustomer(), quotationMaster.getCustomer())) {
