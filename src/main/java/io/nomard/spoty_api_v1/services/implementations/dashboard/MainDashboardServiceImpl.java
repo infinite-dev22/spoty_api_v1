@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -74,25 +73,32 @@ public class MainDashboardServiceImpl implements MainDashboardService {
     }
 
     @Override
-    @Cacheable("weekly_incomes")
+    @Cacheable("monthly_revenue")
     @Transactional(readOnly = true)
-    public List<LineChartModel> getWeeklyIncomes() {
-        return saleMasterRepo.weeklyIncomes(authService.authUser().getTenant().getId());
+    public List<LineChartModel> getMonthlyRevenue() {
+        return saleMasterRepo.monthlyRevenue(authService.authUser().getTenant().getId());
+    }
+
+    @Override
+    @Cacheable("weekly_revenue")
+    @Transactional(readOnly = true)
+    public List<LineChartModel> getWeeklyRevenue() {
+        return saleMasterRepo.weeklyRevenue(authService.authUser().getTenant().getId());
     }
 
     @Override
     @Cacheable("top_product_sold")
     @Transactional(readOnly = true)
     public List<ProductSalesModel> getTopProductsSold(@RequestParam(defaultValue = "10") Integer limit) {
-            PageRequest pageRequest = PageRequest.of(0, limit);
-            return saleMasterRepo.findTopProductsSold(authService.authUser().getTenant().getId(), pageRequest);
+        PageRequest pageRequest = PageRequest.of(0, limit);
+        return saleMasterRepo.findTopProductsSold(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override
     @Cacheable("product_stock_alert")
     @Transactional(readOnly = true)
     public List<StockAlertModel> getProductsStockAlert() {
-            return productRepo.productsStockAlert(authService.authUser().getTenant().getId());
+        return productRepo.productsStockAlert(authService.authUser().getTenant().getId());
     }
 
     @Override
@@ -104,15 +110,37 @@ public class MainDashboardServiceImpl implements MainDashboardService {
     }
 
     @Override
-    @Cacheable("dashboard_kpi")
+    @Cacheable("total_earnings")
     @Transactional(readOnly = true)
-    public List<DashboardKPIModel> getDashboardKPI() {
-        List<DashboardKPIModel> dashboardKPIModels = new ArrayList<>();
-        dashboardKPIModels.add(saleMasterRepo.totalEarnings(authService.authUser().getTenant().getId()));
-        dashboardKPIModels.add(purchaseMasterRepo.totalPurchases(authService.authUser().getTenant().getId()));
-        dashboardKPIModels.add(productRepo.countProducts(authService.authUser().getTenant().getId()));
-        dashboardKPIModels.add(customerRepo.countCustomers(authService.authUser().getTenant().getId()));
-        dashboardKPIModels.add(supplierRepo.countSuppliers(authService.authUser().getTenant().getId()));
-        return dashboardKPIModels;
+    public DashboardKPIModel getTotalEarningsKPI() {
+        return saleMasterRepo.totalEarnings(authService.authUser().getTenant().getId());
+    }
+
+    @Override
+    @Cacheable("total_purchases")
+    @Transactional(readOnly = true)
+    public DashboardKPIModel getTotalPurchasesKPI() {
+        return purchaseMasterRepo.totalPurchases(authService.authUser().getTenant().getId());
+    }
+
+    @Override
+    @Cacheable("total_products")
+    @Transactional(readOnly = true)
+    public DashboardKPIModel getCountProductsKPI() {
+        return productRepo.countProducts(authService.authUser().getTenant().getId());
+    }
+
+    @Override
+    @Cacheable("total_customers")
+    @Transactional(readOnly = true)
+    public DashboardKPIModel getCountCustomersKPI() {
+        return customerRepo.countCustomers(authService.authUser().getTenant().getId());
+    }
+
+    @Override
+    @Cacheable("total_suppliers")
+    @Transactional(readOnly = true)
+    public DashboardKPIModel getCountSuppliersKPI() {
+        return supplierRepo.countSuppliers(authService.authUser().getTenant().getId());
     }
 }

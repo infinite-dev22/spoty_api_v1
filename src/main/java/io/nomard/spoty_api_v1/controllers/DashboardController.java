@@ -46,9 +46,14 @@ public class DashboardController {
         return mainDashboardService.getMonthlyIncomes();
     }
 
-    @GetMapping("/income/weekly")
-    public List<LineChartModel> incomeWeeklySse() {
-        return mainDashboardService.getWeeklyIncomes();
+    @GetMapping("/revenue/monthly")
+    public List<LineChartModel> revenueMonthlySse() {
+        return mainDashboardService.getMonthlyRevenue();
+    }
+
+    @GetMapping("/revenue/weekly")
+    public List<LineChartModel> revenueWeeklySse() {
+        return mainDashboardService.getWeeklyRevenue();
     }
 
     @GetMapping("/top/products")
@@ -66,8 +71,28 @@ public class DashboardController {
         return mainDashboardService.getProductsStockAlert();
     }
 
-    @GetMapping("/kpis")
-    public List<DashboardKPIModel> dashboardKPIs() {
-        return mainDashboardService.getDashboardKPI();
+    @GetMapping("/kpi/earnings")
+    public DashboardKPIModel totalEarningsKPI() {
+        return mainDashboardService.getTotalEarningsKPI();
+    }
+
+    @GetMapping("/kpi/purchases")
+    public DashboardKPIModel totalPurchasesKPI() {
+        return mainDashboardService.getTotalPurchasesKPI();
+    }
+
+    @GetMapping("/kpi/products")
+    public DashboardKPIModel countProductsKPI() {
+        return mainDashboardService.getCountProductsKPI();
+    }
+
+    @GetMapping("/kpi/customers")
+    public DashboardKPIModel countCustomersKPI() {
+        return mainDashboardService.getCountCustomersKPI();
+    }
+
+    @GetMapping("/kpi/suppliers")
+    public DashboardKPIModel countSuppliersKPI() {
+        return mainDashboardService.getCountSuppliersKPI();
     }
 }

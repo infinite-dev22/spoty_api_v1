@@ -17,7 +17,9 @@ public interface MainDashboardService {
 
     List<LineChartModel> getMonthlyIncomes();
 
-    List<LineChartModel> getWeeklyIncomes();
+    List<LineChartModel> getMonthlyRevenue();
+
+    List<LineChartModel> getWeeklyRevenue();
 
     List<ProductSalesModel> getTopProductsSold(Integer limit);
 
@@ -25,5 +27,9 @@ public interface MainDashboardService {
 
     List<StockAlertModel> getProductsStockAlert();
 
-    List<DashboardKPIModel> getDashboardKPI();
+    DashboardKPIModel getTotalEarningsKPI();
+    DashboardKPIModel getTotalPurchasesKPI();
+    DashboardKPIModel getCountProductsKPI();
+    DashboardKPIModel getCountCustomersKPI();
+    DashboardKPIModel getCountSuppliersKPI();
 }
