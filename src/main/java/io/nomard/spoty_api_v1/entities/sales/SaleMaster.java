@@ -71,30 +71,30 @@ public class SaleMaster implements Serializable {
     @Builder.Default
     private double total = 0.0;
 
-    @Column
+    @Column(name = "sub_total")
     @Builder.Default
     private double subTotal = 0.0;
 
-    @Column
+    @Column(name = "amount_paid")
     @Builder.Default
     private double amountPaid = 0.0;
 
-    @Column
+    @Column(name = "amount_due")
     @Builder.Default
     private double amountDue = 0.0;
 
-    @Column
+    @Column(name = "change_amount")
     @Builder.Default
     private double changeAmount = 0.0;
 
-    @Column
+    @Column(name = "shipping_fee")
     @Builder.Default
     private double shippingFee = 0.0;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "payment_status")
     private String paymentStatus;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "sale_status")
     private String saleStatus;
 
     private String notes;
