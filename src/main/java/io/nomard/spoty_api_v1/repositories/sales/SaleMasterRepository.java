@@ -33,15 +33,16 @@ public interface SaleMasterRepository extends PagingAndSortingRepository<SaleMas
             "LEFT JOIN SaleMaster e ON DATE_FORMAT(e.createdAt, '%Y-%m') = DATE_FORMAT(CONCAT(YEAR(CURDATE()), '-', months.month, '-01'), '%Y-%m') " +
             "AND e.tenant.id = :id " +
             "GROUP BY months.month " +
-            "ORDER BY FIELD(months.month, '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12') " +
+            "ORDER BY FIELD(DATE_FORMAT(CONCAT(YEAR(CURDATE()), '-', months.month, '-01'), '%M'), " +
+            "'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December') " +
             "LIMIT 12")
     List<LineChartModel> monthlyIncomes(@Param("id") Long id);
 
-    @Query("SELECT DATE_FORMAT(e.createdAt, '%m') AS period, SUM(e.amountPaid) AS totalValue " +
+    @Query("SELECT DATE_FORMAT(e.createdAt, '%M') AS period, SUM(e.amountPaid) AS totalValue " +
             "FROM SaleMaster e " +
             "WHERE e.tenant.id = :id " +
             "GROUP BY period " +
-            "ORDER BY DATE_FORMAT(e.createdAt, '%m')")
+            "ORDER BY DATE_FORMAT(e.createdAt, '%M')")
     List<LineChartModel> monthlyRevenue(@Param("id") Long id);
 
     @Query("SELECT DATE_FORMAT(e.createdAt, '%a') AS period, SUM(e.amountPaid) AS totalValue " +
