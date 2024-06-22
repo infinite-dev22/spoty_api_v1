@@ -10,10 +10,9 @@ import lombok.*;
 @Builder
 @EqualsAndHashCode
 public class Payload {
-    private String planName;
-    private boolean recurring;
-    private String payMethod;
-    private String paySource;
-    private CardModel card;
-    private User user;
+    private String phoneNumber;
+    private String network;
+    private String amount;
+    private String currency;
+    private String email;
 }

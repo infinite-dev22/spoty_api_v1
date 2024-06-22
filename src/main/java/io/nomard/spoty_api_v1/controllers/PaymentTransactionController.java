@@ -36,13 +36,8 @@ public class PaymentTransactionController {
         return paymentTransactionService.payCard(cardModel);
     }
 
-    @PostMapping("/pay/mtn")
-    public ResponseEntity<ObjectNode> payMTN(@Valid @RequestBody MoMoModel momoModel) {
-        return paymentTransactionService.payMoMo(momoModel);
-    }
-
-    @PostMapping("/pay/airtel")
-    public ResponseEntity<ObjectNode> payAirtel(@Valid @RequestBody MoMoModel momoModel) {
-        return paymentTransactionService.payMoMo(momoModel);
+    @PostMapping("/pay/momo/initiate")
+    public ResponseEntity<ObjectNode> initiateMomo(@Valid @RequestBody MoMoModel momoModel) {
+        return paymentTransactionService.initiateMomoPayment(momoModel);
     }
 }

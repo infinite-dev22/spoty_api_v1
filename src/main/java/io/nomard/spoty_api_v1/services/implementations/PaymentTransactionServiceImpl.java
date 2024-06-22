@@ -1,6 +1,7 @@
 package io.nomard.spoty_api_v1.services.implementations;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.flutterwave.bean.Response;
 import io.nomard.spoty_api_v1.entities.PaymentTransaction;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.payments.CardModel;
@@ -13,14 +14,12 @@ import io.nomard.spoty_api_v1.services.interfaces.PaymentTransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PaymentTransactionServiceImpl implements PaymentTransactionService {
@@ -83,27 +82,30 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> payMoMo(MoMoModel momoModel) {
-        try {
-//            flutterWavePayments.initialize();
-//            flutterWavePayments.momoPay("flw-t1nf-f9b3bf384cd30d6fca42b6df9d27bd2f-m03k", momoModel);
-
+    public ResponseEntity<ObjectNode> initiateMomoPayment(MoMoModel momoModel) {
+        flutterWavePayments.initialize();
+        Response response = flutterWavePayments.initiateMomoPayment(momoModel.getPayload());
+        response.getCode();
+        response.getData();
+        response.getMeta();
+        response.getMessage();
+        response.getError_id();
+        if (Objects.equals(response.getStatus(), "success")) {
             paymentTransaction.setTenant(authService.authUser().getTenant());
             paymentTransaction.setBranch(authService.authUser().getBranch());
             paymentTransaction.setTransactionReference("flw-t1nf-f9b3bf384cd30d6fca42b6df9d27bd2f-m03k");
             paymentTransaction.setPlanName(momoModel.getPlanName());
             paymentTransaction.setPaidOn(new Date());
-            paymentTransaction.setAmount(momoModel.getAmount());
+            paymentTransaction.setAmount(momoModel.getPayload().getAmount());
             paymentTransaction.setPayMethod("MOBILE MONEY");
-            paymentTransaction.setPaySource(momoModel.getPhoneNumber());
+            paymentTransaction.setPaySource(momoModel.getPayload().getPhoneNumber());
             paymentTransaction.setTenant(authService.authUser().getTenant());
             paymentTransaction.setCreatedBy(authService.authUser());
             paymentTransaction.setCreatedAt(new Date());
             paymentTransactionRepo.saveAndFlush(paymentTransaction);
             return spotyResponseImpl.created();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
         }
+        return spotyResponseImpl.custom(HttpStatus.BAD_REQUEST, "Could not initiate mobile money payment.");
     }
 
     @Override

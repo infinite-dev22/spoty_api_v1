@@ -17,7 +17,7 @@ public interface PaymentTransactionService {
 
     ResponseEntity<ObjectNode> payCard(CardModel cardModel);
 
-    ResponseEntity<ObjectNode> payMoMo(MoMoModel momoModel);
+    ResponseEntity<ObjectNode> initiateMomoPayment(MoMoModel momoModel);
 
     ResponseEntity<ObjectNode> delete(Long id);
 

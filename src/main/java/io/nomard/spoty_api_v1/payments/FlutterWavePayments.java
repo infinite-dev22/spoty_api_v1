@@ -5,11 +5,13 @@ import com.flutterwave.services.*;
 import com.flutterwave.utility.Environment;
 import io.nomard.spoty_api_v1.models.payments.CardModel;
 import io.nomard.spoty_api_v1.models.payments.MoMoModel;
+import io.nomard.spoty_api_v1.models.payments.Payload;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class FlutterWavePayments {
@@ -86,22 +88,6 @@ public class FlutterWavePayments {
                 Optional.empty()));
     }
 
-    public Response momoPay(String reference, MoMoModel cardModel) {
-        return new MobileMoney()
-                .runUgandaMobileMoneyTransaction(new UgandaMobileMoneyRequestRequest(reference/*"MC-158523s09v5050e8"*/,
-                        new BigDecimal(cardModel.getAmount()),
-                        "UGX",
-                        "143256743",
-                        "MTN",
-                        cardModel.getEmail() /*"stefan.wexler@hotmail.eu"*/,
-                        cardModel.getPhoneNumber() /*"054709929220"*/,
-                        cardModel.getFullName() /*"Yolande Aglaé Colbert"*/,
-                        cardModel.getClientIp() /*"154.123.220.1"*/,
-                        cardModel.getDeviceFingerPrint() /*"62wd23423rq324323qew1"*/,
-                        Optional.empty()
-                ));
-    }
-
     // For recurring flutterWavePayments.
     public Response tokenizeCard(CardModel card, String token) {
         return new TokenizedCharge()
@@ -141,5 +127,22 @@ public class FlutterWavePayments {
         return new Transactions()
                 .runGetTransactionsFees(new BigDecimal(transactionId),
                         "USD");
+    }
+
+    public Response initiateMomoPayment(Payload payload) {
+        return new MobileMoney()
+                .runUgandaMobileMoneyTransaction(new UgandaMobileMoneyRequestRequest(
+                        "txn-" + UUID.randomUUID(),
+                        new BigDecimal(payload.getAmount()),
+                        payload.getCurrency(),
+                        "",
+                        payload.getNetwork(),
+                        payload.getEmail(),
+                        payload.getPhoneNumber(),
+                        "",
+                        "",
+                        "",
+                        Optional.empty()
+                ));
     }
 }
