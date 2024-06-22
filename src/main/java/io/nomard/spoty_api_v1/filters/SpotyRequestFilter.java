@@ -31,6 +31,9 @@ public class SpotyRequestFilter extends OncePerRequestFilter {
         // look for Bearer auth header
         final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (header == null || !header.startsWith("Bearer")) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().write("{\"status\":401, \n" +
+                    "\"message\": \"Access denied\"}");
             chain.doFilter(request, response);
             return;
         }
@@ -39,20 +42,25 @@ public class SpotyRequestFilter extends OncePerRequestFilter {
         final String username = spotyTokenService.validateTokenAndGetUsername(token);
         if (username == null) {
             // validation failed or token expired
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().write("{\"status\":401, \n" +
+                    "\"message\": \"Access denied\"}");
             chain.doFilter(request, response);
             return;
         }
 
         // set user details on spring security context
-//        try {
-        final UserDetails userDetails = spotyUserDetailsService.loadUserByUsername(username);
-        final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.getAuthorities());
-        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-//        } catch (RuntimeException e) {
-//            response.setStatus(401);
-//        }
+        try {
+            final UserDetails userDetails = spotyUserDetailsService.loadUserByUsername(username);
+            final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    userDetails, null, userDetails.getAuthorities());
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (RuntimeException e) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().write("{\"status\":401, \n" +
+                    "\"message\": \"Access denied\"}");
+        }
 
 
         // continue with authenticated user

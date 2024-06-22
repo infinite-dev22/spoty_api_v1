@@ -13,10 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
@@ -27,11 +26,7 @@ import java.util.Optional;
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
-    AuthenticationManager authenticationManager;
-    @Autowired
     private UserRepository userRepo;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
     @Autowired
     private AuthServiceImpl authService;
     @Autowired
@@ -166,7 +161,7 @@ public class UserServiceImpl implements UserService {
         user.setTenant(data.getTenant());
         user.setBranch(data.getBranch());
         user.setEmail(data.getEmail());
-        user.setPassword(passwordEncoder.encode("new_user"));
+        user.setPassword(new BCryptPasswordEncoder(8).encode("new_user"));
         user.setRole(data.getRole());
         user.setActive(data.isActive());
         user.setLocked(data.isLocked());

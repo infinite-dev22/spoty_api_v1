@@ -2,10 +2,7 @@ package io.nomard.spoty_api_v1.services.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Branch;
-import io.nomard.spoty_api_v1.entities.Tenant;
-import io.nomard.spoty_api_v1.entities.User;
-import io.nomard.spoty_api_v1.entities.UserProfile;
+import io.nomard.spoty_api_v1.entities.*;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.LoginModel;
 import io.nomard.spoty_api_v1.models.SignUpModel;
@@ -29,12 +26,13 @@ import java.util.Objects;
 
 @Service
 public class AuthServiceImpl implements AuthService {
+
     @Autowired
-    public SpotyUserDetailsService spotyUserDetailsService;
+    private SpotyUserDetailsService spotyUserDetailsService;
     @Autowired
-    public SpotyTokenService spotyTokenService;
+    private SpotyTokenService spotyTokenService;
     @Autowired
-    public TenantServiceImpl tenantService;
+    private TenantServiceImpl tenantService;
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
@@ -62,20 +60,27 @@ public class AuthServiceImpl implements AuthService {
                             loginDetails.getEmail(),
                             loginDetails.getPassword()
                     ));
-            final var userDetails = spotyUserDetailsService.loadUserByUsername(loginDetails.getEmail());
-            // Set authenticated user into context.
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            // Get subscription end date.
-            var subscriptionEndDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).getTime()), ZoneId.systemDefault());
-            var nowDateWithGracePeriod = LocalDateTime.ofInstant(Instant.ofEpochMilli(new Date().getTime()), ZoneId.systemDefault());
+
+            var userDetails = spotyUserDetailsService.loadUserByUsername(loginDetails.getEmail());
+            var user = userRepo.findUserByEmail(loginDetails.getEmail());
+            var tenantId = user.getTenant().getId();
+
+            var subscriptionEndDate = LocalDateTime.ofInstant(
+                    Instant.ofEpochMilli(tenantService.getSubscriptionEndDate(tenantId).getTime()),
+                    ZoneId.systemDefault()
+            );
+            var now = LocalDateTime.now();
             var gracePeriodEnd = subscriptionEndDate.plusDays(getGracePeriodDays());
             var subscriptionWarningDate = subscriptionEndDate.minusDays(getGracePeriodDays());
-            var trial = tenantService.isTrial(userRepo.findUserByEmail(loginDetails.getEmail()).getId());
-            var canTry = tenantService.canTry(userRepo.findUserByEmail(loginDetails.getEmail()).getId());
-            var newTenancy = tenantService.isNewTenancy(userRepo.findUserByEmail(loginDetails.getEmail()).getId());
-            var activeTenancy = Date.from(subscriptionEndDate.toInstant(ZoneOffset.UTC)).after(new Date());
-            var activeTenancyWarning = Date.from(subscriptionEndDate.toInstant(ZoneOffset.UTC)).after(Date.from(subscriptionEndDate.minusDays(getGracePeriodDays()).toInstant(ZoneOffset.UTC)));
-            var inActiveTenancyWarning = Date.from(subscriptionEndDate.toInstant(ZoneOffset.UTC)).after(Date.from(nowDateWithGracePeriod.toInstant(ZoneOffset.UTC)));
+
+            boolean trial = tenantService.isTrial(tenantId);
+            boolean canTry = tenantService.canTry(tenantId);
+            boolean newTenancy = tenantService.isNewTenancy(tenantId);
+            boolean activeTenancy = subscriptionEndDate.isAfter(now);
+            boolean activeTenancyWarning = subscriptionEndDate.isAfter(now) && subscriptionEndDate.isBefore(subscriptionWarningDate.plusDays(getGracePeriodDays()));
+            boolean inActiveTenancyWarning = subscriptionEndDate.isBefore(now) && now.isBefore(gracePeriodEnd);
+
             var response = objectMapper.createObjectNode();
             response.put("status", 200);
             response.put("trial", trial);
@@ -85,36 +90,25 @@ public class AuthServiceImpl implements AuthService {
             response.put("activeTenancyWarning", activeTenancyWarning);
             response.put("inActiveTenancyWarning", inActiveTenancyWarning);
             response.put("token", "Bearer " + spotyTokenService.generateToken(userDetails));
-            response.putPOJO("user", userRepo.findUserByEmail(loginDetails.getEmail()));
-            System.out.println("Subscription End: " + Date.from(subscriptionEndDate.toInstant(ZoneOffset.UTC)) + "Subscription End Date With Grace Date: " + new Date());
-            System.out.println("Subscription End: " + Date.from(subscriptionEndDate.toInstant(ZoneOffset.UTC)) + "Subscription End Date With Grace Date: " + Date.from(subscriptionEndDate.minusDays(getGracePeriodDays()).toInstant(ZoneOffset.UTC)));
-            System.out.println("Subscription End: " + Date.from(subscriptionEndDate.toInstant(ZoneOffset.UTC)) + "Subscription End Date With Grace Date: " + Date.from(nowDateWithGracePeriod.toInstant(ZoneOffset.UTC)));
-            // Check if trial is expired.
-            if (tenantService.isTrial(userRepo.findUserByEmail(loginDetails.getEmail()).getId()) && tenantService.getTrialEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date())) {
+            response.putPOJO("user", user);
+
+            if (trial && tenantService.getTrialEndDate(tenantId).before(new Date())) {
                 response.put("message", "Subscription required");
-            }
-            // Check if subscription is expired.
-            if (tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date(subscriptionWarningDate.toEpochSecond(ZoneOffset.UTC)))) {
-                response.put("message", "Subscription required");
+            } else if (subscriptionEndDate.isBefore(now)) {
+                if (now.isBefore(subscriptionWarningDate)) {
+                    response.put("message", "Subscription required");
+                } else if (now.isBefore(gracePeriodEnd)) {
+                    response.put("message", "Subscription expired, please renew");
+                }
+            } else if (subscriptionEndDate.isBefore(subscriptionWarningDate)) {
+                response.put("message", "Subscription is about to expire, please renew");
+            } else {
+                response.put("message", "Process successfully completed");
             }
 
-            // Check if subscription is about to expire(7 days before).
-            if (tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date(subscriptionWarningDate.toEpochSecond(ZoneOffset.UTC)))
-                    && !tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date())) {
-                // send email warning about days left for subscription to expire.
-                response.put("message", "Subscription is about to expire, please renew");
-            }
-            // Check if subscription has expired but in grace period(7 days after).
-            if (tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date())
-                    && !tenantService.getSubscriptionEndDate(userRepo.findUserByEmail(loginDetails.getEmail()).getId()).before(new Date(gracePeriodEnd.toEpochSecond(ZoneOffset.UTC)))) {
-                // send email warning about days left for account to be locked.
-                response.put("message", "Subscription expired, please renew");
-            }
-            response.put("message", "Process successfully completed");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             throw new RuntimeException(e);
-//            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
@@ -124,15 +118,16 @@ public class AuthServiceImpl implements AuthService {
         if (!Objects.equals(signUpDetails.getPassword(), signUpDetails.getConfirmPassword())) {
             return spotyResponseImpl.custom(HttpStatus.CONFLICT, "Passwords do not match");
         }
+
         var existingUser = userRepo.findUserByEmail(signUpDetails.getEmail());
         if (existingUser != null && existingUser.getEmail() != null && !existingUser.getEmail().isEmpty()) {
             return spotyResponseImpl.taken();
         }
+
         var tenant = new Tenant();
-        tenant.setName(signUpDetails.getFirstName() + " " + signUpDetails.getLastName() + " " + signUpDetails.getOtherName());
-//        tenant.setSubscriptionEndDate(new Date(LocalDate.now().minusMonths(1).toEpochDay()));
-        tenant.setSubscriptionEndDate(new Date(LocalDate.now().minusMonths(1).toEpochDay()));
-        tenant.setTrialEndDate(new Date(LocalDate.now().minusMonths(1).toEpochDay()));
+        tenant.setName(String.join(" ", signUpDetails.getFirstName(), signUpDetails.getLastName(), signUpDetails.getOtherName()));
+        tenant.setSubscriptionEndDate(Date.from(LocalDate.now().minusMonths(1).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        tenant.setTrialEndDate(Date.from(LocalDate.now().minusMonths(1).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
         var branch = new Branch();
         branch.setName("Default Branch");
@@ -141,7 +136,6 @@ public class AuthServiceImpl implements AuthService {
         branch.setTown("Default Town");
         branch.setTenant(tenant);
 
-        var user = new User();
         var userProfile = new UserProfile();
         userProfile.setFirstName(signUpDetails.getFirstName());
         userProfile.setLastName(signUpDetails.getLastName());
@@ -149,13 +143,13 @@ public class AuthServiceImpl implements AuthService {
         userProfile.setPhone(signUpDetails.getPhone());
         userProfile.setTenant(tenant);
 
+        var user = new User();
         user.setUserProfile(userProfile);
         user.setTenant(tenant);
         user.setBranch(branch);
         user.setEmail(signUpDetails.getEmail());
         user.setPassword(passwordEncoder.encode(signUpDetails.getPassword()));
         user.setRole(roleRepo.searchAllByNameContainingIgnoreCase("admin").get(0));
-        user.setTenant(tenant);
 
         try {
             tenantRepo.saveAndFlush(tenant);
@@ -171,12 +165,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public User authUser() {
         var principal = (SpotyUserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
         return userRepo.findUserByEmail(principal.getUsername());
     }
 
     private int getGracePeriodDays() {
-        // Retrieve grace period duration from configuration
-        return 7;
+        return 7; // Retrieve grace period duration from configuration
     }
 }

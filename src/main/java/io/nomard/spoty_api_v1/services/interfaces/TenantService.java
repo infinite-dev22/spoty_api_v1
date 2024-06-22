@@ -23,6 +23,8 @@ public interface TenantService {
 
     boolean isNewTenancy(Long id) throws NotFoundException;
 
+    boolean isInGracePeriod(Long userId)  throws NotFoundException;
+
     ResponseEntity<ObjectNode> startTrial(Long tenantId) throws NotFoundException;
 
     ResponseEntity<ObjectNode> save(Tenant tenant);

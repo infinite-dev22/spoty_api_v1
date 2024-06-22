@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.TenantRepository;
+import io.nomard.spoty_api_v1.repositories.UserRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.interfaces.TenantService;
 import io.nomard.spoty_api_v1.utils.DateUtils;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,15 +16,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class TenantServiceImpl implements TenantService {
     @Autowired
     private TenantRepository tenantRepo;
+    @Autowired
+    private UserRepository userRepo;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
 
@@ -35,56 +40,56 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public Tenant getById(Long id) throws NotFoundException {
-        Optional<Tenant> tenant = tenantRepo.findById(id);
-        if (tenant.isEmpty()) {
-            throw new NotFoundException();
-        }
-        return tenant.get();
+        return tenantRepo.findById(id).orElseThrow(NotFoundException::new);
     }
 
     @Override
     public Date getSubscriptionEndDate(Long id) throws NotFoundException {
-        Optional<Tenant> tenant = tenantRepo.findById(id);
-        if (tenant.isEmpty()) {
-            throw new NotFoundException();
-        }
-        return tenant.get().getSubscriptionEndDate();
+        Tenant tenant = tenantRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Tenant not found"));
+        Hibernate.initialize(tenant.getSubscriptionEndDate());
+        return tenant.getSubscriptionEndDate();
     }
+
+//    public TenantDTO getTenantDTO(Long id) throws NotFoundException {
+//        Tenant tenant = tenantRepo.findById(id)
+//                .orElseThrow(() -> new NotFoundException("Tenant not found"));
+//        return new TenantDTO(tenant.getId(), tenant.getName(), tenant.getSubscriptionEndDate());
+//    }
+
+
 
     @Override
     public Date getTrialEndDate(Long id) throws NotFoundException {
-        Optional<Tenant> tenant = tenantRepo.findById(id);
-        if (tenant.isEmpty()) {
-            throw new NotFoundException();
-        }
-        return tenant.get().getTrialEndDate();
+        return userRepo.findById(id).orElseThrow(NotFoundException::new).getTenant().getTrialEndDate();
     }
 
     @Override
     public boolean isTrial(Long id) throws NotFoundException {
-        Optional<Tenant> tenant = tenantRepo.findById(id);
-        if (tenant.isEmpty()) {
-            throw new NotFoundException();
-        }
-        return tenant.get().isTrial();
+        return userRepo.findById(id).orElseThrow(NotFoundException::new).getTenant().isTrial();
     }
 
     @Override
     public boolean canTry(Long id) throws NotFoundException {
-        Optional<Tenant> tenant = tenantRepo.findById(id);
-        if (tenant.isEmpty()) {
-            throw new NotFoundException();
-        }
-        return tenant.get().isCanTry();
+        return userRepo.findById(id).orElseThrow(NotFoundException::new).getTenant().isCanTry();
     }
 
     @Override
     public boolean isNewTenancy(Long id) throws NotFoundException {
-        Optional<Tenant> tenant = tenantRepo.findById(id);
-        if (tenant.isEmpty()) {
-            throw new NotFoundException();
-        }
-        return tenant.get().isNewTenancy();
+        return userRepo.findById(id).orElseThrow(NotFoundException::new).getTenant().isNewTenancy();
+    }
+
+    @Override
+    public boolean isInGracePeriod(Long id) throws NotFoundException {
+        Date subscriptionEndDate = getSubscriptionEndDate(id);
+        LocalDateTime subscriptionEndDateTime = LocalDateTime.ofInstant(subscriptionEndDate.toInstant(), ZoneId.systemDefault());
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime gracePeriodEnd = subscriptionEndDateTime.plusDays(getGracePeriodDays());
+        return now.isBefore(gracePeriodEnd);
+    }
+
+    private int getGracePeriodDays() {
+        return 7; // Adjust this value as needed
     }
 
     @Override
@@ -100,12 +105,9 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ObjectNode> startTrial(Long tenantId) throws NotFoundException {
-        var opt = tenantRepo.findById(tenantId);
-        if (opt.isEmpty()) {
-            throw new NotFoundException();
-        }
-        var tenant = opt.get();
+        Tenant tenant = tenantRepo.findById(tenantId).orElseThrow(NotFoundException::new);
         tenant.setTrial(true);
         tenant.setTrialEndDate(DateUtils.addDays(7));
         tenant.setSubscriptionEndDate(DateUtils.addDays(7));
@@ -122,14 +124,9 @@ public class TenantServiceImpl implements TenantService {
     @Override
     @Transactional
     public ResponseEntity<ObjectNode> update(Tenant data) throws NotFoundException {
-        var opt = tenantRepo.findById(data.getId());
+        Tenant tenant = tenantRepo.findById(data.getId()).orElseThrow(NotFoundException::new);
 
-        if (opt.isEmpty()) {
-            throw new NotFoundException();
-        }
-        var tenant = opt.get();
-
-        if (!Objects.equals(tenant.getName(), data.getName()) && Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+        if (!Objects.equals(tenant.getName(), data.getName()) && Objects.nonNull(data.getName()) && !data.getName().isEmpty()) {
             tenant.setName(data.getName());
         }
 
