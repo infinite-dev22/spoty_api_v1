@@ -32,8 +32,6 @@ public class SpotyRequestFilter extends OncePerRequestFilter {
         final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (header == null || !header.startsWith("Bearer")) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().write("{\"status\":401, \n" +
-                    "\"message\": \"Access denied\"}");
             chain.doFilter(request, response);
             return;
         }
@@ -43,8 +41,6 @@ public class SpotyRequestFilter extends OncePerRequestFilter {
         if (username == null) {
             // validation failed or token expired
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().write("{\"status\":401, \n" +
-                    "\"message\": \"Access denied\"}");
             chain.doFilter(request, response);
             return;
         }
@@ -58,8 +54,6 @@ public class SpotyRequestFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (RuntimeException e) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().write("{\"status\":401, \n" +
-                    "\"message\": \"Access denied\"}");
         }
 
 
