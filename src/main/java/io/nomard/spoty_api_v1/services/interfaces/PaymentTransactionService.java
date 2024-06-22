@@ -3,8 +3,8 @@ package io.nomard.spoty_api_v1.services.interfaces;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.PaymentTransaction;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
-import io.nomard.spoty_api_v1.models.CardModel;
-import io.nomard.spoty_api_v1.models.MoMoModel;
+import io.nomard.spoty_api_v1.models.payments.CardModel;
+import io.nomard.spoty_api_v1.models.payments.MoMoModel;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;

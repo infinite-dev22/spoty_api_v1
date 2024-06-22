@@ -3,9 +3,9 @@ package io.nomard.spoty_api_v1.services.implementations;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.PaymentTransaction;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
-import io.nomard.spoty_api_v1.models.CardModel;
-import io.nomard.spoty_api_v1.models.MoMoModel;
-import io.nomard.spoty_api_v1.payments.Payments;
+import io.nomard.spoty_api_v1.models.payments.CardModel;
+import io.nomard.spoty_api_v1.models.payments.MoMoModel;
+import io.nomard.spoty_api_v1.payments.FlutterWavePayments;
 import io.nomard.spoty_api_v1.repositories.PaymentTransactionRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
@@ -15,7 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -32,7 +31,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
     @Autowired
-    private Payments payments;
+    private FlutterWavePayments flutterWavePayments;
     @Autowired
     private PaymentTransaction paymentTransaction;
 
@@ -56,12 +55,12 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
     @Transactional
     public ResponseEntity<ObjectNode> payCard(CardModel payload) {
         try {
-//            payments.initialize();
-//            if (payload.isRecurring()) {
-//                payments.tokenizeCard(payload, "flw-t1nf-f9b3bf384cd30d6fca42b6df9d27bd2f-m03k");
-//            }
-////            payments.preAuth(payload);
-//            payments.cardPayment(payload);
+            flutterWavePayments.initialize();
+            if (payload.isRecurring()) {
+                flutterWavePayments.tokenizeCard(payload, "flw-t1nf-f9b3bf384cd30d6fca42b6df9d27bd2f-m03k");
+            }
+//            flutterWavePayments.preAuth(payload);
+            flutterWavePayments.cardPayment(payload);
 
             paymentTransaction.setTenant(authService.authUser().getTenant());
             paymentTransaction.setBranch(authService.authUser().getBranch());
@@ -86,8 +85,8 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
     @Transactional
     public ResponseEntity<ObjectNode> payMoMo(MoMoModel momoModel) {
         try {
-//            payments.initialize();
-//            payments.momoPay("flw-t1nf-f9b3bf384cd30d6fca42b6df9d27bd2f-m03k", momoModel);
+//            flutterWavePayments.initialize();
+//            flutterWavePayments.momoPay("flw-t1nf-f9b3bf384cd30d6fca42b6df9d27bd2f-m03k", momoModel);
 
             paymentTransaction.setTenant(authService.authUser().getTenant());
             paymentTransaction.setBranch(authService.authUser().getBranch());
