@@ -15,10 +15,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 
 @Component
 public class SubscriptionFilter extends OncePerRequestFilter {
+    private static final String[] EXEMPT_URLS = {
+            "/tenants/start/trial",
+            "/payment/transactions/pay/card",
+            "/payment/transactions/pay/momo/initiate"};
     @Autowired
     private UserRepository userRepo;
     @Autowired
@@ -27,6 +32,13 @@ public class SubscriptionFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(final @NotNull HttpServletRequest request, final @NotNull HttpServletResponse response,
                                     final @NotNull FilterChain chain) throws ServletException, IOException {
+        String path = request.getRequestURI();
+
+        if (isExemptUrl(path)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.isAuthenticated()) {
@@ -50,14 +62,19 @@ public class SubscriptionFilter extends OncePerRequestFilter {
 
                 if (!isSubscriptionValid && !isInGracePeriod) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    response.getWriter().write("{\"status\":200, \n" +
-                            "\"activeTenancy\": false, \n" +
-                            "\"canTry\": false}");
+                    response.getWriter().write("""
+                            {"status":200,\s
+                            "activeTenancy": false,\s
+                            "canTry": false}""");
                     return;
                 }
             }
         }
 
         chain.doFilter(request, response);
+    }
+
+    private boolean isExemptUrl(String path) {
+        return Arrays.stream(EXEMPT_URLS).anyMatch(path::matches);
     }
 }
