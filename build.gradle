@@ -1,8 +1,8 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.3.0'
+    id 'org.springframework.boot' version '3.3.1'
     id 'io.spring.dependency-management' version '1.1.5'
-    id 'org.hibernate.orm' version '6.5.2.Final'
+    id 'org.hibernate.orm' version '7.0.0.Alpha3'
     id 'org.graalvm.buildtools.native' version '0.10.2'
     id 'org.asciidoctor.jvm.convert' version '4.0.2'
 }
@@ -123,7 +123,7 @@ bootJar {
 
 dependencies {
     implementation ('com.flutterwave:f4b-java:3.0.1F'){
-        exclude group:'commons.logging', module: 'commons-logging'
+        exclude group: 'commons-logging', module: 'commons-logging'
     }
     implementation 'org.realityforge.org.jetbrains.annotations:org.jetbrains.annotations:1.7.0'
     implementation 'com.auth0:java-jwt:4.4.0'
