@@ -28,7 +28,6 @@ import io.nomard.spoty_api_v1.entities.transfers.TransferDetail;
 import io.nomard.spoty_api_v1.entities.transfers.TransferMaster;
 import io.nomard.spoty_api_v1.entities.transfers.TransferTransaction;
 import io.nomard.spoty_api_v1.filters.SpotyRequestFilter;
-import io.nomard.spoty_api_v1.filters.SubscriptionFilter;
 import io.nomard.spoty_api_v1.payments.FlutterWavePayments;
 import io.nomard.spoty_api_v1.security.SpotyAuthEntryPoint;
 import io.nomard.spoty_api_v1.services.auth.SpotyTokenService;
@@ -241,11 +240,6 @@ public class AppConfig {
     @Bean
     public SpotyRequestFilter spotyRequestFilter() {
         return new SpotyRequestFilter();
-    }
-
-    @Bean
-    public SubscriptionFilter subscriptionFilter() {
-        return new SubscriptionFilter();
     }
 
     @Bean

@@ -1,7 +1,6 @@
 package io.nomard.spoty_api_v1.configs;
 
 import io.nomard.spoty_api_v1.filters.SpotyRequestFilter;
-import io.nomard.spoty_api_v1.filters.SubscriptionFilter;
 import io.nomard.spoty_api_v1.security.SpotyAuthEntryPoint;
 import io.nomard.spoty_api_v1.services.auth.SpotyUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +34,6 @@ public class SecurityConfig {
     @Autowired
     private SpotyRequestFilter spotyRequestFilter;
 
-    @Autowired
-    private SubscriptionFilter subscriptionFilter;
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(8);
@@ -63,7 +59,6 @@ public class SecurityConfig {
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(spotyRequestFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(subscriptionFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(Customizer.withDefaults())
                 .build();
     }
