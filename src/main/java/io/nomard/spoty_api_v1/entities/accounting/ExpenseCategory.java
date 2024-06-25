@@ -12,18 +12,19 @@
  * Jonathan Mark Mwigo makes no warranties, express or implied, with respect to the computer system code. Jonathan Mark Mwigo shall not be liable for any damages, including, but not limited to, direct, indirect, incidental, special, consequential, or punitive damages, arising out of or in connection with the use of the computer system code.
  */
 
-package io.nomard.spoty_api_v1.entities;
+package io.nomard.spoty_api_v1.entities.accounting;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.nomard.spoty_api_v1.entities.Branch;
+import io.nomard.spoty_api_v1.entities.Tenant;
+import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
 
-// TODO: Remove uUser Property.
-
-@Table(name = "expenses")
+@Table(name = "expense_categories")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -31,38 +32,21 @@ import java.util.Date;
 @Builder
 @Entity
 @EqualsAndHashCode
-public class Expense implements Serializable {
+public class ExpenseCategory implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private Date date;
-
-    private String ref;
-
+    private String name;
+    @ManyToOne(targetEntity = Branch.class, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Branch branch;
     @JoinColumn(nullable = false, name = "company_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;
 
-    @Column(nullable = false)
-    private String name;
-    // TODO: Add not nullable when the user system works.
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User user_detail;
-
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, name = "expense_category_id")
-    private ExpenseCategory expenseCategory;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "branch_id")
-    private Branch branch;
-
-    private String details;
-
-    @Column(nullable = false)
-    private double amount;
+    private String description;
 
     @Column(name = "created_at")
     @JsonIgnore

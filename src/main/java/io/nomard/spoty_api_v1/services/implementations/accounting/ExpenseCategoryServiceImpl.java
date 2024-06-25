@@ -1,12 +1,12 @@
-package io.nomard.spoty_api_v1.services.implementations;
+package io.nomard.spoty_api_v1.services.implementations.accounting;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.ExpenseCategory;
+import io.nomard.spoty_api_v1.entities.accounting.ExpenseCategory;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
-import io.nomard.spoty_api_v1.repositories.ExpenseCategoryRepository;
+import io.nomard.spoty_api_v1.repositories.accounting.ExpenseCategoryRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
-import io.nomard.spoty_api_v1.services.interfaces.ExpenseCategoryService;
+import io.nomard.spoty_api_v1.services.interfaces.accounting.ExpenseCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
