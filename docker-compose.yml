@@ -1,5 +1,6 @@
+version: '3.1'
 services:
-  spoty_api_server:
+  app:
     build:
       context: .
     restart: unless-stopped
@@ -8,43 +9,54 @@ services:
     networks:
       - api-net
     environment:
-      SPRING_DATASOURCE_URL: 'jdbc:mysql://db:3306/${MYSQLDB_DATABASE}?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false'
-      SPRING_DATASOURCE_USERNAME: '${MYSQLDB_USER}'
-      SPRING_DATASOURCE_PASSWORD: '${MYSQL_PASSWORD}'
+      SPRING_DATASOURCE_URL: 'jdbc:mariadb://mariadb:3306/${MARIADB_DATABASE}?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false'
+      SPRING_DATASOURCE_USERNAME: '${MARIADB_USER}'
+      SPRING_DATASOURCE_PASSWORD: '${MARIA_PASSWORD}'
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     depends_on:
-      db:
+      mariadb:
         condition: service_healthy
-  db:
-    image: 'mysql:latest'
+  mariadb:
+    image: 'mariadb:latest'
     restart: unless-stopped
     ports:
-      - '${MYSQLDB_LOCAL_PORT}:${MYSQLDB_DOCKER_PORT}'
+      - '${MARIADB_LOCAL_PORT}:${MARIADB_DOCKER_PORT}'
     expose:
-      - '${MYSQLDB_LOCAL_PORT}'
+      - '${MARIADB_LOCAL_PORT}'
     networks:
       - api-net
     environment:
-      MYSQL_ROOT_PASSWORD: '${MYSQLDB_ROOT_PASSWORD}'
-      MYSQL_DATABASE: '${MYSQLDB_DATABASE}'
+      MARIADB_ROOT_PASSWORD: '${MARIADB_ROOT_PASSWORD}'
+      MARIADB_DATABASE: '${MARIADB_DATABASE}'
+      MARIADB_USER: '${MARIADB_USER}'
+      MARIADB_PASSWORD: '${MARIADB_ROOT_PASSWORD}'
     volumes:
-      - 'db_data:/var/lib/mysql'
+      - 'mariadb_data:/var/lib/mysql'
+      - 'mariadb_logs:/var/log/mysql'
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-u", "root", "-p${MARIADB_ROOT_PASSWORD}" ]
+      interval: 1m
+      timeout: 10s
+      retries: 5
   phpmyadmin:
     image: 'phpmyadmin:latest'
     environment:
-      PMA_HOST: db
-      PMA_PASSWORD: '${MYSQLDB_ROOT_PASSWORD}'
+      PMA_HOST: mariadb
+      PMA_PASSWORD: '${MARIADB_ROOT_PASSWORD}'
     depends_on:
-      db:
+      mariadb:
         condition: service_healthy
     links:
-      - db
+      - mariadb
     ports:
       - '${PHP_MY_ADMIN_LOCAL_PORT}:${PHP_MY_ADMIN_DOCKER_PORT}'
     networks:
       - api-net
     restart: unless-stopped
 volumes:
-  db_data: null
+  mariadb_data:
+    driver: local
+  mariadb_logs:
+    driver: local
 networks:
   api-net: null
