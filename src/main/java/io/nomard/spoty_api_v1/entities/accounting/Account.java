@@ -33,7 +33,9 @@ public class Account {
     private String accountNumber;
 
     private String balance;
-    private String logo;
+    private String credit;
+    private String debit;
+    private String description;
 
     @Column(name = "created_at")
     @JsonIgnore

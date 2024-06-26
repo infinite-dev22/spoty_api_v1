@@ -72,25 +72,32 @@ public class AccountServiceImpl implements AccountService {
         }
         var bank = opt.get();
 
-        if (Objects.nonNull(data.getBankName()) && !"".equalsIgnoreCase(data.getBankName())) {
+        if (Objects.nonNull(data.getBankName()) && !Objects.equals(bank.getBankName(), data.getBankName()) && !"".equalsIgnoreCase(data.getBankName())) {
             bank.setBankName(data.getBankName());
         }
 
-        if (Objects.nonNull(data.getAccountName()) && !"".equalsIgnoreCase(data.getAccountName())) {
+        if (Objects.nonNull(data.getAccountName()) && !Objects.equals(bank.getAccountName(), data.getAccountName()) && !"".equalsIgnoreCase(data.getAccountName())) {
             bank.setAccountName(data.getAccountName());
         }
 
-        if (Objects.nonNull(data.getAccountNumber()) && !"".equalsIgnoreCase(data.getAccountNumber())) {
+        if (Objects.nonNull(data.getAccountNumber()) && !Objects.equals(bank.getAccountNumber(), data.getAccountNumber()) && !"".equalsIgnoreCase(data.getAccountNumber())) {
             bank.setAccountNumber(data.getAccountNumber());
         }
 
-        if (Objects.nonNull(data.getBalance()) && !"".equalsIgnoreCase(data.getBalance())) {
+        if (Objects.nonNull(data.getBalance()) && !Objects.equals(bank.getBalance(), data.getBalance()) && !"".equalsIgnoreCase(data.getBalance())) {
             bank.setBalance(data.getBalance());
         }
 
-        // TODO: Add image url only after successful upload of image in case any is provided.
-        if (Objects.nonNull(data.getLogo()) && !"".equalsIgnoreCase(data.getLogo())) {
-            bank.setLogo(data.getLogo());
+        if (Objects.nonNull(data.getCredit()) && !Objects.equals(bank.getCredit(), data.getCredit()) && !"".equalsIgnoreCase(data.getCredit())) {
+            bank.setCredit(data.getCredit());
+        }
+
+        if (Objects.nonNull(data.getDebit()) && !Objects.equals(bank.getDebit(), data.getDebit()) && !"".equalsIgnoreCase(data.getDebit())) {
+            bank.setDebit(data.getDebit());
+        }
+
+        if (Objects.nonNull(data.getDescription()) && !Objects.equals(bank.getDescription(), data.getDescription()) && !"".equalsIgnoreCase(data.getDescription())) {
+            bank.setDescription(data.getDescription());
         }
 
         bank.setUpdatedBy(authService.authUser());
