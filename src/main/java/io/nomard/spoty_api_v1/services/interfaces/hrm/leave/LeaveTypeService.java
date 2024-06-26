@@ -12,9 +12,9 @@ public interface LeaveTypeService {
 
     LeaveType getById(Long id) throws NotFoundException;
 
-    ResponseEntity<ObjectNode> save(LeaveType bank);
+    ResponseEntity<ObjectNode> save(LeaveType leaveType);
 
-    ResponseEntity<ObjectNode> update(LeaveType bank) throws NotFoundException;
+    ResponseEntity<ObjectNode> update(LeaveType leaveType) throws NotFoundException;
 
     ResponseEntity<ObjectNode> delete(Long id);
 

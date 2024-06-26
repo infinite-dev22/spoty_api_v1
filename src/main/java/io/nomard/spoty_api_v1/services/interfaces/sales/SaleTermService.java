@@ -14,9 +14,9 @@ public interface SaleTermService {
 
     List<SaleTerm> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(SaleTerm bank);
+    ResponseEntity<ObjectNode> save(SaleTerm saleTerm);
 
-    ResponseEntity<ObjectNode> update(SaleTerm bank) throws NotFoundException;
+    ResponseEntity<ObjectNode> update(SaleTerm saleTerm) throws NotFoundException;
 
     ResponseEntity<ObjectNode> delete(Long id);
 
