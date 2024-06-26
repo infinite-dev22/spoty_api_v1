@@ -34,11 +34,11 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account getById(Long id) throws NotFoundException {
-        Optional<Account> bank = bankRepo.findById(id);
-        if (bank.isEmpty()) {
+        Optional<Account> account = bankRepo.findById(id);
+        if (account.isEmpty()) {
             throw new NotFoundException();
         }
-        return bank.get();
+        return account.get();
     }
 
     @Override
@@ -70,41 +70,41 @@ public class AccountServiceImpl implements AccountService {
         if (opt.isEmpty()) {
             throw new NotFoundException();
         }
-        var bank = opt.get();
+        var account = opt.get();
 
-        if (Objects.nonNull(data.getBankName()) && !Objects.equals(bank.getBankName(), data.getBankName()) && !"".equalsIgnoreCase(data.getBankName())) {
-            bank.setBankName(data.getBankName());
+        if (Objects.nonNull(data.getBankName()) && !Objects.equals(account.getBankName(), data.getBankName()) && !"".equalsIgnoreCase(data.getBankName())) {
+            account.setBankName(data.getBankName());
         }
 
-        if (Objects.nonNull(data.getAccountName()) && !Objects.equals(bank.getAccountName(), data.getAccountName()) && !"".equalsIgnoreCase(data.getAccountName())) {
-            bank.setAccountName(data.getAccountName());
+        if (Objects.nonNull(data.getAccountName()) && !Objects.equals(account.getAccountName(), data.getAccountName()) && !"".equalsIgnoreCase(data.getAccountName())) {
+            account.setAccountName(data.getAccountName());
         }
 
-        if (Objects.nonNull(data.getAccountNumber()) && !Objects.equals(bank.getAccountNumber(), data.getAccountNumber()) && !"".equalsIgnoreCase(data.getAccountNumber())) {
-            bank.setAccountNumber(data.getAccountNumber());
+        if (Objects.nonNull(data.getAccountNumber()) && !Objects.equals(account.getAccountNumber(), data.getAccountNumber()) && !"".equalsIgnoreCase(data.getAccountNumber())) {
+            account.setAccountNumber(data.getAccountNumber());
         }
 
-        if (Objects.nonNull(data.getBalance()) && !Objects.equals(bank.getBalance(), data.getBalance()) && !"".equalsIgnoreCase(data.getBalance())) {
-            bank.setBalance(data.getBalance());
+        if (Objects.nonNull(data.getBalance()) && !Objects.equals(account.getBalance(), data.getBalance()) && !"".equalsIgnoreCase(data.getBalance())) {
+            account.setBalance(data.getBalance());
         }
 
-        if (Objects.nonNull(data.getCredit()) && !Objects.equals(bank.getCredit(), data.getCredit()) && !"".equalsIgnoreCase(data.getCredit())) {
-            bank.setCredit(data.getCredit());
+        if (Objects.nonNull(data.getCredit()) && !Objects.equals(account.getCredit(), data.getCredit()) && !"".equalsIgnoreCase(data.getCredit())) {
+            account.setCredit(data.getCredit());
         }
 
-        if (Objects.nonNull(data.getDebit()) && !Objects.equals(bank.getDebit(), data.getDebit()) && !"".equalsIgnoreCase(data.getDebit())) {
-            bank.setDebit(data.getDebit());
+        if (Objects.nonNull(data.getDebit()) && !Objects.equals(account.getDebit(), data.getDebit()) && !"".equalsIgnoreCase(data.getDebit())) {
+            account.setDebit(data.getDebit());
         }
 
-        if (Objects.nonNull(data.getDescription()) && !Objects.equals(bank.getDescription(), data.getDescription()) && !"".equalsIgnoreCase(data.getDescription())) {
-            bank.setDescription(data.getDescription());
+        if (Objects.nonNull(data.getDescription()) && !Objects.equals(account.getDescription(), data.getDescription()) && !"".equalsIgnoreCase(data.getDescription())) {
+            account.setDescription(data.getDescription());
         }
 
-        bank.setUpdatedBy(authService.authUser());
-        bank.setUpdatedAt(new Date());
+        account.setUpdatedBy(authService.authUser());
+        account.setUpdatedAt(new Date());
 
         try {
-            bankRepo.saveAndFlush(bank);
+            bankRepo.saveAndFlush(account);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
