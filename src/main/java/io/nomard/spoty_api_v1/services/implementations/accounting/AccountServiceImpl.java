@@ -89,10 +89,6 @@ public class AccountServiceImpl implements AccountService {
         }
         var account = opt.get();
 
-        if (Objects.nonNull(data.getBankName()) && !Objects.equals(account.getBankName(), data.getBankName()) && !"".equalsIgnoreCase(data.getBankName())) {
-            account.setBankName(data.getBankName());
-        }
-
         if (Objects.nonNull(data.getAccountName()) && !Objects.equals(account.getAccountName(), data.getAccountName()) && !"".equalsIgnoreCase(data.getAccountName())) {
             account.setAccountName(data.getAccountName());
         }

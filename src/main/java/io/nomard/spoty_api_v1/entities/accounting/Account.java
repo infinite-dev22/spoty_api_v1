@@ -24,9 +24,6 @@ public class Account {
     @JoinColumn(nullable = false, name = "company_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;
-
-    @Column(name = "bank_name")
-    private String bankName;
     @Column(name = "account_name")
     private String accountName;
     @Column(name = "account_number")
