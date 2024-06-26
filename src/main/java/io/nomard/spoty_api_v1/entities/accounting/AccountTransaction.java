@@ -1,6 +1,7 @@
 package io.nomard.spoty_api_v1.entities.accounting;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,6 +20,10 @@ public class AccountTransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @JoinColumn(nullable = false, name = "company_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Tenant tenant;
     @ManyToOne
     private Account account;
 
