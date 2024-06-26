@@ -90,7 +90,6 @@ public class SaleMasterServiceImpl implements SaleMasterService {
         if (Objects.isNull(saleMaster.getBranch())) {
             saleMaster.setBranch(authService.authUser().getBranch());
         }
-
         if (!Objects.equals(total, 0d)) {
             var account = accountService.getByContains(authService.authUser().getTenant(), "Default Account");
             var accountTransaction = new AccountTransaction();
@@ -104,7 +103,6 @@ public class SaleMasterServiceImpl implements SaleMasterService {
             accountTransaction.setCreatedAt(new Date());
             accountTransactionService.save(accountTransaction);
         }
-
         saleMaster.setCreatedBy(authService.authUser());
         saleMaster.setCreatedAt(new Date());
         try {
@@ -167,10 +165,10 @@ public class SaleMasterServiceImpl implements SaleMasterService {
         if (!Objects.equals(data.getDiscount(), saleMaster.getDiscount()) && Objects.nonNull(data.getDiscount())) {
             saleMaster.setDiscount(data.getDiscount());
         }
-        if (!Objects.equals(data.getTotal(), saleMaster.getTotal())) {
+        if (!Objects.equals(data.getTotal(), total)) {
             saleMaster.setTotal(total);
         }
-        if (!Objects.equals(data.getSubTotal(), saleMaster.getSubTotal())) {
+        if (!Objects.equals(data.getSubTotal(), subTotal)) {
             saleMaster.setSubTotal(subTotal);
         }
         if (!Objects.equals(data.getAmountPaid(), saleMaster.getAmountPaid())) {
