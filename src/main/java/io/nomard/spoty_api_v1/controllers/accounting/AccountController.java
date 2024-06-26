@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("banks")
+@RequestMapping("accounts")
 public class AccountController {
     @Autowired
     private AccountServiceImpl bankService;
