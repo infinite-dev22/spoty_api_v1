@@ -1,6 +1,7 @@
 package io.nomard.spoty_api_v1.services.implementations.accounting;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.accounting.Account;
 import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
@@ -139,5 +140,9 @@ public class AccountServiceImpl implements AccountService {
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
         }
+    }
+
+    public Account getByContains(Tenant tenant, String search) {
+        return accountRepo.findByTenantAndAccountNameContainingIgnoreCase(tenant, search);
     }
 }
