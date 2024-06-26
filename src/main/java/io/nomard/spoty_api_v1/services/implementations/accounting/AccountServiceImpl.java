@@ -84,15 +84,15 @@ public class AccountServiceImpl implements AccountService {
             account.setAccountNumber(data.getAccountNumber());
         }
 
-        if (Objects.nonNull(data.getBalance()) && !Objects.equals(account.getBalance(), data.getBalance()) && !"".equalsIgnoreCase(data.getBalance())) {
+        if (Objects.nonNull(data.getBalance()) && !Objects.equals(account.getBalance(), data.getBalance())&& !Objects.equals(data.getBalance(), 0d)) {
             account.setBalance(data.getBalance());
         }
 
-        if (Objects.nonNull(data.getCredit()) && !Objects.equals(account.getCredit(), data.getCredit()) && !"".equalsIgnoreCase(data.getCredit())) {
+        if (Objects.nonNull(data.getCredit()) && !Objects.equals(account.getCredit(), data.getCredit())&& !Objects.equals(data.getCredit(), 0d)) {
             account.setCredit(data.getCredit());
         }
 
-        if (Objects.nonNull(data.getDebit()) && !Objects.equals(account.getDebit(), data.getDebit()) && !"".equalsIgnoreCase(data.getDebit())) {
+        if (Objects.nonNull(data.getDebit()) && !Objects.equals(account.getDebit(), data.getDebit())&& !Objects.equals(data.getDebit(), 0d)) {
             account.setDebit(data.getDebit());
         }
 

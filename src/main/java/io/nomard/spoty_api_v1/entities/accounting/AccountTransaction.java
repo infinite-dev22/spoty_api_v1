@@ -29,9 +29,9 @@ public class AccountTransaction {
 
     @Column(name = "transaction_date")
     private Date transactionDate;
-    private String credit;
-    private String debit;
-    private String amount;
+    private Double credit;
+    private Double debit;
+    private Double amount;
     private String note;
 
     // Deposit, Sale, Payroll, Purchase Returns, Sale Returns, Purchase, Transfer, Expense

@@ -32,9 +32,9 @@ public class Account {
     @Column(name = "account_number")
     private String accountNumber;
 
-    private String balance;
-    private String credit;
-    private String debit;
+    private Double balance;
+    private Double credit;
+    private Double debit;
     private String description;
 
     @Column(name = "created_at")

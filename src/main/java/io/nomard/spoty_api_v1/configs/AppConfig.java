@@ -3,6 +3,7 @@ package io.nomard.spoty_api_v1.configs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nomard.spoty_api_v1.entities.*;
 import io.nomard.spoty_api_v1.entities.accounting.Account;
+import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
 import io.nomard.spoty_api_v1.entities.accounting.Expense;
 import io.nomard.spoty_api_v1.entities.accounting.ExpenseCategory;
 import io.nomard.spoty_api_v1.entities.adjustments.AdjustmentDetail;
@@ -203,6 +204,11 @@ public class AppConfig {
     @Bean
     public Account account() {
         return new Account();
+    }
+
+    @Bean
+    public AccountTransaction accountTransaction() {
+        return new AccountTransaction();
     }
 
     @Bean
