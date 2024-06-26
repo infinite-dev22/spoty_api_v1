@@ -201,7 +201,7 @@ public class AppConfig {
     }
 
     @Bean
-    public Account bank() {
+    public Account account() {
         return new Account();
     }
 
