@@ -2,6 +2,7 @@ package io.nomard.spoty_api_v1.services.implementations.accounting;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.accounting.Account;
+import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.accounting.AccountRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
@@ -19,7 +20,9 @@ import java.util.*;
 @Service
 public class AccountServiceImpl implements AccountService {
     @Autowired
-    private AccountRepository bankRepo;
+    private AccountRepository accountRepo;
+    @Autowired
+    private AccountTransactionServiceImpl accountTransactionService;
     @Autowired
     private AuthServiceImpl authService;
     @Autowired
@@ -28,13 +31,13 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public List<Account> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<Account> page = bankRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+        Page<Account> page = accountRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         return page.getContent();
     }
 
     @Override
     public Account getById(Long id) throws NotFoundException {
-        Optional<Account> account = bankRepo.findById(id);
+        Optional<Account> account = accountRepo.findById(id);
         if (account.isEmpty()) {
             throw new NotFoundException();
         }
@@ -43,7 +46,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public List<Account> getByContains(String search) {
-        return bankRepo.searchAllByBankNameContainingIgnoreCaseOrAccountNameContainingIgnoreCaseOrAccountNumberContainsIgnoreCase(
+        return accountRepo.searchAllByBankNameContainingIgnoreCaseOrAccountNameContainingIgnoreCaseOrAccountNumberContainsIgnoreCase(
                 search, search, search
         );
     }
@@ -53,9 +56,23 @@ public class AccountServiceImpl implements AccountService {
     public ResponseEntity<ObjectNode> save(Account account) {
         try {
             account.setTenant(authService.authUser().getTenant());
+            var amount = account.getBalance();
+            account.setBalance(0d);
             account.setCreatedBy(authService.authUser());
             account.setCreatedAt(new Date());
-            bankRepo.saveAndFlush(account);
+            accountRepo.saveAndFlush(account);
+            if (Objects.nonNull(amount) && !Objects.equals(amount, 0d)) {
+                var accountTransaction = new AccountTransaction();
+                accountTransaction.setTenant(authService.authUser().getTenant());
+                accountTransaction.setTransactionDate(new Date());
+                accountTransaction.setAccount(account);
+                accountTransaction.setAmount(amount);
+                accountTransaction.setTransactionType("Deposit");
+                accountTransaction.setNote("Initial deposit");
+                accountTransaction.setCreatedBy(authService.authUser());
+                accountTransaction.setCreatedAt(new Date());
+                accountTransactionService.save(accountTransaction);
+            }
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -65,7 +82,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public ResponseEntity<ObjectNode> update(Account data) throws NotFoundException {
-        var opt = bankRepo.findById(data.getId());
+        var opt = accountRepo.findById(data.getId());
 
         if (opt.isEmpty()) {
             throw new NotFoundException();
@@ -84,15 +101,11 @@ public class AccountServiceImpl implements AccountService {
             account.setAccountNumber(data.getAccountNumber());
         }
 
-        if (Objects.nonNull(data.getBalance()) && !Objects.equals(account.getBalance(), data.getBalance())&& !Objects.equals(data.getBalance(), 0d)) {
-            account.setBalance(data.getBalance());
-        }
-
-        if (Objects.nonNull(data.getCredit()) && !Objects.equals(account.getCredit(), data.getCredit())&& !Objects.equals(data.getCredit(), 0d)) {
+        if (Objects.nonNull(data.getCredit()) && !Objects.equals(account.getCredit(), data.getCredit()) && !Objects.equals(data.getCredit(), 0d)) {
             account.setCredit(data.getCredit());
         }
 
-        if (Objects.nonNull(data.getDebit()) && !Objects.equals(account.getDebit(), data.getDebit())&& !Objects.equals(data.getDebit(), 0d)) {
+        if (Objects.nonNull(data.getDebit()) && !Objects.equals(account.getDebit(), data.getDebit()) && !Objects.equals(data.getDebit(), 0d)) {
             account.setDebit(data.getDebit());
         }
 
@@ -104,7 +117,7 @@ public class AccountServiceImpl implements AccountService {
         account.setUpdatedAt(new Date());
 
         try {
-            bankRepo.saveAndFlush(account);
+            accountRepo.saveAndFlush(account);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -115,7 +128,7 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
-            bankRepo.deleteById(id);
+            accountRepo.deleteById(id);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -125,7 +138,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) throws NotFoundException {
         try {
-            bankRepo.deleteAllById(idList);
+            accountRepo.deleteAllById(idList);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

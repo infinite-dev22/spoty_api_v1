@@ -9,7 +9,7 @@ import lombok.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "banks")
+@Table(name = "accounts")
 @Getter
 @Setter
 @AllArgsConstructor
