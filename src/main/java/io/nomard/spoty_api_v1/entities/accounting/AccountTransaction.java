@@ -19,7 +19,8 @@ public class AccountTransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String account;
+    @ManyToOne
+    private Account account;
 
     @Column(name = "transaction_date")
     private Date transactionDate;
