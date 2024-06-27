@@ -1,11 +1,14 @@
 package io.nomard.spoty_api_v1.services.implementations.purchases;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
 import io.nomard.spoty_api_v1.entities.purchases.PurchaseMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.purchases.PurchaseMasterRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
+import io.nomard.spoty_api_v1.services.implementations.accounting.AccountServiceImpl;
+import io.nomard.spoty_api_v1.services.implementations.accounting.AccountTransactionServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.purchases.PurchaseMasterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,6 +30,10 @@ public class PurchaseMasterServiceImpl implements PurchaseMasterService {
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
+    @Autowired
+    private AccountTransactionServiceImpl accountTransactionService;
+    @Autowired
+    private AccountServiceImpl accountService;
 
     @Override
     public List<PurchaseMaster> getAll(int pageNo, int pageSize) {
@@ -74,6 +81,19 @@ public class PurchaseMasterServiceImpl implements PurchaseMasterService {
         purchaseMaster.setTenant(authService.authUser().getTenant());
         if (Objects.isNull(purchaseMaster.getBranch())) {
             purchaseMaster.setBranch(authService.authUser().getBranch());
+        }
+        if (!Objects.equals(total, 0d)) {
+            var account = accountService.getByContains(authService.authUser().getTenant(), "Default Account");
+            var accountTransaction = new AccountTransaction();
+            accountTransaction.setTenant(authService.authUser().getTenant());
+            accountTransaction.setTransactionDate(new Date());
+            accountTransaction.setAccount(account);
+            accountTransaction.setAmount(total);
+            accountTransaction.setTransactionType("Purchase");
+            accountTransaction.setNote("Purchase made");
+            accountTransaction.setCreatedBy(authService.authUser());
+            accountTransaction.setCreatedAt(new Date());
+            accountTransactionService.save(accountTransaction);
         }
         purchaseMaster.setCreatedBy(authService.authUser());
         purchaseMaster.setCreatedAt(new Date());
@@ -133,42 +153,32 @@ public class PurchaseMasterServiceImpl implements PurchaseMasterService {
         if (!Objects.equals(data.getDiscount(), purchaseMaster.getDiscount()) && Objects.nonNull(data.getDiscount())) {
             purchaseMaster.setDiscount(data.getDiscount());
         }
-
         if (!Objects.equals(data.getDiscount(), purchaseMaster.getDiscount())) {
             purchaseMaster.setDiscount(data.getDiscount());
         }
-
         if (!Objects.equals(data.getAmountPaid(), purchaseMaster.getAmountPaid())) {
             purchaseMaster.setAmountPaid(data.getAmountPaid());
         }
-
         if (!Objects.equals(data.getTotal(), total)) {
             purchaseMaster.setTotal(total);
         }
-
         if (!Objects.equals(data.getSubTotal(), subTotal)) {
             purchaseMaster.setSubTotal(subTotal);
         }
-
         if (!Objects.equals(data.getAmountDue(), purchaseMaster.getAmountDue())) {
             purchaseMaster.setAmountDue(data.getAmountDue());
         }
-
         if (Objects.nonNull(data.getPurchaseStatus()) && !"".equalsIgnoreCase(data.getPurchaseStatus())) {
             purchaseMaster.setPurchaseStatus(data.getPurchaseStatus());
         }
-
         if (Objects.nonNull(data.getPaymentStatus()) && !"".equalsIgnoreCase(data.getPaymentStatus())) {
             purchaseMaster.setPaymentStatus(data.getPaymentStatus());
         }
-
         if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
             purchaseMaster.setNotes(data.getNotes());
         }
-
         purchaseMaster.setUpdatedBy(authService.authUser());
         purchaseMaster.setUpdatedAt(new Date());
-
         try {
             purchaseMasterRepo.saveAndFlush(purchaseMaster);
             return spotyResponseImpl.ok();
