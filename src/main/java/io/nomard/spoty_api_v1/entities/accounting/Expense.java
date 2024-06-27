@@ -47,6 +47,8 @@ public class Expense implements Serializable {
     @JoinColumn(nullable = false, name = "company_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;
+    @ManyToOne
+    private Account account;
 
     @Column(nullable = false)
     private String name;
@@ -62,7 +64,7 @@ public class Expense implements Serializable {
     @JoinColumn(name = "branch_id")
     private Branch branch;
 
-    private String details;
+    private String note;
 
     @Column(nullable = false)
     private double amount;
