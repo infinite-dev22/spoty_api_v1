@@ -26,7 +26,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableGlobalAuthentication
 @EnableMethodSecurity
 public class SecurityConfig {
-    private static final String[] WHITE_LIST_URL = {"/auth/**", "/error/**", "/error", "dashboard/expense/**", "dashboard/income/**"};
+    private static final String[] WHITE_LIST_URL = {"/auth/**", "/error/**", "/error", "/documents/uploads/**"};
 
     @Autowired
     private SpotyAuthEntryPoint spotyAuthEntryPoint;

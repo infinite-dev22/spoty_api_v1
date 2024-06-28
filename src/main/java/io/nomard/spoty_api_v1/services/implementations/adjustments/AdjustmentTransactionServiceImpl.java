@@ -60,7 +60,7 @@ public class AdjustmentTransactionServiceImpl implements AdjustmentTransactionSe
 
             var product = adjustmentDetail.getProduct();
             product.setQuantity(productQuantity);
-            productService.update(product);
+            productService.update(product, null);
 
             AdjustmentTransaction adjustmentTransaction = new AdjustmentTransaction();
             adjustmentTransaction.setBranch(adjustmentDetail.getAdjustment().getBranch());
@@ -115,7 +115,7 @@ public class AdjustmentTransactionServiceImpl implements AdjustmentTransactionSe
 
             var product = data.getProduct();
             product.setQuantity(productQuantity);
-            productService.update(product);
+            productService.update(product, null);
 
             adjustmentTransaction.setProduct(data.getProduct());
         }

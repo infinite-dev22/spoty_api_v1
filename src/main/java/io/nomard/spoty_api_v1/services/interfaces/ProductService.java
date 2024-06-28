@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Product;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,9 +18,9 @@ public interface ProductService {
 
     List<Product> getWarning();
 
-    ResponseEntity<ObjectNode> save(Product product);
+    ResponseEntity<ObjectNode> save(Product product, MultipartFile file);
 
-    ResponseEntity<ObjectNode> update(Product product) throws NotFoundException;
+    ResponseEntity<ObjectNode> update(Product product, MultipartFile file) throws NotFoundException;
 
     ResponseEntity<ObjectNode> delete(Long id);
 

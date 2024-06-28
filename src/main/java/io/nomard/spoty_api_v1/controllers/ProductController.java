@@ -8,11 +8,12 @@ import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.ProductServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -42,15 +43,14 @@ public class ProductController {
         return productService.getWarning();
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<ObjectNode> save(@Valid @RequestBody Product product) {
-        product.setCreatedAt(new Date());
-        return productService.save(product);
+    @PostMapping(path = "/add", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<ObjectNode> save(@Valid @RequestPart("product") Product product, @Valid @RequestPart("file") MultipartFile file) {
+        return productService.save(product, file);
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<ObjectNode> update(@Valid @RequestBody Product product) throws NotFoundException {
-        return productService.update(product);
+    @PutMapping(path = "/update", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<ObjectNode> update(@Valid @RequestPart("product") Product product, @Valid @RequestPart("file") MultipartFile file) throws NotFoundException {
+        return productService.update(product, file);
     }
 
     @DeleteMapping("/delete/single")

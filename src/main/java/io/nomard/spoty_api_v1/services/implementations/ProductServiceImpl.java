@@ -15,7 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -25,6 +25,8 @@ public class ProductServiceImpl implements ProductService {
     private ProductRepository productRepo;
     @Autowired
     private AuthServiceImpl authService;
+    @Autowired
+    private DocumentServiceImpl documentService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
 
@@ -63,10 +65,16 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @Transactional
-    public ResponseEntity<ObjectNode> save(Product product) {
+//    @Transactional
+    public ResponseEntity<ObjectNode> save(Product product, MultipartFile file) {
+        var fileURL = "";
         try {
             product.setTenant(authService.authUser().getTenant());
+            if (Objects.nonNull(file)) {
+                fileURL = String.valueOf(documentService.save(file));
+                product.setImage(fileURL);
+            }
+
             if (Objects.isNull(product.getBranch())) {
                 product.setBranch(authService.authUser().getBranch());
             }
@@ -81,8 +89,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @CacheEvict(value = "products", key = "#data.id")
-    public ResponseEntity<ObjectNode> update(Product data) throws NotFoundException {
+    public ResponseEntity<ObjectNode> update(Product data, MultipartFile file) throws NotFoundException {
         var opt = productRepo.findById(data.getId());
+        var fileURL = "";
 
         if (opt.isEmpty()) {
             throw new NotFoundException();
@@ -140,9 +149,13 @@ public class ProductServiceImpl implements ProductService {
         if (Objects.nonNull(data.getSerialNumber()) && !"".equalsIgnoreCase(data.getSerialNumber())) {
             product.setSerialNumber(data.getSerialNumber());
         }
-
-        if (Objects.nonNull(data.getImage()) && !"".equalsIgnoreCase(data.getImage())) {
-            product.setImage(data.getImage());
+        if (Objects.nonNull(file)) {
+            try {
+                fileURL = String.valueOf(documentService.save(file));
+            } catch (Exception e) {
+                return spotyResponseImpl.error(e);
+            }
+            product.setImage(fileURL);
         }
 
         product.setUpdatedBy(authService.authUser());

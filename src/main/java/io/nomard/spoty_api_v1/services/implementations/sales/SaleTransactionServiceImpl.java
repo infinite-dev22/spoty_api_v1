@@ -55,7 +55,7 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
 
                 var product = saleDetail.getProduct();
                 product.setQuantity(productQuantity);
-                productService.update(product);
+                productService.update(product, null);
 
                 SaleTransaction saleTransaction = new SaleTransaction();
                 saleTransaction.setBranch(saleDetail.getSale().getBranch());
@@ -99,7 +99,7 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
 
                 var product = data.getProduct();
                 product.setQuantity(productQuantity);
-                productService.update(product);
+                productService.update(product, null);
             }
 
             saleTransaction.setProduct(data.getProduct());

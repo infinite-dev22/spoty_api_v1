@@ -55,7 +55,7 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
 
                 var product = transferDetail.getProduct();
                 product.setQuantity(productQuantity);
-                productService.update(product);
+                productService.update(product, null);
 
                 TransferTransaction transferTransaction = new TransferTransaction();
                 transferTransaction.setFromBranch(transferDetail.getTransfer().getFromBranch());
@@ -103,7 +103,7 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
 
                 var product = data.getProduct();
                 product.setQuantity(productQuantity);
-                productService.update(product);
+                productService.update(product, null);
             }
 
             transferTransaction.setProduct(data.getProduct());
