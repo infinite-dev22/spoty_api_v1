@@ -5,8 +5,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface DocumentService {
+    List<String> fileList();
+
     String save(MultipartFile file) throws IOException;
 
     ResponseEntity<?> download(String fileCode) throws IOException;

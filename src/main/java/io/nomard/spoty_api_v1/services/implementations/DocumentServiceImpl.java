@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -20,13 +21,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
 public class DocumentServiceImpl implements DocumentService {
     private final Path uploadPath = Paths.get(System.getProperty("user.home") + "/uploads/");
-    private final ConcurrentHashMap<String, Path> fileCache = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void init() {
@@ -40,15 +42,22 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    public List<String> fileList() {
+        File dir = new File(uploadPath.toUri().toString());
+        File[] files = dir.listFiles();
+
+        return files != null ? Arrays.stream(files).map(File::getName).collect(Collectors.toList()) : null;
+    }
+
+    @Override
     public String save(MultipartFile file) {
         var fileName = file.getOriginalFilename();
         var fileCode = RandomStringUtils.randomAlphanumeric(8);
         try (InputStream inputStream = file.getInputStream()) {
             Path filePath = uploadPath.resolve(fileCode + '-' + fileName);
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
-            fileCache.put(fileCode, filePath);
             return ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path('/' + fileCode)
+                    .path("/documents/show/image/" + fileName)
                     .toUriString();
         } catch (IOException ioe) {
             throw new RuntimeException("Error whilst saving file: " + fileName, ioe);
@@ -57,7 +66,7 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public ResponseEntity<?> download(String fileCode) throws MalformedURLException {
-        Path file = fileCache.computeIfAbsent(fileCode, this::findFileByCode);
+        Path file = Paths.get(System.getProperty("user.home") + "/uploads/" + fileCode);
         if (file != null) {
             var resource = new UrlResource(file.toUri());
             String contentType = "application/octet-stream";
@@ -73,7 +82,7 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public ResponseEntity<Resource> showImage(String fileCode) throws IOException {
         // Path to the image file
-        Path path = fileCache.computeIfAbsent(fileCode, this::findFileByCode);
+        Path path = Paths.get(System.getProperty("user.home") + "/uploads/" + fileCode);
         // Load the resource
         Resource resource = new UrlResource(path.toUri());
         // Return ResponseEntity with image content type
@@ -85,7 +94,7 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public ResponseEntity<Resource> showFile(String fileCode) throws IOException {
         // Path to the PDF file
-        Path path = fileCache.computeIfAbsent(fileCode, this::findFileByCode);
+        Path path = Paths.get(System.getProperty("user.home") + "/uploads/" + fileCode);
         // Load the resource
         Resource resource = new UrlResource(path.toUri());
         // Return ResponseEntity with PDF content type
