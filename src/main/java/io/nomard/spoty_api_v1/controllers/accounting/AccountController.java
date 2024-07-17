@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -25,10 +26,19 @@ public class AccountController {
     private AccountServiceImpl accountService;
     @Autowired
     private AccountTransactionServiceImpl accountTransactionService;
+    private final String BASE_URL = "accounts";
+    private final String ACCOUNTS_URL = "accounts";
+    private final String ACCOUNT_URL = "accounts";
+    private final String SEARCH_ACCOUNTS_URL = "accounts";
+    private final String SAVE_ACCOUNT_URL = "accounts";
+    private final String UPDATE_ACCOUNT_URL = "accounts";
+    private final String DELETE_ACCOUNT_URL = "accounts";
+    private final String DELETE_ACCOUNTS_URL = "accounts";
 
     @GetMapping("/all")
     public Flux<PageImpl<Account>> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                           @RequestParam(defaultValue = "50") Integer pageSize) {
+        var client = WebClient.create(ACCOUNTS_URL);
         return accountService.getAll(pageNo, pageSize);
     }
 
