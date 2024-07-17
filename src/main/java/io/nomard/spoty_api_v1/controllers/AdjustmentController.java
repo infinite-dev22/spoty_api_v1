@@ -3,15 +3,16 @@ package io.nomard.spoty_api_v1.controllers;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.adjustments.AdjustmentMaster;
-import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
-import io.nomard.spoty_api_v1.services.implementations.adjustments.AdjustmentDetailServiceImpl;
-import io.nomard.spoty_api_v1.services.implementations.adjustments.AdjustmentMasterServiceImpl;
+import io.nomard.spoty_api_v1.services.implementations.adjustments.AdjustmentServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -19,42 +20,42 @@ import java.util.List;
 @RequestMapping("adjustments")
 public class AdjustmentController {
     @Autowired
-    private AdjustmentMasterServiceImpl adjustmentMasterService;
+    private AdjustmentServiceImpl adjustmentMasterService;
 
     // ADJUSTMENT MASTERS.
     @GetMapping("/all")
-    public List<AdjustmentMaster> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
-                                                @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Flux<PageImpl<AdjustmentMaster>> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
+                                                          @RequestParam(defaultValue = "50") Integer pageSize) {
         return adjustmentMasterService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public AdjustmentMaster getMastersById(@RequestBody FindModel findModel) throws NotFoundException {
+    public Mono<AdjustmentMaster> getMastersById(@RequestBody FindModel findModel) {
         return adjustmentMasterService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<AdjustmentMaster> getMastersByContains(@RequestBody SearchModel searchModel) {
+    public Flux<AdjustmentMaster> getMastersByContains(@RequestBody SearchModel searchModel) {
         return adjustmentMasterService.getByContains(searchModel.getSearch());
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ObjectNode> saveMaster(@Valid @RequestBody AdjustmentMaster adjustmentMaster) {
+    public Mono<ResponseEntity<ObjectNode>> saveMaster(@Valid @RequestBody AdjustmentMaster adjustmentMaster) {
         return adjustmentMasterService.save(adjustmentMaster);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ObjectNode> updateMaster(@Valid @RequestBody AdjustmentMaster adjustmentMaster) throws NotFoundException {
+    public Mono<ResponseEntity<ObjectNode>> updateMaster(@Valid @RequestBody AdjustmentMaster adjustmentMaster) {
         return adjustmentMasterService.update(adjustmentMaster);
     }
 
     @DeleteMapping("/delete/single")
-    public ResponseEntity<ObjectNode> deleteMaster(@RequestBody FindModel findModel) {
+    public Mono<ResponseEntity<ObjectNode>> deleteMaster(@RequestBody FindModel findModel) {
         return adjustmentMasterService.delete(findModel.getId());
     }
 
     @DeleteMapping("/delete/multiple")
-    public ResponseEntity<ObjectNode> deleteMasters(@RequestBody List<Long> idList) {
+    public Mono<ResponseEntity<ObjectNode>> deleteMasters(@RequestBody List<Long> idList) {
         return adjustmentMasterService.deleteMultiple(idList);
     }
 }

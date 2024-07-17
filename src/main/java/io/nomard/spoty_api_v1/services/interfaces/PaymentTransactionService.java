@@ -5,21 +5,23 @@ import io.nomard.spoty_api_v1.entities.PaymentTransaction;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.payments.CardModel;
 import io.nomard.spoty_api_v1.models.payments.MoMoModel;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public interface PaymentTransactionService {
-    List<PaymentTransaction> getAll(int pageNo, int pageSize);
+    Flux<PageImpl<PaymentTransaction>> getAll(int pageNo, int pageSize);
 
-    PaymentTransaction getById(Long id) throws NotFoundException;
+    Mono<PaymentTransaction> getById(Long id);
 
-    ResponseEntity<ObjectNode> payCard(CardModel cardModel);
+    Mono<ResponseEntity<ObjectNode>> payCard(CardModel cardModel);
 
-    ResponseEntity<ObjectNode> initiateMomoPayment(MoMoModel momoModel);
+    Mono<ResponseEntity<ObjectNode>> initiateMomoPayment(MoMoModel momoModel);
 
-    ResponseEntity<ObjectNode> delete(Long id);
+    Mono<ResponseEntity<ObjectNode>> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> deleteMultiple(ArrayList<Long> idList);
 }

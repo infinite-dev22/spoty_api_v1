@@ -2,23 +2,25 @@ package io.nomard.spoty_api_v1.services.interfaces.stock_ins;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.stock_ins.StockInMaster;
-import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 public interface StockInMasterService {
-    List<StockInMaster> getAll(int pageNo, int pageSize);
+    Flux<PageImpl<StockInMaster>> getAll(int pageNo, int pageSize);
 
-    StockInMaster getById(Long id) throws NotFoundException;
+    Mono<StockInMaster> getById(Long id);
 
-    List<StockInMaster> getByContains(String search);
+    Flux<StockInMaster> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(StockInMaster stockInMaster);
+    Mono<ResponseEntity<ObjectNode>> save(StockInMaster stockInMaster);
 
-    ResponseEntity<ObjectNode> update(StockInMaster stockInMaster) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> update(StockInMaster stockInMaster);
 
-    ResponseEntity<ObjectNode> delete(Long id);
+    Mono<ResponseEntity<ObjectNode>> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList);
+    Mono<ResponseEntity<ObjectNode>> deleteMultiple(List<Long> idList);
 }

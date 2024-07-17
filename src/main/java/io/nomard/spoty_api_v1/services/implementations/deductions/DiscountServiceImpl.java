@@ -8,13 +8,17 @@ import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.deductions.DiscountService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Objects;
 
 @Service
 public class DiscountServiceImpl implements DiscountService {
@@ -26,78 +30,76 @@ public class DiscountServiceImpl implements DiscountService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Discount> getAll(int pageNo, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<Discount> page = discountRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+    public Flux<PageImpl<Discount>> getAll(int pageNo, int pageSize) {
+        return authService.authUser()
+                .flatMapMany(user -> discountRepo.findAllByTenantId(user.getTenant().getId(), PageRequest.of(pageNo, pageSize))
+                        .collectList()
+                        .zipWith(discountRepo.count())
+                        .map(p -> new PageImpl<>(p.getT1(), PageRequest.of(pageNo, pageSize), p.getT2())));
     }
 
     @Override
-    public Discount getById(Long id) throws NotFoundException {
-        Optional<Discount> discount = discountRepo.findById(id);
-        if (discount.isEmpty()) {
-            throw new NotFoundException();
-        }
-        return discount.get();
-    }
-
-    @Override
-    @Transactional
-    public ResponseEntity<ObjectNode> save(Discount discount) {
-        try {
-            discount.setTenant(authService.authUser().getTenant());
-            discount.setBranch(authService.authUser().getBranch());
-            discount.setCreatedBy(authService.authUser());
-            discount.setCreatedAt(new Date());
-            discountRepo.saveAndFlush(discount);
-            return spotyResponseImpl.created();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<Discount> getById(Long id) {
+        return discountRepo.findById(id).switchIfEmpty(Mono.error(new NotFoundException()));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> update(Discount data) throws NotFoundException {
-        var opt = discountRepo.findById(data.getId());
-        if (opt.isEmpty()) {
-            throw new NotFoundException();
-        }
-        var discount = opt.get();
-        if (!Objects.equals(discount.getName(), data.getName()) && Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
-            discount.setName(data.getName());
-        }
-        if (!Objects.equals(discount.getPercentage(), data.getPercentage())) {
-            discount.setPercentage(data.getPercentage());
-        }
-        discount.setUpdatedBy(authService.authUser());
-        discount.setUpdatedAt(new Date());
-        try {
-            discountRepo.saveAndFlush(discount);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> save(Discount discount) {
+        return authService.authUser()
+                .flatMap(user -> {
+                    discount.setTenant(user.getTenant());
+                    discount.setBranch(user.getBranch());
+                    discount.setCreatedBy(user);
+                    discount.setCreatedAt(new Date());
+                    return discountRepo.save(discount)
+                            .thenReturn(spotyResponseImpl.created());
+                }).onErrorResume(e -> Mono.just(spotyResponseImpl.error(new RuntimeException(e))));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> delete(Long id) {
-        try {
-            discountRepo.deleteById(id);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> update(Discount data) {
+        return discountRepo.findById(data.getId())
+                .switchIfEmpty(Mono.error(new NotFoundException("Discount not found")))
+                .flatMap(discount -> {
+                    boolean updated = false;
+
+                    if (!Objects.equals(discount.getName(), data.getName()) && Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+                        discount.setName(data.getName());
+                        updated = true;
+                    }
+                    if (!Objects.equals(discount.getPercentage(), data.getPercentage())) {
+                        discount.setPercentage(data.getPercentage());
+                        updated = true;
+                    }
+                    if (updated) {
+                        return authService.authUser()
+                                .flatMap(user -> {
+                                    discount.setUpdatedBy(user);
+                                    discount.setUpdatedAt(new Date());
+                                    return discountRepo.save(discount)
+                                            .thenReturn(spotyResponseImpl.ok());
+                                });
+                    } else {
+                        return Mono.just(spotyResponseImpl.ok());
+                    }
+                })
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 
     @Override
-    public ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) throws NotFoundException {
-        try {
-            discountRepo.deleteAllById(idList);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    @Transactional
+    public Mono<ResponseEntity<ObjectNode>> delete(Long id) {
+        return discountRepo.deleteById(id)
+                .thenReturn(spotyResponseImpl.ok())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
+    }
+
+    @Override
+    public Mono<ResponseEntity<ObjectNode>> deleteMultiple(ArrayList<Long> idList) {
+        return discountRepo.deleteAllById(idList)
+                .thenReturn(spotyResponseImpl.ok())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 }

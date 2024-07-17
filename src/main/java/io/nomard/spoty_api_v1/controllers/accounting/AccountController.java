@@ -10,11 +10,13 @@ import io.nomard.spoty_api_v1.services.implementations.accounting.AccountService
 import io.nomard.spoty_api_v1.services.implementations.accounting.AccountTransactionServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("accounts")
@@ -25,44 +27,44 @@ public class AccountController {
     private AccountTransactionServiceImpl accountTransactionService;
 
     @GetMapping("/all")
-    public List<Account> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Flux<PageImpl<Account>> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                          @RequestParam(defaultValue = "50") Integer pageSize) {
         return accountService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public Account getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public Mono<Account> getById(@RequestBody FindModel findModel) {
         return accountService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<Account> getByContains(@RequestBody SearchModel searchModel) {
+    public Flux<Account> getByContains(@RequestBody SearchModel searchModel) {
         return accountService.getByContains(searchModel.getSearch());
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ObjectNode> save(@Valid @RequestBody Account account) {
+    public Mono<ResponseEntity<ObjectNode>> save(@Valid @RequestBody Account account) {
         return accountService.save(account);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ObjectNode> update(@Valid @RequestBody Account account) throws NotFoundException {
+    public Mono<ResponseEntity<ObjectNode>> update(@Valid @RequestBody Account account) {
         return accountService.update(account);
     }
 
     @DeleteMapping("/delete/single")
-    public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
+    public Mono<ResponseEntity<ObjectNode>> delete(@RequestBody FindModel findModel) {
         return accountService.delete(findModel.getId());
     }
 
     @DeleteMapping("/delete/multiple")
-    public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> ids) throws NotFoundException {
+    public Mono<ResponseEntity<ObjectNode>> deleteMultiple(@RequestBody ArrayList<Long> ids) {
         return accountService.deleteMultiple(ids);
     }
 
     @GetMapping("/transactions")
-    public List<AccountTransaction> getTransactions(@RequestParam(defaultValue = "0") Integer pageNo,
-                                @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Flux<PageImpl<AccountTransaction>> getTransactions(@RequestParam(defaultValue = "0") Integer pageNo,
+                                                              @RequestParam(defaultValue = "50") Integer pageSize) {
         return accountTransactionService.getAll(pageNo, pageSize);
     }
 }

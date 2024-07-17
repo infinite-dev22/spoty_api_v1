@@ -1,21 +1,19 @@
 package io.nomard.spoty_api_v1.repositories.accounting;
 
 import io.nomard.spoty_api_v1.entities.accounting.Expense;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.data.repository.reactive.ReactiveSortingRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
 
 @Repository
-public interface ExpenseRepository extends PagingAndSortingRepository<Expense, Long>, JpaRepository<Expense, Long> {
-    @Query("select e from Expense e where trim(lower(e.name)) like %:search")
-    List<Expense> searchAllByNameContainingIgnoreCase(String search);
+public interface ExpenseRepository extends ReactiveSortingRepository<Expense, Long>, ReactiveCrudRepository<Expense, Long> {
+    @Query("SELECT e FROM Expense e WHERE e.tenant.id = :id AND TRIM(LOWER(e.name)) LIKE %:search%")
+    Flux<Expense> search(@Param("id") Long id, @Param("search") String search);
 
-    @Query("select p from Expense p where p.tenant.id = :id")
-    Page<Expense> findAllByTenantId(@Param("id") Long id, Pageable pageable);
+    @Query("SELECT p FROM Expense p WHERE p.tenant.id = :id")
+    Flux<Expense> findAllByTenantId(@Param("id") Long id, Pageable pageable);
 }

@@ -9,7 +9,7 @@ public interface SpotyResponse {
 
     ResponseEntity<ObjectNode> created();
 
-    ResponseEntity<ObjectNode> error(Exception exception);
+    ResponseEntity<ObjectNode> error(Throwable throwable);
 
     ResponseEntity<ObjectNode> conflict();
 

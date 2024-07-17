@@ -33,11 +33,11 @@ public class SpotyResponseImpl implements SpotyResponse {
     }
 
     @Override
-    public ResponseEntity<ObjectNode> error(Exception exception) {
+    public ResponseEntity<ObjectNode> error(Throwable throwable) {
         var response = objectMapper.createObjectNode();
         response.put("status", 500);
         response.put("message", "An error occurred");
-        response.put("body", exception.getMessage());
+        response.put("body", throwable.getMessage());
         return new ResponseEntity<>(
                 response, HttpStatus.INTERNAL_SERVER_ERROR
         );

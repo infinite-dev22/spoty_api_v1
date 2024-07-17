@@ -18,13 +18,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Product;
 import io.nomard.spoty_api_v1.entities.UnitOfMeasure;
 import io.nomard.spoty_api_v1.entities.User;
+import io.nomard.spoty_api_v1.entities.purchases.PurchaseMaster;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
+@Accessors(chain = true)
 @Table(name = "purchase_return_details")
 @Getter
 @Setter
@@ -35,36 +38,20 @@ import java.util.Date;
 public class PurchaseReturnDetail implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
-    @Column(nullable = false)
     private double cost;
+    @Column(name = "sub_total_cost")
+    private double subTotalCost;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, name = "purchase_unit_id")
-    private UnitOfMeasure purchaseUnit;
-
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "purchase_return_master_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
+    @JoinColumn(name = "purchase_return_id")
     private PurchaseReturnMaster purchaseReturn;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, name = "product_id")
     private Product product;
-
-    private double netTax;
-    private String taxType;
-    private double discount;
-    private String discountType;
-
-    @Column(nullable = false)
     private int quantity;
-
-    @Column(nullable = false)
-    private double total;
-
-    private String serialNumber;
 
     @Column(name = "created_at")
     @JsonIgnore

@@ -3,23 +3,25 @@ package io.nomard.spoty_api_v1.services.interfaces;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Brand;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public interface BrandService {
-    List<Brand> getAll(int pageNo, int pageSize);
+    Flux<PageImpl<Brand>> getAll(int pageNo, int pageSize);
 
-    Brand getById(Long id) throws NotFoundException;
+    Mono<Brand> getById(Long id);
 
-    List<Brand> getByContains(String search);
+    Flux<Brand> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(Brand brand);
+    Mono<ResponseEntity<ObjectNode>> save(Brand brand);
 
-    ResponseEntity<ObjectNode> update(Brand data) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> update(Brand data);
 
-    ResponseEntity<ObjectNode> delete(Long id);
+    Mono<ResponseEntity<ObjectNode>> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList);
+    Mono<ResponseEntity<ObjectNode>> deleteMultiple(ArrayList<Long> idList);
 }

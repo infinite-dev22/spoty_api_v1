@@ -8,11 +8,13 @@ import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.hrm.hrm.EmploymentStatusServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("employment/statuses")
@@ -21,38 +23,38 @@ public class EmploymentStatusController {
     private EmploymentStatusServiceImpl employmentStatusService;
 
     @GetMapping("/all")
-    public List<EmploymentStatus> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                         @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Flux<PageImpl<EmploymentStatus>> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                                   @RequestParam(defaultValue = "50") Integer pageSize) {
         return employmentStatusService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public EmploymentStatus getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public Mono<EmploymentStatus> getById(@RequestBody FindModel findModel) {
         return employmentStatusService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<EmploymentStatus> getByContains(@RequestBody SearchModel searchModel) {
+    public Flux<EmploymentStatus> getByContains(@RequestBody SearchModel searchModel) {
         return employmentStatusService.getByContains(searchModel.getSearch());
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ObjectNode> save(@Valid @RequestBody EmploymentStatus employmentStatus) {
+    public Mono<ResponseEntity<ObjectNode>> save(@Valid @RequestBody EmploymentStatus employmentStatus) {
         return employmentStatusService.save(employmentStatus);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ObjectNode> update(@Valid @RequestBody EmploymentStatus employmentStatus) throws NotFoundException {
+    public Mono<ResponseEntity<ObjectNode>> update(@Valid @RequestBody EmploymentStatus employmentStatus) {
         return employmentStatusService.update(employmentStatus);
     }
 
     @DeleteMapping("/delete/single")
-    public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
+    public Mono<ResponseEntity<ObjectNode>> delete(@RequestBody FindModel findModel) {
         return employmentStatusService.delete(findModel.getId());
     }
 
     @DeleteMapping("/delete/multiple")
-    public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> idList) throws NotFoundException {
+    public Mono<ResponseEntity<ObjectNode>> deleteMultiple(@RequestBody ArrayList<Long> idList) {
         return employmentStatusService.deleteMultiple(idList);
     }
 }

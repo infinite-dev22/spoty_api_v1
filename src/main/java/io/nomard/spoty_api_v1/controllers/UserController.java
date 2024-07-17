@@ -9,8 +9,11 @@ import io.nomard.spoty_api_v1.models.UserModel;
 import io.nomard.spoty_api_v1.services.implementations.UserServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -21,33 +24,33 @@ public class UserController {
     private UserServiceImpl userService;
 
     @GetMapping("/all")
-    public List<User> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                             @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Flux<PageImpl<User>> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                       @RequestParam(defaultValue = "50") Integer pageSize) {
         return userService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public User getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public Mono<User> getById(@RequestBody FindModel findModel) {
         return userService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<User> getByContains(@RequestBody SearchModel searchModel) {
+    public Flux<List<User>> getByContains(@RequestBody SearchModel searchModel) {
         return userService.getByContains(searchModel.getSearch());
     }
 
     @PostMapping("/add")
-    public ObjectNode save(@Valid @RequestBody UserModel userModel) throws NotFoundException {
-        return userService.add(userModel).getBody();
+    public Mono<ResponseEntity<ObjectNode>> save(@Valid @RequestBody UserModel userModel) {
+        return userService.add(userModel);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ObjectNode> update(@Valid @RequestBody UserModel userModel) throws NotFoundException {
+    public Mono<ResponseEntity<ObjectNode>> update(@Valid @RequestBody UserModel userModel) {
         return userService.update(userModel);
     }
 
     @DeleteMapping("/delete/single")
-    public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
+    public Mono<ResponseEntity<ObjectNode>> delete(@RequestBody FindModel findModel) {
         return userService.delete(findModel.getId());
     }
 }

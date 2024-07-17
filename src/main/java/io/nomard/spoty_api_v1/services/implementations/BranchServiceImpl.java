@@ -8,13 +8,17 @@ import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.BranchService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Objects;
 
 @Service
 public class BranchServiceImpl implements BranchService {
@@ -26,103 +30,107 @@ public class BranchServiceImpl implements BranchService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Branch> getAll(int pageNo, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<Branch> page = branchRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+    public Flux<PageImpl<Branch>> getAll(int pageNo, int pageSize) {
+        return authService.authUser()
+                .flatMapMany(user -> branchRepo.findAllByTenantId(user.getTenant().getId(), PageRequest.of(pageNo, pageSize))
+                        .collectList()
+                        .zipWith(branchRepo.count())
+                        .map(p -> new PageImpl<>(p.getT1(), PageRequest.of(pageNo, pageSize), p.getT2())));
     }
 
     @Override
-    public Branch getById(Long id) throws NotFoundException {
-        Optional<Branch> branch = branchRepo.findById(id);
-        if (branch.isEmpty()) {
-            throw new NotFoundException();
-        }
-        return branch.get();
+    public Mono<Branch> getById(Long id) {
+        return branchRepo.findById(id).switchIfEmpty(Mono.error(new NotFoundException()));
     }
 
     @Override
-    public List<Branch> getByContains(String search) {
-        return branchRepo.searchAllByEmailContainingIgnoreCaseOrNameContainingIgnoreCaseOrCityContainingIgnoreCaseOrTownContainingIgnoreCaseOrPhoneContainingIgnoreCase(
-                search.toLowerCase(), search.toLowerCase(), search.toLowerCase(), search.toLowerCase(), search.toLowerCase()
-        );
-    }
-
-    @Override
-    @Transactional
-    public ResponseEntity<ObjectNode> save(Branch branch) {
-        try {
-            branch.setTenant(authService.authUser().getTenant());
-            branch.setCreatedBy(authService.authUser());
-            branch.setCreatedAt(new Date());
-            branchRepo.saveAndFlush(branch);
-            return spotyResponseImpl.created();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Flux<Branch> getByContains(String search) {
+        return authService.authUser()
+                .flatMapMany(user -> branchRepo.search(
+                        user.getTenant().getId(),
+                        search.toLowerCase()
+                ));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> update(Branch data) throws NotFoundException {
-        var opt = branchRepo.findById(data.getId());
-        if (opt.isEmpty()) {
-            throw new NotFoundException();
-        }
-        var branch = opt.get();
-
-        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
-            branch.setName(data.getName());
-        }
-
-        if (Objects.nonNull(data.getCity()) && !"".equalsIgnoreCase(data.getCity())) {
-            branch.setCity(data.getCity());
-        }
-
-        if (Objects.nonNull(data.getPhone()) && !"".equalsIgnoreCase(data.getPhone())) {
-            branch.setPhone(data.getPhone());
-        }
-
-        if (Objects.nonNull(data.getEmail()) && !"".equalsIgnoreCase(data.getEmail())) {
-            branch.setEmail(data.getEmail());
-        }
-
-        if (Objects.nonNull(data.getTown()) && !"".equalsIgnoreCase(data.getTown())) {
-            branch.setTown(data.getTown());
-        }
-
-        if (Objects.nonNull(data.getZipCode()) && !"".equalsIgnoreCase(data.getZipCode())) {
-            branch.setZipCode(data.getZipCode());
-        }
-        branch.setUpdatedBy(authService.authUser());
-        branch.setUpdatedAt(new Date());
-
-        try {
-            branchRepo.save(branch);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> save(Branch branch) {
+        return authService.authUser()
+                .flatMap(user -> {
+                    branch.setTenant(user.getTenant());
+                    branch.setCreatedBy(user);
+                    branch.setCreatedAt(new Date());
+                    return branchRepo.save(branch)
+                            .thenReturn(spotyResponseImpl.created());
+                })
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(new RuntimeException(e))));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> delete(Long id) {
-        try {
-            branchRepo.deleteById(id);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> update(Branch data) {
+        return branchRepo.findById(data.getId())
+                .switchIfEmpty(Mono.error(new NotFoundException("Branch not found")))
+                .flatMap(branch -> {
+                    boolean updated = false;
+
+                    if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+                        branch.setName(data.getName());
+                        updated = true;
+                    }
+
+                    if (Objects.nonNull(data.getCity()) && !"".equalsIgnoreCase(data.getCity())) {
+                        branch.setCity(data.getCity());
+                        updated = true;
+                    }
+
+                    if (Objects.nonNull(data.getPhone()) && !"".equalsIgnoreCase(data.getPhone())) {
+                        branch.setPhone(data.getPhone());
+                        updated = true;
+                    }
+
+                    if (Objects.nonNull(data.getEmail()) && !"".equalsIgnoreCase(data.getEmail())) {
+                        branch.setEmail(data.getEmail());
+                        updated = true;
+                    }
+
+                    if (Objects.nonNull(data.getTown()) && !"".equalsIgnoreCase(data.getTown())) {
+                        branch.setTown(data.getTown());
+                        updated = true;
+                    }
+
+                    if (Objects.nonNull(data.getZipCode()) && !"".equalsIgnoreCase(data.getZipCode())) {
+                        branch.setZipCode(data.getZipCode());
+                        updated = true;
+                    }
+
+                    if (updated) {
+                        return authService.authUser()
+                                .flatMap(user -> {
+                                    branch.setUpdatedBy(user);
+                                    branch.setUpdatedAt(new Date());
+                                    return branchRepo.save(branch)
+                                            .thenReturn(spotyResponseImpl.ok());
+                                });
+                    } else {
+                        return Mono.just(spotyResponseImpl.ok());
+                    }
+                })
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 
     @Override
-    public ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) {
-        try {
-            branchRepo.deleteAllById(idList);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    @Transactional
+    public Mono<ResponseEntity<ObjectNode>> delete(Long id) {
+        return branchRepo.deleteById(id)
+                .thenReturn(spotyResponseImpl.ok())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
+    }
+
+    @Override
+    public Mono<ResponseEntity<ObjectNode>> deleteMultiple(ArrayList<Long> idList) {
+        return branchRepo.deleteAllById(idList)
+                .thenReturn(spotyResponseImpl.ok())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 }

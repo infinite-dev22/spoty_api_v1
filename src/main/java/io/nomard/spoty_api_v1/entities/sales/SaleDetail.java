@@ -19,11 +19,13 @@ import io.nomard.spoty_api_v1.entities.Product;
 import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
+@Accessors(chain = true)
 @Table(name = "sale_details")
 @Getter
 @Setter
@@ -37,7 +39,7 @@ public class SaleDetail implements Serializable {
     private Long id;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "saleMaster_id", nullable = false)
+    @JoinColumn(name = "sale_master_id", nullable = false)
     @JsonIgnore
     private SaleMaster sale;
 

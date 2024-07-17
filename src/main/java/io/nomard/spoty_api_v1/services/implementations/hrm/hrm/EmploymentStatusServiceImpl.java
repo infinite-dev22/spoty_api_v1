@@ -8,16 +8,17 @@ import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.hrm.hrm.EmploymentStatusService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class EmploymentStatusServiceImpl implements EmploymentStatusService {
@@ -29,95 +30,92 @@ public class EmploymentStatusServiceImpl implements EmploymentStatusService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<EmploymentStatus> getAll(int pageNo, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<EmploymentStatus> page = employmentStatusRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+    public Flux<PageImpl<EmploymentStatus>> getAll(int pageNo, int pageSize) {
+        return authService.authUser()
+                .flatMapMany(user -> employmentStatusRepo.findAllByTenantId(user.getTenant().getId(), PageRequest.of(pageNo, pageSize))
+                        .collectList()
+                        .zipWith(employmentStatusRepo.count())
+                        .map(p -> new PageImpl<>(p.getT1(), PageRequest.of(pageNo, pageSize), p.getT2())));
     }
 
     @Override
-    public EmploymentStatus getById(Long id) throws NotFoundException {
-        Optional<EmploymentStatus> employmentStatus = employmentStatusRepo.findById(id);
-        if (employmentStatus.isEmpty()) {
-            throw new NotFoundException();
-        }
-        return employmentStatus.get();
+    public Mono<EmploymentStatus> getById(Long id) {
+        return employmentStatusRepo.findById(id).switchIfEmpty(Mono.error(new NotFoundException()));
     }
 
     @Override
-    public List<EmploymentStatus> getByContains(String search) {
-        return employmentStatusRepo.searchAllByNameContainingIgnoreCaseOrColorContainingIgnoreCaseOrDescriptionContainsIgnoreCase(
-                search,
-                search,
-                search
-        );
-    }
-
-    @Override
-    @Transactional
-    public ResponseEntity<ObjectNode> save(EmploymentStatus employmentStatus) {
-        try {
-            employmentStatus.setTenant(authService.authUser().getTenant());
-            employmentStatus.setCreatedBy(authService.authUser());
-            employmentStatus.setCreatedAt(new Date());
-            employmentStatusRepo.saveAndFlush(employmentStatus);
-            return spotyResponseImpl.created();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Flux<EmploymentStatus> getByContains(String search) {
+        return authService.authUser()
+                .flatMapMany(user -> employmentStatusRepo.search(
+                        user.getTenant().getId(),
+                        search.toLowerCase()
+                ));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> update(EmploymentStatus data) throws NotFoundException {
-        var opt = employmentStatusRepo.findById(data.getId());
-
-        if (opt.isEmpty()) {
-            throw new NotFoundException();
-        }
-        var employmentStatus = opt.get();
-
-        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
-            employmentStatus.setName(data.getName());
-        }
-
-        if (Objects.nonNull(data.getColor()) && !"".equalsIgnoreCase(data.getColor())) {
-            employmentStatus.setColor(data.getColor());
-        }
-
-        if (Objects.nonNull(data.getDescription()) && !"".equalsIgnoreCase(data.getDescription())) {
-            employmentStatus.setDescription(data.getDescription());
-        }
-
-        employmentStatus.setUpdatedBy(authService.authUser());
-        employmentStatus.setUpdatedAt(new Date());
-
-        try {
-            employmentStatusRepo.saveAndFlush(employmentStatus);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> save(EmploymentStatus employmentStatus) {
+        return authService.authUser()
+                .flatMap(user -> {
+                    employmentStatus.setTenant(user.getTenant());
+                    employmentStatus.setCreatedBy(user);
+                    employmentStatus.setCreatedAt(new Date());
+                    return employmentStatusRepo.save(employmentStatus)
+                            .thenReturn(spotyResponseImpl.created());
+                })
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(new RuntimeException(e))));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> delete(Long id) {
-        try {
-            employmentStatusRepo.deleteById(id);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> update(EmploymentStatus data) {
+        return employmentStatusRepo.findById(data.getId())
+                .switchIfEmpty(Mono.error(new NotFoundException("Employment status not found")))
+                .flatMap(employmentStatus -> {
+                    boolean updated = false;
+
+                    if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+                        employmentStatus.setName(data.getName());
+                        updated = true;
+                    }
+
+                    if (Objects.nonNull(data.getColor()) && !"".equalsIgnoreCase(data.getColor())) {
+                        employmentStatus.setColor(data.getColor());
+                        updated = true;
+                    }
+
+                    if (Objects.nonNull(data.getDescription()) && !"".equalsIgnoreCase(data.getDescription())) {
+                        employmentStatus.setDescription(data.getDescription());
+                        updated = true;
+                    }
+
+                    if (updated) {
+                        return authService.authUser()
+                                .flatMap(user -> {
+                                    employmentStatus.setUpdatedBy(user);
+                                    employmentStatus.setUpdatedAt(new Date());
+                                    return employmentStatusRepo.save(employmentStatus)
+                                            .thenReturn(spotyResponseImpl.ok());
+                                });
+                    } else {
+                        return Mono.just(spotyResponseImpl.ok());
+                    }
+                })
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 
     @Override
-    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) {
-        try {
-            employmentStatusRepo.deleteAllById(idList);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    @Transactional
+    public Mono<ResponseEntity<ObjectNode>> delete(Long id) {
+        return employmentStatusRepo.deleteById(id)
+                .thenReturn(spotyResponseImpl.ok())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
+    }
+
+    @Override
+    public Mono<ResponseEntity<ObjectNode>> deleteMultiple(List<Long> idList) {
+        return employmentStatusRepo.deleteAllById(idList)
+                .thenReturn(spotyResponseImpl.ok())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 }

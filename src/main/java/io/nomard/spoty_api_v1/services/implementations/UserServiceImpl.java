@@ -10,18 +10,18 @@ import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -33,151 +33,161 @@ public class UserServiceImpl implements UserService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<User> getAll(int pageNo, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<User> page = userRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+    public Flux<PageImpl<User>> getAll(int pageNo, int pageSize) {
+        return authService.authUser()
+                .flatMapMany(user -> userRepo.findAllByTenantId(user.getTenant().getId(), PageRequest.of(pageNo, pageSize))
+                        .collectList()
+                        .zipWith(userRepo.count())
+                        .map(p -> new PageImpl<>(p.getT1(), PageRequest.of(pageNo, pageSize), p.getT2())));
     }
 
     @Override
-    public User getById(Long id) throws NotFoundException {
-        Optional<User> user = userRepo.findById(id);
-        if (user.isEmpty()) {
-            throw new NotFoundException();
-        }
-        return user.get();
+    public Mono<User> getById(Long id) {
+        return userRepo.findById(id).switchIfEmpty(Mono.error(new NotFoundException()));
     }
 
     @Override
-    public User getByEmail(String email) {
+    public Mono<User> getByEmail(String email) {
         return userRepo.findUserByEmail(email);
     }
 
     @Override
-    public List<User> getByContains(String search) {
-        return userRepo.searchAllByEmailContainingIgnoreCase(search.toLowerCase());
+    public Flux<List<User>> getByContains(String search) {
+        return authService.authUser()
+                .flatMapMany(user -> userRepo.searchAllByEmail(
+                        user.getTenant().getId(),
+                        search.toLowerCase()
+                ));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> update(UserModel data) throws NotFoundException {
-        var opt = userRepo.findById(data.getId());
+    public Mono<ResponseEntity<ObjectNode>> update(UserModel data) {
+        return userRepo.findById(data.getId())
+                .switchIfEmpty(Mono.error(new NotFoundException("User not found")))
+                .flatMap(user -> {
+                    boolean updated = false;
 
-        if (opt.isEmpty()) {
-            throw new NotFoundException();
-        }
-        var user = opt.get();
-        var userProfile = user.getUserProfile();
+                    var userProfile = user.getUserProfile();
 
-        if (!Objects.equals(user.getTenant(), data.getTenant()) && Objects.nonNull(data.getTenant())) {
-            user.setTenant(data.getTenant());
-        }
+                    if (!Objects.equals(user.getTenant(), data.getTenant()) && Objects.nonNull(data.getTenant())) {
+                        user.setTenant(data.getTenant());
+                        updated = true;
+                    }
 
-        if (!Objects.equals(user.getBranch(), data.getBranch()) && Objects.nonNull(data.getBranch())) {
-            user.setBranch(data.getBranch());
-        }
+                    if (!Objects.equals(user.getBranch(), data.getBranch()) && Objects.nonNull(data.getBranch())) {
+                        user.setBranch(data.getBranch());
+                        updated = true;
+                    }
 
-        if (!Objects.equals(userProfile.getFirstName(), data.getFirstName()) && Objects.nonNull(data.getFirstName()) && !"".equalsIgnoreCase(data.getFirstName())) {
-            userProfile.setFirstName(data.getFirstName());
-        }
+                    if (!Objects.equals(userProfile.getFirstName(), data.getFirstName()) && Objects.nonNull(data.getFirstName()) && !"".equalsIgnoreCase(data.getFirstName())) {
+                        userProfile.setFirstName(data.getFirstName());
+                        updated = true;
+                    }
 
-        if (!Objects.equals(userProfile.getLastName(), data.getLastName()) && Objects.nonNull(data.getLastName()) && !"".equalsIgnoreCase(data.getLastName())) {
-            userProfile.setLastName(data.getLastName());
-        }
+                    if (!Objects.equals(userProfile.getLastName(), data.getLastName()) && Objects.nonNull(data.getLastName()) && !"".equalsIgnoreCase(data.getLastName())) {
+                        userProfile.setLastName(data.getLastName());
+                        updated = true;
+                    }
 
-        if (!Objects.equals(userProfile.getOtherName(), data.getOtherName()) && Objects.nonNull(data.getOtherName()) && !"".equalsIgnoreCase(data.getOtherName())) {
-            userProfile.setOtherName(data.getOtherName());
-        }
+                    if (!Objects.equals(userProfile.getOtherName(), data.getOtherName()) && Objects.nonNull(data.getOtherName()) && !"".equalsIgnoreCase(data.getOtherName())) {
+                        userProfile.setOtherName(data.getOtherName());
+                        updated = true;
+                    }
 
-        if (!Objects.equals(user.getEmail(), data.getEmail()) && Objects.nonNull(data.getEmail()) && !"".equalsIgnoreCase(data.getEmail())) {
-            user.setEmail(data.getEmail());
-        }
+                    if (!Objects.equals(user.getEmail(), data.getEmail()) && Objects.nonNull(data.getEmail()) && !"".equalsIgnoreCase(data.getEmail())) {
+                        user.setEmail(data.getEmail());
+                        updated = true;
+                    }
 
-        if (!Objects.equals(userProfile.getPhone(), data.getPhone()) && Objects.nonNull(data.getPhone()) && !"".equalsIgnoreCase(data.getPhone())) {
-            userProfile.setPhone(data.getPhone());
-        }
+                    if (!Objects.equals(userProfile.getPhone(), data.getPhone()) && Objects.nonNull(data.getPhone()) && !"".equalsIgnoreCase(data.getPhone())) {
+                        userProfile.setPhone(data.getPhone());
+                        updated = true;
+                    }
 
-        if (!Objects.equals(user.getRole(), data.getRole()) && Objects.nonNull(data.getRole())) {
-            user.setRole(data.getRole());
-        }
+                    if (!Objects.equals(user.getRole(), data.getRole()) && Objects.nonNull(data.getRole())) {
+                        user.setRole(data.getRole());
+                        updated = true;
+                    }
 
-        if (!Objects.equals(user.isActive(), data.isActive())) {
-            user.setActive(data.isActive());
-        }
+                    if (!Objects.equals(user.isActive(), data.isActive())) {
+                        user.setActive(data.isActive());
+                        updated = true;
+                    }
 
-        if (!Objects.equals(user.isLocked(), data.isLocked())) {
-            user.setLocked(data.isLocked());
-        }
+                    if (!Objects.equals(user.isLocked(), data.isLocked())) {
+                        user.setLocked(data.isLocked());
+                        updated = true;
+                    }
 
-        if (Objects.nonNull(data.getAvatar()) && !"".equalsIgnoreCase(data.getAvatar())) {
-            userProfile.setAvatar(data.getAvatar());
-        }
+                    if (Objects.nonNull(data.getAvatar()) && !"".equalsIgnoreCase(data.getAvatar())) {
+                        userProfile.setAvatar(data.getAvatar());
+                        updated = true;
+                    }
 
-        user.setUpdatedBy(authService.authUser());
-        user.setUpdatedAt(new Date());
-
-        try {
-            userRepo.saveAndFlush(user);
-
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+                    if (updated) {
+                        return authService.authUser()
+                                .flatMap(authUser -> {
+                                    user.setUpdatedBy(authUser);
+                                    user.setUpdatedAt(new Date());
+                                    return userRepo.save(user)
+                                            .thenReturn(spotyResponseImpl.ok());
+                                });
+                    } else {
+                        return Mono.just(spotyResponseImpl.ok());
+                    }
+                })
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> delete(Long id) {
-        try {
-            userRepo.deleteById(id);
-
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> delete(Long id) {
+        return userRepo.deleteById(id)
+                .thenReturn(spotyResponseImpl.ok())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> add(UserModel data) throws NotFoundException {
-        User existingUser = userRepo.findUserByEmail(data.getEmail());
+    public Mono<ResponseEntity<ObjectNode>> add(UserModel data) {
+        return userRepo.findUserByEmail(data.getEmail())
+                .flatMap(existingUser -> {
+                    if (existingUser != null && existingUser.getEmail() != null && !existingUser.getEmail().isEmpty()) {
+                        return Mono.just(spotyResponseImpl.taken());
+                    }
+                    return authService.authUser()
+                            .flatMap(authUser -> {
+                                User user = new User();
+                                UserProfile userProfile = new UserProfile();
+                                userProfile.setFirstName(data.getFirstName());
+                                userProfile.setLastName(data.getLastName());
+                                userProfile.setOtherName(data.getOtherName());
+                                userProfile.setPhone(data.getPhone());
+                                userProfile.setAvatar(data.getAvatar());
+                                userProfile.setTenant(authUser.getTenant());
+                                userProfile.setCreatedBy(authUser);
+                                userProfile.setCreatedAt(new Date());
 
-        if (existingUser != null && existingUser.getEmail() != null && !existingUser.getEmail().isEmpty()) {
-            return spotyResponseImpl.taken();
-        }
+                                user.setUserProfile(userProfile);
+                                user.setTenant(data.getTenant());
+                                user.setBranch(data.getBranch());
+                                user.setEmail(data.getEmail());
+                                user.setPassword(new BCryptPasswordEncoder(8).encode("new_user"));
+                                user.setRole(data.getRole());
+                                user.setActive(data.isActive());
+                                user.setLocked(data.isLocked());
+                                if (Objects.isNull(user.getBranch())) {
+                                    user.setBranch(authUser.getBranch());
+                                }
+                                user.setTenant(authUser.getTenant());
+                                user.setCreatedBy(authUser);
+                                user.setCreatedAt(new Date());
+                                return userRepo.save(user)
+                                        .thenReturn(spotyResponseImpl.created());
+                            });
 
-        User user = new User();
-        UserProfile userProfile = new UserProfile();
-        userProfile.setFirstName(data.getFirstName());
-        userProfile.setLastName(data.getLastName());
-        userProfile.setOtherName(data.getOtherName());
-        userProfile.setPhone(data.getPhone());
-        userProfile.setAvatar(data.getAvatar());
-        userProfile.setTenant(authService.authUser().getTenant());
-        userProfile.setCreatedBy(authService.authUser());
-        userProfile.setCreatedAt(new Date());
-
-        user.setUserProfile(userProfile);
-        user.setTenant(data.getTenant());
-        user.setBranch(data.getBranch());
-        user.setEmail(data.getEmail());
-        user.setPassword(new BCryptPasswordEncoder(8).encode("new_user"));
-        user.setRole(data.getRole());
-        user.setActive(data.isActive());
-        user.setLocked(data.isLocked());
-        if (Objects.isNull(user.getBranch())) {
-            user.setBranch(authService.authUser().getBranch());
-        }
-        user.setTenant(authService.authUser().getTenant());
-        user.setCreatedBy(authService.authUser());
-        user.setCreatedAt(new Date());
-
-        try {
-            userRepo.save(user);
-
-            return spotyResponseImpl.created();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+                })
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(new RuntimeException(e))));
     }
 }

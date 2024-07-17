@@ -2,23 +2,25 @@ package io.nomard.spoty_api_v1.services.interfaces.adjustments;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.adjustments.AdjustmentMaster;
-import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 public interface AdjustmentMasterService {
-    List<AdjustmentMaster> getAll(int pageNo, int pageSize);
+    Flux<PageImpl<AdjustmentMaster>> getAll(int pageNo, int pageSize);
 
-    AdjustmentMaster getById(Long id) throws NotFoundException;
+    Mono<AdjustmentMaster> getById(Long id);
 
-    List<AdjustmentMaster> getByContains(String search);
+    Flux<AdjustmentMaster> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(AdjustmentMaster adjustmentMaster);
+    Mono<ResponseEntity<ObjectNode>> save(AdjustmentMaster adjustmentMaster);
 
-    ResponseEntity<ObjectNode> update(AdjustmentMaster adjustmentMaster) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> update(AdjustmentMaster adjustmentMaster);
 
-    ResponseEntity<ObjectNode> delete(Long id);
+    Mono<ResponseEntity<ObjectNode>> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList);
+    Mono<ResponseEntity<ObjectNode>> deleteMultiple(List<Long> idList);
 }

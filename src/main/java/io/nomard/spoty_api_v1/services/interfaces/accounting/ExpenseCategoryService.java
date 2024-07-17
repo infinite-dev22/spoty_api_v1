@@ -3,23 +3,25 @@ package io.nomard.spoty_api_v1.services.interfaces.accounting;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.accounting.ExpenseCategory;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public interface ExpenseCategoryService {
-    List<ExpenseCategory> getAll(int pageNo, int pageSize);
+    Mono<PageImpl<ExpenseCategory>> getAll(int pageNo, int pageSize);
 
-    ExpenseCategory getById(Long id) throws NotFoundException;
+    Mono<ExpenseCategory> getById(Long id);
 
-    List<ExpenseCategory> getByContains(String search);
+    Flux<ExpenseCategory> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(ExpenseCategory expenseCategory);
+    Mono<ResponseEntity<ObjectNode>> save(ExpenseCategory expenseCategory);
 
-    ResponseEntity<ObjectNode> update(ExpenseCategory expenseCategory) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> update(ExpenseCategory expenseCategory);
 
-    ResponseEntity<ObjectNode> delete(Long id);
+    Mono<ResponseEntity<ObjectNode>> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList);
+    Mono<ResponseEntity<ObjectNode>> deleteMultiple(ArrayList<Long> idList);
 }

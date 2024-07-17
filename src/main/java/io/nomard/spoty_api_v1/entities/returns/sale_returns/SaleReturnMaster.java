@@ -19,14 +19,21 @@ import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Customer;
 import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.User;
+import io.nomard.spoty_api_v1.entities.deductions.Discount;
+import io.nomard.spoty_api_v1.entities.deductions.Tax;
+import io.nomard.spoty_api_v1.entities.sales.SaleDetail;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 @Entity
+@Accessors(chain = true)
 @Table(name = "sale_return_masters")
 @Getter
 @Setter
@@ -37,13 +44,7 @@ import java.util.Set;
 public class SaleReturnMaster implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User user_detail;
-
-    @Column(nullable = false)
-    private Date date;
+    private Long id;
 
     private String ref;
 
@@ -58,29 +59,51 @@ public class SaleReturnMaster implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;
 
-    @OneToMany(orphanRemoval = true, mappedBy = "saleReturn", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<SaleReturnDetail> saleReturnDetails;
+    @OneToMany(orphanRemoval = true, mappedBy = "sale", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<SaleReturnDetail> saleDetails = new LinkedList<>();
 
-    private double taxRate;
-    private double netTax;
-    private double discount;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tax_id")
+    private Tax tax;
 
-    @Column(nullable = false)
-    private double total;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "discount_id")
+    private Discount discount;
 
-    @Column(nullable = false)
-    private double paid;
+    @Column
+    @Builder.Default
+    private double total = 0.0;
 
-    @Column(nullable = false)
+    @Column(name = "sub_total")
+    @Builder.Default
+    private double subTotal = 0.0;
+
+    @Column(name = "amount_paid")
+    @Builder.Default
+    private double amountPaid = 0.0;
+
+    @Column(name = "amount_due")
+    @Builder.Default
+    private double amountDue = 0.0;
+
+    @Column(name = "change_amount")
+    @Builder.Default
+    private double changeAmount = 0.0;
+
+    @Column(name = "shipping_fee")
+    @Builder.Default
+    private double shippingFee = 0.0;
+
+    @Column(nullable = false, name = "payment_status")
     private String paymentStatus;
 
-    @Column(nullable = false)
-    private String status;
+    @Column(nullable = false, name = "sale_status")
+    private String saleStatus;
 
     private String notes;
 
     @Column(name = "created_at")
-    @JsonIgnore
     private Date createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)

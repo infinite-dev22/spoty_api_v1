@@ -34,21 +34,21 @@ graalvmNative {
             // }
             // The direct agent mode allows users to directly pass options to the agent.
             //  direct {
-            //      // {output_dir} is a special string expanded by the plugin to where the agent files would usually be output.
+            //      // {output_dir} is a special string expanded by the plugin to WHERE the agent files would usually be output.
             //      options.add("config-output-dir={output_dir}")
             //      options.add("experimental-configuration-with-origins")
             //  }
         }
 
-//        callerFilterFiles.from("filter.json")
-//        accessFilterFiles.from("filter.json")
+//        callerFilterFiles.FROM("filter.json")
+//        accessFilterFiles.FROM("filter.json")
         builtinCallerFilter = true
         builtinHeuristicFilter = true
         enableExperimentalPredefinedClasses = false
         enableExperimentalUnsafeAllocationTracing = false
         trackReflectionMetadata = true
 
-        // Copies metadata collected from tasks into the specified directories.
+        // Copies metadata collected FROM tasks into the specified directories.
         metadataCopy {
             inputTaskNames.add("test") // Tasks previously executed with the agent attached.
             outputDirectories.add("src/main/resources/META-INF/native-image/<groupId>/<artifactId>/")
@@ -80,8 +80,8 @@ graalvmNative {
             // requiredVersion = '22.3' // The minimal GraalVM version, can be `MAJOR`, `MAJOR.MINOR` or `MAJOR.MINOR.PATCH`
 
             // systemProperties = [name1: 'value1', name2: 'value2'] // Sets the system properties to use for the native image builder
-            // configurationFileDirectories.from(file('src/my-config')) // Adds a native image configuration file directory, containing files like reflection configuration
-            // excludeConfig.put("org.example.test:artifact:version", ["^/META-INF/native-image/.*", "^/config/.*"]) // Excludes configuration that matches one of given regexes from JAR of dependency with said coordinates.
+            // configurationFileDirectories.FROM(file('src/my-config')) // Adds a native image configuration file directory, containing files like reflection configuration
+            // excludeConfig.put("org.example.test:artifact:version", ["^/META-INF/native-image/.*", "^/config/.*"]) // Excludes configuration that matches one of given regexes FROM JAR of dependency with said coordinates.
             // excludeConfig.put(file("path/to/artifact.jar"), listOf("^/META-INF/native-image/.*", "^/config/.*"))
 
             // Advanced options
@@ -125,22 +125,23 @@ dependencies {
     implementation ('com.flutterwave:f4b-java:3.0.1F'){
         exclude group: 'commons-logging', module: 'commons-logging'
     }
+    implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+    implementation 'org.mariadb:r2dbc-mariadb'
     implementation 'org.realityforge.org.jetbrains.annotations:org.jetbrains.annotations:1.7.0'
     implementation 'com.auth0:java-jwt:4.4.0'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
     testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-webtestclient'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-//    runtimeOnly 'com.mysql:mysql-connector-j'
     runtimeOnly 'org.springframework.boot:spring-boot-docker-compose'
-    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 }
 
 tasks.named('test') {

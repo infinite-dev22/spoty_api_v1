@@ -8,13 +8,17 @@ import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.DesignationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 public class DesignationServiceImpl implements DesignationService {
@@ -26,97 +30,93 @@ public class DesignationServiceImpl implements DesignationService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Designation> getAll(int pageNo, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<Designation> page = designationRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+    public Flux<PageImpl<Designation>> getAll(int pageNo, int pageSize) {
+        return authService.authUser()
+                .flatMapMany(user -> designationRepo.findAllByTenantId(user.getTenant().getId(), PageRequest.of(pageNo, pageSize))
+                        .collectList()
+                        .zipWith(designationRepo.count())
+                        .map(p -> new PageImpl<>(p.getT1(), PageRequest.of(pageNo, pageSize), p.getT2())));
     }
 
     @Override
-    public Designation getById(Long id) throws NotFoundException {
-        Optional<Designation> designation = designationRepo.findById(id);
-        if (designation.isEmpty()) {
-            throw new NotFoundException();
-        }
-        return designation.get();
+    public Mono<Designation> getById(Long id) {
+        return designationRepo.findById(id).switchIfEmpty(Mono.error(new NotFoundException()));
     }
 
     @Override
-    public ArrayList<Designation> getByContains(String search) {
-        return designationRepo.searchAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
-                search,
-                search
-        );
-    }
-
-    @Override
-    @Transactional
-    public ResponseEntity<ObjectNode> save(Designation designation) {
-        try {
-            designation.setTenant(authService.authUser().getTenant());
-            if (Objects.isNull(designation.getBranch())) {
-                designation.setBranch(authService.authUser().getBranch());
-            }
-            designation.setCreatedBy(authService.authUser());
-            designation.setCreatedAt(new Date());
-            designationRepo.saveAndFlush(designation);
-            return spotyResponseImpl.created();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Flux<Designation> getByContains(String search) {
+        return authService.authUser()
+                .flatMapMany(user -> designationRepo.search(
+                        user.getTenant().getId(),
+                        search.toLowerCase()
+                ));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> update(Designation data) throws NotFoundException {
-        var opt = designationRepo.findById(data.getId());
-
-        if (opt.isEmpty()) {
-            throw new NotFoundException();
-        }
-        var designation = opt.get();
-
-        if (Objects.nonNull(data.getBranch())) {
-            designation.setBranch(data.getBranch());
-        }
-
-        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
-            designation.setName(data.getName());
-        }
-
-        if (Objects.nonNull(data.getDescription()) && !"".equalsIgnoreCase(data.getDescription())) {
-            designation.setDescription(data.getDescription());
-        }
-
-        designation.setUpdatedBy(authService.authUser());
-        designation.setUpdatedAt(new Date());
-
-        try {
-            designationRepo.saveAndFlush(designation);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> save(Designation designation) {
+        return authService.authUser()
+                .flatMap(user -> {
+                    designation.setTenant(user.getTenant());
+                    designation.setBranch(user.getBranch());
+                    designation.setCreatedBy(user);
+                    designation.setCreatedAt(new Date());
+                    return designationRepo.save(designation)
+                            .thenReturn(spotyResponseImpl.created());
+                })
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(new RuntimeException(e))));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> delete(Long id) {
-        try {
-            designationRepo.deleteById(id);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> update(Designation data) {
+        return designationRepo.findById(data.getId())
+                .switchIfEmpty(Mono.error(new NotFoundException("Designation not found")))
+                .flatMap(designation -> {
+                    boolean updated = false;
+
+                    if (Objects.nonNull(data.getBranch())) {
+                        designation.setBranch(data.getBranch());
+                        updated = true;
+                    }
+
+                    if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+                        designation.setName(data.getName());
+                        updated = true;
+                    }
+
+                    if (Objects.nonNull(data.getDescription()) && !"".equalsIgnoreCase(data.getDescription())) {
+                        designation.setDescription(data.getDescription());
+                        updated = true;
+                    }
+
+                    if (updated) {
+                        return authService.authUser()
+                                .flatMap(user -> {
+                                    designation.setUpdatedBy(user);
+                                    designation.setUpdatedAt(new Date());
+                                    return designationRepo.save(designation)
+                                            .thenReturn(spotyResponseImpl.ok());
+                                });
+                    } else {
+                        return Mono.just(spotyResponseImpl.ok());
+                    }
+                })
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 
     @Override
-    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) {
-        try {
-            designationRepo.deleteAllById(idList);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    @Transactional
+    public Mono<ResponseEntity<ObjectNode>> delete(Long id) {
+        return designationRepo.deleteById(id)
+                .thenReturn(spotyResponseImpl.ok())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
+    }
+
+    @Override
+    public Mono<ResponseEntity<ObjectNode>> deleteMultiple(List<Long> idList) {
+        return designationRepo.deleteAllById(idList)
+                .thenReturn(spotyResponseImpl.ok())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 }

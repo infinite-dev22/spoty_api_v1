@@ -2,34 +2,36 @@ package io.nomard.spoty_api_v1.services.interfaces.dashboard;
 
 import io.nomard.spoty_api_v1.entities.sales.*;
 import io.nomard.spoty_api_v1.models.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 public interface MainDashboardService {
     // Expenses.
-    List<LineChartModel> getYearlyExpenses();
+    Flux<LineChartModel> getYearlyExpenses();
 
-    List<LineChartModel> getMonthlyExpenses();
+    Flux<LineChartModel> getMonthlyExpenses();
 
-    List<LineChartModel> getWeeklyExpenses();
+    Flux<LineChartModel> getWeeklyExpenses();
     // Incomes.
-    List<LineChartModel> getYearlyIncomes();
+    Flux<LineChartModel> getYearlyIncomes();
 
-    List<LineChartModel> getMonthlyIncomes();
+    Flux<LineChartModel> getMonthlyIncomes();
 
-    List<LineChartModel> getMonthlyRevenue();
+    Flux<LineChartModel> getMonthlyRevenue();
 
-    List<LineChartModel> getWeeklyRevenue();
+    Flux<LineChartModel> getWeeklyRevenue();
 
-    List<ProductSalesModel> getTopProductsSold(Integer limit);
+    Flux<ProductSalesModel> getTopProductsSold(Integer limit);
 
-    List<SaleMaster> getRecentOrders(Integer limit);
+    Flux<SaleMaster> getRecentOrders(Integer limit);
 
-    List<StockAlertModel> getProductsStockAlert();
+    Flux<StockAlertModel> getProductsStockAlert();
 
-    DashboardKPIModel getTotalEarningsKPI();
-    DashboardKPIModel getTotalPurchasesKPI();
-    DashboardKPIModel getCountProductsKPI();
-    DashboardKPIModel getCountCustomersKPI();
-    DashboardKPIModel getCountSuppliersKPI();
+    Mono<DashboardKPIModel> getTotalEarningsKPI();
+    Mono<DashboardKPIModel> getTotalPurchasesKPI();
+    Mono<DashboardKPIModel> getCountProductsKPI();
+    Mono<DashboardKPIModel> getCountCustomersKPI();
+    Mono<DashboardKPIModel> getCountSuppliersKPI();
 }

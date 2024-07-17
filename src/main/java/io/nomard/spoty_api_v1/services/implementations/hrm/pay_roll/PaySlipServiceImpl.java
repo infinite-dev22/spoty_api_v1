@@ -8,16 +8,17 @@ import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.hrm.pay_roll.PaySlipService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class PaySlipServiceImpl implements PaySlipService {
@@ -29,96 +30,99 @@ public class PaySlipServiceImpl implements PaySlipService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<PaySlip> getAll(int pageNo, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<PaySlip> page = paySlipRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+    public Flux<PageImpl<PaySlip>> getAll(int pageNo, int pageSize) {
+        return authService.authUser()
+                .flatMapMany(user -> paySlipRepo.findAllByTenantId(user.getTenant().getId(), PageRequest.of(pageNo, pageSize))
+                        .collectList()
+                        .zipWith(paySlipRepo.count())
+                        .map(p -> new PageImpl<>(p.getT1(), PageRequest.of(pageNo, pageSize), p.getT2())));
     }
 
     @Override
-    public PaySlip getById(Long id) throws NotFoundException {
-        Optional<PaySlip> paySlip = paySlipRepo.findById(id);
-        if (paySlip.isEmpty()) {
-            throw new NotFoundException();
-        }
-        return paySlip.get();
-    }
-
-    @Override
-    @Transactional
-    public ResponseEntity<ObjectNode> save(PaySlip paySlip) {
-        try {
-            paySlip.setTenant(authService.authUser().getTenant());
-            if (Objects.isNull(paySlip.getBranch())) {
-                paySlip.setBranch(authService.authUser().getBranch());
-            }
-            paySlip.setCreatedBy(authService.authUser());
-            paySlip.setCreatedAt(new Date());
-            paySlipRepo.saveAndFlush(paySlip);
-            return spotyResponseImpl.created();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<PaySlip> getById(Long id) {
+        return paySlipRepo.findById(id).switchIfEmpty(Mono.error(new NotFoundException()));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> update(PaySlip data) throws NotFoundException {
-        var opt = paySlipRepo.findById(data.getId());
-
-        if (opt.isEmpty()) {
-            throw new NotFoundException();
-        }
-        var paySlip = opt.get();
-
-        if (Objects.nonNull(data.getPaySlipType())) {
-            paySlip.setPaySlipType(data.getPaySlipType());
-        }
-
-        if (Objects.nonNull(data.getStartDate()) && !Objects.equals(data.getStartDate(), paySlip.getStartDate())) {
-            paySlip.setStartDate(data.getStartDate());
-        }
-
-        if (Objects.nonNull(data.getEndDate()) && !Objects.equals(data.getEndDate(), paySlip.getEndDate())) {
-            paySlip.setEndDate(data.getEndDate());
-        }
-
-        if (!Objects.equals(data.getSalariesQuantity(), paySlip.getSalariesQuantity())) {
-            paySlip.setSalariesQuantity(data.getSalariesQuantity());
-        }
-
-        if (data.getStatus() != '\0') {
-            paySlip.setStatus(data.getStatus());
-        }
-
-        if (Objects.nonNull(data.getMessage()) && !"".equalsIgnoreCase(data.getMessage())) {
-            paySlip.setMessage(data.getMessage());
-        }
-
-        paySlip.setUpdatedBy(authService.authUser());
-        paySlip.setUpdatedAt(new Date());
-
-        try {
-            paySlipRepo.saveAndFlush(paySlip);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> save(PaySlip paySlip) {
+        return authService.authUser()
+                .flatMap(user -> {
+                    paySlip.setTenant(user.getTenant());
+                    paySlip.setBranch(user.getBranch());
+                    paySlip.setCreatedBy(user);
+                    paySlip.setCreatedAt(new Date());
+                    return paySlipRepo.save(paySlip)
+                            .thenReturn(spotyResponseImpl.created());
+                })
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(new RuntimeException(e))));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> delete(Long id) {
-        try {
-            paySlipRepo.deleteById(id);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> update(PaySlip data) {
+        return paySlipRepo.findById(data.getId())
+                .switchIfEmpty(Mono.error(new NotFoundException("Branch not found")))
+                .flatMap(paySlip -> {
+                    boolean updated = false;
+
+                    if (Objects.nonNull(data.getPaySlipType())) {
+                        paySlip.setPaySlipType(data.getPaySlipType());
+                        updated = true;
+                    }
+
+                    if (Objects.nonNull(data.getStartDate()) && !Objects.equals(data.getStartDate(), paySlip.getStartDate())) {
+                        paySlip.setStartDate(data.getStartDate());
+                        updated = true;
+                    }
+
+                    if (Objects.nonNull(data.getEndDate()) && !Objects.equals(data.getEndDate(), paySlip.getEndDate())) {
+                        paySlip.setEndDate(data.getEndDate());
+                        updated = true;
+                    }
+
+                    if (!Objects.equals(data.getSalariesQuantity(), paySlip.getSalariesQuantity())) {
+                        paySlip.setSalariesQuantity(data.getSalariesQuantity());
+                        updated = true;
+                    }
+
+                    if (data.getStatus() != '\0') {
+                        paySlip.setStatus(data.getStatus());
+                        updated = true;
+                    }
+
+                    if (Objects.nonNull(data.getMessage()) && !"".equalsIgnoreCase(data.getMessage())) {
+                        paySlip.setMessage(data.getMessage());
+                        updated = true;
+                    }
+
+                    if (updated) {
+                        return authService.authUser()
+                                .flatMap(user -> {
+                                    paySlip.setUpdatedBy(user);
+                                    paySlip.setUpdatedAt(new Date());
+                                    return paySlipRepo.save(paySlip)
+                                            .thenReturn(spotyResponseImpl.ok());
+                                });
+                    } else {
+                        return Mono.just(spotyResponseImpl.ok());
+                    }
+                })
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 
     @Override
-    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException {
-        return null;
+    @Transactional
+    public Mono<ResponseEntity<ObjectNode>> delete(Long id) {
+        return paySlipRepo.deleteById(id)
+                .thenReturn(spotyResponseImpl.ok())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
+    }
+
+    @Override
+    public Mono<ResponseEntity<ObjectNode>> deleteMultiple(List<Long> idList) {
+        return paySlipRepo.deleteAllById(idList)
+                .thenReturn(spotyResponseImpl.ok())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 }

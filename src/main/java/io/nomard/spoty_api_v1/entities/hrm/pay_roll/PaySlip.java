@@ -6,6 +6,7 @@ import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
+@Accessors(chain = true)
 @Table(name = "pay_slip_types")
 @Getter
 @Setter

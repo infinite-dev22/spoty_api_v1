@@ -1,21 +1,19 @@
 package io.nomard.spoty_api_v1.services.interfaces.sales;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.returns.sale_returns.SaleReturnDetail;
 import io.nomard.spoty_api_v1.entities.sales.SaleDetail;
 import io.nomard.spoty_api_v1.entities.sales.SaleTransaction;
-import io.nomard.spoty_api_v1.errors.NotFoundException;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 public interface SaleTransactionService {
-    SaleTransaction getById(Long id) throws NotFoundException;
+    Flux<SaleTransaction> getById(Long id);
 
-    ResponseEntity<ObjectNode> save(SaleDetail saleDetail);
+    Mono<ResponseEntity<ObjectNode>> save(SaleDetail saleDetail);
 
-    ResponseEntity<ObjectNode> update(SaleDetail saleDetail) throws NotFoundException;
-
-    ResponseEntity<ObjectNode> delete(Long id);
-
-    ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList);
+    Mono<ResponseEntity<ObjectNode>> saveReturn(SaleReturnDetail saleReturnDetail);
 }

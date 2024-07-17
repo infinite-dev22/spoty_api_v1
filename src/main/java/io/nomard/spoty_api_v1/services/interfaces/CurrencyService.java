@@ -3,23 +3,25 @@ package io.nomard.spoty_api_v1.services.interfaces;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Currency;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public interface CurrencyService {
-    List<Currency> getAll(int pageNo, int pageSize);
+    Flux<PageImpl<Currency>> getAll(int pageNo, int pageSize);
 
-    Currency getById(Long id) throws NotFoundException;
+    Mono<Currency> getById(Long id);
 
-    List<Currency> getByContains(String search);
+    Flux<Currency> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(Currency currency);
+    Mono<ResponseEntity<ObjectNode>> save(Currency currency);
 
-    ResponseEntity<ObjectNode> update(Currency currency) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> update(Currency currency);
 
-    ResponseEntity<ObjectNode> delete(Long id);
+    Mono<ResponseEntity<ObjectNode>> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList);
+    Mono<ResponseEntity<ObjectNode>> deleteMultiple(ArrayList<Long> idList);
 }

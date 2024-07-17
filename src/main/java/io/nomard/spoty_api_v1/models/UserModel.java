@@ -18,6 +18,7 @@ import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Role;
 import io.nomard.spoty_api_v1.entities.Tenant;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 

@@ -3,23 +3,25 @@ package io.nomard.spoty_api_v1.services.interfaces;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.ProductCategory;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public interface ProductCategoryService {
-    List<ProductCategory> getAll(int pageNo, int pageSize);
+    Flux<PageImpl<ProductCategory>> getAll(int pageNo, int pageSize);
 
-    ProductCategory getById(Long id) throws NotFoundException;
+    Mono<ProductCategory> getById(Long id);
 
-    List<ProductCategory> getByContains(String search);
+    Flux<ProductCategory> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(ProductCategory productCategory);
+    Mono<ResponseEntity<ObjectNode>> save(ProductCategory productCategory);
 
-    ResponseEntity<ObjectNode> update(ProductCategory productCategory) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> update(ProductCategory productCategory);
 
-    ResponseEntity<ObjectNode> delete(Long id);
+    Mono<ResponseEntity<ObjectNode>> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList);
+    Mono<ResponseEntity<ObjectNode>> deleteMultiple(ArrayList<Long> idList);
 }

@@ -8,11 +8,13 @@ import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.hrm.hrm.DesignationServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("designations")
@@ -21,38 +23,38 @@ public class DesignationController {
     private DesignationServiceImpl designationService;
 
     @GetMapping("/all")
-    public List<Designation> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                    @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Flux<PageImpl<Designation>> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                              @RequestParam(defaultValue = "50") Integer pageSize) {
         return designationService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public Designation getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public Mono<Designation> getById(@RequestBody FindModel findModel) {
         return designationService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<Designation> getByContains(@RequestBody SearchModel searchModel) {
+    public Flux<Designation> getByContains(@RequestBody SearchModel searchModel) {
         return designationService.getByContains(searchModel.getSearch());
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ObjectNode> save(@Valid @RequestBody Designation designation) {
+    public Mono<ResponseEntity<ObjectNode>> save(@Valid @RequestBody Designation designation) {
         return designationService.save(designation);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ObjectNode> update(@Valid @RequestBody Designation designation) throws NotFoundException {
+    public Mono<ResponseEntity<ObjectNode>> update(@Valid @RequestBody Designation designation) {
         return designationService.update(designation);
     }
 
     @DeleteMapping("/delete/single")
-    public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
+    public Mono<ResponseEntity<ObjectNode>> delete(@RequestBody FindModel findModel) {
         return designationService.delete(findModel.getId());
     }
 
     @DeleteMapping("/delete/multiple")
-    public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> idList) {
+    public Mono<ResponseEntity<ObjectNode>> deleteMultiple(@RequestBody ArrayList<Long> idList) {
         return designationService.deleteMultiple(idList);
     }
 }

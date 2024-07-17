@@ -3,22 +3,25 @@ package io.nomard.spoty_api_v1.services.interfaces.hrm.hrm;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.hrm.hrm.EmploymentStatus;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 public interface EmploymentStatusService {
-    List<EmploymentStatus> getAll(int pageNo, int pageSize);
+    Flux<PageImpl<EmploymentStatus>> getAll(int pageNo, int pageSize);
 
-    EmploymentStatus getById(Long id) throws NotFoundException;
+    Mono<EmploymentStatus> getById(Long id);
 
-    List<EmploymentStatus> getByContains(String search);
+    Flux<EmploymentStatus> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(EmploymentStatus employmentStatus);
+    Mono<ResponseEntity<ObjectNode>> save(EmploymentStatus employmentStatus);
 
-    ResponseEntity<ObjectNode> update(EmploymentStatus employmentStatus) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> update(EmploymentStatus employmentStatus);
 
-    ResponseEntity<ObjectNode> delete(Long id);
+    Mono<ResponseEntity<ObjectNode>> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList);
+    Mono<ResponseEntity<ObjectNode>> deleteMultiple(List<Long> idList);
 }

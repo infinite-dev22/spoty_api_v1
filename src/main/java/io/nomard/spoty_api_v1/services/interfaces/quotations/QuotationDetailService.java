@@ -10,15 +10,15 @@ import java.util.List;
 public interface QuotationDetailService {
     List<QuotationDetail> getAll(int pageNo, int pageSize);
 
-    QuotationDetail getById(Long id) throws NotFoundException;
+    QuotationDetail getById(Long id);
 
     ResponseEntity<ObjectNode> save(QuotationDetail quotationDetail);
 
     ResponseEntity<ObjectNode> saveMultiple(List<QuotationDetail> quotationDetailList);
 
-    ResponseEntity<ObjectNode> update(QuotationDetail quotationDetail) throws NotFoundException;
+    ResponseEntity<ObjectNode> update(QuotationDetail quotationDetail);
 
     ResponseEntity<ObjectNode> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException;
+    ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList);
 }

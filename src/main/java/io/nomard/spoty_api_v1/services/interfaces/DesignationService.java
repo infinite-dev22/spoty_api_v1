@@ -3,23 +3,25 @@ package io.nomard.spoty_api_v1.services.interfaces;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.hrm.hrm.Designation;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface DesignationService {
-    List<Designation> getAll(int pageNo, int pageSize);
+    Flux<PageImpl<Designation>> getAll(int pageNo, int pageSize);
 
-    Designation getById(Long id) throws NotFoundException;
+    Mono<Designation> getById(Long id);
 
-    ArrayList<Designation> getByContains(String search);
+    Flux<Designation> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(Designation designation);
+    Mono<ResponseEntity<ObjectNode>> save(Designation designation);
 
-    ResponseEntity<ObjectNode> update(Designation designation) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> update(Designation designation);
 
-    ResponseEntity<ObjectNode> delete(Long id);
+    Mono<ResponseEntity<ObjectNode>> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> deleteMultiple(List<Long> idList);
 }

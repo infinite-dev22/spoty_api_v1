@@ -18,13 +18,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Product;
 import io.nomard.spoty_api_v1.entities.UnitOfMeasure;
 import io.nomard.spoty_api_v1.entities.User;
+import io.nomard.spoty_api_v1.entities.sales.SaleMaster;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
+@Accessors(chain = true)
 @Table(name = "sale_return_details")
 @Getter
 @Setter
@@ -38,32 +41,19 @@ public class SaleReturnDetail implements Serializable {
     private Long id;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "saleReturnMaster_id", nullable = false)
+    @JoinColumn(name = "sale_return_master_id", nullable = false)
     @JsonIgnore
-    private SaleReturnMaster saleReturn;
+    private SaleReturnMaster sale;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "product_id")
     private Product product;
 
     @Column(nullable = false)
-    private double price;
-
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, name = "sale_unit_id")
-    private UnitOfMeasure saleUnit;
-
-    private double netTax;
-    private String taxType;
-    private double discount;
-    private String discountType;
-    private String serialNumber;
+    private double subTotalPrice;
 
     @Column(nullable = false)
     private int quantity;
-
-    @Column(nullable = false)
-    private double total;
 
     @Column(name = "created_at")
     @JsonIgnore

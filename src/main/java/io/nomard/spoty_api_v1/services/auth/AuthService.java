@@ -6,11 +6,12 @@ import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.LoginModel;
 import io.nomard.spoty_api_v1.models.SignUpModel;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Mono;
 
 public interface AuthService {
-    ResponseEntity<ObjectNode> register(SignUpModel signUpDetails) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> register(SignUpModel signUpDetails);
 
-    ResponseEntity<ObjectNode> login(LoginModel loginDetails) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> login(LoginModel loginDetails);
 
-    User authUser();
+    Mono<User> authUser();
 }

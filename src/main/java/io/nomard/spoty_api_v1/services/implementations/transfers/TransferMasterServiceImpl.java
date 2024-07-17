@@ -1,31 +1,33 @@
 package io.nomard.spoty_api_v1.services.implementations.transfers;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.UnitOfMeasure;
+import io.nomard.spoty_api_v1.entities.transfers.TransferDetail;
 import io.nomard.spoty_api_v1.entities.transfers.TransferMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
-import io.nomard.spoty_api_v1.repositories.transfers.TransferMasterRepository;
+import io.nomard.spoty_api_v1.repositories.transfers.TransferRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.transfers.TransferMasterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class TransferMasterServiceImpl implements TransferMasterService {
     @Autowired
-    private TransferMasterRepository transferMasterRepo;
+    private TransferRepository transferRepo;
     @Autowired
     private TransferTransactionServiceImpl transferTransactionService;
     @Autowired
@@ -36,142 +38,132 @@ public class TransferMasterServiceImpl implements TransferMasterService {
     @Override
     @Cacheable("transfer_masters")
     @Transactional(readOnly = true)
-    public List<TransferMaster> getAll(int pageNo, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<TransferMaster> page = transferMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+    public Flux<PageImpl<TransferMaster>> getAll(int pageNo, int pageSize) {
+        return authService.authUser()
+                .flatMapMany(user -> transferRepo.findAllByTenantId(user.getTenant().getId(), PageRequest.of(pageNo, pageSize))
+                        .collectList()
+                        .zipWith(transferRepo.count())
+                        .map(p -> new PageImpl<>(p.getT1(), PageRequest.of(pageNo, pageSize), p.getT2())));
     }
 
     @Override
     @Cacheable("transfer_masters")
     @Transactional(readOnly = true)
-    public TransferMaster getById(Long id) throws NotFoundException {
-        Optional<TransferMaster> transferMaster = transferMasterRepo.findById(id);
-        if (transferMaster.isEmpty()) {
-            throw new NotFoundException();
-        }
-        return transferMaster.get();
+    public Mono<TransferMaster> getById(Long id) {
+        return transferRepo.findById(id).switchIfEmpty(Mono.error(new NotFoundException()));
     }
 
     @Override
     @Cacheable("transfer_masters")
     @Transactional(readOnly = true)
-    public List<TransferMaster> getByContains(String search) {
-        return transferMasterRepo.searchAllByRefContainingIgnoreCase(
-                search.toLowerCase()
-        );
+    public Flux<UnitOfMeasure> getByContains(String search) {
+        return authService.authUser()
+                .flatMapMany(user -> transferRepo.search(
+                        user.getTenant().getId(),
+                        search.toLowerCase()
+                ));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> save(TransferMaster transferMaster) {
-        try {
-            for (int i = 0; i < transferMaster.getTransferDetails().size(); i++) {
-                transferMaster.getTransferDetails().get(i).setTransfer(transferMaster);
-            }
-            transferMaster.setTenant(authService.authUser().getTenant());
-            transferMaster.setCreatedBy(authService.authUser());
-            transferMaster.setCreatedAt(new Date());
-            transferMasterRepo.saveAndFlush(transferMaster);
+    public Mono<ResponseEntity<ObjectNode>> save(TransferMaster transfer) {
+        return authService.authUser()
+                .flatMap(user -> {
+                    transfer.getTransferDetails().forEach(detail -> detail.setTransfer(transfer));
+                    transfer.setTenant(user.getTenant());
+                    transfer.setCreatedBy(user);
+                    transfer.setCreatedAt(new Date());
 
-            for (int i = 0; i < transferMaster.getTransferDetails().size(); i++) {
-                transferTransactionService.save(transferMaster.getTransferDetails().get(i));
-            }
+                    return transferRepo.save(transfer)
+                            .flatMap(savedMaster -> {
+                                Flux<TransferDetail> saveDetailsFlux = Flux.fromIterable(transfer.getTransferDetails())
+                                        .flatMap(detail -> transferTransactionService.save(detail).then(Mono.just(detail)));
 
-            return spotyResponseImpl.created();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+                                return saveDetailsFlux.collectList()
+                                        .then(Mono.just(savedMaster));
+                            });
+                })
+                .map(savedMaster -> spotyResponseImpl.created())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 
     @Override
     @CacheEvict(value = "transfer_masters", key = "#data.id")
-    public ResponseEntity<ObjectNode> update(TransferMaster data) throws NotFoundException {
-        var opt = transferMasterRepo.findById(data.getId());
+    public Mono<ResponseEntity<ObjectNode>> update(TransferMaster data) {
+        return transferRepo.findById(data.getId())
+                .switchIfEmpty(Mono.error(new NotFoundException()))
+                .flatMap(transfer -> {
+                    if (Objects.nonNull(data.getRef()) && !"".equalsIgnoreCase(data.getRef())) {
+                        transfer.setRef(data.getRef());
+                    }
 
-        if (opt.isEmpty()) {
-            throw new NotFoundException();
-        }
-        var transferMaster = opt.get();
+                    if (!Objects.equals(transfer.getDate(), data.getDate()) && Objects.nonNull(data.getDate())) {
+                        transfer.setDate(data.getDate());
+                    }
 
-        if (Objects.nonNull(data.getRef()) && !"".equalsIgnoreCase(data.getRef())) {
-            transferMaster.setRef(data.getRef());
-        }
+                    if (!Objects.equals(transfer.getFromBranch(), data.getFromBranch()) && Objects.nonNull(data.getFromBranch())) {
+                        transfer.setFromBranch(data.getFromBranch());
+                    }
 
-        if (!Objects.equals(transferMaster.getDate(), data.getDate()) && Objects.nonNull(data.getDate())) {
-            transferMaster.setDate(data.getDate());
-        }
+                    if (!Objects.equals(transfer.getToBranch(), data.getToBranch()) && Objects.nonNull(data.getToBranch())) {
+                        transfer.setToBranch(data.getToBranch());
+                    }
 
-        if (!Objects.equals(transferMaster.getFromBranch(), data.getFromBranch()) && Objects.nonNull(data.getFromBranch())) {
-            transferMaster.setFromBranch(data.getFromBranch());
-        }
+                    if (Objects.nonNull(data.getTransferDetails()) && !data.getTransferDetails().isEmpty()) {
+                        transfer.setTransferDetails(data.getTransferDetails());
+                        return Flux.fromIterable(transfer.getTransferDetails())
+                                .flatMap(detail -> {
+                                    detail.setTransfer(transfer);
+                                    return transferTransactionService.update(detail)
+                                            .onErrorMap(NotFoundException.class, RuntimeException::new);
+                                })
+                                .then(Mono.just(transfer));
+                    }
 
-        if (!Objects.equals(transferMaster.getToBranch(), data.getToBranch()) && Objects.nonNull(data.getToBranch())) {
-            transferMaster.setToBranch(data.getToBranch());
-        }
+                    return Mono.just(transfer);
+                })
+                .flatMap(transfer -> {
+                    if (Objects.nonNull(data.getShipping()) && !"".equalsIgnoreCase(data.getShipping())) {
+                        transfer.setShipping(data.getShipping());
+                    }
 
-        if (Objects.nonNull(data.getTransferDetails()) && !data.getTransferDetails().isEmpty()) {
-            transferMaster.setTransferDetails(data.getTransferDetails());
+                    if (!Objects.equals(data.getTotal(), transfer.getTotal())) {
+                        transfer.setTotal(data.getTotal());
+                    }
 
-            for (int i = 0; i < transferMaster.getTransferDetails().size(); i++) {
-                transferMaster.getTransferDetails().get(i).setTransfer(transferMaster);
-                try {
-                    transferTransactionService.update(transferMaster.getTransferDetails().get(i));
-                } catch (NotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
+                    if (Objects.nonNull(data.getStatus()) && !"".equalsIgnoreCase(data.getStatus())) {
+                        transfer.setStatus(data.getStatus());
+                    }
 
-        if (Objects.nonNull(data.getShipping()) && !"".equalsIgnoreCase(data.getShipping())) {
-            transferMaster.setShipping(data.getShipping());
-        }
+                    if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
+                        transfer.setNotes(data.getNotes());
+                    }
 
-        if (!Objects.equals(data.getTotal(), transferMaster.getTotal())) {
-            transferMaster.setTotal(data.getTotal());
-        }
+                    return authService.authUser()
+                            .flatMap(user -> {
+                                transfer.setUpdatedBy(user);
+                                transfer.setUpdatedAt(new Date());
 
-        if (Objects.nonNull(data.getStatus()) && !"".equalsIgnoreCase(data.getStatus())) {
-            transferMaster.setStatus(data.getStatus());
-        }
-
-        if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
-            transferMaster.setNotes(data.getNotes());
-        }
-
-        if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
-            transferMaster.setNotes(data.getNotes());
-        }
-
-        transferMaster.setUpdatedBy(authService.authUser());
-        transferMaster.setUpdatedAt(new Date());
-
-        try {
-            transferMasterRepo.saveAndFlush(transferMaster);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+                                return transferRepo.save(transfer);
+                            });
+                })
+                .map(savedMaster -> spotyResponseImpl.ok())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
+
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> delete(Long id) {
-        try {
-            transferMasterRepo.deleteById(id);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> delete(Long id) {
+        return transferRepo.deleteById(id)
+                .thenReturn(spotyResponseImpl.ok())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 
     @Override
-    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) {
-        try {
-            transferMasterRepo.deleteAllById(idList);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> deleteMultiple(List<Long> idList) {
+        return transferRepo.deleteAllById(idList)
+                .thenReturn(spotyResponseImpl.ok())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 }

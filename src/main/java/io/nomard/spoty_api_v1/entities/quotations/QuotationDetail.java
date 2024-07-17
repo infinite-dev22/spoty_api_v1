@@ -22,11 +22,13 @@ import io.nomard.spoty_api_v1.entities.deductions.Discount;
 import io.nomard.spoty_api_v1.entities.deductions.Tax;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
+@Accessors(chain = true)
 @Table(name = "quotation_details")
 @Getter
 @Setter

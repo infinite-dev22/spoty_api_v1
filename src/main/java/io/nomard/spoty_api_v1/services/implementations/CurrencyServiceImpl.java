@@ -8,13 +8,17 @@ import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.CurrencyService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Objects;
 
 @Service
 public class CurrencyServiceImpl implements CurrencyService {
@@ -26,94 +30,91 @@ public class CurrencyServiceImpl implements CurrencyService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Currency> getAll(int pageNo, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<Currency> page = currencyRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+    public Flux<PageImpl<Currency>> getAll(int pageNo, int pageSize) {
+        return authService.authUser()
+                .flatMapMany(user -> currencyRepo.findAllByTenantId(user.getTenant().getId(), PageRequest.of(pageNo, pageSize))
+                        .collectList()
+                        .zipWith(currencyRepo.count())
+                        .map(p -> new PageImpl<>(p.getT1(), PageRequest.of(pageNo, pageSize), p.getT2())));
     }
 
     @Override
-    public Currency getById(Long id) throws NotFoundException {
-        Optional<Currency> currency = currencyRepo.findById(id);
-        if (currency.isEmpty()) {
-            throw new NotFoundException();
-        }
-        return currency.get();
+    public Mono<Currency> getById(Long id) {
+        return currencyRepo.findById(id).switchIfEmpty(Mono.error(new NotFoundException()));
     }
 
     @Override
-    public List<Currency> getByContains(String search) {
-        return currencyRepo.searchAllByNameContainingIgnoreCaseOrCodeContainingIgnoreCaseOrSymbolContainingIgnoreCase(
-                search.toLowerCase(),
-                search.toLowerCase(),
-                search.toLowerCase()
-        );
+    public Flux<Currency> getByContains(String search) {
+        return authService.authUser()
+                .flatMapMany(user -> currencyRepo.search(
+                        user.getTenant().getId(),
+                        search.toLowerCase()
+                ));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> save(Currency currency) {
-        try {
-            currency.setTenant(authService.authUser().getTenant());
-            currency.setCreatedBy(authService.authUser());
-            currency.setCreatedAt(new Date());
-            currencyRepo.saveAndFlush(currency);
-            return spotyResponseImpl.created();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> save(Currency currency) {
+        return authService.authUser()
+                .flatMap(user -> {
+                    currency.setTenant(user.getTenant());
+                    currency.setCreatedBy(user);
+                    currency.setCreatedAt(new Date());
+                    return currencyRepo.save(currency)
+                            .thenReturn(spotyResponseImpl.created());
+                })
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(new RuntimeException(e))));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> update(Currency data) throws NotFoundException {
-        var opt = currencyRepo.findById(data.getId());
+    public Mono<ResponseEntity<ObjectNode>> update(Currency data) {
+        return currencyRepo.findById(data.getId())
+                .switchIfEmpty(Mono.error(new NotFoundException("Currency not found")))
+                .flatMap(currency -> {
+                    boolean updated = false;
 
-        if (opt.isEmpty()) {
-            throw new NotFoundException();
-        }
-        var currency = opt.get();
+                    if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+                        currency.setName(data.getName());
+                        updated = true;
+                    }
 
-        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
-            currency.setName(data.getName());
-        }
+                    if (Objects.nonNull(data.getCode()) && !"".equalsIgnoreCase(data.getCode())) {
+                        currency.setCode(data.getCode());
+                        updated = true;
+                    }
 
-        if (Objects.nonNull(data.getCode()) && !"".equalsIgnoreCase(data.getCode())) {
-            currency.setCode(data.getCode());
-        }
+                    if (Objects.nonNull(data.getSymbol()) && !"".equalsIgnoreCase(data.getSymbol())) {
+                        currency.setSymbol(data.getSymbol());
+                        updated = true;
+                    }
 
-        if (Objects.nonNull(data.getSymbol()) && !"".equalsIgnoreCase(data.getSymbol())) {
-            currency.setSymbol(data.getSymbol());
-        }
-
-        currency.setUpdatedBy(authService.authUser());
-        currency.setUpdatedAt(new Date());
-
-        try {
-            currencyRepo.saveAndFlush(currency);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+                    if (updated) {
+                        return authService.authUser()
+                                .flatMap(user -> {
+                                    currency.setUpdatedBy(user);
+                                    currency.setUpdatedAt(new Date());
+                                    return currencyRepo.save(currency)
+                                            .thenReturn(spotyResponseImpl.ok());
+                                });
+                    } else {
+                        return Mono.just(spotyResponseImpl.ok());
+                    }
+                })
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> delete(Long id) {
-        try {
-            currencyRepo.deleteById(id);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> delete(Long id) {
+        return currencyRepo.deleteById(id)
+                .thenReturn(spotyResponseImpl.ok())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 
-    public ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) {
-        try {
-            currencyRepo.deleteAllById(idList);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> deleteMultiple(ArrayList<Long> idList) {
+        return currencyRepo.deleteAllById(idList)
+                .thenReturn(spotyResponseImpl.ok())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 }

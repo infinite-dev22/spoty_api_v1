@@ -10,13 +10,13 @@ import java.util.List;
 public interface DesignationService {
     List<Designation> getAll(int pageNo, int pageSize);
 
-    Designation getById(Long id) throws NotFoundException;
+    Designation getById(Long id);
 
     ResponseEntity<ObjectNode> save(Designation designation);
 
-    ResponseEntity<ObjectNode> update(Designation designation) throws NotFoundException;
+    ResponseEntity<ObjectNode> update(Designation designation);
 
     ResponseEntity<ObjectNode> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException;
+    ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList);
 }

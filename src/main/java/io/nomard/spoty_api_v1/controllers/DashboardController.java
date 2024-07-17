@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("dashboard")
@@ -22,77 +22,77 @@ public class DashboardController {
     private MainDashboardServiceImpl mainDashboardService;
 
     @GetMapping("/expense/yearly")
-    public List<LineChartModel> expenseYearlySse() {
+    public Flux<LineChartModel> expenseYearlySse() {
         return mainDashboardService.getYearlyExpenses();
     }
 
     @GetMapping("/expense/monthly")
-    public List<LineChartModel> expenseMonthlySse() {
+    public Flux<LineChartModel> expenseMonthlySse() {
         return mainDashboardService.getMonthlyExpenses();
     }
 
     @GetMapping("/expense/weekly")
-    public List<LineChartModel> expenseWeeklySse() {
+    public Flux<LineChartModel> expenseWeeklySse() {
         return mainDashboardService.getWeeklyExpenses();
     }
 
     @GetMapping("/income/yearly")
-    public List<LineChartModel> incomeYearlySse() {
+    public Flux<LineChartModel> incomeYearlySse() {
         return mainDashboardService.getYearlyIncomes();
     }
 
     @GetMapping("/income/monthly")
-    public List<LineChartModel> incomeMonthlySse() {
+    public Flux<LineChartModel> incomeMonthlySse() {
         return mainDashboardService.getMonthlyIncomes();
     }
 
     @GetMapping("/revenue/monthly")
-    public List<LineChartModel> revenueMonthlySse() {
+    public Flux<LineChartModel> revenueMonthlySse() {
         return mainDashboardService.getMonthlyRevenue();
     }
 
     @GetMapping("/revenue/weekly")
-    public List<LineChartModel> revenueWeeklySse() {
+    public Flux<LineChartModel> revenueWeeklySse() {
         return mainDashboardService.getWeeklyRevenue();
     }
 
     @GetMapping("/top/products")
-    public List<ProductSalesModel> topProductsSold(@RequestParam(defaultValue = "10") Integer limit) {
+    public Flux<ProductSalesModel> topProductsSold(@RequestParam(defaultValue = "10") Integer limit) {
         return mainDashboardService.getTopProductsSold(limit);
     }
 
     @GetMapping("/recent/orders")
-    public List<SaleMaster> recentOrders(@RequestParam(defaultValue = "10") Integer limit) {
+    public Flux<SaleMaster> recentOrders(@RequestParam(defaultValue = "10") Integer limit) {
         return mainDashboardService.getRecentOrders(limit);
     }
 
     @GetMapping("/stock/alerts")
-    public List<StockAlertModel> stockAlerts() {
+    public Flux<StockAlertModel> stockAlerts() {
         return mainDashboardService.getProductsStockAlert();
     }
 
     @GetMapping("/kpi/earnings")
-    public DashboardKPIModel totalEarningsKPI() {
+    public Mono<DashboardKPIModel> totalEarningsKPI() {
         return mainDashboardService.getTotalEarningsKPI();
     }
 
     @GetMapping("/kpi/purchases")
-    public DashboardKPIModel totalPurchasesKPI() {
+    public Mono<DashboardKPIModel> totalPurchasesKPI() {
         return mainDashboardService.getTotalPurchasesKPI();
     }
 
     @GetMapping("/kpi/products")
-    public DashboardKPIModel countProductsKPI() {
+    public Mono<DashboardKPIModel> countProductsKPI() {
         return mainDashboardService.getCountProductsKPI();
     }
 
     @GetMapping("/kpi/customers")
-    public DashboardKPIModel countCustomersKPI() {
+    public Mono<DashboardKPIModel> countCustomersKPI() {
         return mainDashboardService.getCountCustomersKPI();
     }
 
     @GetMapping("/kpi/suppliers")
-    public DashboardKPIModel countSuppliersKPI() {
+    public Mono<DashboardKPIModel> countSuppliersKPI() {
         return mainDashboardService.getCountSuppliersKPI();
     }
 }

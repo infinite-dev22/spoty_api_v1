@@ -2,16 +2,17 @@ package io.nomard.spoty_api_v1.controllers;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.deductions.Discount;
-import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.services.implementations.deductions.DiscountServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("discounts")
@@ -20,33 +21,33 @@ public class DiscountController {
     private DiscountServiceImpl discountService;
 
     @GetMapping("/all")
-    public List<Discount> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                 @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Flux<PageImpl<Discount>> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                           @RequestParam(defaultValue = "50") Integer pageSize) {
         return discountService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public Discount getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public Mono<Discount> getById(@RequestBody FindModel findModel) {
         return discountService.getById(findModel.getId());
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ObjectNode> save(@Valid @RequestBody Discount discount) {
+    public Mono<ResponseEntity<ObjectNode>> save(@Valid @RequestBody Discount discount) {
         return discountService.save(discount);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ObjectNode> update(@Valid @RequestBody Discount discount) throws NotFoundException {
+    public Mono<ResponseEntity<ObjectNode>> update(@Valid @RequestBody Discount discount) {
         return discountService.update(discount);
     }
 
     @DeleteMapping("/delete/single")
-    public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
+    public Mono<ResponseEntity<ObjectNode>> delete(@RequestBody FindModel findModel) {
         return discountService.delete(findModel.getId());
     }
 
     @DeleteMapping("/delete/multiple")
-    public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> ids) throws NotFoundException {
+    public Mono<ResponseEntity<ObjectNode>> deleteMultiple(@RequestBody ArrayList<Long> ids) {
         return discountService.deleteMultiple(ids);
     }
 }

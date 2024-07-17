@@ -11,15 +11,15 @@ import java.util.List;
 public interface UserProfileService {
     List<UserProfile> getAll(int pageNo, int pageSize);
 
-    UserProfile getById(Long id) throws NotFoundException;
+    UserProfile getById(Long id);
 
-    UserProfile getByEmail(String email) throws NotFoundException;
+    UserProfile getByEmail(String email);
 
     List<UserProfile> getByContains(String search);
 
-    ResponseEntity<ObjectNode> add(UserProfile userProfile) throws NotFoundException;
+    ResponseEntity<ObjectNode> add(UserProfile userProfile);
 
-    ResponseEntity<ObjectNode> update(UserModel userModel) throws NotFoundException;
+    ResponseEntity<ObjectNode> update(UserModel userModel);
 
     ResponseEntity<ObjectNode> delete(Long id);
 }

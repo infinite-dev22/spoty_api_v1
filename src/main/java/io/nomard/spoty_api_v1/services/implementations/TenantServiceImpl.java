@@ -10,16 +10,15 @@ import io.nomard.spoty_api_v1.services.interfaces.TenantService;
 import io.nomard.spoty_api_v1.utils.DateUtils;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -32,134 +31,131 @@ public class TenantServiceImpl implements TenantService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Tenant> getAll(int pageNo, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<Tenant> page = tenantRepo.findAll(pageRequest);
-        return page.getContent();
+    public Flux<Tenant> getAll(int pageNo, int pageSize) {
+        return tenantRepo.findAll();
     }
 
     @Override
-    public Tenant getById(Long id) throws NotFoundException {
-        return tenantRepo.findById(id).orElseThrow(NotFoundException::new);
+    public Mono<Tenant> getById(Long id) {
+        return tenantRepo.findById(id).switchIfEmpty(Mono.error(new NotFoundException()));
     }
 
     @Override
-    public Date getSubscriptionEndDate(Long id) throws NotFoundException {
-        Tenant tenant = tenantRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException("Tenant not found"));
-        Hibernate.initialize(tenant.getSubscriptionEndDate());
-        return tenant.getSubscriptionEndDate();
+    public Mono<Date> getSubscriptionEndDate(Long id) {
+        return tenantRepo.findById(id)
+                .switchIfEmpty(Mono.error(new NotFoundException("Tenant not found"))).map(tenant -> {
+                    Hibernate.initialize(tenant.getSubscriptionEndDate());
+                    return tenant.getSubscriptionEndDate();
+                });
     }
-
-//    public TenantDTO getTenantDTO(Long id) throws NotFoundException {
-//        Tenant tenant = tenantRepo.findById(id)
-//                .orElseThrow(() -> new NotFoundException("Tenant not found"));
-//        return new TenantDTO(tenant.getId(), tenant.getName(), tenant.getSubscriptionEndDate());
-//    }
-
 
 
     @Override
-    public Date getTrialEndDate(Long id) throws NotFoundException {
-        return userRepo.findById(id).orElseThrow(NotFoundException::new).getTenant().getTrialEndDate();
+    public Mono<Date> getTrialEndDate(Long id) {
+        return userRepo.findById(id)
+                .switchIfEmpty(Mono.error(new NotFoundException("User not found")))
+                .map(user -> user.getTenant().getTrialEndDate());
     }
 
     @Override
-    public boolean isTrial(Long id) throws NotFoundException {
-        return userRepo.findById(id).orElseThrow(NotFoundException::new).getTenant().isTrial();
+    public Mono<Boolean> isTrial(Long id) {
+        return userRepo.findById(id)
+                .switchIfEmpty(Mono.error(new NotFoundException("User not found")))
+                .map(user -> user.getTenant().isTrial());
     }
 
     @Override
-    public boolean canTry(Long id) throws NotFoundException {
-        return userRepo.findById(id).orElseThrow(NotFoundException::new).getTenant().isCanTry();
+    public Mono<Boolean> canTry(Long id) {
+        return userRepo.findById(id)
+                .switchIfEmpty(Mono.error(new NotFoundException("User not found")))
+                .map(user -> user.getTenant().isCanTry());
     }
 
     @Override
-    public boolean isNewTenancy(Long id) throws NotFoundException {
-        return userRepo.findById(id).orElseThrow(NotFoundException::new).getTenant().isNewTenancy();
+    public Mono<Boolean> isNewTenancy(Long id) {
+        return userRepo.findById(id)
+                .switchIfEmpty(Mono.error(new NotFoundException("User not found")))
+                .map(user -> user.getTenant().isNewTenancy());
     }
 
     @Override
-    public boolean isInGracePeriod(Long id) throws NotFoundException {
-        Date subscriptionEndDate = getSubscriptionEndDate(id);
-        LocalDateTime subscriptionEndDateTime = LocalDateTime.ofInstant(subscriptionEndDate.toInstant(), ZoneId.systemDefault());
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime gracePeriodEnd = subscriptionEndDateTime.plusDays(getGracePeriodDays());
-        return now.isBefore(gracePeriodEnd);
+    public Mono<Boolean> isInGracePeriod(Long id) {
+        return getSubscriptionEndDate(id)
+                .map(subscriptionEndDate -> {
+                    LocalDateTime subscriptionEndDateTime = LocalDateTime.ofInstant(subscriptionEndDate.toInstant(), ZoneId.systemDefault());
+                    LocalDateTime gracePeriodEnd = subscriptionEndDateTime.plusDays(getGracePeriodDays());
+                    return LocalDateTime.now().isBefore(gracePeriodEnd);
+                });
     }
 
     private int getGracePeriodDays() {
-        return 7; // Adjust this value as needed
+        return 7;
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> save(Tenant tenant) {
-        try {
-            tenant.setCreatedAt(new Date());
-            tenantRepo.saveAndFlush(tenant);
-            return spotyResponseImpl.created();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> save(Tenant tenant) {
+        tenant.setCreatedAt(new Date());
+        return tenantRepo.save(tenant)
+                .map(savedTenant -> spotyResponseImpl.created())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
+
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> startTrial(Long tenantId) throws NotFoundException {
-        Tenant tenant = tenantRepo.findById(tenantId).orElseThrow(NotFoundException::new);
-        tenant.setTrial(true);
-        tenant.setTrialEndDate(DateUtils.addDays(7));
-        tenant.setSubscriptionEndDate(DateUtils.addDays(7));
-        tenant.setCanTry(false);
-        tenant.setUpdatedAt(new Date());
-        try {
-            tenantRepo.saveAndFlush(tenant);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> startTrial(Long tenantId) {
+        return tenantRepo.findById(tenantId)
+                .switchIfEmpty(Mono.error(new NotFoundException()))
+                .flatMap(tenant -> {
+                    tenant.setTrial(true);
+                    tenant.setTrialEndDate(DateUtils.addDays(7));
+                    tenant.setSubscriptionEndDate(DateUtils.addDays(7));
+                    tenant.setCanTry(false);
+                    tenant.setUpdatedAt(new Date());
+                    return tenantRepo.save(tenant)
+                            .thenReturn(spotyResponseImpl.ok());
+                })
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
+
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> update(Tenant data) throws NotFoundException {
-        Tenant tenant = tenantRepo.findById(data.getId()).orElseThrow(NotFoundException::new);
+    public Mono<ResponseEntity<ObjectNode>> update(Tenant data) {
+        return tenantRepo.findById(data.getId())
+                .switchIfEmpty(Mono.error(new NotFoundException()))
+                .flatMap(existingTenant -> {
+                    if (!Objects.equals(existingTenant.getName(), data.getName()) && Objects.nonNull(data.getName()) && !data.getName().isEmpty()) {
+                        existingTenant.setName(data.getName());
+                    }
 
-        if (!Objects.equals(tenant.getName(), data.getName()) && Objects.nonNull(data.getName()) && !data.getName().isEmpty()) {
-            tenant.setName(data.getName());
-        }
+                    if (!Objects.equals(existingTenant.isTrial(), data.isTrial())) {
+                        existingTenant.setTrial(data.isTrial());
+                    }
 
-        if (!Objects.equals(tenant.isTrial(), data.isTrial())) {
-            tenant.setTrial(data.isTrial());
-        }
+                    if (!Objects.equals(existingTenant.getTrialEndDate(), data.getTrialEndDate()) && Objects.nonNull(data.getTrialEndDate())) {
+                        existingTenant.setTrialEndDate(data.getTrialEndDate());
+                    }
 
-        if (!Objects.equals(tenant.getTrialEndDate(), data.getTrialEndDate()) && Objects.nonNull(data.getTrialEndDate())) {
-            tenant.setTrialEndDate(data.getTrialEndDate());
-        }
+                    if (!Objects.equals(existingTenant.isNewTenancy(), data.isNewTenancy())) {
+                        existingTenant.setNewTenancy(data.isNewTenancy());
+                    }
 
-        if (!Objects.equals(tenant.isNewTenancy(), data.isNewTenancy())) {
-            tenant.setNewTenancy(data.isNewTenancy());
-        }
+                    existingTenant.setUpdatedAt(new Date());
 
-        tenant.setUpdatedAt(new Date());
-
-        try {
-            tenantRepo.saveAndFlush(tenant);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+                    return tenantRepo.save(existingTenant)
+                            .thenReturn(spotyResponseImpl.ok());
+                })
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
+
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> delete(Long id) {
-        try {
-            tenantRepo.deleteById(id);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> delete(Long id) {
+        return tenantRepo.deleteById(id)
+                .thenReturn(spotyResponseImpl.ok())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 }

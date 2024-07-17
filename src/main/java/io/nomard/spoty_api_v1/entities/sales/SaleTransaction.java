@@ -19,12 +19,15 @@ import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Product;
 import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.User;
+import io.nomard.spoty_api_v1.entities.returns.sale_returns.SaleReturnDetail;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.util.Date;
 
 @Entity
+@Accessors(chain = true)
 @Table(name = "sale_transactions")
 @Getter
 @Setter
@@ -48,9 +51,13 @@ public class SaleTransaction {
     @JoinColumn(nullable = false, name = "product_id")
     private Product product;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, name = "sale_detail_id")
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @JoinColumn(nullable = true, name = "sale_detail_id")
     private SaleDetail saleDetail;
+
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @JoinColumn(nullable = true, name = "sale_return_detail_id")
+    private SaleReturnDetail saleReturnDetail;
 
     @Column
     private Date date;

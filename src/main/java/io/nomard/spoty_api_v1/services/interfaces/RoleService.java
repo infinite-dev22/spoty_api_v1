@@ -3,23 +3,25 @@ package io.nomard.spoty_api_v1.services.interfaces;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Role;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public interface RoleService {
-    List<Role> getAll(int pageNo, int pageSize);
+    Flux<PageImpl<Role>> getAll(int pageNo, int pageSize);
 
-    Role getById(Long id) throws NotFoundException;
+    Mono<Role> getById(Long id);
 
-    List<Role> search(String search);
+    Flux<Role> search(String search);
 
-    ResponseEntity<ObjectNode> save(Role role);
+    Mono<ResponseEntity<ObjectNode>> save(Role role);
 
-    ResponseEntity<ObjectNode> update(Role role) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> update(Role role);
 
-    ResponseEntity<ObjectNode> delete(Long id);
+    Mono<ResponseEntity<ObjectNode>> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList);
+    Mono<ResponseEntity<ObjectNode>> deleteMultiple(ArrayList<Long> idList);
 }

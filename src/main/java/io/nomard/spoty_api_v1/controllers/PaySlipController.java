@@ -7,10 +7,13 @@ import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.services.implementations.hrm.pay_roll.PaySlipServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("payslip")
@@ -19,33 +22,33 @@ public class PaySlipController {
     private PaySlipServiceImpl paySlipService;
 
     @GetMapping("/all")
-    public List<PaySlip> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Flux<PageImpl<PaySlip>> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                          @RequestParam(defaultValue = "50") Integer pageSize) {
         return paySlipService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public PaySlip getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public Mono<PaySlip> getById(@RequestBody FindModel findModel) {
         return paySlipService.getById(findModel.getId());
     }
 
-//    @GetMapping("/search")
-//    public List<PaySlip> getByContains(@RequestBody SearchModel searchModel) {
-//        return paySlipService.getByContains(searchModel.getSearch());
-//    }
-
     @PostMapping("/add")
-    public ResponseEntity<ObjectNode> save(@Valid @RequestBody PaySlip paySlip) {
+    public Mono<ResponseEntity<ObjectNode>> save(@Valid @RequestBody PaySlip paySlip) {
         return paySlipService.save(paySlip);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ObjectNode> update(@Valid @RequestBody PaySlip paySlip) throws NotFoundException {
+    public Mono<ResponseEntity<ObjectNode>> update(@Valid @RequestBody PaySlip paySlip) {
         return paySlipService.update(paySlip);
     }
 
     @DeleteMapping("/delete/single")
-    public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
+    public Mono<ResponseEntity<ObjectNode>> delete(@RequestBody FindModel findModel) {
         return paySlipService.delete(findModel.getId());
+    }
+
+    @DeleteMapping("/delete/multiple")
+    public Mono<ResponseEntity<ObjectNode>> deleteMultiple(@RequestBody ArrayList<Long> idList) {
+        return paySlipService.deleteMultiple(idList);
     }
 }

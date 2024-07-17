@@ -5,22 +5,21 @@ import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,65 +41,89 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<String> fileList() {
-        File dir = new File(uploadPath.toUri().toString());
-        File[] files = dir.listFiles();
-
-        return files != null ? Arrays.stream(files).map(File::getName).collect(Collectors.toList()) : null;
+    public Flux<?> fileList() {
+        return Mono.fromCallable(() -> {
+            File dir = new File(uploadPath.toUri());
+            File[] files = dir.listFiles();
+            return files != null ? Arrays.stream(files).map(File::getName).collect(Collectors.toList()) : List.of();
+        }).flatMapMany(Flux::fromIterable);
     }
 
     @Override
-    public String save(MultipartFile file) {
-        var fileName = file.getOriginalFilename();
-        var fileCode = RandomStringUtils.randomAlphanumeric(8);
-        try (InputStream inputStream = file.getInputStream()) {
-            Path filePath = uploadPath.resolve(fileCode + '-' + fileName);
-            Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
-            return ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/documents/show/image/" + fileName)
-                    .toUriString();
-        } catch (IOException ioe) {
-            throw new RuntimeException("Error whilst saving file: " + fileName, ioe);
-        }
+    public Mono<String> save(MultipartFile file) {
+        return Mono.fromCallable(() -> {
+            var fileName = file.getOriginalFilename();
+            var fileCode = RandomStringUtils.randomAlphanumeric(8);
+            try (InputStream inputStream = file.getInputStream()) {
+                Path filePath = uploadPath.resolve(fileCode + '-' + fileName);
+                Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+                return "/documents/show/image/" + fileName;
+                //return ServletUriComponentsBuilder.fromCurrentContextPath()
+                //        .path("/documents/show/image/" + fileName)
+                //        .toUriString();
+            }
+        }).onErrorMap(throwable -> new RuntimeException("Error whilst saving file: " + file.getOriginalFilename(), throwable));
+    }
+
+//    @Override
+//    public Mono<String> save(MultipartFile file) {
+//        return Mono.fromCallable(() -> {
+//                    var fileName = file.getOriginalFilename();
+//                    var fileCode = RandomStringUtils.randomAlphanumeric(8);
+//                    Path filePath = uploadPath.resolve(fileCode + '-' + fileName);
+//                    return DataBufferUtils.readInputStream(file::getInputStream, Schedulers.boundedElastic(), 4096)
+//                            .flatMap(dataBuffer -> DataBufferUtils.write(Flux.just(dataBuffer), filePath, StandardOpenOption.CREATE)
+//                                    .then(Mono.just(dataBuffer)))
+//                            .then()
+//                            .thenReturn("/documents/show/image/" + fileCode + '-' + fileName);
+//                })
+//                .flatMap(mono -> mono)
+//                .onErrorMap(throwable -> new RuntimeException("Error whilst saving file: " + file.getOriginalFilename(), throwable));
+//    }
+
+    @Override
+    public Mono<ResponseEntity<?>> download(String fileCode) {
+        return Mono.fromCallable(() -> {
+            Path file = findFileByCode(fileCode);
+            if (file != null) {
+                Resource resource = new UrlResource(file.toUri());
+                String contentType = "application/octet-stream";
+                String headerValue = "attachment; filename=\"" + resource.getFilename() + "\"";
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType(contentType))
+                        .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
+                        .body(resource);
+            }
+            return new ResponseEntity<>("File not found", HttpStatus.NOT_FOUND);
+        });
     }
 
     @Override
-    public ResponseEntity<?> download(String fileCode) throws MalformedURLException {
-        Path file = Paths.get(System.getProperty("user.home") + "/uploads/" + fileCode);
-        if (file != null) {
-            var resource = new UrlResource(file.toUri());
-            String contentType = "application/octet-stream";
-            String headerValue = "attachment; filename=\"" + resource.getFilename() + "\"";
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(contentType))
-                    .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
-                    .body(resource);
-        }
-        return new ResponseEntity<>("File not found", HttpStatus.NOT_FOUND);
+    public Mono<ResponseEntity<Resource>> showImage(String fileCode) {
+        return Mono.fromCallable(() -> {
+            Path path = findFileByCode(fileCode);
+            if (path != null) {
+                Resource resource = new UrlResource(path.toUri());
+                return ResponseEntity.ok()
+                        .contentType(MediaType.IMAGE_JPEG)
+                        .body(resource);
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        });
     }
 
     @Override
-    public ResponseEntity<Resource> showImage(String fileCode) throws IOException {
-        // Path to the image file
-        Path path = Paths.get(System.getProperty("user.home") + "/uploads/" + fileCode);
-        // Load the resource
-        Resource resource = new UrlResource(path.toUri());
-        // Return ResponseEntity with image content type
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .body(resource);
-    }
-
-    @Override
-    public ResponseEntity<Resource> showFile(String fileCode) throws IOException {
-        // Path to the PDF file
-        Path path = Paths.get(System.getProperty("user.home") + "/uploads/" + fileCode);
-        // Load the resource
-        Resource resource = new UrlResource(path.toUri());
-        // Return ResponseEntity with PDF content type
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(resource);
+    public Mono<ResponseEntity<Resource>> showFile(String fileCode) {
+        return Mono.fromCallable(() -> {
+            Path path = findFileByCode(fileCode);
+            if (path != null) {
+                Resource resource = new UrlResource(path.toUri());
+                return ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_PDF)
+                        .body(resource);
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        });
     }
 
     private Path findFileByCode(String fileCode) {

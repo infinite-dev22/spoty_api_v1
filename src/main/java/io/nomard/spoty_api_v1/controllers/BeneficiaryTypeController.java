@@ -9,11 +9,13 @@ import io.nomard.spoty_api_v1.services.implementations.hrm.pay_roll.BeneficiaryT
 import jakarta.validation.Valid;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("beneficiary/types")
@@ -22,38 +24,38 @@ public class BeneficiaryTypeController {
     private BeneficiaryTypeServiceImpl beneficiaryTypeService;
 
     @GetMapping("/all")
-    public List<BeneficiaryType> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                        @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Flux<PageImpl<BeneficiaryType>> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                                  @RequestParam(defaultValue = "50") Integer pageSize) {
         return beneficiaryTypeService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public BeneficiaryType getById(@RequestBody @NotNull FindModel findModel) throws NotFoundException {
+    public Mono<BeneficiaryType> getById(@RequestBody @NotNull FindModel findModel) {
         return beneficiaryTypeService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<BeneficiaryType> getByContains(@RequestBody @NotNull SearchModel searchModel) {
+    public Flux<BeneficiaryType> getByContains(@RequestBody @NotNull SearchModel searchModel) {
         return beneficiaryTypeService.getByContains(searchModel.getSearch());
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ObjectNode> save(@Valid @RequestBody BeneficiaryType beneficiaryType) {
+    public Mono<ResponseEntity<ObjectNode>> save(@Valid @RequestBody BeneficiaryType beneficiaryType) {
         return beneficiaryTypeService.save(beneficiaryType);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ObjectNode> update(@Valid @RequestBody BeneficiaryType beneficiaryType) throws NotFoundException {
+    public Mono<ResponseEntity<ObjectNode>> update(@Valid @RequestBody BeneficiaryType beneficiaryType) {
         return beneficiaryTypeService.update(beneficiaryType);
     }
 
     @DeleteMapping("/delete/single")
-    public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
+    public Mono<ResponseEntity<ObjectNode>> delete(@RequestBody FindModel findModel) {
         return beneficiaryTypeService.delete(findModel.getId());
     }
 
     @DeleteMapping("/delete/multiple")
-    public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> idList) {
+    public Mono<ResponseEntity<ObjectNode>> deleteMultiple(@RequestBody ArrayList<Long> idList) {
         return beneficiaryTypeService.deleteMultiple(idList);
     }
 }

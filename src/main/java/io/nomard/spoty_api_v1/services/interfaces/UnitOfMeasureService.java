@@ -3,23 +3,25 @@ package io.nomard.spoty_api_v1.services.interfaces;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.UnitOfMeasure;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public interface UnitOfMeasureService {
-    List<UnitOfMeasure> getAll(int pageNo, int pageSize);
+    Flux<PageImpl<UnitOfMeasure>> getAll(int pageNo, int pageSize);
 
-    UnitOfMeasure getById(Long id) throws NotFoundException;
+    Mono<UnitOfMeasure> getById(Long id);
 
-    List<UnitOfMeasure> getByContains(String search);
+    Flux<UnitOfMeasure> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(UnitOfMeasure uom);
+    Mono<ResponseEntity<ObjectNode>> save(UnitOfMeasure uom);
 
-    ResponseEntity<ObjectNode> update(UnitOfMeasure uom) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> update(UnitOfMeasure uom);
 
-    ResponseEntity<ObjectNode> delete(Long id);
+    Mono<ResponseEntity<ObjectNode>> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList);
+    Mono<ResponseEntity<ObjectNode>> deleteMultiple(ArrayList<Long> idList);
 }

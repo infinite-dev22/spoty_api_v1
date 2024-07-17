@@ -10,15 +10,15 @@ import java.util.List;
 public interface PurchaseDetailService {
     List<PurchaseDetail> getAll(int pageNo, int pageSize);
 
-    PurchaseDetail getById(Long id) throws NotFoundException;
+    PurchaseDetail getById(Long id);
 
     ResponseEntity<ObjectNode> save(PurchaseDetail purchaseDetail);
 
     ResponseEntity<ObjectNode> saveMultiple(List<PurchaseDetail> purchaseDetailList);
 
-    ResponseEntity<ObjectNode> update(PurchaseDetail purchaseDetail) throws NotFoundException;
+    ResponseEntity<ObjectNode> update(PurchaseDetail purchaseDetail);
 
     ResponseEntity<ObjectNode> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException;
+    ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList);
 }

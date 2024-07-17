@@ -1,25 +1,30 @@
 package io.nomard.spoty_api_v1.services.interfaces.accounting;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.accounting.Account;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public interface AccountService {
-    List<Account> getAll(int pageNo, int pageSize);
+    Flux<PageImpl<Account>> getAll(int pageNo, int pageSize);
 
-    Account getById(Long id) throws NotFoundException;
+    Mono<Account> getById(Long id);
 
-    List<Account> getByContains(String search);
+    Flux<Account> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(Account account);
+    Mono<Account> getByContains(Tenant tenant, String search);
 
-    ResponseEntity<ObjectNode> update(Account account) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> save(Account account);
 
-    ResponseEntity<ObjectNode> delete(Long id);
+    Mono<ResponseEntity<ObjectNode>> update(Account account);
 
-    ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> delete(Long id);
+
+    Mono<ResponseEntity<ObjectNode>> deleteMultiple(ArrayList<Long> idList);
 }

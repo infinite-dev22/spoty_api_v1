@@ -8,16 +8,17 @@ import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.hrm.leave.LeaveTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class LeaveTypeServiceImpl implements LeaveTypeService {
@@ -29,90 +30,88 @@ public class LeaveTypeServiceImpl implements LeaveTypeService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<LeaveType> getAll(int pageNo, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<LeaveType> page = leaveTypeRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+    public Flux<PageImpl<LeaveType>> getAll(int pageNo, int pageSize) {
+        return authService.authUser()
+                .flatMapMany(user -> leaveTypeRepo.findAllByTenantId(user.getTenant().getId(), PageRequest.of(pageNo, pageSize))
+                        .collectList()
+                        .zipWith(leaveTypeRepo.count())
+                        .map(p -> new PageImpl<>(p.getT1(), PageRequest.of(pageNo, pageSize), p.getT2())));
     }
 
     @Override
-    public LeaveType getById(Long id) throws NotFoundException {
-        Optional<LeaveType> leaveType = leaveTypeRepo.findById(id);
-        if (leaveType.isEmpty()) {
-            throw new NotFoundException();
-        }
-        return leaveType.get();
-    }
-
-    @Override
-    @Transactional
-    public ResponseEntity<ObjectNode> save(LeaveType leaveType) {
-        try {
-            leaveType.setTenant(authService.authUser().getTenant());
-            leaveType.setCreatedBy(authService.authUser());
-            leaveType.setCreatedAt(new Date());
-            leaveTypeRepo.saveAndFlush(leaveType);
-            return spotyResponseImpl.created();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<LeaveType> getById(Long id) {
+        return leaveTypeRepo.findById(id).switchIfEmpty(Mono.error(new NotFoundException()));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> update(LeaveType data) throws NotFoundException {
-        var opt = leaveTypeRepo.findById(data.getId());
-
-        if (opt.isEmpty()) {
-            throw new NotFoundException();
-        }
-        var leaveType = opt.get();
-
-        if (Objects.nonNull(data.getBranches()) && !data.getBranches().isEmpty()) {
-            leaveType.setBranches(data.getBranches());
-        }
-
-        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
-            leaveType.setName(data.getName());
-        }
-
-        if (Objects.nonNull(data.getDescription()) && !"".equalsIgnoreCase(data.getDescription())) {
-            leaveType.setDescription(data.getDescription());
-        }
-
-        if (Objects.nonNull(data.getColor()) && !"".equalsIgnoreCase(data.getColor())) {
-            leaveType.setColor(data.getColor());
-        }
-
-        leaveType.setUpdatedBy(authService.authUser());
-        leaveType.setUpdatedAt(new Date());
-
-        try {
-            leaveTypeRepo.saveAndFlush(leaveType);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> save(LeaveType leaveType) {
+        return authService.authUser()
+                .flatMap(user -> {
+                    leaveType.setTenant(user.getTenant());
+                    leaveType.setCreatedBy(user);
+                    leaveType.setCreatedAt(new Date());
+                    return leaveTypeRepo.save(leaveType)
+                            .thenReturn(spotyResponseImpl.created());
+                })
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(new RuntimeException(e))));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> delete(Long id) {
-        try {
-            leaveTypeRepo.deleteById(id);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> update(LeaveType data) {
+        return leaveTypeRepo.findById(data.getId())
+                .switchIfEmpty(Mono.error(new NotFoundException("Branch not found")))
+                .flatMap(leaveType -> {
+                    boolean updated = false;
+
+                    if (Objects.nonNull(data.getBranches()) && !data.getBranches().isEmpty()) {
+                        leaveType.setBranches(data.getBranches());
+                        updated = true;
+                    }
+
+                    if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+                        leaveType.setName(data.getName());
+                        updated = true;
+                    }
+
+                    if (Objects.nonNull(data.getDescription()) && !"".equalsIgnoreCase(data.getDescription())) {
+                        leaveType.setDescription(data.getDescription());
+                        updated = true;
+                    }
+
+                    if (Objects.nonNull(data.getColor()) && !"".equalsIgnoreCase(data.getColor())) {
+                        leaveType.setColor(data.getColor());
+                        updated = true;
+                    }
+
+                    if (updated) {
+                        return authService.authUser()
+                                .flatMap(user -> {
+                                    leaveType.setUpdatedBy(user);
+                                    leaveType.setUpdatedAt(new Date());
+                                    return leaveTypeRepo.save(leaveType)
+                                            .thenReturn(spotyResponseImpl.ok());
+                                });
+                    } else {
+                        return Mono.just(spotyResponseImpl.ok());
+                    }
+                })
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 
     @Override
-    public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) {
-        try {
-            leaveTypeRepo.deleteAllById(idList);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    @Transactional
+    public Mono<ResponseEntity<ObjectNode>> delete(Long id) {
+        return leaveTypeRepo.deleteById(id)
+                .thenReturn(spotyResponseImpl.ok())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
+    }
+
+    @Override
+    public Mono<ResponseEntity<ObjectNode>> deleteMultiple(List<Long> idList) {
+        return leaveTypeRepo.deleteAllById(idList)
+                .thenReturn(spotyResponseImpl.ok())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 }

@@ -8,11 +8,13 @@ import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.hrm.pay_roll.BeneficiaryBadgeServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("beneficiary/badges")
@@ -21,38 +23,38 @@ public class BeneficiaryBadgeController {
     private BeneficiaryBadgeServiceImpl beneficiaryBadgeService;
 
     @GetMapping("/all")
-    public List<BeneficiaryBadge> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                         @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Flux<PageImpl<BeneficiaryBadge>> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                                   @RequestParam(defaultValue = "50") Integer pageSize) {
         return beneficiaryBadgeService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public BeneficiaryBadge getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public Mono<BeneficiaryBadge> getById(@RequestBody FindModel findModel) {
         return beneficiaryBadgeService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<BeneficiaryBadge> getByContains(@RequestBody SearchModel searchModel) {
+    public Flux<BeneficiaryBadge> getByContains(@RequestBody SearchModel searchModel) {
         return beneficiaryBadgeService.getByContains(searchModel.getSearch());
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ObjectNode> save(@Valid @RequestBody BeneficiaryBadge beneficiaryBadge) {
+    public Mono<ResponseEntity<ObjectNode>> save(@Valid @RequestBody BeneficiaryBadge beneficiaryBadge) {
         return beneficiaryBadgeService.save(beneficiaryBadge);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ObjectNode> update(@Valid @RequestBody BeneficiaryBadge beneficiaryBadge) throws NotFoundException {
+    public Mono<ResponseEntity<ObjectNode>> update(@Valid @RequestBody BeneficiaryBadge beneficiaryBadge) {
         return beneficiaryBadgeService.update(beneficiaryBadge);
     }
 
     @DeleteMapping("/delete/single")
-    public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
+    public Mono<ResponseEntity<ObjectNode>> delete(@RequestBody FindModel findModel) {
         return beneficiaryBadgeService.delete(findModel.getId());
     }
 
     @DeleteMapping("/delete/multiple")
-    public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> idList) throws NotFoundException {
+    public Mono<ResponseEntity<ObjectNode>> deleteMultiple(@RequestBody ArrayList<Long> idList) {
         return beneficiaryBadgeService.deleteMultiple(idList);
     }
 }

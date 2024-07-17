@@ -4,32 +4,33 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Date;
-import java.util.List;
 
 public interface TenantService {
-    List<Tenant> getAll(int pageNo, int pageSize);
+    Flux<Tenant> getAll(int pageNo, int pageSize);
 
-    Tenant getById(Long id) throws NotFoundException;
+    Mono<Tenant> getById(Long id);
 
-    Date getSubscriptionEndDate(Long id) throws NotFoundException;
+    Mono<Date> getSubscriptionEndDate(Long id);
 
-    Date getTrialEndDate(Long id) throws NotFoundException;
+    Mono<Date> getTrialEndDate(Long id);
 
-    boolean isTrial(Long id) throws NotFoundException;
+    Mono<Boolean> isTrial(Long id);
 
-    boolean canTry(Long id) throws NotFoundException;
+    Mono<Boolean> canTry(Long id);
 
-    boolean isNewTenancy(Long id) throws NotFoundException;
+    Mono<Boolean> isNewTenancy(Long id);
 
-    boolean isInGracePeriod(Long userId)  throws NotFoundException;
+    Mono<Boolean> isInGracePeriod(Long userId)  throws NotFoundException;
 
-    ResponseEntity<ObjectNode> startTrial(Long tenantId) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> startTrial(Long tenantId);
 
-    ResponseEntity<ObjectNode> save(Tenant tenant);
+    Mono<ResponseEntity<ObjectNode>> save(Tenant tenant);
 
-    ResponseEntity<ObjectNode> update(Tenant tenant) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> update(Tenant tenant);
 
-    ResponseEntity<ObjectNode> delete(Long id);
+    Mono<ResponseEntity<ObjectNode>> delete(Long id);
 }

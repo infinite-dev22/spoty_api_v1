@@ -3,20 +3,23 @@ package io.nomard.spoty_api_v1.services.interfaces.hrm.pay_roll;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.hrm.pay_roll.PaySlipType;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 public interface PaySlipTypeService {
-    List<PaySlipType> getAll(int pageNo, int pageSize);
+    Flux<PageImpl<PaySlipType>> getAll(int pageNo, int pageSize);
 
-    PaySlipType getById(Long id) throws NotFoundException;
+    Mono<PaySlipType> getById(Long id);
 
-    ResponseEntity<ObjectNode> save(PaySlipType paySlipType);
+    Mono<ResponseEntity<ObjectNode>> save(PaySlipType paySlipType);
 
-    ResponseEntity<ObjectNode> update(PaySlipType paySlipType) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> update(PaySlipType paySlipType);
 
-    ResponseEntity<ObjectNode> delete(Long id);
+    Mono<ResponseEntity<ObjectNode>> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> deleteMultiple(List<Long> idList);
 }

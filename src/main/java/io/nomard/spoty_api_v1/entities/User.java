@@ -17,11 +17,13 @@ package io.nomard.spoty_api_v1.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
+@Accessors(chain = true)
 @Table(name = "users")
 @Getter
 @Setter

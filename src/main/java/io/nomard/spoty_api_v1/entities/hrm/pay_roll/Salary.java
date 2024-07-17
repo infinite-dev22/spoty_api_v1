@@ -7,11 +7,13 @@ import io.nomard.spoty_api_v1.entities.User;
 import io.nomard.spoty_api_v1.entities.hrm.hrm.Designation;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.util.Date;
 import java.util.Set;
 
 @Entity
+@Accessors(chain = true)
 @Table(name = "salaries")
 @Getter
 @Setter

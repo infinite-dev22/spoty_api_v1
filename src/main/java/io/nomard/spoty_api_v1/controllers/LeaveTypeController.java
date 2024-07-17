@@ -7,11 +7,13 @@ import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.services.implementations.hrm.leave.LeaveTypeServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("leave/types")
@@ -20,38 +22,33 @@ public class LeaveTypeController {
     private LeaveTypeServiceImpl leaveTypeService;
 
     @GetMapping("/all")
-    public List<LeaveType> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                  @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Flux<PageImpl<LeaveType>> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                            @RequestParam(defaultValue = "50") Integer pageSize) {
         return leaveTypeService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public LeaveType getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public Mono<LeaveType> getById(@RequestBody FindModel findModel) {
         return leaveTypeService.getById(findModel.getId());
     }
 
-//    @GetMapping("/search")
-//    public List<LeaveType> getByContains(@RequestBody SearchModel searchModel) {
-//        return leaveTypeService.getByContains(searchModel.getSearch());
-//    }
-
     @PostMapping("/add")
-    public ResponseEntity<ObjectNode> save(@Valid @RequestBody LeaveType leaveType) {
+    public Mono<ResponseEntity<ObjectNode>> save(@Valid @RequestBody LeaveType leaveType) {
         return leaveTypeService.save(leaveType);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ObjectNode> update(@Valid @RequestBody LeaveType leaveType) throws NotFoundException {
+    public Mono<ResponseEntity<ObjectNode>> update(@Valid @RequestBody LeaveType leaveType) {
         return leaveTypeService.update(leaveType);
     }
 
     @DeleteMapping("/delete/single")
-    public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
+    public Mono<ResponseEntity<ObjectNode>> delete(@RequestBody FindModel findModel) {
         return leaveTypeService.delete(findModel.getId());
     }
 
     @DeleteMapping("/delete/multiple")
-    public ResponseEntity<ObjectNode> deleteMultiple(@RequestBody ArrayList<Long> idList) {
+    public Mono<ResponseEntity<ObjectNode>> deleteMultiple(@RequestBody ArrayList<Long> idList) {
         return leaveTypeService.deleteMultiple(idList);
     }
 }

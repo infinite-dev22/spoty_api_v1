@@ -8,8 +8,8 @@ import io.nomard.spoty_api_v1.models.StockAlertModel;
 import io.nomard.spoty_api_v1.repositories.CustomerRepository;
 import io.nomard.spoty_api_v1.repositories.ProductRepository;
 import io.nomard.spoty_api_v1.repositories.SupplierRepository;
-import io.nomard.spoty_api_v1.repositories.purchases.PurchaseMasterRepository;
-import io.nomard.spoty_api_v1.repositories.sales.SaleMasterRepository;
+import io.nomard.spoty_api_v1.repositories.purchases.PurchaseRepository;
+import io.nomard.spoty_api_v1.repositories.sales.SaleRepository;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.dashboard.MainDashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,17 +19,17 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class MainDashboardServiceImpl implements MainDashboardService {
     @Autowired
-    private PurchaseMasterRepository purchaseMasterRepo;
+    private PurchaseRepository purchaseMasterRepo;
     @Autowired
     private ProductRepository productRepo;
     @Autowired
-    private SaleMasterRepository saleMasterRepo;
+    private SaleRepository saleMasterRepo;
     @Autowired
     private CustomerRepository customerRepo;
     @Autowired
@@ -40,107 +40,122 @@ public class MainDashboardServiceImpl implements MainDashboardService {
     @Override
     @Cacheable("yearly_expenses")
     @Transactional(readOnly = true)
-    public List<LineChartModel> getYearlyExpenses() {
-        return purchaseMasterRepo.yearlyExpenses(authService.authUser().getTenant().getId());
+    public Flux<LineChartModel> getYearlyExpenses() {
+        return authService.authUser()
+                .flatMapMany(user -> purchaseMasterRepo.yearlyExpenses(user.getTenant().getId()));
     }
 
     @Override
     @Cacheable("monthly_expenses")
     @Transactional(readOnly = true)
-    public List<LineChartModel> getMonthlyExpenses() {
-        return purchaseMasterRepo.monthlyExpenses(authService.authUser().getTenant().getId());
+    public Flux<LineChartModel> getMonthlyExpenses() {
+        return authService.authUser()
+                .flatMapMany(user -> purchaseMasterRepo.monthlyExpenses(user.getTenant().getId()));
     }
 
     @Override
     @Cacheable("weekly_expenses")
     @Transactional(readOnly = true)
-    public List<LineChartModel> getWeeklyExpenses() {
-        return purchaseMasterRepo.weeklyExpenses(authService.authUser().getTenant().getId());
+    public Flux<LineChartModel> getWeeklyExpenses() {
+        return authService.authUser()
+                .flatMapMany(user -> purchaseMasterRepo.weeklyExpenses(user.getTenant().getId()));
     }
 
     @Override
     @Cacheable("yearly_incomes")
     @Transactional(readOnly = true)
-    public List<LineChartModel> getYearlyIncomes() {
-        return saleMasterRepo.yearlyIncomes(authService.authUser().getTenant().getId());
+    public Flux<LineChartModel> getYearlyIncomes() {
+        return authService.authUser()
+                .flatMapMany(user -> saleMasterRepo.yearlyIncomes(user.getTenant().getId()));
     }
 
     @Override
     @Cacheable("monthly_incomes")
     @Transactional(readOnly = true)
-    public List<LineChartModel> getMonthlyIncomes() {
-        return saleMasterRepo.monthlyIncomes(authService.authUser().getTenant().getId());
+    public Flux<LineChartModel> getMonthlyIncomes() {
+        return authService.authUser()
+                .flatMapMany(user -> saleMasterRepo.monthlyIncomes(user.getTenant().getId()));
     }
 
     @Override
     @Cacheable("monthly_revenue")
     @Transactional(readOnly = true)
-    public List<LineChartModel> getMonthlyRevenue() {
-        return saleMasterRepo.monthlyRevenue(authService.authUser().getTenant().getId());
+    public Flux<LineChartModel> getMonthlyRevenue() {
+        return authService.authUser()
+                .flatMapMany(user -> saleMasterRepo.monthlyRevenue(user.getTenant().getId()));
     }
 
     @Override
     @Cacheable("weekly_revenue")
     @Transactional(readOnly = true)
-    public List<LineChartModel> getWeeklyRevenue() {
-        return saleMasterRepo.weeklyRevenue(authService.authUser().getTenant().getId());
+    public Flux<LineChartModel> getWeeklyRevenue() {
+        return authService.authUser()
+                .flatMapMany(user -> saleMasterRepo.weeklyRevenue(user.getTenant().getId()));
     }
 
     @Override
     @Cacheable("top_product_sold")
     @Transactional(readOnly = true)
-    public List<ProductSalesModel> getTopProductsSold(@RequestParam(defaultValue = "10") Integer limit) {
+    public Flux<ProductSalesModel> getTopProductsSold(@RequestParam(defaultValue = "10") Integer limit) {
         PageRequest pageRequest = PageRequest.of(0, limit);
-        return saleMasterRepo.findTopProductsSold(authService.authUser().getTenant().getId(), pageRequest);
+        return authService.authUser()
+                .flatMapMany(user -> saleMasterRepo.findTopProductsSold(user.getId(), pageRequest));
     }
 
     @Override
     @Cacheable("product_stock_alert")
     @Transactional(readOnly = true)
-    public List<StockAlertModel> getProductsStockAlert() {
-        return productRepo.productsStockAlert(authService.authUser().getTenant().getId());
+    public Flux<StockAlertModel> getProductsStockAlert() {
+        return authService.authUser()
+                .flatMapMany(user -> productRepo.productsStockAlert(user.getTenant().getId()));
     }
 
     @Override
     @Cacheable("recent_sales")
     @Transactional(readOnly = true)
-    public List<SaleMaster> getRecentOrders(@RequestParam(defaultValue = "10") Integer limit) {
+    public Flux<SaleMaster> getRecentOrders(@RequestParam(defaultValue = "10") Integer limit) {
         PageRequest pageRequest = PageRequest.of(0, limit, Sort.by("createdAt").descending());
-        return saleMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest).getContent();
+        return authService.authUser()
+                .flatMapMany(user -> saleMasterRepo.findAllByTenantId(user.getTenant().getId(), pageRequest));
     }
 
     @Override
     @Cacheable("total_earnings")
     @Transactional(readOnly = true)
-    public DashboardKPIModel getTotalEarningsKPI() {
-        return saleMasterRepo.totalEarnings(authService.authUser().getTenant().getId());
+    public Mono<DashboardKPIModel> getTotalEarningsKPI() {
+        return authService.authUser()
+                .flatMap(user -> saleMasterRepo.totalEarnings(user.getTenant().getId()));
     }
 
     @Override
     @Cacheable("total_purchases")
     @Transactional(readOnly = true)
-    public DashboardKPIModel getTotalPurchasesKPI() {
-        return purchaseMasterRepo.totalPurchases(authService.authUser().getTenant().getId());
+    public Mono<DashboardKPIModel> getTotalPurchasesKPI() {
+        return authService.authUser()
+                .flatMap(user -> purchaseMasterRepo.totalPurchases(user.getTenant().getId()));
     }
 
     @Override
     @Cacheable("total_products")
     @Transactional(readOnly = true)
-    public DashboardKPIModel getCountProductsKPI() {
-        return productRepo.countProducts(authService.authUser().getTenant().getId());
+    public Mono<DashboardKPIModel> getCountProductsKPI() {
+        return authService.authUser()
+                .flatMap(user -> productRepo.countProducts(user.getTenant().getId()));
     }
 
     @Override
     @Cacheable("total_customers")
     @Transactional(readOnly = true)
-    public DashboardKPIModel getCountCustomersKPI() {
-        return customerRepo.countCustomers(authService.authUser().getTenant().getId());
+    public Mono<DashboardKPIModel> getCountCustomersKPI() {
+        return authService.authUser()
+                .flatMap(user -> customerRepo.countCustomers(user.getTenant().getId()));
     }
 
     @Override
     @Cacheable("total_suppliers")
     @Transactional(readOnly = true)
-    public DashboardKPIModel getCountSuppliersKPI() {
-        return supplierRepo.countSuppliers(authService.authUser().getTenant().getId());
+    public Mono<DashboardKPIModel> getCountSuppliersKPI() {
+        return authService.authUser()
+                .flatMap(user -> supplierRepo.countSuppliers(user.getTenant().getId()));
     }
 }

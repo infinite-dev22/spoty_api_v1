@@ -23,6 +23,7 @@ import io.nomard.spoty_api_v1.entities.deductions.Discount;
 import io.nomard.spoty_api_v1.entities.deductions.Tax;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -30,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Entity
+@Accessors(chain = true)
 @Table(name = "sale_masters")
 @Getter
 @Setter

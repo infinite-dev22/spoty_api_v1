@@ -1,20 +1,19 @@
 package io.nomard.spoty_api_v1.repositories;
 
 import io.nomard.spoty_api_v1.entities.Currency;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.data.repository.reactive.ReactiveSortingRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
 
 @Repository
-public interface CurrencyRepository extends PagingAndSortingRepository<Currency, Long>, JpaRepository<Currency, Long> {
-    List<Currency> searchAllByNameContainingIgnoreCaseOrCodeContainingIgnoreCaseOrSymbolContainingIgnoreCase(String name, String code, String symbol);
+public interface CurrencyRepository extends ReactiveSortingRepository<Currency, Long>, ReactiveCrudRepository<Currency, Long> {
+    @Query("SELECT c FROM Currency c WHERE c.tenant.id = :id AND CONCAT(LOWER(c.name), LOWER(c.code),LOWER(c.symbol)) LIKE %:search%")
+    Flux<Currency> search(@Param("id") Long id, @Param("search") String search);
 
-    @Query("select p from Currency p where p.tenant.id = :id")
-    Page<Currency> findAllByTenantId(@Param("id") Long id, Pageable pageable);
+    @Query("SELECT c FROM Currency c WHERE c.tenant.id = :id")
+    Flux<Currency> findAllByTenantId(@Param("id") Long id, Pageable pageable);
 }

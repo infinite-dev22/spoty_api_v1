@@ -3,23 +3,25 @@ package io.nomard.spoty_api_v1.services.interfaces;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public interface BranchService {
-    List<Branch> getAll(int pageNo, int pageSize);
+    Flux<PageImpl<Branch>> getAll(int pageNo, int pageSize);
 
-    Branch getById(Long id) throws NotFoundException;
+    Mono<Branch> getById(Long id);
 
-    List<Branch> getByContains(String search);
+    Flux<Branch> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(Branch branch);
+    Mono<ResponseEntity<ObjectNode>> save(Branch branch);
 
-    ResponseEntity<ObjectNode> update(Branch branch) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> update(Branch branch);
 
-    ResponseEntity<ObjectNode> delete(Long id);
+    Mono<ResponseEntity<ObjectNode>> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList);
+    Mono<ResponseEntity<ObjectNode>> deleteMultiple(ArrayList<Long> idList);
 }

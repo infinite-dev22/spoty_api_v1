@@ -2,24 +2,25 @@ package io.nomard.spoty_api_v1.services.interfaces;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Customer;
-import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public interface CustomerService {
-    List<Customer> getAll(int pageNo, int pageSize);
+    Flux<PageImpl<Customer>> getAll(int pageNo, int pageSize);
 
-    Customer getById(Long id) throws NotFoundException;
+    Mono<Customer> getById(Long id);
 
-    List<Customer> getByContains(String search);
+    Flux<Customer> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(Customer customer);
+    Mono<ResponseEntity<ObjectNode>> save(Customer customer);
 
-    ResponseEntity<ObjectNode> update(Customer customer) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> update(Customer customer);
 
-    ResponseEntity<ObjectNode> delete(Long id);
+    Mono<ResponseEntity<ObjectNode>> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList);
+    Mono<ResponseEntity<ObjectNode>> deleteMultiple(ArrayList<Long> idList);
 }

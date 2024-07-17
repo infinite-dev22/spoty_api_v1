@@ -3,26 +3,29 @@ package io.nomard.spoty_api_v1.services.interfaces;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Product;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public interface ProductService {
-    List<Product> getAll(int pageNo, int pageSize);
+    Flux<PageImpl<Product>> getAll(int pageNo, int pageSize);
 
-    Product getById(Long id) throws NotFoundException;
+    Mono<Product> getById(Long id);
 
-    List<Product> getByContains(String search);
+    Flux<Product> getByContains(String search);
 
-    List<Product> getWarning();
+    Flux<Product> getWarning();
 
-    ResponseEntity<ObjectNode> save(Product product, MultipartFile file);
+    Mono<ResponseEntity<ObjectNode>> save(Product product, MultipartFile file);
 
-    ResponseEntity<ObjectNode> update(Product product, MultipartFile file) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> update(Product product, MultipartFile file);
 
-    ResponseEntity<ObjectNode> delete(Long id);
+    Mono<ResponseEntity<ObjectNode>> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList);
+    Mono<ResponseEntity<ObjectNode>> deleteMultiple(ArrayList<Long> idList);
 }

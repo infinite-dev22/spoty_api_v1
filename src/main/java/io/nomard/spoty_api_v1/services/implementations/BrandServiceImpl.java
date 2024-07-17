@@ -8,13 +8,17 @@ import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.BrandService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Objects;
 
 @Service
 public class BrandServiceImpl implements BrandService {
@@ -26,95 +30,91 @@ public class BrandServiceImpl implements BrandService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Brand> getAll(int pageNo, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<Brand> page = brandRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+    public Flux<PageImpl<Brand>> getAll(int pageNo, int pageSize) {
+        return authService.authUser()
+                .flatMapMany(user -> brandRepo.findAllByTenantId(user.getTenant().getId(), PageRequest.of(pageNo, pageSize))
+                        .collectList()
+                        .zipWith(brandRepo.count())
+                        .map(p -> new PageImpl<>(p.getT1(), PageRequest.of(pageNo, pageSize), p.getT2())));
     }
 
     @Override
-    public Brand getById(Long id) throws NotFoundException {
-        Optional<Brand> brand = brandRepo.findById(id);
-        if (brand.isEmpty()) {
-            throw new NotFoundException();
-        }
-        return brand.get();
+    public Mono<Brand> getById(Long id) {
+        return brandRepo.findById(id).switchIfEmpty(Mono.error(new NotFoundException()));
     }
 
     @Override
-    public List<Brand> getByContains(String search) {
-        return brandRepo.searchAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
-                search.toLowerCase(),
-                search.toLowerCase());
-    }
-
-    @Override
-    @Transactional
-    public ResponseEntity<ObjectNode> save(Brand brand) {
-        try {
-            brand.setTenant(authService.authUser().getTenant());
-            if (Objects.isNull(brand.getBranch())) {
-                brand.setBranch(authService.authUser().getBranch());
-            }
-            brand.setCreatedBy(authService.authUser());
-            brand.setCreatedAt(new Date());
-            brandRepo.saveAndFlush(brand);
-            return spotyResponseImpl.created();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Flux<Brand> getByContains(String search) {
+        return authService.authUser()
+                .flatMapMany(user -> brandRepo.search(
+                        user.getTenant().getId(),
+                        search.toLowerCase()
+                ));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> update(Brand data) throws NotFoundException {
-        var opt = brandRepo.findById(data.getId());
-        if (opt.isEmpty()) {
-            throw new NotFoundException();
-        }
-        var brand = opt.get();
-
-        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
-            brand.setName(data.getName());
-        }
-
-        if (Objects.nonNull(data.getDescription()) && !"".equalsIgnoreCase(data.getDescription())) {
-            brand.setDescription(data.getDescription());
-        }
-
-        if (Objects.nonNull(data.getImage()) && !"".equalsIgnoreCase(data.getImage())) {
-            brand.setImage(data.getImage());
-        }
-
-        brand.setUpdatedBy(authService.authUser());
-        brand.setUpdatedAt(new Date());
-
-        try {
-            brandRepo.saveAndFlush(brand);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> save(Brand brand) {
+        return authService.authUser()
+                .flatMap(user -> {
+                    brand.setTenant(user.getTenant());
+                    brand.setBranch(user.getBranch());
+                    brand.setCreatedBy(user);
+                    brand.setCreatedAt(new Date());
+                    return brandRepo.save(brand)
+                            .thenReturn(spotyResponseImpl.created());
+                })
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(new RuntimeException(e))));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> delete(Long id) {
-        try {
-            brandRepo.deleteById(id);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> update(Brand data) {
+        return brandRepo.findById(data.getId())
+                .flatMap(brand -> {
+                    boolean updated = false;
+
+                    if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+                        brand.setName(data.getName());
+                        updated = true;
+                    }
+
+                    if (Objects.nonNull(data.getDescription()) && !"".equalsIgnoreCase(data.getDescription())) {
+                        brand.setDescription(data.getDescription());
+                        updated = true;
+                    }
+
+                    if (Objects.nonNull(data.getImage()) && !"".equalsIgnoreCase(data.getImage())) {
+                        brand.setImage(data.getImage());
+                        updated = true;
+                    }
+                    if (updated) {
+                        return authService.authUser()
+                                .flatMap(user -> {
+                                    brand.setUpdatedBy(user);
+                                    brand.setUpdatedAt(new Date());
+                                    return brandRepo.save(brand)
+                                            .thenReturn(spotyResponseImpl.ok());
+                                });
+                    } else {
+                        return Mono.just(spotyResponseImpl.ok());
+                    }
+                })
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 
     @Override
-    public ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) {
-        try {
-            brandRepo.deleteAllById(idList);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    @Transactional
+    public Mono<ResponseEntity<ObjectNode>> delete(Long id) {
+        return brandRepo.deleteById(id)
+                .thenReturn(spotyResponseImpl.ok())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
+    }
+
+    @Override
+    public Mono<ResponseEntity<ObjectNode>> deleteMultiple(ArrayList<Long> idList) {
+        return brandRepo.deleteAllById(idList)
+                .thenReturn(spotyResponseImpl.ok())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 }

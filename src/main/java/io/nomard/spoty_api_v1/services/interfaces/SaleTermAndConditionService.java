@@ -3,20 +3,23 @@ package io.nomard.spoty_api_v1.services.interfaces;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.SaleTermAndCondition;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 public interface SaleTermAndConditionService {
-    List<SaleTermAndCondition> getAll(int pageNo, int pageSize);
+    Flux<PageImpl<SaleTermAndCondition>> getAll(int pageNo, int pageSize);
 
-    SaleTermAndCondition getById(Long id) throws NotFoundException;
+    Mono<SaleTermAndCondition> getById(Long id);
 
-    ResponseEntity<ObjectNode> save(SaleTermAndCondition saleTermAndCondition);
+    Mono<ResponseEntity<ObjectNode>> save(SaleTermAndCondition saleTermAndCondition);
 
-    ResponseEntity<ObjectNode> update(SaleTermAndCondition saleTermAndCondition) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> update(SaleTermAndCondition saleTermAndCondition);
 
-    ResponseEntity<ObjectNode> delete(Long id);
+    Mono<ResponseEntity<ObjectNode>> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> deleteMultiple(List<Long> idList);
 }

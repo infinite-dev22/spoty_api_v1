@@ -3,21 +3,23 @@ package io.nomard.spoty_api_v1.services.interfaces.deductions;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.deductions.Tax;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public interface TaxService {
-    List<Tax> getAll(int pageNo, int pageSize);
+    Flux<PageImpl<Tax>> getAll(int pageNo, int pageSize);
 
-    Tax getById(Long id) throws NotFoundException;
+    Mono<Tax> getById(Long id);
 
-    ResponseEntity<ObjectNode> save(Tax tax);
+    Mono<ResponseEntity<ObjectNode>> save(Tax tax);
 
-    ResponseEntity<ObjectNode> update(Tax tax) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> update(Tax tax);
 
-    ResponseEntity<ObjectNode> delete(Long id);
+    Mono<ResponseEntity<ObjectNode>> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> deleteMultiple(ArrayList<Long> idList);
 }

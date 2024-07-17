@@ -2,23 +2,25 @@ package io.nomard.spoty_api_v1.services.interfaces.quotations;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.quotations.QuotationMaster;
-import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 public interface QuotationMasterService {
-    List<QuotationMaster> getAll(int pageNo, int pageSize);
+    Flux<PageImpl<QuotationMaster>> getAll(int pageNo, int pageSize);
 
-    QuotationMaster getById(Long id) throws NotFoundException;
+    Mono<QuotationMaster> getById(Long id);
 
-    List<QuotationMaster> getByContains(String search);
+    Flux<QuotationMaster> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(QuotationMaster quotationMaster);
+    Mono<ResponseEntity<ObjectNode>> save(QuotationMaster quotationMaster);
 
-    ResponseEntity<ObjectNode> update(QuotationMaster quotationMaster) throws NotFoundException;
+    Mono<ResponseEntity<ObjectNode>> update(QuotationMaster quotationMaster);
 
-    ResponseEntity<ObjectNode> delete(Long id);
+    Mono<ResponseEntity<ObjectNode>> delete(Long id);
 
-    ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList);
+    Mono<ResponseEntity<ObjectNode>> deleteMultiple(List<Long> idList);
 }

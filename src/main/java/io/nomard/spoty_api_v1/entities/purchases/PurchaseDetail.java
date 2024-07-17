@@ -19,12 +19,10 @@ import io.nomard.spoty_api_v1.entities.Product;
 import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
-
-// TODO: Remove total and Quantity and add them to PurchaseMaster.
-// TODO: In place of total create purchasePrice.
 @Entity
 @Table(name = "purchase_details")
 @Getter

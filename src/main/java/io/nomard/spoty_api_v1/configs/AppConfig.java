@@ -39,9 +39,11 @@ import io.nomard.spoty_api_v1.services.auth.SpotyUserDetailsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.server.ServerAuthenticationEntryPoint;
+import org.springframework.web.reactive.config.EnableWebFlux;
 
 @Configuration
+@EnableWebFlux
 public class AppConfig {
     @Value("jwt.secret")
     private String secret;
@@ -232,7 +234,7 @@ public class AppConfig {
     }
 
     @Bean
-    public AuthenticationEntryPoint unauthorizedHandler() {
+    public ServerAuthenticationEntryPoint unauthorizedHandler() {
         return new SpotyAuthEntryPoint();
     }
 

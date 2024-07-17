@@ -7,11 +7,13 @@ import io.nomard.spoty_api_v1.entities.User;
 import io.nomard.spoty_api_v1.entities.hrm.hrm.Designation;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.time.Duration;
 import java.util.Date;
 
 @Entity
+@Accessors(chain = true)
 @Table(name = "leaves")
 @Getter
 @Setter
@@ -33,9 +35,6 @@ public class Leave {
     @JoinColumn(nullable = false, name = "company_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;
-    @ManyToOne
-    @JoinColumn(name = "designation_id")
-    private Designation designation;
     private String description;
     @Column(name = "start_date")
     private Date startDate;

@@ -8,13 +8,17 @@ import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.UnitOfMeasureService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Objects;
 
 @Service
 public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
@@ -26,105 +30,100 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<UnitOfMeasure> getAll(int pageNo, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<UnitOfMeasure> page = uomRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+    public Flux<PageImpl<UnitOfMeasure>> getAll(int pageNo, int pageSize) {
+        return authService.authUser()
+                .flatMapMany(user -> uomRepo.findAllByTenantId(user.getTenant().getId(), PageRequest.of(pageNo, pageSize))
+                        .collectList()
+                        .zipWith(uomRepo.count())
+                        .map(p -> new PageImpl<>(p.getT1(), PageRequest.of(pageNo, pageSize), p.getT2())));
     }
 
     @Override
-    public UnitOfMeasure getById(Long id) throws NotFoundException {
-        Optional<UnitOfMeasure> unitOfMeasure = uomRepo.findById(id);
-        if (unitOfMeasure.isEmpty()) {
-            throw new NotFoundException();
-        }
-        return unitOfMeasure.get();
+    public Mono<UnitOfMeasure> getById(Long id) {
+        return uomRepo.findById(id).switchIfEmpty(Mono.error(new NotFoundException()));
     }
 
     @Override
-    public List<UnitOfMeasure> getByContains(String search) {
-        return uomRepo.searchAllByNameContainingIgnoreCaseOrShortNameContainingIgnoreCase(
-                search.toLowerCase(),
-                search.toLowerCase()
-        );
-    }
-
-    @Override
-    @Transactional
-    public ResponseEntity<ObjectNode> save(UnitOfMeasure uom) {
-        uom.setTenant(authService.authUser().getTenant());
-        uom.setCreatedBy(authService.authUser());
-        uom.setCreatedAt(new Date());
-        uomRepo.saveAndFlush(uom);
-        try {
-            uomRepo.saveAndFlush(uom);
-
-            return spotyResponseImpl.created();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Flux<UnitOfMeasure> getByContains(String search) {
+        return authService.authUser()
+                .flatMapMany(user -> uomRepo.search(
+                        user.getTenant().getId(),
+                        search.toLowerCase()
+                ));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> update(UnitOfMeasure data) throws NotFoundException {
-        var opt = uomRepo.findById(data.getId());
-
-        if (opt.isEmpty()) {
-            throw new NotFoundException();
-        }
-        var uom = opt.get();
-
-        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
-            uom.setName(data.getName());
-        }
-
-        if (Objects.nonNull(data.getShortName()) && !"".equalsIgnoreCase(data.getShortName())) {
-            uom.setShortName(data.getShortName());
-        }
-
-        if (Objects.nonNull(data.getOperator()) && !"".equalsIgnoreCase(data.getOperator())) {
-            uom.setOperator(data.getOperator());
-        }
-
-        if (!Objects.equals(data.getOperatorValue(), 0)) {
-            uom.setOperatorValue(data.getOperatorValue());
-        }
-
-        if (Objects.nonNull(data.getBaseUnit())) {
-            uom.setBaseUnit(data.getBaseUnit());
-        }
-
-        uom.setUpdatedBy(authService.authUser());
-        uom.setUpdatedAt(new Date());
-
-        try {
-            uomRepo.saveAndFlush(uom);
-
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> save(UnitOfMeasure uom) {
+        return authService.authUser()
+                .flatMap(user -> {
+                    uom.setTenant(user.getTenant());
+                    uom.setCreatedBy(user);
+                    uom.setCreatedAt(new Date());
+                    return uomRepo.save(uom)
+                            .thenReturn(spotyResponseImpl.created());
+                })
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(new RuntimeException(e))));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> delete(Long id) {
-        try {
-            uomRepo.deleteById(id);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    public Mono<ResponseEntity<ObjectNode>> update(UnitOfMeasure data) {
+        return uomRepo.findById(data.getId())
+                .flatMap(unitOfMeasure -> {
+                    boolean updated = false;
+
+                    if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
+                        unitOfMeasure.setName(data.getName());
+                        updated = true;
+                    }
+
+                    if (Objects.nonNull(data.getShortName()) && !"".equalsIgnoreCase(data.getShortName())) {
+                        unitOfMeasure.setShortName(data.getShortName());
+                        updated = true;
+                    }
+
+                    if (Objects.nonNull(data.getOperator()) && !"".equalsIgnoreCase(data.getOperator())) {
+                        unitOfMeasure.setOperator(data.getOperator());
+                        updated = true;
+                    }
+
+                    if (!Objects.equals(data.getOperatorValue(), 0)) {
+                        unitOfMeasure.setOperatorValue(data.getOperatorValue());
+                        updated = true;
+                    }
+
+                    if (Objects.nonNull(data.getBaseUnit())) {
+                        unitOfMeasure.setBaseUnit(data.getBaseUnit());
+                        updated = true;
+                    }
+                    if (updated) {
+                        return authService.authUser()
+                                .flatMap(user -> {
+                                    unitOfMeasure.setUpdatedBy(user);
+                                    unitOfMeasure.setUpdatedAt(new Date());
+                                    return uomRepo.save(unitOfMeasure)
+                                            .thenReturn(spotyResponseImpl.ok());
+                                });
+                    } else {
+                        return Mono.just(spotyResponseImpl.ok());
+                    }
+                })
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 
     @Override
-    public ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) {
-        try {
-            uomRepo.deleteAllById(idList);
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            return spotyResponseImpl.error(e);
-        }
+    @Transactional
+    public Mono<ResponseEntity<ObjectNode>> delete(Long id) {
+        return uomRepo.deleteById(id)
+                .thenReturn(spotyResponseImpl.ok())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
+    }
+
+    @Override
+    public Mono<ResponseEntity<ObjectNode>> deleteMultiple(ArrayList<Long> idList) {
+        return uomRepo.deleteAllById(idList)
+                .thenReturn(spotyResponseImpl.ok())
+                .onErrorResume(e -> Mono.just(spotyResponseImpl.error(e)));
     }
 }
