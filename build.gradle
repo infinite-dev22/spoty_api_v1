@@ -5,6 +5,7 @@ plugins {
     id 'org.hibernate.orm' version '6.5.2.Final'
     id 'org.graalvm.buildtools.native' version '0.10.2'
     id 'org.asciidoctor.jvm.convert' version '4.0.2'
+    id 'org.flywaydb.flyway' version '10.15.2'
 }
 
 apply plugin: 'io.spring.dependency-management'
@@ -130,11 +131,14 @@ dependencies {
     implementation 'org.mariadb:r2dbc-mariadb'
     implementation 'org.realityforge.org.jetbrains.annotations:org.jetbrains.annotations:1.7.0'
     implementation 'com.auth0:java-jwt:4.4.0'
-//    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-mysql'
+    implementation 'org.springframework:spring-jdbc'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'io.projectreactor:reactor-test'
     compileOnly 'org.projectlombok:lombok'

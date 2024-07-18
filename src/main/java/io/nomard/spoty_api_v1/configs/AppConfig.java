@@ -66,9 +66,7 @@ public class AppConfig {
     @Bean
     public Brand brand() {
         return new Brand();
-    }
-
-    @Bean
+    }    @Bean
     public ProductCategory productCategory() {
         return new ProductCategory();
     }

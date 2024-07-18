@@ -10,9 +10,7 @@ import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 //@SpringBootApplication
 @EnableR2dbcRepositories
 public class SpotyApiV1Application {
-
     public static void main(String[] args) {
         SpringApplication.run(SpotyApiV1Application.class, args);
     }
-
 }
