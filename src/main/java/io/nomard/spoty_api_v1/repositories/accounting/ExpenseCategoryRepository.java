@@ -1,6 +1,6 @@
-package io.nomard.spoty_api_v1.repositories;
+package io.nomard.spoty_api_v1.repositories.accounting;
 
-import io.nomard.spoty_api_v1.entities.ExpenseCategory;
+import io.nomard.spoty_api_v1.entities.accounting.ExpenseCategory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,7 +1,7 @@
-package io.nomard.spoty_api_v1.services.interfaces;
+package io.nomard.spoty_api_v1.services.interfaces.accounting;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Expense;
+import io.nomard.spoty_api_v1.entities.accounting.Expense;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import org.springframework.http.ResponseEntity;
 

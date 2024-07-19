@@ -12,9 +12,12 @@
  * Jonathan Mark Mwigo makes no warranties, express or implied, with respect to the computer system code. Jonathan Mark Mwigo shall not be liable for any damages, including, but not limited to, direct, indirect, incidental, special, consequential, or punitive damages, arising out of or in connection with the use of the computer system code.
  */
 
-package io.nomard.spoty_api_v1.entities;
+package io.nomard.spoty_api_v1.entities.accounting;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.nomard.spoty_api_v1.entities.Branch;
+import io.nomard.spoty_api_v1.entities.Tenant;
+import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -44,6 +47,8 @@ public class Expense implements Serializable {
     @JoinColumn(nullable = false, name = "company_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;
+    @ManyToOne
+    private Account account;
 
     @Column(nullable = false)
     private String name;
@@ -59,7 +64,7 @@ public class Expense implements Serializable {
     @JoinColumn(name = "branch_id")
     private Branch branch;
 
-    private String details;
+    private String note;
 
     @Column(nullable = false)
     private double amount;

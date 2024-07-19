@@ -1,11 +1,14 @@
 package io.nomard.spoty_api_v1.services.implementations.sales;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
 import io.nomard.spoty_api_v1.entities.sales.SaleMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.sales.SaleMasterRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
+import io.nomard.spoty_api_v1.services.implementations.accounting.AccountServiceImpl;
+import io.nomard.spoty_api_v1.services.implementations.accounting.AccountTransactionServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.sales.SaleMasterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -27,6 +30,10 @@ public class SaleMasterServiceImpl implements SaleMasterService {
     private SaleMasterRepository saleMasterRepo;
     @Autowired
     private SaleTransactionServiceImpl saleTransactionService;
+    @Autowired
+    private AccountTransactionServiceImpl accountTransactionService;
+    @Autowired
+    private AccountServiceImpl accountService;
     @Autowired
     private AuthServiceImpl authService;
     @Autowired
@@ -69,18 +76,32 @@ public class SaleMasterServiceImpl implements SaleMasterService {
         for (int i = 0; i < saleMaster.getSaleDetails().size(); i++) {
             saleMaster.getSaleDetails().get(i).setSale(saleMaster);
             subTotal += saleMaster.getSaleDetails().get(i).getSubTotalPrice();
+            total = subTotal;
         }
         if (Objects.nonNull(saleMaster.getTax()) && saleMaster.getTax().getPercentage() > 0.0) {
-            total += subTotal * (saleMaster.getTax().getPercentage() / 100);
+            total += total * (saleMaster.getTax().getPercentage() / 100);
         }
         if (Objects.nonNull(saleMaster.getDiscount()) && saleMaster.getDiscount().getPercentage() > 0.0) {
-            total += subTotal * (saleMaster.getDiscount().getPercentage() / 100);
+            total += total * (saleMaster.getDiscount().getPercentage() / 100);
         }
         saleMaster.setSubTotal(subTotal);
         saleMaster.setTotal(total);
         saleMaster.setTenant(authService.authUser().getTenant());
         if (Objects.isNull(saleMaster.getBranch())) {
             saleMaster.setBranch(authService.authUser().getBranch());
+        }
+        if (!Objects.equals(total, 0d)) {
+            var account = accountService.getByContains(authService.authUser().getTenant(), "Default Account");
+            var accountTransaction = new AccountTransaction();
+            accountTransaction.setTenant(authService.authUser().getTenant());
+            accountTransaction.setTransactionDate(new Date());
+            accountTransaction.setAccount(account);
+            accountTransaction.setAmount(total);
+            accountTransaction.setTransactionType("Sale");
+            accountTransaction.setNote("Sale made");
+            accountTransaction.setCreatedBy(authService.authUser());
+            accountTransaction.setCreatedAt(new Date());
+            accountTransactionService.save(accountTransaction);
         }
         saleMaster.setCreatedBy(authService.authUser());
         saleMaster.setCreatedAt(new Date());
@@ -144,10 +165,10 @@ public class SaleMasterServiceImpl implements SaleMasterService {
         if (!Objects.equals(data.getDiscount(), saleMaster.getDiscount()) && Objects.nonNull(data.getDiscount())) {
             saleMaster.setDiscount(data.getDiscount());
         }
-        if (!Objects.equals(data.getTotal(), saleMaster.getTotal())) {
+        if (!Objects.equals(data.getTotal(), total)) {
             saleMaster.setTotal(total);
         }
-        if (!Objects.equals(data.getSubTotal(), saleMaster.getSubTotal())) {
+        if (!Objects.equals(data.getSubTotal(), subTotal)) {
             saleMaster.setSubTotal(subTotal);
         }
         if (!Objects.equals(data.getAmountPaid(), saleMaster.getAmountPaid())) {

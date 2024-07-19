@@ -53,7 +53,7 @@ public class StockInTransactionServiceImpl implements StockInTransactionService 
 
             var product = stockInDetail.getProduct();
             product.setQuantity(productQuantity);
-            productService.update(product);
+            productService.update(product, null);
 
             StockInTransaction stockInTransaction = new StockInTransaction();
             stockInTransaction.setBranch(stockInDetail.getStockIn().getBranch());
@@ -94,7 +94,7 @@ public class StockInTransactionServiceImpl implements StockInTransactionService 
 
             var product = data.getProduct();
             product.setQuantity(productQuantity);
-            productService.update(product);
+            productService.update(product, null);
         }
 
         stockInTransaction.setProduct(data.getProduct());

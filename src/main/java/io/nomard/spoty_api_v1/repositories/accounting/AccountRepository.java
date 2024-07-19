@@ -1,5 +1,6 @@
-package io.nomard.spoty_api_v1.repositories;
+package io.nomard.spoty_api_v1.repositories.accounting;
 
+import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.accounting.Account;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,8 +14,10 @@ import java.util.List;
 
 @Repository
 public interface AccountRepository extends PagingAndSortingRepository<Account, Long>, JpaRepository<Account, Long> {
-    List<Account> searchAllByBankNameContainingIgnoreCaseOrAccountNameContainingIgnoreCaseOrAccountNumberContainsIgnoreCase(String bankName, String accountName, String accountNumber);
+    List<Account> searchAllByAccountNameContainingIgnoreCaseOrAccountNumberContainsIgnoreCase(String accountName, String accountNumber);
 
-    @Query("select a from Account a where a.tenant.id = :id")
+    @Query("select p from Account p where p.tenant.id = :id")
     Page<Account> findAllByTenantId(@Param("id") Long id, Pageable pageable);
+
+    Account findByTenantAndAccountNameContainingIgnoreCase(Tenant tenant, String accountName);
 }

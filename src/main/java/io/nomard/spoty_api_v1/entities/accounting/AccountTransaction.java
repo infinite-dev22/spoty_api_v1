@@ -1,37 +1,42 @@
-package io.nomard.spoty_api_v1.entities;
+package io.nomard.spoty_api_v1.entities.accounting;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.nomard.spoty_api_v1.entities.Tenant;
+import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
 
 @Entity
-@Table(name = "banks")
+@Table(name = "account_transactions")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @EqualsAndHashCode
-public class Account {
+public class AccountTransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @JoinColumn(nullable = false, name = "company_id")
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private Tenant tenant;
+    @ManyToOne
+    private Account account;
 
-    @Column(name = "bank_name")
-    private String bankName;
-    @Column(name = "account_name")
-    private String accountName;
-    @Column(name = "account_number")
-    private String accountNumber;
+    @Column(name = "transaction_date")
+    private Date transactionDate;
+    private Double credit;
+    private Double debit;
+    private Double amount;
+    private String note;
 
-    private String balance;
-    private String logo;
+    // Deposit, Sale, Payroll, Purchase Returns, Sale Returns, Purchase, Transfer, Expense
+    @Column(name = "transaction_type")
+    private String transactionType;
 
     @Column(name = "created_at")
     @JsonIgnore

@@ -19,6 +19,8 @@ import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Supplier;
 import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.User;
+import io.nomard.spoty_api_v1.entities.deductions.Discount;
+import io.nomard.spoty_api_v1.entities.deductions.Tax;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -58,9 +60,17 @@ public class PurchaseMaster implements Serializable {
     @Builder.Default
     private List<PurchaseDetail> purchaseDetails = new LinkedList<>();
 
-    private double taxRate;
-    private double netTax;
-    private double discount;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tax_id")
+    private Tax tax;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "discount_id")
+    private Discount discount;
+
+    @Column(name = "shipping_fee")
+    @Builder.Default
+    private double shippingFee = 0.0;
     private double amountPaid;
     private double total;
     private double subTotal;

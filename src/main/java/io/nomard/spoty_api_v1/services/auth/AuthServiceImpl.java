@@ -3,11 +3,13 @@ package io.nomard.spoty_api_v1.services.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.*;
+import io.nomard.spoty_api_v1.entities.accounting.Account;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.LoginModel;
 import io.nomard.spoty_api_v1.models.SignUpModel;
 import io.nomard.spoty_api_v1.principals.SpotyUserPrincipal;
 import io.nomard.spoty_api_v1.repositories.*;
+import io.nomard.spoty_api_v1.repositories.accounting.AccountRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.implementations.TenantServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +53,8 @@ public class AuthServiceImpl implements AuthService {
     private SpotyResponseImpl spotyResponseImpl;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private AccountRepository accountRepo;
 
     @Override
     public ResponseEntity<ObjectNode> login(LoginModel loginDetails) throws NotFoundException {
@@ -136,6 +140,13 @@ public class AuthServiceImpl implements AuthService {
         branch.setTown("Default Town");
         branch.setTenant(tenant);
 
+        var account = new Account();
+        account.setAccountName("Default Account");
+        account.setAccountNumber("ACC000000000001");
+        account.setBalance(0d);
+        account.setDescription("Default account for sales, purchases, payroll, etc.");
+        account.setTenant(tenant);
+
         var userProfile = new UserProfile();
         userProfile.setFirstName(signUpDetails.getFirstName());
         userProfile.setLastName(signUpDetails.getLastName());
@@ -153,6 +164,7 @@ public class AuthServiceImpl implements AuthService {
 
         try {
             tenantRepo.saveAndFlush(tenant);
+            accountRepo.saveAndFlush(account);
             branchRepo.saveAndFlush(branch);
             userProfileRepo.saveAndFlush(userProfile);
             userRepo.save(user);
