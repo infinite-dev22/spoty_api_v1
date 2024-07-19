@@ -113,10 +113,6 @@ public class ExpenseServiceImpl implements ExpenseService {
             expense.setDate(data.getDate());
         }
 
-        if (!Objects.equals(expense.getExpenseCategory(), data.getExpenseCategory()) && Objects.nonNull(data.getExpenseCategory())) {
-            expense.setExpenseCategory(data.getExpenseCategory());
-        }
-
         expense.setUpdatedBy(authService.authUser());
         expense.setUpdatedAt(new Date());
 
