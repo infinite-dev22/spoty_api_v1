@@ -198,8 +198,8 @@ public class AppConfig {
     }
 
     @Bean
-    public Bank bank() {
-        return new Bank();
+    public Account account() {
+        return new Account();
     }
 
     @Bean

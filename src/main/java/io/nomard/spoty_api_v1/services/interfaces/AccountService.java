@@ -1,23 +1,23 @@
 package io.nomard.spoty_api_v1.services.interfaces;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Bank;
+import io.nomard.spoty_api_v1.entities.Account;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public interface BankService {
-    List<Bank> getAll(int pageNo, int pageSize);
+public interface AccountService {
+    List<Account> getAll(int pageNo, int pageSize);
 
-    Bank getById(Long id) throws NotFoundException;
+    Account getById(Long id) throws NotFoundException;
 
-    List<Bank> getByContains(String search);
+    List<Account> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(Bank bank);
+    ResponseEntity<ObjectNode> save(Account account);
 
-    ResponseEntity<ObjectNode> update(Bank bank) throws NotFoundException;
+    ResponseEntity<ObjectNode> update(Account account) throws NotFoundException;
 
     ResponseEntity<ObjectNode> delete(Long id);
 

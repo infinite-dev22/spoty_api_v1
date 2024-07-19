@@ -1,12 +1,12 @@
 package io.nomard.spoty_api_v1.services.implementations;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Bank;
+import io.nomard.spoty_api_v1.entities.Account;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
-import io.nomard.spoty_api_v1.repositories.BankRepository;
+import io.nomard.spoty_api_v1.repositories.AccountRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
-import io.nomard.spoty_api_v1.services.interfaces.BankService;
+import io.nomard.spoty_api_v1.services.interfaces.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,24 +17,24 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 @Service
-public class BankServiceImpl implements BankService {
+public class AccountServiceImpl implements AccountService {
     @Autowired
-    private BankRepository bankRepo;
+    private AccountRepository bankRepo;
     @Autowired
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Bank> getAll(int pageNo, int pageSize) {
+    public List<Account> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<Bank> page = bankRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+        Page<Account> page = bankRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
         return page.getContent();
     }
 
     @Override
-    public Bank getById(Long id) throws NotFoundException {
-        Optional<Bank> bank = bankRepo.findById(id);
+    public Account getById(Long id) throws NotFoundException {
+        Optional<Account> bank = bankRepo.findById(id);
         if (bank.isEmpty()) {
             throw new NotFoundException();
         }
@@ -42,7 +42,7 @@ public class BankServiceImpl implements BankService {
     }
 
     @Override
-    public List<Bank> getByContains(String search) {
+    public List<Account> getByContains(String search) {
         return bankRepo.searchAllByBankNameContainingIgnoreCaseOrAccountNameContainingIgnoreCaseOrAccountNumberContainsIgnoreCase(
                 search, search, search
         );
@@ -50,12 +50,12 @@ public class BankServiceImpl implements BankService {
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> save(Bank bank) {
+    public ResponseEntity<ObjectNode> save(Account account) {
         try {
-            bank.setTenant(authService.authUser().getTenant());
-            bank.setCreatedBy(authService.authUser());
-            bank.setCreatedAt(new Date());
-            bankRepo.saveAndFlush(bank);
+            account.setTenant(authService.authUser().getTenant());
+            account.setCreatedBy(authService.authUser());
+            account.setCreatedAt(new Date());
+            bankRepo.saveAndFlush(account);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -64,7 +64,7 @@ public class BankServiceImpl implements BankService {
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> update(Bank data) throws NotFoundException {
+    public ResponseEntity<ObjectNode> update(Account data) throws NotFoundException {
         var opt = bankRepo.findById(data.getId());
 
         if (opt.isEmpty()) {
