@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 
 @RestController
 @RequestMapping("/subscription")
@@ -31,12 +29,11 @@ public class SubscriptionController {
     @GetMapping("/status")
     public ResponseEntity<ObjectNode> getSubscriptionStatus(@RequestParam String email) throws NotFoundException {
         Long userId = userService.getByEmail(email).getId();
-        Date subscriptionEndDate = tenantService.getSubscriptionEndDate(userId);
-        Date trialEndDate = tenantService.getTrialEndDate(userId);
+        var trialEndDate = tenantService.getTrialEndDate(userId);
         boolean isTrial = tenantService.isTrial(userId);
         boolean canTry = tenantService.canTry(userId);
         boolean isNewTenancy = tenantService.isNewTenancy(userId);
-        LocalDateTime subscriptionEndDateTime = LocalDateTime.ofInstant(subscriptionEndDate.toInstant(), ZoneId.systemDefault());
+        LocalDateTime subscriptionEndDateTime = tenantService.getSubscriptionEndDate(userId);
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime gracePeriodEnd = subscriptionEndDateTime.plusDays(getGracePeriodDays());
         LocalDateTime subscriptionWarningDate = subscriptionEndDateTime.minusDays(getGracePeriodDays());
@@ -45,7 +42,7 @@ public class SubscriptionController {
         response.put("isTrial", isTrial);
         response.put("canTry", canTry);
         response.put("isNewTenancy", isNewTenancy);
-        response.put("subscriptionEndDate", subscriptionEndDate.toString());
+        response.put("subscriptionEndDate", tenantService.getSubscriptionEndDate(userId).toString());
         response.put("trialEndDate", trialEndDate != null ? trialEndDate.toString() : null);
 
         if (now.isAfter(subscriptionEndDateTime)) {

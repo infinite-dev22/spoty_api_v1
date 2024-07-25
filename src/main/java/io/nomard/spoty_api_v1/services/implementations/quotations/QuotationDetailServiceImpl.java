@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -49,7 +49,7 @@ public class QuotationDetailServiceImpl implements QuotationDetailService {
     public ResponseEntity<ObjectNode> save(QuotationDetail quotationDetail) {
         try {
             quotationDetail.setCreatedBy(authService.authUser());
-            quotationDetail.setCreatedAt(new Date());
+            quotationDetail.setCreatedAt(LocalDateTime.now());
             quotationDetailRepo.saveAndFlush(quotationDetail);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -89,7 +89,7 @@ public class QuotationDetailServiceImpl implements QuotationDetailService {
         }
 
         quotationDetail.setUpdatedBy(authService.authUser());
-        quotationDetail.setUpdatedAt(new Date());
+        quotationDetail.setUpdatedAt(LocalDateTime.now());
 
         try {
             quotationDetailRepo.saveAndFlush(quotationDetail);

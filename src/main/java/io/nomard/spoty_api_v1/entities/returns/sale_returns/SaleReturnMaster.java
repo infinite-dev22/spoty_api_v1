@@ -23,7 +23,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -43,7 +43,7 @@ public class SaleReturnMaster implements Serializable {
     private User user_detail;
 
     @Column(nullable = false)
-    private Date date;
+    private LocalDateTime date;
 
     private String ref;
 
@@ -81,7 +81,7 @@ public class SaleReturnMaster implements Serializable {
 
     @Column(name = "created_at")
     @JsonIgnore
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
@@ -90,7 +90,7 @@ public class SaleReturnMaster implements Serializable {
 
     @Column(name = "updated_at")
     @JsonIgnore
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")

@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -50,7 +50,7 @@ public class PurchaseDetailServiceImpl implements PurchaseDetailService {
         try {
             purchaseDetail.setSubTotalCost(purchaseDetail.getCost() * purchaseDetail.getQuantity());
             purchaseDetail.setCreatedBy(authService.authUser());
-            purchaseDetail.setCreatedAt(new Date());
+            purchaseDetail.setCreatedAt(LocalDateTime.now());
             purchaseDetailRepo.saveAndFlush(purchaseDetail);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -91,7 +91,7 @@ public class PurchaseDetailServiceImpl implements PurchaseDetailService {
         }
 
         purchaseDetail.setUpdatedBy(authService.authUser());
-        purchaseDetail.setUpdatedAt(new Date());
+        purchaseDetail.setUpdatedAt(LocalDateTime.now());
 
         try {
             purchaseDetailRepo.saveAndFlush(purchaseDetail);

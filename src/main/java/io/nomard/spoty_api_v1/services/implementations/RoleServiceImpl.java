@@ -15,9 +15,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -61,7 +64,7 @@ public class RoleServiceImpl implements RoleService {
             role.setPermissions(permissions); // Set the fetched permissions
             role.setTenant(authService.authUser().getTenant());
             role.setCreatedBy(authService.authUser());
-            role.setCreatedAt(new Date());
+            role.setCreatedAt(LocalDateTime.now());
             roleRepo.saveAndFlush(role);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -98,7 +101,7 @@ public class RoleServiceImpl implements RoleService {
         }
 
         role.setUpdatedBy(authService.authUser());
-        role.setUpdatedAt(new Date());
+        role.setUpdatedAt(LocalDateTime.now());
 
         try {
             roleRepo.saveAndFlush(role);

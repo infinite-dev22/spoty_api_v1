@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -67,7 +67,7 @@ public class StockInMasterServiceImpl implements StockInMasterService {
                 stockInMaster.setBranch(authService.authUser().getBranch());
             }
             stockInMaster.setCreatedBy(authService.authUser());
-            stockInMaster.setCreatedAt(new Date());
+            stockInMaster.setCreatedAt(LocalDateTime.now());
             stockInMasterRepo.saveAndFlush(stockInMaster);
 
             if (!stockInMaster.getStockInDetails().isEmpty()) {
@@ -117,7 +117,7 @@ public class StockInMasterServiceImpl implements StockInMasterService {
         }
 
         stockInMaster.setUpdatedBy(authService.authUser());
-        stockInMaster.setUpdatedAt(new Date());
+        stockInMaster.setUpdatedAt(LocalDateTime.now());
 
         try {
             stockInMasterRepo.saveAndFlush(stockInMaster);

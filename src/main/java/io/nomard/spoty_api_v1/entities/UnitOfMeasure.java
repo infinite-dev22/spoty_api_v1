@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "units_of_measure")
@@ -52,7 +52,7 @@ public class UnitOfMeasure {
 
     @Column(name = "created_at")
     @JsonIgnore
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
@@ -61,7 +61,7 @@ public class UnitOfMeasure {
 
     @Column(name = "updated_at")
     @JsonIgnore
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")

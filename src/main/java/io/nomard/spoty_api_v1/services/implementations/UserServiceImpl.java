@@ -14,11 +14,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -114,7 +113,7 @@ public class UserServiceImpl implements UserService {
         }
 
         user.setUpdatedBy(authService.authUser());
-        user.setUpdatedAt(new Date());
+        user.setUpdatedAt(LocalDateTime.now());
 
         try {
             userRepo.saveAndFlush(user);
@@ -155,7 +154,7 @@ public class UserServiceImpl implements UserService {
         userProfile.setAvatar(data.getAvatar());
         userProfile.setTenant(authService.authUser().getTenant());
         userProfile.setCreatedBy(authService.authUser());
-        userProfile.setCreatedAt(new Date());
+        userProfile.setCreatedAt(LocalDateTime.now());
 
         user.setUserProfile(userProfile);
         user.setTenant(data.getTenant());
@@ -170,7 +169,7 @@ public class UserServiceImpl implements UserService {
         }
         user.setTenant(authService.authUser().getTenant());
         user.setCreatedBy(authService.authUser());
-        user.setCreatedAt(new Date());
+        user.setCreatedAt(LocalDateTime.now());
 
         try {
             userRepo.save(user);

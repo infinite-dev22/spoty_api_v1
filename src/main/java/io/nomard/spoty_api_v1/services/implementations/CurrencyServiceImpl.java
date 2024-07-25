@@ -14,7 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class CurrencyServiceImpl implements CurrencyService {
@@ -56,7 +60,7 @@ public class CurrencyServiceImpl implements CurrencyService {
         try {
             currency.setTenant(authService.authUser().getTenant());
             currency.setCreatedBy(authService.authUser());
-            currency.setCreatedAt(new Date());
+            currency.setCreatedAt(LocalDateTime.now());
             currencyRepo.saveAndFlush(currency);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -87,7 +91,7 @@ public class CurrencyServiceImpl implements CurrencyService {
         }
 
         currency.setUpdatedBy(authService.authUser());
-        currency.setUpdatedAt(new Date());
+        currency.setUpdatedAt(LocalDateTime.now());
 
         try {
             currencyRepo.saveAndFlush(currency);

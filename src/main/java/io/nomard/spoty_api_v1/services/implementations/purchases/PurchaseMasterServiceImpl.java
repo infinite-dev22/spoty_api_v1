@@ -17,7 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -86,17 +86,17 @@ public class PurchaseMasterServiceImpl implements PurchaseMasterService {
             var account = accountService.getByContains(authService.authUser().getTenant(), "Default Account");
             var accountTransaction = new AccountTransaction();
             accountTransaction.setTenant(authService.authUser().getTenant());
-            accountTransaction.setTransactionDate(new Date());
+            accountTransaction.setTransactionDate(LocalDateTime.now());
             accountTransaction.setAccount(account);
             accountTransaction.setAmount(total);
             accountTransaction.setTransactionType("Purchase");
             accountTransaction.setNote("Purchase made");
             accountTransaction.setCreatedBy(authService.authUser());
-            accountTransaction.setCreatedAt(new Date());
+            accountTransaction.setCreatedAt(LocalDateTime.now());
             accountTransactionService.save(accountTransaction);
         }
         purchaseMaster.setCreatedBy(authService.authUser());
-        purchaseMaster.setCreatedAt(new Date());
+        purchaseMaster.setCreatedAt(LocalDateTime.now());
         try {
             purchaseMasterRepo.saveAndFlush(purchaseMaster);
             return spotyResponseImpl.created();
@@ -178,7 +178,7 @@ public class PurchaseMasterServiceImpl implements PurchaseMasterService {
             purchaseMaster.setNotes(data.getNotes());
         }
         purchaseMaster.setUpdatedBy(authService.authUser());
-        purchaseMaster.setUpdatedAt(new Date());
+        purchaseMaster.setUpdatedAt(LocalDateTime.now());
         try {
             purchaseMasterRepo.saveAndFlush(purchaseMaster);
             return spotyResponseImpl.ok();

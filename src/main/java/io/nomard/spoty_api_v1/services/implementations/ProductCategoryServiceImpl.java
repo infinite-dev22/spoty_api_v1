@@ -14,7 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class ProductCategoryServiceImpl implements ProductCategoryService {
@@ -58,7 +62,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
                 productCategory.setBranch(authService.authUser().getBranch());
             }
             productCategory.setCreatedBy(authService.authUser());
-            productCategory.setCreatedAt(new Date());
+            productCategory.setCreatedAt(LocalDateTime.now());
             productCategoryRepo.saveAndFlush(productCategory);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -85,7 +89,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         }
 
         productCategory.setUpdatedBy(authService.authUser());
-        productCategory.setUpdatedAt(new Date());
+        productCategory.setUpdatedAt(LocalDateTime.now());
 
         try {
             productCategoryRepo.saveAndFlush(productCategory);

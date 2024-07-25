@@ -16,9 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -62,11 +61,11 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
                 transferTransaction.setToBranch(transferDetail.getTransfer().getToBranch());
                 transferTransaction.setProduct(transferDetail.getProduct());
                 transferTransaction.setTransferDetail(transferDetail);
-                transferTransaction.setDate(new Date());
+                transferTransaction.setDate(LocalDateTime.now());
                 transferTransaction.setTransferQuantity(transferDetail.getQuantity());
                 transferTransaction.setTenant(authService.authUser().getTenant());
                 transferTransaction.setCreatedBy(authService.authUser());
-                transferTransaction.setCreatedAt(new Date());
+                transferTransaction.setCreatedAt(LocalDateTime.now());
                 transferTransactionRepo.saveAndFlush(transferTransaction);
                 return spotyResponseImpl.created();
             } catch (Exception e) {
@@ -122,7 +121,7 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
         }
 
         transferTransaction.setUpdatedBy(authService.authUser());
-        transferTransaction.setUpdatedAt(new Date());
+        transferTransaction.setUpdatedAt(LocalDateTime.now());
 
         try {
             transferTransactionRepo.saveAndFlush(transferTransaction);

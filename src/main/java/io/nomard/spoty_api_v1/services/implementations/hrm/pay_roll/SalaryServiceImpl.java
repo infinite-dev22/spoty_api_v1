@@ -14,7 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class SalaryServiceImpl implements SalaryService {
@@ -55,7 +59,7 @@ public class SalaryServiceImpl implements SalaryService {
                 salary.setBranch(authService.authUser().getBranch());
             }
             salary.setCreatedBy(authService.authUser());
-            salary.setCreatedAt(new Date());
+            salary.setCreatedAt(LocalDateTime.now());
             salaryRepo.saveAndFlush(salary);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -106,7 +110,7 @@ public class SalaryServiceImpl implements SalaryService {
 //        }
 
         salary.setUpdatedBy(authService.authUser());
-        salary.setUpdatedAt(new Date());
+        salary.setUpdatedAt(LocalDateTime.now());
 
         try {
             salaryRepo.saveAndFlush(salary);

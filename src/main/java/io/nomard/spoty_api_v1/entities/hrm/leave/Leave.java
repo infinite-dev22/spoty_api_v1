@@ -9,7 +9,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Duration;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "leaves")
@@ -38,9 +38,9 @@ public class Leave {
     private Designation designation;
     private String description;
     @Column(name = "start_date")
-    private Date startDate;
+    private LocalDateTime startDate;
     @Column(name = "end_date")
-    private Date endDate;
+    private LocalDateTime endDate;
     private Duration duration;
     @ManyToOne
     @JoinColumn(name = "leave_type_id")
@@ -50,7 +50,7 @@ public class Leave {
 
     @Column(name = "created_at")
     @JsonIgnore
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
@@ -59,7 +59,7 @@ public class Leave {
 
     @Column(name = "updated_at")
     @JsonIgnore
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")

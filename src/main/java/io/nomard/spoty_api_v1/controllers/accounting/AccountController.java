@@ -62,7 +62,7 @@ public class AccountController {
 
     @GetMapping("/transactions")
     public List<AccountTransaction> getTransactions(@RequestParam(defaultValue = "0") Integer pageNo,
-                                @RequestParam(defaultValue = "50") Integer pageSize) {
+                                                    @RequestParam(defaultValue = "50") Integer pageSize) {
         return accountTransactionService.getAll(pageNo, pageSize);
     }
 }

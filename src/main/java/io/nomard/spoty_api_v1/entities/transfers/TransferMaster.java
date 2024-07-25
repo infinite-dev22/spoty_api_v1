@@ -22,7 +22,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.LinkedList;
+import java.util.List;
 
 @Entity
 @Table(name = "transfer_masters")
@@ -40,7 +42,7 @@ public class TransferMaster implements Serializable {
     private String ref;
 
     @Column(nullable = false)
-    private Date date;
+    private LocalDateTime date;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "from_branch_id")
@@ -68,7 +70,7 @@ public class TransferMaster implements Serializable {
 
     @Column(name = "created_at")
     @JsonIgnore
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
@@ -77,7 +79,7 @@ public class TransferMaster implements Serializable {
 
     @Column(name = "updated_at")
     @JsonIgnore
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")

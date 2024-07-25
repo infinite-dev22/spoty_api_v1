@@ -23,7 +23,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.LinkedList;
+import java.util.List;
 
 @Entity
 @Table(name = "requisition_masters")
@@ -40,7 +42,7 @@ public class RequisitionMaster implements Serializable {
     private String ref;
 
     @Column(nullable = false)
-    private Date date;
+    private LocalDateTime date;
 
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "supplier_id")
@@ -60,7 +62,7 @@ public class RequisitionMaster implements Serializable {
     private String shipVia;
     private String shipMethod;
     private String shippingTerms;
-    private Date deliveryDate;
+    private LocalDateTime deliveryDate;
     private String notes;
 
     @Column(nullable = false)
@@ -71,7 +73,7 @@ public class RequisitionMaster implements Serializable {
 
     @Column(name = "created_at")
     @JsonIgnore
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
@@ -80,7 +82,7 @@ public class RequisitionMaster implements Serializable {
 
     @Column(name = "updated_at")
     @JsonIgnore
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "updated_by")

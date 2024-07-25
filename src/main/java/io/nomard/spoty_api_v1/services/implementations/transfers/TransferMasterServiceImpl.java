@@ -15,9 +15,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -71,7 +70,7 @@ public class TransferMasterServiceImpl implements TransferMasterService {
             }
             transferMaster.setTenant(authService.authUser().getTenant());
             transferMaster.setCreatedBy(authService.authUser());
-            transferMaster.setCreatedAt(new Date());
+            transferMaster.setCreatedAt(LocalDateTime.now());
             transferMasterRepo.saveAndFlush(transferMaster);
 
             for (int i = 0; i < transferMaster.getTransferDetails().size(); i++) {
@@ -144,7 +143,7 @@ public class TransferMasterServiceImpl implements TransferMasterService {
         }
 
         transferMaster.setUpdatedBy(authService.authUser());
-        transferMaster.setUpdatedAt(new Date());
+        transferMaster.setUpdatedAt(LocalDateTime.now());
 
         try {
             transferMasterRepo.saveAndFlush(transferMaster);

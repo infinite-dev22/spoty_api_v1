@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -49,7 +49,7 @@ public class StockInDetailServiceImpl implements StockInDetailService {
     public ResponseEntity<ObjectNode> save(StockInDetail stockInDetail) {
         try {
             stockInDetail.setCreatedBy(authService.authUser());
-            stockInDetail.setCreatedAt(new Date());
+            stockInDetail.setCreatedAt(LocalDateTime.now());
             stockInDetailRepo.saveAndFlush(stockInDetail);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -105,7 +105,7 @@ public class StockInDetailServiceImpl implements StockInDetailService {
         }
 
         stockInDetail.setUpdatedBy(authService.authUser());
-        stockInDetail.setUpdatedAt(new Date());
+        stockInDetail.setUpdatedAt(LocalDateTime.now());
 
         try {
             stockInDetailRepo.saveAndFlush(stockInDetail);

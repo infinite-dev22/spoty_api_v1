@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -49,7 +49,7 @@ public class RequisitionDetailServiceImpl implements RequisitionDetailService {
     public ResponseEntity<ObjectNode> save(RequisitionDetail requisitionDetail) {
         try {
             requisitionDetail.setCreatedBy(authService.authUser());
-            requisitionDetail.setCreatedAt(new Date());
+            requisitionDetail.setCreatedAt(LocalDateTime.now());
             requisitionDetailRepo.saveAndFlush(requisitionDetail);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -105,7 +105,7 @@ public class RequisitionDetailServiceImpl implements RequisitionDetailService {
         }
 
         requisitionDetail.setUpdatedBy(authService.authUser());
-        requisitionDetail.setUpdatedAt(new Date());
+        requisitionDetail.setUpdatedAt(LocalDateTime.now());
 
         try {
             requisitionDetailRepo.saveAndFlush(requisitionDetail);

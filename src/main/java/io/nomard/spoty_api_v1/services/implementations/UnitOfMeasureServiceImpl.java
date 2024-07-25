@@ -14,7 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
@@ -54,7 +58,7 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
     public ResponseEntity<ObjectNode> save(UnitOfMeasure uom) {
         uom.setTenant(authService.authUser().getTenant());
         uom.setCreatedBy(authService.authUser());
-        uom.setCreatedAt(new Date());
+        uom.setCreatedAt(LocalDateTime.now());
         uomRepo.saveAndFlush(uom);
         try {
             uomRepo.saveAndFlush(uom);
@@ -96,7 +100,7 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
         }
 
         uom.setUpdatedBy(authService.authUser());
-        uom.setUpdatedAt(new Date());
+        uom.setUpdatedAt(LocalDateTime.now());
 
         try {
             uomRepo.saveAndFlush(uom);

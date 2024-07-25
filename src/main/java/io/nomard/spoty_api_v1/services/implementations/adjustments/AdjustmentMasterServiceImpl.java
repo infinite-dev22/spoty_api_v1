@@ -15,9 +15,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -73,7 +72,7 @@ public class AdjustmentMasterServiceImpl implements AdjustmentMasterService {
                 adjustmentMaster.setBranch(authService.authUser().getBranch());
             }
             adjustmentMaster.setCreatedBy(authService.authUser());
-            adjustmentMaster.setCreatedAt(new Date());
+            adjustmentMaster.setCreatedAt(LocalDateTime.now());
             adjustmentMasterRepo.saveAndFlush(adjustmentMaster);
 
             for (int i = 0; i < adjustmentMaster.getAdjustmentDetails().size(); i++) {
@@ -122,7 +121,7 @@ public class AdjustmentMasterServiceImpl implements AdjustmentMasterService {
         }
 
         adjustmentMaster.setUpdatedBy(authService.authUser());
-        adjustmentMaster.setUpdatedAt(new Date());
+        adjustmentMaster.setUpdatedAt(LocalDateTime.now());
 
         try {
             adjustmentMasterRepo.saveAndFlush(adjustmentMaster);

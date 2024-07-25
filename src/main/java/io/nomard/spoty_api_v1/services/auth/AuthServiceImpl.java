@@ -2,7 +2,10 @@ package io.nomard.spoty_api_v1.services.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.*;
+import io.nomard.spoty_api_v1.entities.Branch;
+import io.nomard.spoty_api_v1.entities.Tenant;
+import io.nomard.spoty_api_v1.entities.User;
+import io.nomard.spoty_api_v1.entities.UserProfile;
 import io.nomard.spoty_api_v1.entities.accounting.Account;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.LoginModel;
@@ -22,8 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Service
@@ -69,21 +71,16 @@ public class AuthServiceImpl implements AuthService {
             var userDetails = spotyUserDetailsService.loadUserByUsername(loginDetails.getEmail());
             var user = userRepo.findUserByEmail(loginDetails.getEmail());
             var tenantId = user.getTenant().getId();
-
-            var subscriptionEndDate = LocalDateTime.ofInstant(
-                    Instant.ofEpochMilli(tenantService.getSubscriptionEndDate(tenantId).getTime()),
-                    ZoneId.systemDefault()
-            );
             var now = LocalDateTime.now();
-            var gracePeriodEnd = subscriptionEndDate.plusDays(getGracePeriodDays());
-            var subscriptionWarningDate = subscriptionEndDate.minusDays(getGracePeriodDays());
+            var gracePeriodEnd = tenantService.getSubscriptionEndDate(tenantId).plusDays(getGracePeriodDays());
+            var subscriptionWarningDate = tenantService.getSubscriptionEndDate(tenantId).minusDays(getGracePeriodDays());
 
             boolean trial = tenantService.isTrial(tenantId);
             boolean canTry = tenantService.canTry(tenantId);
             boolean newTenancy = tenantService.isNewTenancy(tenantId);
-            boolean activeTenancy = subscriptionEndDate.isAfter(now);
-            boolean activeTenancyWarning = subscriptionEndDate.isAfter(now) && subscriptionEndDate.isBefore(subscriptionWarningDate.plusDays(getGracePeriodDays()));
-            boolean inActiveTenancyWarning = subscriptionEndDate.isBefore(now) && now.isBefore(gracePeriodEnd);
+            boolean activeTenancy = tenantService.getSubscriptionEndDate(tenantId).isAfter(now);
+            boolean activeTenancyWarning = tenantService.getSubscriptionEndDate(tenantId).isAfter(now) && tenantService.getSubscriptionEndDate(tenantId).isBefore(subscriptionWarningDate.plusDays(getGracePeriodDays()));
+            boolean inActiveTenancyWarning = tenantService.getSubscriptionEndDate(tenantId).isBefore(now) && now.isBefore(gracePeriodEnd);
 
             var response = objectMapper.createObjectNode();
             response.put("status", 200);
@@ -96,15 +93,15 @@ public class AuthServiceImpl implements AuthService {
             response.put("token", "Bearer " + spotyTokenService.generateToken(userDetails));
             response.putPOJO("user", user);
 
-            if (trial && tenantService.getTrialEndDate(tenantId).before(new Date())) {
+            if (trial && tenantService.getTrialEndDate(tenantId).isBefore(LocalDateTime.now())) {
                 response.put("message", "Subscription required");
-            } else if (subscriptionEndDate.isBefore(now)) {
+            } else if (tenantService.getSubscriptionEndDate(tenantId).isBefore(now)) {
                 if (now.isBefore(subscriptionWarningDate)) {
                     response.put("message", "Subscription required");
                 } else if (now.isBefore(gracePeriodEnd)) {
                     response.put("message", "Subscription expired, please renew");
                 }
-            } else if (subscriptionEndDate.isBefore(subscriptionWarningDate)) {
+            } else if (tenantService.getSubscriptionEndDate(tenantId).isBefore(subscriptionWarningDate)) {
                 response.put("message", "Subscription is about to expire, please renew");
             } else {
                 response.put("message", "Process successfully completed");
@@ -130,8 +127,8 @@ public class AuthServiceImpl implements AuthService {
 
         var tenant = new Tenant();
         tenant.setName(String.join(" ", signUpDetails.getFirstName(), signUpDetails.getLastName(), signUpDetails.getOtherName()));
-        tenant.setSubscriptionEndDate(Date.from(LocalDate.now().minusMonths(1).atStartOfDay(ZoneId.systemDefault()).toInstant()));
-        tenant.setTrialEndDate(Date.from(LocalDate.now().minusMonths(1).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        tenant.setSubscriptionEndDate(LocalDateTime.now().minusMonths(12));
+        tenant.setTrialEndDate(LocalDateTime.now().minusMonths(12));
 
         var branch = new Branch();
         branch.setName("Default Branch");

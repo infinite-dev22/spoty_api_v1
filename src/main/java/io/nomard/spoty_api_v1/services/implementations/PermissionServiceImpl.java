@@ -14,7 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class PermissionServiceImpl implements PermissionService {
@@ -46,7 +50,7 @@ public class PermissionServiceImpl implements PermissionService {
     public ResponseEntity<ObjectNode> save(Permission permission) {
         try {
             permission.setCreatedBy(authService.authUser());
-            permission.setCreatedAt(new Date());
+            permission.setCreatedAt(LocalDateTime.now());
             permissionRepo.saveAndFlush(permission);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -77,7 +81,7 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         permission.setUpdatedBy(authService.authUser());
-        permission.setUpdatedAt(new Date());
+        permission.setUpdatedAt(LocalDateTime.now());
 
         try {
             permissionRepo.saveAndFlush(permission);

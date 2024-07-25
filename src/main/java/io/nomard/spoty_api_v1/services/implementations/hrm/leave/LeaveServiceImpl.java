@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -53,7 +53,7 @@ public class LeaveServiceImpl implements LeaveService {
                 leave.setBranch(authService.authUser().getBranch());
             }
             leave.setCreatedBy(authService.authUser());
-            leave.setCreatedAt(new Date());
+            leave.setCreatedAt(LocalDateTime.now());
             leaveStatusRepo.saveAndFlush(leave);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -112,7 +112,7 @@ public class LeaveServiceImpl implements LeaveService {
         }
 
         leaveStatus.setUpdatedBy(authService.authUser());
-        leaveStatus.setUpdatedAt(new Date());
+        leaveStatus.setUpdatedAt(LocalDateTime.now());
 
         try {
             leaveStatusRepo.saveAndFlush(leaveStatus);

@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -63,7 +63,7 @@ public class PurchaseReturnMasterServiceImpl implements PurchaseReturnMasterServ
                 purchaseReturnMaster.setBranch(authService.authUser().getBranch());
             }
             purchaseReturnMaster.setCreatedBy(authService.authUser());
-            purchaseReturnMaster.setCreatedAt(new Date());
+            purchaseReturnMaster.setCreatedAt(LocalDateTime.now());
             purchaseReturnMasterRepo.saveAndFlush(purchaseReturnMaster);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -142,7 +142,7 @@ public class PurchaseReturnMasterServiceImpl implements PurchaseReturnMasterServ
         }
 
         purchaseReturnMaster.setUpdatedBy(authService.authUser());
-        purchaseReturnMaster.setUpdatedAt(new Date());
+        purchaseReturnMaster.setUpdatedAt(LocalDateTime.now());
 
         try {
             purchaseReturnMasterRepo.saveAndFlush(purchaseReturnMaster);

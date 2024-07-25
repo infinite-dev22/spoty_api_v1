@@ -22,7 +22,7 @@ import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "stock_in_transactions")
@@ -53,14 +53,14 @@ public class StockInTransaction {
     private StockInDetail stockInDetail;
 
     @Column
-    private Date date;
+    private LocalDateTime date;
 
     @Column(name = "stock_in_quantity")
     private long stockInQuantity;
 
     @Column(name = "created_at")
     @JsonIgnore
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
@@ -69,7 +69,7 @@ public class StockInTransaction {
 
     @Column(name = "updated_at")
     @JsonIgnore
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "updated_by")

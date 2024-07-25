@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -49,7 +49,7 @@ public class PurchaseReturnDetailServiceImpl implements PurchaseReturnDetailServ
     public ResponseEntity<ObjectNode> save(PurchaseReturnDetail purchaseReturnDetail) {
         try {
             purchaseReturnDetail.setCreatedBy(authService.authUser());
-            purchaseReturnDetail.setCreatedAt(new Date());
+            purchaseReturnDetail.setCreatedAt(LocalDateTime.now());
             purchaseReturnDetailRepo.saveAndFlush(purchaseReturnDetail);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -109,7 +109,7 @@ public class PurchaseReturnDetailServiceImpl implements PurchaseReturnDetailServ
         }
 
         purchaseReturnDetail.setUpdatedBy(authService.authUser());
-        purchaseReturnDetail.setUpdatedAt(new Date());
+        purchaseReturnDetail.setUpdatedAt(LocalDateTime.now());
 
         try {
             purchaseReturnDetailRepo.saveAndFlush(purchaseReturnDetail);

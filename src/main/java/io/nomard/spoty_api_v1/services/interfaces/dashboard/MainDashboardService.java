@@ -1,7 +1,10 @@
 package io.nomard.spoty_api_v1.services.interfaces.dashboard;
 
-import io.nomard.spoty_api_v1.entities.sales.*;
-import io.nomard.spoty_api_v1.models.*;
+import io.nomard.spoty_api_v1.entities.sales.SaleMaster;
+import io.nomard.spoty_api_v1.models.DashboardKPIModel;
+import io.nomard.spoty_api_v1.models.LineChartModel;
+import io.nomard.spoty_api_v1.models.ProductSalesModel;
+import io.nomard.spoty_api_v1.models.StockAlertModel;
 
 import java.util.List;
 
@@ -12,6 +15,7 @@ public interface MainDashboardService {
     List<LineChartModel> getMonthlyExpenses();
 
     List<LineChartModel> getWeeklyExpenses();
+
     // Incomes.
     List<LineChartModel> getYearlyIncomes();
 
@@ -28,8 +32,12 @@ public interface MainDashboardService {
     List<StockAlertModel> getProductsStockAlert();
 
     DashboardKPIModel getTotalEarningsKPI();
+
     DashboardKPIModel getTotalPurchasesKPI();
+
     DashboardKPIModel getCountProductsKPI();
+
     DashboardKPIModel getCountCustomersKPI();
+
     DashboardKPIModel getCountSuppliersKPI();
 }

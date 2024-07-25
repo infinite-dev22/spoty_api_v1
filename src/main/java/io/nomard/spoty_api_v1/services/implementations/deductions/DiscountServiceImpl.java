@@ -14,7 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class DiscountServiceImpl implements DiscountService {
@@ -48,7 +52,7 @@ public class DiscountServiceImpl implements DiscountService {
             discount.setTenant(authService.authUser().getTenant());
             discount.setBranch(authService.authUser().getBranch());
             discount.setCreatedBy(authService.authUser());
-            discount.setCreatedAt(new Date());
+            discount.setCreatedAt(LocalDateTime.now());
             discountRepo.saveAndFlush(discount);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -71,7 +75,7 @@ public class DiscountServiceImpl implements DiscountService {
             discount.setPercentage(data.getPercentage());
         }
         discount.setUpdatedBy(authService.authUser());
-        discount.setUpdatedAt(new Date());
+        discount.setUpdatedAt(LocalDateTime.now());
         try {
             discountRepo.saveAndFlush(discount);
             return spotyResponseImpl.ok();

@@ -17,8 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -44,23 +42,15 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    public Date getSubscriptionEndDate(Long id) throws NotFoundException {
+    public LocalDateTime getSubscriptionEndDate(Long id) throws NotFoundException {
         Tenant tenant = tenantRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("Tenant not found"));
         Hibernate.initialize(tenant.getSubscriptionEndDate());
         return tenant.getSubscriptionEndDate();
     }
 
-//    public TenantDTO getTenantDTO(Long id) throws NotFoundException {
-//        Tenant tenant = tenantRepo.findById(id)
-//                .orElseThrow(() -> new NotFoundException("Tenant not found"));
-//        return new TenantDTO(tenant.getId(), tenant.getName(), tenant.getSubscriptionEndDate());
-//    }
-
-
-
     @Override
-    public Date getTrialEndDate(Long id) throws NotFoundException {
+    public LocalDateTime getTrialEndDate(Long id) throws NotFoundException {
         return userRepo.findById(id).orElseThrow(NotFoundException::new).getTenant().getTrialEndDate();
     }
 
@@ -81,8 +71,7 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public boolean isInGracePeriod(Long id) throws NotFoundException {
-        Date subscriptionEndDate = getSubscriptionEndDate(id);
-        LocalDateTime subscriptionEndDateTime = LocalDateTime.ofInstant(subscriptionEndDate.toInstant(), ZoneId.systemDefault());
+        LocalDateTime subscriptionEndDateTime = getSubscriptionEndDate(id);
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime gracePeriodEnd = subscriptionEndDateTime.plusDays(getGracePeriodDays());
         return now.isBefore(gracePeriodEnd);
@@ -96,7 +85,7 @@ public class TenantServiceImpl implements TenantService {
     @Transactional
     public ResponseEntity<ObjectNode> save(Tenant tenant) {
         try {
-            tenant.setCreatedAt(new Date());
+            tenant.setCreatedAt(LocalDateTime.now());
             tenantRepo.saveAndFlush(tenant);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -112,7 +101,7 @@ public class TenantServiceImpl implements TenantService {
         tenant.setTrialEndDate(DateUtils.addDays(7));
         tenant.setSubscriptionEndDate(DateUtils.addDays(7));
         tenant.setCanTry(false);
-        tenant.setUpdatedAt(new Date());
+        tenant.setUpdatedAt(LocalDateTime.now());
         try {
             tenantRepo.saveAndFlush(tenant);
             return spotyResponseImpl.ok();
@@ -142,7 +131,7 @@ public class TenantServiceImpl implements TenantService {
             tenant.setNewTenancy(data.isNewTenancy());
         }
 
-        tenant.setUpdatedAt(new Date());
+        tenant.setUpdatedAt(LocalDateTime.now());
 
         try {
             tenantRepo.saveAndFlush(tenant);

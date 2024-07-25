@@ -14,7 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class SupplierServiceImpl implements SupplierService {
@@ -55,7 +59,7 @@ public class SupplierServiceImpl implements SupplierService {
                 supplier.setBranch(authService.authUser().getBranch());
             }
             supplier.setCreatedBy(authService.authUser());
-            supplier.setCreatedAt(new Date());
+            supplier.setCreatedAt(LocalDateTime.now());
             supplierRepo.saveAndFlush(supplier);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -106,7 +110,7 @@ public class SupplierServiceImpl implements SupplierService {
         }
 
         supplier.setUpdatedBy(authService.authUser());
-        supplier.setUpdatedAt(new Date());
+        supplier.setUpdatedAt(LocalDateTime.now());
 
         try {
             supplierRepo.saveAndFlush(supplier);

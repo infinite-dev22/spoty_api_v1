@@ -5,7 +5,7 @@ import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface TenantService {
@@ -13,9 +13,9 @@ public interface TenantService {
 
     Tenant getById(Long id) throws NotFoundException;
 
-    Date getSubscriptionEndDate(Long id) throws NotFoundException;
+    LocalDateTime getSubscriptionEndDate(Long id) throws NotFoundException;
 
-    Date getTrialEndDate(Long id) throws NotFoundException;
+    LocalDateTime getTrialEndDate(Long id) throws NotFoundException;
 
     boolean isTrial(Long id) throws NotFoundException;
 
@@ -23,7 +23,7 @@ public interface TenantService {
 
     boolean isNewTenancy(Long id) throws NotFoundException;
 
-    boolean isInGracePeriod(Long userId)  throws NotFoundException;
+    boolean isInGracePeriod(Long userId) throws NotFoundException;
 
     ResponseEntity<ObjectNode> startTrial(Long tenantId) throws NotFoundException;
 

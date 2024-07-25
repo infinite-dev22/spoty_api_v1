@@ -14,7 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class BeneficiaryTypeServiceImpl implements BeneficiaryTypeService {
@@ -55,7 +59,7 @@ public class BeneficiaryTypeServiceImpl implements BeneficiaryTypeService {
         try {
             beneficiaryType.setTenant(authService.authUser().getTenant());
             beneficiaryType.setCreatedBy(authService.authUser());
-            beneficiaryType.setCreatedAt(new Date());
+            beneficiaryType.setCreatedAt(LocalDateTime.now());
             beneficiaryTypeRepo.saveAndFlush(beneficiaryType);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -90,7 +94,7 @@ public class BeneficiaryTypeServiceImpl implements BeneficiaryTypeService {
         }
 
         beneficiaryType.setUpdatedBy(authService.authUser());
-        beneficiaryType.setUpdatedAt(new Date());
+        beneficiaryType.setUpdatedAt(LocalDateTime.now());
 
         try {
             beneficiaryTypeRepo.saveAndFlush(beneficiaryType);

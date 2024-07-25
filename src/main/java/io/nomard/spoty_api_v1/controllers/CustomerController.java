@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -39,7 +38,6 @@ public class CustomerController {
 
     @PostMapping("/add")
     public ResponseEntity<ObjectNode> save(@Valid @RequestBody Customer customer) {
-        customer.setCreatedAt(new Date());
         return customerService.save(customer);
     }
 

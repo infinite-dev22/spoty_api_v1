@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -59,7 +59,7 @@ public class EmploymentStatusServiceImpl implements EmploymentStatusService {
         try {
             employmentStatus.setTenant(authService.authUser().getTenant());
             employmentStatus.setCreatedBy(authService.authUser());
-            employmentStatus.setCreatedAt(new Date());
+            employmentStatus.setCreatedAt(LocalDateTime.now());
             employmentStatusRepo.saveAndFlush(employmentStatus);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -90,7 +90,7 @@ public class EmploymentStatusServiceImpl implements EmploymentStatusService {
         }
 
         employmentStatus.setUpdatedBy(authService.authUser());
-        employmentStatus.setUpdatedAt(new Date());
+        employmentStatus.setUpdatedAt(LocalDateTime.now());
 
         try {
             employmentStatusRepo.saveAndFlush(employmentStatus);

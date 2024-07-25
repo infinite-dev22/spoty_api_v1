@@ -15,7 +15,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class ExpenseServiceImpl implements ExpenseService {
@@ -62,16 +66,16 @@ public class ExpenseServiceImpl implements ExpenseService {
             var account = accountService.getByContains(authService.authUser().getTenant(), "Default Account");
             var accountTransaction = new AccountTransaction();
             accountTransaction.setTenant(authService.authUser().getTenant());
-            accountTransaction.setTransactionDate(new Date());
+            accountTransaction.setTransactionDate(LocalDateTime.now());
             accountTransaction.setAccount(account);
             accountTransaction.setAmount(expense.getAmount());
             accountTransaction.setTransactionType("Expense");
             accountTransaction.setNote("Expense made");
             accountTransaction.setCreatedBy(authService.authUser());
-            accountTransaction.setCreatedAt(new Date());
+            accountTransaction.setCreatedAt(LocalDateTime.now());
             accountTransactionService.save(accountTransaction);
             expense.setCreatedBy(authService.authUser());
-            expense.setCreatedAt(new Date());
+            expense.setCreatedAt(LocalDateTime.now());
             expenseRepo.saveAndFlush(expense);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -114,7 +118,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         }
 
         expense.setUpdatedBy(authService.authUser());
-        expense.setUpdatedAt(new Date());
+        expense.setUpdatedAt(LocalDateTime.now());
 
         try {
             expenseRepo.saveAndFlush(expense);

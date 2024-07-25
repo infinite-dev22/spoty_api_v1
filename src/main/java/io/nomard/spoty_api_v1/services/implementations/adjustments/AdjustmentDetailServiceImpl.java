@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -49,7 +49,7 @@ public class AdjustmentDetailServiceImpl implements AdjustmentDetailService {
     public ResponseEntity<ObjectNode> save(AdjustmentDetail adjustmentDetail) {
         try {
             adjustmentDetail.setCreatedBy(authService.authUser());
-            adjustmentDetail.setCreatedAt(new Date());
+            adjustmentDetail.setCreatedAt(LocalDateTime.now());
             adjustmentDetailRepo.saveAndFlush(adjustmentDetail);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -89,7 +89,7 @@ public class AdjustmentDetailServiceImpl implements AdjustmentDetailService {
         }
 
         adjustmentDetail.setUpdatedBy(authService.authUser());
-        adjustmentDetail.setUpdatedAt(new Date());
+        adjustmentDetail.setUpdatedAt(LocalDateTime.now());
 
         try {
             adjustmentDetailRepo.saveAndFlush(adjustmentDetail);

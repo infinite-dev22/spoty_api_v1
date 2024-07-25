@@ -15,9 +15,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -59,12 +58,12 @@ public class StockInTransactionServiceImpl implements StockInTransactionService 
             stockInTransaction.setBranch(stockInDetail.getStockIn().getBranch());
             stockInTransaction.setProduct(stockInDetail.getProduct());
             stockInTransaction.setStockInDetail(stockInDetail);
-            stockInTransaction.setDate(new Date());
+            stockInTransaction.setDate(LocalDateTime.now());
             stockInTransaction.setStockInQuantity(stockInDetail.getQuantity());
             stockInTransaction.setTenant(authService.authUser().getTenant());
             stockInTransaction.setBranch(authService.authUser().getBranch());
             stockInTransaction.setCreatedBy(authService.authUser());
-            stockInTransaction.setCreatedAt(new Date());
+            stockInTransaction.setCreatedAt(LocalDateTime.now());
             stockInTransactionRepo.saveAndFlush(stockInTransaction);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -112,7 +111,7 @@ public class StockInTransactionServiceImpl implements StockInTransactionService 
         }
 
         stockInTransaction.setUpdatedBy(authService.authUser());
-        stockInTransaction.setUpdatedAt(new Date());
+        stockInTransaction.setUpdatedAt(LocalDateTime.now());
 
         try {
             stockInTransactionRepo.saveAndFlush(stockInTransaction);

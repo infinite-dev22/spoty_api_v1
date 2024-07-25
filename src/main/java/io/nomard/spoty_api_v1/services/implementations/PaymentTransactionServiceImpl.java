@@ -19,7 +19,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class PaymentTransactionServiceImpl implements PaymentTransactionService {
@@ -65,14 +69,14 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
             paymentTransaction.setBranch(authService.authUser().getBranch());
             paymentTransaction.setTransactionReference("flw-t1nf-f9b3bf384cd30d6fca42b6df9d27bd2f-m03k");
             paymentTransaction.setPlanName(payload.getPlanName());
-            paymentTransaction.setPaidOn(new Date());
+            paymentTransaction.setPaidOn(LocalDateTime.now());
             paymentTransaction.setAmount(payload.getAmount());
             paymentTransaction.setRecurring(payload.isRecurring());
             paymentTransaction.setPayMethod("CARD");
             paymentTransaction.setPaySource(payload.getCard());
             paymentTransaction.setTenant(authService.authUser().getTenant());
             paymentTransaction.setCreatedBy(authService.authUser());
-            paymentTransaction.setCreatedAt(new Date());
+            paymentTransaction.setCreatedAt(LocalDateTime.now());
             paymentTransactionRepo.saveAndFlush(paymentTransaction);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -95,13 +99,13 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
             paymentTransaction.setBranch(authService.authUser().getBranch());
             paymentTransaction.setTransactionReference("flw-t1nf-f9b3bf384cd30d6fca42b6df9d27bd2f-m03k");
             paymentTransaction.setPlanName(momoModel.getPlanName());
-            paymentTransaction.setPaidOn(new Date());
+            paymentTransaction.setPaidOn(LocalDateTime.now());
             paymentTransaction.setAmount(momoModel.getPayload().getAmount());
             paymentTransaction.setPayMethod("MOBILE MONEY");
             paymentTransaction.setPaySource(momoModel.getPayload().getPhoneNumber());
             paymentTransaction.setTenant(authService.authUser().getTenant());
             paymentTransaction.setCreatedBy(authService.authUser());
-            paymentTransaction.setCreatedAt(new Date());
+            paymentTransaction.setCreatedAt(LocalDateTime.now());
             paymentTransactionRepo.saveAndFlush(paymentTransaction);
             return spotyResponseImpl.created();
         }

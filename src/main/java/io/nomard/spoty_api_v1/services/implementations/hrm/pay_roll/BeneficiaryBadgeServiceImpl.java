@@ -14,7 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class BeneficiaryBadgeServiceImpl implements BeneficiaryBadgeService {
@@ -52,7 +56,7 @@ public class BeneficiaryBadgeServiceImpl implements BeneficiaryBadgeService {
         try {
             beneficiaryBadge.setTenant(authService.authUser().getTenant());
             beneficiaryBadge.setCreatedBy(authService.authUser());
-            beneficiaryBadge.setCreatedAt(new Date());
+            beneficiaryBadge.setCreatedAt(LocalDateTime.now());
             beneficiaryBadgeRepo.saveAndFlush(beneficiaryBadge);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -91,7 +95,7 @@ public class BeneficiaryBadgeServiceImpl implements BeneficiaryBadgeService {
         }
 
         beneficiaryBadge.setUpdatedBy(authService.authUser());
-        beneficiaryBadge.setUpdatedAt(new Date());
+        beneficiaryBadge.setUpdatedAt(LocalDateTime.now());
 
         try {
             beneficiaryBadgeRepo.saveAndFlush(beneficiaryBadge);

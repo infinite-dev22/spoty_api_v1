@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -50,7 +50,7 @@ public class PaySlipTypeServiceImpl implements PaySlipTypeService {
         try {
             paySlipType.setTenant(authService.authUser().getTenant());
             paySlipType.setCreatedBy(authService.authUser());
-            paySlipType.setCreatedAt(new Date());
+            paySlipType.setCreatedAt(LocalDateTime.now());
             paySlipTypeRepo.saveAndFlush(paySlipType);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -85,7 +85,7 @@ public class PaySlipTypeServiceImpl implements PaySlipTypeService {
         }
 
         paySlipType.setUpdatedBy(authService.authUser());
-        paySlipType.setUpdatedAt(new Date());
+        paySlipType.setUpdatedAt(LocalDateTime.now());
 
         try {
             paySlipTypeRepo.saveAndFlush(paySlipType);

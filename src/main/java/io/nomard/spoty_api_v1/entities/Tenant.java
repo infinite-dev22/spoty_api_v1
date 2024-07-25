@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Table(name = "tenants")
 @Getter
@@ -24,7 +24,7 @@ public class Tenant {
 
     @Column(nullable = false, name = "subscription_end_date")
     @Basic(fetch = FetchType.EAGER)
-    private Date subscriptionEndDate;
+    private LocalDateTime subscriptionEndDate;
 
     @Column
     @Builder.Default
@@ -35,7 +35,7 @@ public class Tenant {
     private boolean canTry = true;
 
     @Column(name = "trial_end_date")
-    private Date trialEndDate;
+    private LocalDateTime trialEndDate;
 
     @Column(name = "new_tenancy")
     @Builder.Default
@@ -43,7 +43,7 @@ public class Tenant {
 
     @Column(name = "created_at")
     @JsonIgnore
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
@@ -52,7 +52,7 @@ public class Tenant {
 
     @Column(name = "updated_at")
     @JsonIgnore
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")

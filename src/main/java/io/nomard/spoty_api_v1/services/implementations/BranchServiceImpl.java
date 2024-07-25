@@ -14,7 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class BranchServiceImpl implements BranchService {
@@ -54,7 +58,7 @@ public class BranchServiceImpl implements BranchService {
         try {
             branch.setTenant(authService.authUser().getTenant());
             branch.setCreatedBy(authService.authUser());
-            branch.setCreatedAt(new Date());
+            branch.setCreatedAt(LocalDateTime.now());
             branchRepo.saveAndFlush(branch);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -95,7 +99,7 @@ public class BranchServiceImpl implements BranchService {
             branch.setZipCode(data.getZipCode());
         }
         branch.setUpdatedBy(authService.authUser());
-        branch.setUpdatedAt(new Date());
+        branch.setUpdatedAt(LocalDateTime.now());
 
         try {
             branchRepo.save(branch);

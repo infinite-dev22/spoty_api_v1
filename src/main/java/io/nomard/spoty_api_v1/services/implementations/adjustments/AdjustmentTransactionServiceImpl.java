@@ -15,9 +15,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -66,14 +65,14 @@ public class AdjustmentTransactionServiceImpl implements AdjustmentTransactionSe
             adjustmentTransaction.setBranch(adjustmentDetail.getAdjustment().getBranch());
             adjustmentTransaction.setProduct(adjustmentDetail.getProduct());
             adjustmentTransaction.setAdjustmentDetail(adjustmentDetail);
-            adjustmentTransaction.setDate(new Date());
+            adjustmentTransaction.setDate(LocalDateTime.now());
             adjustmentTransaction.setAdjustQuantity(adjustmentDetail.getQuantity());
             adjustmentTransaction.setAdjustmentType(adjustmentDetail.getAdjustmentType());
 
             adjustmentTransaction.setTenant(authService.authUser().getTenant());
             adjustmentTransaction.setBranch(authService.authUser().getBranch());
             adjustmentTransaction.setCreatedBy(authService.authUser());
-            adjustmentTransaction.setCreatedAt(new Date());
+            adjustmentTransaction.setCreatedAt(LocalDateTime.now());
             adjustmentTransactionRepo.saveAndFlush(adjustmentTransaction);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -137,7 +136,7 @@ public class AdjustmentTransactionServiceImpl implements AdjustmentTransactionSe
         }
 
         adjustmentTransaction.setUpdatedBy(authService.authUser());
-        adjustmentTransaction.setUpdatedAt(new Date());
+        adjustmentTransaction.setUpdatedAt(LocalDateTime.now());
 
         try {
             adjustmentTransactionRepo.saveAndFlush(adjustmentTransaction);

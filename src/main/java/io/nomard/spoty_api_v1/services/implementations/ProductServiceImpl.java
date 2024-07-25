@@ -17,7 +17,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -79,7 +83,7 @@ public class ProductServiceImpl implements ProductService {
                 product.setBranch(authService.authUser().getBranch());
             }
             product.setCreatedBy(authService.authUser());
-            product.setCreatedAt(new Date());
+            product.setCreatedAt(LocalDateTime.now());
             productRepo.saveAndFlush(product);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -159,7 +163,7 @@ public class ProductServiceImpl implements ProductService {
         }
 
         product.setUpdatedBy(authService.authUser());
-        product.setUpdatedAt(new Date());
+        product.setUpdatedAt(LocalDateTime.now());
 
         try {
             productRepo.saveAndFlush(product);

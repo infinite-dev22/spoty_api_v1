@@ -16,9 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -61,12 +60,12 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
                 saleTransaction.setBranch(saleDetail.getSale().getBranch());
                 saleTransaction.setProduct(saleDetail.getProduct());
                 saleTransaction.setSaleDetail(saleDetail);
-                saleTransaction.setDate(new Date());
+                saleTransaction.setDate(LocalDateTime.now());
                 saleTransaction.setSaleQuantity(saleDetail.getQuantity());
                 saleTransaction.setTenant(authService.authUser().getTenant());
                 saleTransaction.setBranch(authService.authUser().getBranch());
                 saleTransaction.setCreatedBy(authService.authUser());
-                saleTransaction.setCreatedAt(new Date());
+                saleTransaction.setCreatedAt(LocalDateTime.now());
                 saleTransactionRepo.saveAndFlush(saleTransaction);
                 return spotyResponseImpl.created();
             } catch (Exception e) {
@@ -118,7 +117,7 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
         }
 
         saleTransaction.setUpdatedBy(authService.authUser());
-        saleTransaction.setUpdatedAt(new Date());
+        saleTransaction.setUpdatedAt(LocalDateTime.now());
 
         try {
             saleTransactionRepo.saveAndFlush(saleTransaction);

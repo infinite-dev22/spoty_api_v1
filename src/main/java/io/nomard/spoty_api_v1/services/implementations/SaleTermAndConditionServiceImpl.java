@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -50,7 +50,7 @@ public class SaleTermAndConditionServiceImpl implements SaleTermAndConditionServ
         try {
             saleTermAndCondition.setTenant(authService.authUser().getTenant());
             saleTermAndCondition.setCreatedBy(authService.authUser());
-            saleTermAndCondition.setCreatedAt(new Date());
+            saleTermAndCondition.setCreatedAt(LocalDateTime.now());
             saleTermAndConditionRepo.saveAndFlush(saleTermAndCondition);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -77,7 +77,7 @@ public class SaleTermAndConditionServiceImpl implements SaleTermAndConditionServ
         }
 
         saleTermAndCondition.setUpdatedBy(authService.authUser());
-        saleTermAndCondition.setUpdatedAt(new Date());
+        saleTermAndCondition.setUpdatedAt(LocalDateTime.now());
 
         try {
             saleTermAndConditionRepo.saveAndFlush(saleTermAndCondition);

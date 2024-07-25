@@ -16,7 +16,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -60,18 +64,18 @@ public class AccountServiceImpl implements AccountService {
             var amount = account.getBalance();
             account.setBalance(0d);
             account.setCreatedBy(authService.authUser());
-            account.setCreatedAt(new Date());
+            account.setCreatedAt(LocalDateTime.now());
             accountRepo.saveAndFlush(account);
             if (Objects.nonNull(amount) && !Objects.equals(amount, 0d)) {
                 var accountTransaction = new AccountTransaction();
                 accountTransaction.setTenant(authService.authUser().getTenant());
-                accountTransaction.setTransactionDate(new Date());
+                accountTransaction.setTransactionDate(LocalDateTime.now());
                 accountTransaction.setAccount(account);
                 accountTransaction.setAmount(amount);
                 accountTransaction.setTransactionType("Deposit");
                 accountTransaction.setNote("Initial deposit");
                 accountTransaction.setCreatedBy(authService.authUser());
-                accountTransaction.setCreatedAt(new Date());
+                accountTransaction.setCreatedAt(LocalDateTime.now());
                 accountTransactionService.save(accountTransaction);
             }
             return spotyResponseImpl.created();
@@ -111,7 +115,7 @@ public class AccountServiceImpl implements AccountService {
         }
 
         account.setUpdatedBy(authService.authUser());
-        account.setUpdatedAt(new Date());
+        account.setUpdatedAt(LocalDateTime.now());
 
         try {
             accountRepo.saveAndFlush(account);

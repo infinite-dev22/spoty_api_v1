@@ -14,7 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -61,7 +65,7 @@ public class CustomerServiceImpl implements CustomerService {
                 customer.setBranch(authService.authUser().getBranch());
             }
             customer.setCreatedBy(authService.authUser());
-            customer.setCreatedAt(new Date());
+            customer.setCreatedAt(LocalDateTime.now());
             customerRepo.saveAndFlush(customer);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -112,7 +116,7 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
         customer.setUpdatedBy(authService.authUser());
-        customer.setUpdatedAt(new Date());
+        customer.setUpdatedAt(LocalDateTime.now());
 
         try {
             customerRepo.saveAndFlush(customer);

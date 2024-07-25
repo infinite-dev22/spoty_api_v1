@@ -2,12 +2,10 @@ package io.nomard.spoty_api_v1.controllers;
 
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.stock_ins.StockInDetail;
 import io.nomard.spoty_api_v1.entities.stock_ins.StockInMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
-import io.nomard.spoty_api_v1.services.implementations.stock_ins.StockInDetailServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.stock_ins.StockInMasterServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

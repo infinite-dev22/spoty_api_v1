@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "payment_transactions")
@@ -32,7 +32,7 @@ public class PaymentTransaction {
     @Column(name = "plan_name")
     private String planName;
     @Column(name = "paid_on")
-    private Date paidOn;
+    private LocalDateTime paidOn;
     private String amount;
     @Builder.Default
     private boolean recurring = false;
@@ -43,7 +43,7 @@ public class PaymentTransaction {
 
     @Column(name = "created_at")
     @JsonIgnore
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
@@ -52,7 +52,7 @@ public class PaymentTransaction {
 
     @Column(name = "updated_at")
     @JsonIgnore
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")

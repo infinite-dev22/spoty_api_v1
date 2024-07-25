@@ -14,7 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class TaxServiceImpl implements TaxService {
@@ -48,7 +52,7 @@ public class TaxServiceImpl implements TaxService {
             tax.setTenant(authService.authUser().getTenant());
             tax.setBranch(authService.authUser().getBranch());
             tax.setCreatedBy(authService.authUser());
-            tax.setCreatedAt(new Date());
+            tax.setCreatedAt(LocalDateTime.now());
             taxRepo.saveAndFlush(tax);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -71,7 +75,7 @@ public class TaxServiceImpl implements TaxService {
             tax.setPercentage(data.getPercentage());
         }
         tax.setUpdatedBy(authService.authUser());
-        tax.setUpdatedAt(new Date());
+        tax.setUpdatedAt(LocalDateTime.now());
         try {
             taxRepo.saveAndFlush(tax);
             return spotyResponseImpl.ok();

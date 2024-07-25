@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -63,11 +63,11 @@ public class AccountTransactionServiceImpl implements AccountTransactionService 
                 account.setDebit(accountTransaction.getAmount());
                 account.setBalance(account.getBalance() - accountTransaction.getAmount());
             }
-            account.setUpdatedAt(new Date());
+            account.setUpdatedAt(LocalDateTime.now());
             account.setUpdatedBy(authService.authUser());
             accountRepo.saveAndFlush(account);
             accountTransaction.setCreatedBy(authService.authUser());
-            accountTransaction.setCreatedAt(new Date());
+            accountTransaction.setCreatedAt(LocalDateTime.now());
             accountTransactionRepo.saveAndFlush(accountTransaction);
             return spotyResponseImpl.created();
         } catch (Exception e) {
