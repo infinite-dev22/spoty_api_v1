@@ -155,6 +155,7 @@ public class ProductServiceImpl implements ProductService {
         }
         if (Objects.nonNull(file)) {
             try {
+                documentService.delete(product.getImage());
                 fileURL = String.valueOf(documentService.save(file));
             } catch (Exception e) {
                 return spotyResponseImpl.error(e);

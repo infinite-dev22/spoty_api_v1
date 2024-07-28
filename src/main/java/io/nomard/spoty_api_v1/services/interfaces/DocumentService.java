@@ -12,6 +12,8 @@ public interface DocumentService {
 
     String save(MultipartFile file) throws IOException;
 
+    void delete(String filePath) throws IOException;
+
     ResponseEntity<?> download(String fileCode) throws IOException;
 
     ResponseEntity<Resource> showImage(String fileCode) throws IOException;

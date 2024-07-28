@@ -57,11 +57,21 @@ public class DocumentServiceImpl implements DocumentService {
             Path filePath = uploadPath.resolve(fileCode + '-' + fileName);
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
             return ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/documents/show/image/" + fileName)
+                    .path("/documents/show/image/" + fileCode + '-' + fileName)
                     .toUriString();
         } catch (IOException ioe) {
             throw new RuntimeException("Error whilst saving file: " + fileName, ioe);
         }
+    }
+
+    @Override
+    public void delete(String fileUrl) throws IOException {
+        // Find the last occurrence of '/'
+        int lastSlashIndex = fileUrl.lastIndexOf('/');
+        // Extract the file name
+        String fileName = fileUrl.substring(lastSlashIndex + 1);
+        Path path = Paths.get(System.getProperty("user.home") + "/uploads/" + fileName);
+        Files.delete(path);
     }
 
     @Override

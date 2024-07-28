@@ -25,6 +25,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,7 +45,7 @@ public class PurchaseMaster implements Serializable {
 
     private String ref;
     @Column(nullable = false)
-    private LocalDateTime date;
+    private LocalDate date;
     @JoinColumn(nullable = false, name = "supplier_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Supplier supplier;
