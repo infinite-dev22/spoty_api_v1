@@ -56,27 +56,13 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
 //    @Transactional
     public ResponseEntity<ObjectNode> save(QuotationMaster quotationMaster) {
         var total = 0.00;
-        var tax = 0.00;
-        var netTax = 0.00;
-        var discount = 0.00;
-        var netDiscount = 0.00;
         if (!quotationMaster.getQuotationDetails().isEmpty()) {
             for (int i = 0; i < quotationMaster.getQuotationDetails().size(); i++) {
                 var quotationDetail = quotationMaster.getQuotationDetails().get(i);
                 quotationDetail.setQuotation(quotationMaster);
                 total += quotationDetail.getSubTotal();
-                if (Objects.nonNull(quotationDetail.getTax()) && quotationDetail.getTax().getPercentage() > 0.0) {
-                    tax += quotationDetail.getTax().getPercentage();
-                }
-                if (Objects.nonNull(quotationDetail.getDiscount()) && quotationDetail.getDiscount().getPercentage() > 0.0) {
-                    discount += quotationDetail.getDiscount().getPercentage();
-                }
             }
-            netTax += tax / quotationMaster.getQuotationDetails().size();
-            netDiscount += discount / quotationMaster.getQuotationDetails().size();
         }
-        quotationMaster.setNetTax(netTax);
-        quotationMaster.setDiscount(netDiscount);
         quotationMaster.setTotal(total);
         quotationMaster.setTenant(authService.authUser().getTenant());
         if (Objects.isNull(quotationMaster.getBranch())) {
@@ -97,10 +83,6 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
     public ResponseEntity<ObjectNode> update(QuotationMaster data) throws NotFoundException {
         var opt = quotationMasterRepo.findById(data.getId());
         var total = 0.00;
-        var tax = 0.00;
-        var netTax = 0.00;
-        var discount = 0.00;
-        var netDiscount = 0.00;
 
         if (opt.isEmpty()) {
             throw new NotFoundException();
@@ -128,29 +110,18 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
                     quotationDetail.setQuotation(quotationMaster);
                 }
                 total += quotationDetail.getSubTotal();
-                if (Objects.nonNull(quotationDetail.getTax()) && quotationDetail.getTax().getPercentage() > 0.0) {
-                    tax += quotationDetail.getTax().getPercentage();
-                }
-                if (Objects.nonNull(quotationDetail.getDiscount()) && quotationDetail.getDiscount().getPercentage() > 0.0) {
-                    discount += quotationDetail.getDiscount().getPercentage();
-                }
             }
-            netTax += tax / data.getQuotationDetails().size();
-            netDiscount += discount / data.getQuotationDetails().size();
         }
 
-        if (!Objects.equals(data.getNetTax(), quotationMaster.getNetTax())) {
-//            quotationMaster.setNetTax(data.getNetTax());
-            quotationMaster.setNetTax(netTax);
+        if (!Objects.equals(data.getTax(), quotationMaster.getTax())) {
+            quotationMaster.setTax(data.getTax());
         }
 
         if (!Objects.equals(data.getDiscount(), quotationMaster.getDiscount())) {
-//            quotationMaster.setDiscount(data.getDiscount());
-            quotationMaster.setDiscount(netDiscount);
+            quotationMaster.setDiscount(data.getDiscount());
         }
 
         if (!Objects.equals(data.getTotal(), quotationMaster.getTotal())) {
-//            quotationMaster.setTotal(data.getTotal());
             quotationMaster.setTotal(total);
         }
 

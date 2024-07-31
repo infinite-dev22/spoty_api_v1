@@ -19,6 +19,8 @@ import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Customer;
 import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.User;
+import io.nomard.spoty_api_v1.entities.deductions.Discount;
+import io.nomard.spoty_api_v1.entities.deductions.Tax;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -64,13 +66,13 @@ public class QuotationMaster implements Serializable {
     @Builder.Default
     private double total = 0;
 
-    @Column(nullable = false)
-    @Builder.Default
-    private double netTax = 0;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tax_id")
+    private Tax tax;
 
-    @Column(nullable = false)
-    @Builder.Default
-    private double discount = 0;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "discount_id")
+    private Discount discount;
 
     @Column(nullable = false)
     @Builder.Default

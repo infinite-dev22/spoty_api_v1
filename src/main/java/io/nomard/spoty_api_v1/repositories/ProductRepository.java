@@ -16,13 +16,7 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends PagingAndSortingRepository<Product, Long>, JpaRepository<Product, Long> {
     @Query("select p from Product p where concat(" +
-            "trim(lower(p.unit.name))," +
-            "trim(lower(p.category.name))," +
-            "trim(lower(p.barcodeType))," +
             "trim(lower(p.name))," +
-            "trim(lower(p.brand.name))," +
-            "trim(lower(p.tax.name))," +
-            "trim(lower(p.discount.name))," +
             "trim(lower(p.serialNumber))) like %:search%")
     List<Product> searchAll(@Param("search") String search);
 
