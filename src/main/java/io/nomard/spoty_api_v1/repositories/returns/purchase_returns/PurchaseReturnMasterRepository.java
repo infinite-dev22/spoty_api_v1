@@ -1,6 +1,5 @@
 package io.nomard.spoty_api_v1.repositories.returns.purchase_returns;
 
-import io.nomard.spoty_api_v1.entities.accounting.Account;
 import io.nomard.spoty_api_v1.entities.returns.purchase_returns.PurchaseReturnMaster;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @Repository
 public interface PurchaseReturnMasterRepository extends PagingAndSortingRepository<PurchaseReturnMaster, Long>, JpaRepository<PurchaseReturnMaster, Long> {

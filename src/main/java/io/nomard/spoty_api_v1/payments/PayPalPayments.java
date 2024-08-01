@@ -86,5 +86,6 @@ public class PayPalPayments {
         System.out.println(response);
     }
 
-    public void createFreeTrial(){}
+    public void createFreeTrial() {
+    }
 }

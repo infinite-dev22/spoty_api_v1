@@ -1,7 +1,6 @@
 package io.nomard.spoty_api_v1.repositories;
 
 import io.nomard.spoty_api_v1.entities.Currency;
-import io.nomard.spoty_api_v1.entities.accounting.Account;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @Repository
 public interface CurrencyRepository extends PagingAndSortingRepository<Currency, Long>, JpaRepository<Currency, Long> {
