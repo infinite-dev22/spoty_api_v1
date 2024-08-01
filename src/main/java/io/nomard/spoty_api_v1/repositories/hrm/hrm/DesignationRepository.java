@@ -13,8 +13,10 @@ import java.util.ArrayList;
 
 @Repository
 public interface DesignationRepository extends PagingAndSortingRepository<Designation, Long>, JpaRepository<Designation, Long> {
-    ArrayList<Designation> searchAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String name, String designation);
+    @Query("SELECT d FROM Designation d WHERE d.tenant.id = :tenantId " +
+            "AND TRIM(LOWER(d.name)) LIKE %:search%")
+    ArrayList<Designation> searchAll(@Param("tenantId") Long tenantId, @Param("search") String search);
 
-    @Query("select p from Designation p where p.tenant.id = :id")
+    @Query("select d from Designation d where d.tenant.id = :id")
     Page<Designation> findAllByTenantId(@Param("id") Long id, Pageable pageable);
 }

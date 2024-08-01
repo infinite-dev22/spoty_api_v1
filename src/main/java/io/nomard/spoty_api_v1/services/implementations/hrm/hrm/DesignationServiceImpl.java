@@ -47,10 +47,7 @@ public class DesignationServiceImpl implements DesignationService {
 
     @Override
     public ArrayList<Designation> getByContains(String search) {
-        return designationRepo.searchAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
-                search,
-                search
-        );
+        return designationRepo.searchAll(authService.authUser().getTenant().getId(), search);
     }
 
     @Override

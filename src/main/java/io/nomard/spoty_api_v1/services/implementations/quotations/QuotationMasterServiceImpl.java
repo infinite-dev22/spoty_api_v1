@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -45,11 +46,8 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
     }
 
     @Override
-    public List<QuotationMaster> getByContains(String search) {
-        return quotationMasterRepo.searchAllByRefContainingIgnoreCaseOrStatusContainingIgnoreCase(
-                search.toLowerCase(),
-                search.toLowerCase()
-        );
+    public ArrayList<QuotationMaster> getByContains(String search) {
+        return quotationMasterRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
     }
 
     @Override

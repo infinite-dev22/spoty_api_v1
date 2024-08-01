@@ -46,12 +46,8 @@ public class CurrencyServiceImpl implements CurrencyService {
     }
 
     @Override
-    public List<Currency> getByContains(String search) {
-        return currencyRepo.searchAllByNameContainingIgnoreCaseOrCodeContainingIgnoreCaseOrSymbolContainingIgnoreCase(
-                search.toLowerCase(),
-                search.toLowerCase(),
-                search.toLowerCase()
-        );
+    public ArrayList<Currency> getByContains(String search) {
+        return currencyRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
     }
 
     @Override

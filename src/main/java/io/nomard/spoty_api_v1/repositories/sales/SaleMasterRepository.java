@@ -12,6 +12,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -71,7 +72,9 @@ public interface SaleMasterRepository extends PagingAndSortingRepository<SaleMas
             "WHERE s.tenant.id = :id ")
     DashboardKPIModel totalEarnings(@Param("id") Long id);
 
-    List<SaleMaster> searchAllByRefContainingIgnoreCase(String ref);
+    @Query("SELECT sm FROM SaleMaster sm WHERE sm.tenant.id = :tenantId " +
+            "AND TRIM(LOWER(sm.ref)) LIKE %:search%")
+    ArrayList<SaleMaster> searchAll(@Param("tenantId") Long tenantId, @Param("search") String search);
 
     @Query("select p from SaleMaster p where p.tenant.id = :id")
     Page<SaleMaster> findAllByTenantId(@Param("id") Long id, Pageable pageable);

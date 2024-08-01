@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -45,12 +46,8 @@ public class EmploymentStatusServiceImpl implements EmploymentStatusService {
     }
 
     @Override
-    public List<EmploymentStatus> getByContains(String search) {
-        return employmentStatusRepo.searchAllByNameContainingIgnoreCaseOrColorContainingIgnoreCaseOrDescriptionContainsIgnoreCase(
-                search,
-                search,
-                search
-        );
+    public ArrayList<EmploymentStatus> getByContains(String search) {
+        return employmentStatusRepo.searchAll(authService.authUser().getTenant().getId(), search);
     }
 
     @Override

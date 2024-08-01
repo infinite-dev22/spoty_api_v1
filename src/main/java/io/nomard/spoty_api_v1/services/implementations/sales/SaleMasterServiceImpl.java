@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -62,10 +63,8 @@ public class SaleMasterServiceImpl implements SaleMasterService {
     @Override
     @Cacheable("sale_masters")
     @Transactional(readOnly = true)
-    public List<SaleMaster> getByContains(String search) {
-        return saleMasterRepo.searchAllByRefContainingIgnoreCase(
-                search.toLowerCase()
-        );
+    public ArrayList<SaleMaster> getByContains(String search) {
+        return saleMasterRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
     }
 
     @Override

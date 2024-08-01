@@ -46,11 +46,8 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     }
 
     @Override
-    public List<ProductCategory> getByContains(String search) {
-        return productCategoryRepo.searchAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
-                search.toLowerCase(),
-                search.toLowerCase()
-        );
+    public ArrayList<ProductCategory> getByContains(String search) {
+        return productCategoryRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
     }
 
     @Override

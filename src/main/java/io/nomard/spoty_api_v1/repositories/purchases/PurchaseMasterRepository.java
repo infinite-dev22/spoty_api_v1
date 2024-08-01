@@ -11,6 +11,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -44,7 +45,9 @@ public interface PurchaseMasterRepository extends PagingAndSortingRepository<Pur
             "ORDER BY DATE_FORMAT(e.createdAt, '%Y-%m-%u')")
     List<LineChartModel> weeklyExpenses(@Param("id") Long id);
 
-    List<PurchaseMaster> searchAllByRefContainingIgnoreCaseOrPurchaseStatusContainingIgnoreCaseOrPaymentStatusContainsIgnoreCase(String ref, String purchaseStatus, String paymentStatus);
+    @Query("SELECT pm FROM PurchaseMaster pm WHERE pm.tenant.id = :tenantId " +
+            "AND TRIM(LOWER(pm.ref)) LIKE %:search%")
+    ArrayList<PurchaseMaster> searchAll(@Param("tenantId") Long tenantId, @Param("search") String search);
 
     @Query("select p from PurchaseMaster p where p.tenant.id = :id")
     Page<PurchaseMaster> findAllByTenantId(@Param("id") Long id, Pageable pageable);

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -52,12 +53,8 @@ public class PurchaseMasterServiceImpl implements PurchaseMasterService {
     }
 
     @Override
-    public List<PurchaseMaster> getByContains(String search) {
-        return purchaseMasterRepo.searchAllByRefContainingIgnoreCaseOrPurchaseStatusContainingIgnoreCaseOrPaymentStatusContainsIgnoreCase(
-                search.toLowerCase(),
-                search.toLowerCase(),
-                search.toLowerCase()
-        );
+    public ArrayList<PurchaseMaster> getByContains(String search) {
+        return purchaseMasterRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
     }
 
     @Override

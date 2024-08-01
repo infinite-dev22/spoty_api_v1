@@ -13,7 +13,9 @@ import java.util.List;
 
 @Repository
 public interface AdjustmentMasterRepository extends PagingAndSortingRepository<AdjustmentMaster, Long>, JpaRepository<AdjustmentMaster, Long> {
-    List<AdjustmentMaster> searchAllByRefContainingIgnoreCase(String ref);
+    @Query("SELECT am FROM AdjustmentMaster am WHERE am.tenant.id = :tenantId " +
+            "AND TRIM(LOWER(am.ref)) LIKE %:search%")
+    List<AdjustmentMaster> searchAll(@Param("tenantId") Long tenantId, @Param("search") String search);
 
     @Query("select p from AdjustmentMaster p where p.tenant.id = :id")
     Page<AdjustmentMaster> findAllByTenantId(@Param("id") Long id, Pageable pageable);

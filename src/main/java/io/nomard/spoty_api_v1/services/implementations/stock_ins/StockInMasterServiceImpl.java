@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -47,10 +48,8 @@ public class StockInMasterServiceImpl implements StockInMasterService {
     }
 
     @Override
-    public List<StockInMaster> getByContains(String search) {
-        return stockInMasterRepo.searchAllByRefContainingIgnoreCase(
-                search.toLowerCase()
-        );
+    public ArrayList<StockInMaster> getByContains(String search) {
+        return stockInMasterRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
     }
 
     @Override

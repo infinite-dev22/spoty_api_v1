@@ -46,11 +46,8 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
     }
 
     @Override
-    public List<UnitOfMeasure> getByContains(String search) {
-        return uomRepo.searchAllByNameContainingIgnoreCaseOrShortNameContainingIgnoreCase(
-                search.toLowerCase(),
-                search.toLowerCase()
-        );
+    public ArrayList<UnitOfMeasure> getByContains(String search) {
+        return uomRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
     }
 
     @Override

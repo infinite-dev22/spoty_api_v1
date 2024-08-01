@@ -56,7 +56,7 @@ public class AdjustmentMasterServiceImpl implements AdjustmentMasterService {
     @Cacheable("adjustment_masters")
     @Transactional(readOnly = true)
     public List<AdjustmentMaster> getByContains(String search) {
-        return adjustmentMasterRepo.searchAllByRefContainingIgnoreCase(search.toLowerCase());
+        return adjustmentMasterRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
     }
 
     @Override

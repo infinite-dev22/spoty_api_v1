@@ -14,7 +14,11 @@ import java.util.List;
 
 @Repository
 public interface AccountRepository extends PagingAndSortingRepository<Account, Long>, JpaRepository<Account, Long> {
-    List<Account> searchAllByAccountNameContainingIgnoreCaseOrAccountNumberContainsIgnoreCase(String accountName, String accountNumber);
+    @Query("SELECT ac FROM Account ac WHERE ac.tenant.id = :tenantId " +
+            "AND CONCAT(" +
+            "TRIM(LOWER(ac.accountName))," +
+            "TRIM(LOWER(ac.accountNumber))) LIKE %:search%")
+    List<Account> searchAll(@Param("tenantId") Long tenantId, @Param("search") String search);
 
     @Query("select p from Account p where p.tenant.id = :id")
     Page<Account> findAllByTenantId(@Param("id") Long id, Pageable pageable);

@@ -52,7 +52,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public List<Expense> getByContains(String search) {
-        return expenseRepo.searchAllByNameContainingIgnoreCase(search.toLowerCase());
+        return expenseRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
     }
 
     @Override

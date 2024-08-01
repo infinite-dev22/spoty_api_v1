@@ -46,10 +46,8 @@ public class BrandServiceImpl implements BrandService {
     }
 
     @Override
-    public List<Brand> getByContains(String search) {
-        return brandRepo.searchAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
-                search.toLowerCase(),
-                search.toLowerCase());
+    public ArrayList<Brand> getByContains(String search) {
+        return brandRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
     }
 
     @Override

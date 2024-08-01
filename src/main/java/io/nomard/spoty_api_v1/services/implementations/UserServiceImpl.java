@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -53,8 +54,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getByContains(String search) {
-        return userRepo.searchAllByEmailContainingIgnoreCase(search.toLowerCase());
+    public ArrayList<User> getByContains(String search) {
+        return userRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
     }
 
     @Override

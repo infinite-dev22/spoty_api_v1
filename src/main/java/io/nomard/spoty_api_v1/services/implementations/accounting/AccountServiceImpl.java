@@ -51,9 +51,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public List<Account> getByContains(String search) {
-        return accountRepo.searchAllByAccountNameContainingIgnoreCaseOrAccountNumberContainsIgnoreCase(
-                search, search
-        );
+        return accountRepo.searchAll(authService.authUser().getTenant().getId(), search);
     }
 
     @Override

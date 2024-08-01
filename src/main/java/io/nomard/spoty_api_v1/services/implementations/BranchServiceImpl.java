@@ -46,10 +46,8 @@ public class BranchServiceImpl implements BranchService {
     }
 
     @Override
-    public List<Branch> getByContains(String search) {
-        return branchRepo.searchAllByEmailContainingIgnoreCaseOrNameContainingIgnoreCaseOrCityContainingIgnoreCaseOrTownContainingIgnoreCaseOrPhoneContainingIgnoreCase(
-                search.toLowerCase(), search.toLowerCase(), search.toLowerCase(), search.toLowerCase(), search.toLowerCase()
-        );
+    public ArrayList<Branch> getByContains(String search) {
+        return branchRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
     }
 
     @Override

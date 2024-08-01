@@ -46,8 +46,8 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     @Override
-    public List<Supplier> getByContains(String search) {
-        return supplierRepo.searchAll(search.toLowerCase());
+    public ArrayList<Supplier> getByContains(String search) {
+        return supplierRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
     }
 
     @Override

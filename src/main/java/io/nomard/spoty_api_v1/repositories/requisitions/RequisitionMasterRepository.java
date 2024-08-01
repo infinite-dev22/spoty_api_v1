@@ -9,11 +9,13 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.ArrayList;
 
 @Repository
 public interface RequisitionMasterRepository extends PagingAndSortingRepository<RequisitionMaster, Long>, JpaRepository<RequisitionMaster, Long> {
-    List<RequisitionMaster> searchAllByRefContainingIgnoreCaseOrStatusContainingIgnoreCase(String ref, String status);
+    @Query("SELECT rm FROM RequisitionMaster rm WHERE rm.tenant.id = :tenantId " +
+            "AND TRIM(LOWER(rm.ref)) LIKE %:search%")
+    ArrayList<RequisitionMaster> searchAll(@Param("tenantId") Long tenantId, @Param("search") String search);
 
     @Query("select p from RequisitionMaster p where p.tenant.id = :id")
     Page<RequisitionMaster> findAllByTenantId(@Param("id") Long id, Pageable pageable);

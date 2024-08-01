@@ -46,14 +46,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<Customer> getByContains(String search) {
-        return customerRepo.searchAllByNameContainingIgnoreCaseOrCodeContainingIgnoreCaseOrCityContainingIgnoreCaseOrPhoneContainingIgnoreCaseOrAddressContainingIgnoreCaseOrCountryContainingIgnoreCase(
-                search.toLowerCase(),
-                search.toLowerCase(),
-                search.toLowerCase(),
-                search.toLowerCase(),
-                search.toLowerCase(),
-                search.toLowerCase());
+    public ArrayList<Customer> getByContains(String search) {
+        return customerRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
     }
 
     @Override
