@@ -72,7 +72,6 @@ public class Product implements Serializable {
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "created_by")
-    @JsonIgnore
     private User createdBy;
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
