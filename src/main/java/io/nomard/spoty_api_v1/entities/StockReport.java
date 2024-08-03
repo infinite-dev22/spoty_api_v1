@@ -24,6 +24,7 @@ public class StockReport {
     private Branch branch;
     @JoinColumn(nullable = false, name = "company_id")
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private Tenant tenant;
 
     @Column(name = "product_name")
@@ -44,20 +45,16 @@ public class StockReport {
     private String purchaseStockValue;  // Value of current stock at purchase price.
 
     @Column(name = "created_at")
-    @JsonIgnore
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
-    @JsonIgnore
     private User createdBy;
 
     @Column(name = "updated_at")
-    @JsonIgnore
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")
-    @JsonIgnore
     private User updatedBy;
 }

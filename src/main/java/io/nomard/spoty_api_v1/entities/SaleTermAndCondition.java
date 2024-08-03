@@ -23,26 +23,23 @@ public class SaleTermAndCondition {
 
     @JoinColumn(nullable = false, name = "company_id")
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private Tenant tenant;
 
     @Builder.Default
     private boolean active = true;
 
     @Column(name = "created_at")
-    @JsonIgnore
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
-    @JsonIgnore
     private User createdBy;
 
     @Column(name = "updated_at")
-    @JsonIgnore
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")
-    @JsonIgnore
     private User updatedBy;
 }

@@ -39,6 +39,7 @@ public class User implements Serializable {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "organisation_id", nullable = false)
+    @JsonIgnore
     private Tenant tenant;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -52,6 +53,7 @@ public class User implements Serializable {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = false)
+    @JsonIgnore
     private Role role;
 
     @Column(nullable = false)
@@ -64,20 +66,16 @@ public class User implements Serializable {
     private boolean locked = false;
 
     @Column(name = "created_at")
-    @JsonIgnore
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
-    @JsonIgnore
     private User createdBy;
 
     @Column(name = "updated_at")
-    @JsonIgnore
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")
-    @JsonIgnore
     private User updatedBy;
 }

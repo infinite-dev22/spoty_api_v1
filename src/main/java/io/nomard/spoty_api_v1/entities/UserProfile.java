@@ -38,6 +38,7 @@ public class UserProfile implements Serializable {
     private Branch branch;
     @JoinColumn(nullable = false, name = "company_id")
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private Tenant tenant;
 
     @Column(name = "first_name")
@@ -55,20 +56,16 @@ public class UserProfile implements Serializable {
     private String avatar;
 
     @Column(name = "created_at")
-    @JsonIgnore
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
-    @JsonIgnore
     private User createdBy;
 
     @Column(name = "updated_at")
-    @JsonIgnore
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")
-    @JsonIgnore
     private User updatedBy;
 }

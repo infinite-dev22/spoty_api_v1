@@ -92,6 +92,7 @@ public class AuthServiceImpl implements AuthService {
             response.put("inActiveTenancyWarning", inActiveTenancyWarning);
             response.put("token", "Bearer " + spotyTokenService.generateToken(userDetails));
             response.putPOJO("user", user);
+            response.putPOJO("role", user.getRole());
 
             if (trial && tenantService.getTrialEndDate(tenantId).isBefore(LocalDateTime.now())) {
                 response.put("message", "Subscription required");

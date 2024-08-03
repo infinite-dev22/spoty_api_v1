@@ -29,30 +29,28 @@ public class LeaveType {
             name = "leave_types_branches",
             joinColumns = {@JoinColumn(name = "leave_type_id")},
             inverseJoinColumns = {@JoinColumn(name = "branch_id")})
+    @JsonIgnore
     @Builder.Default
     private List<Branch> branches = new LinkedList<>();
     @JoinColumn(nullable = false, name = "company_id")
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private Tenant tenant;
     private String name;
     private String color;
     private String description;
 
     @Column(name = "created_at")
-    @JsonIgnore
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
-    @JsonIgnore
     private User createdBy;
 
     @Column(name = "updated_at")
-    @JsonIgnore
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")
-    @JsonIgnore
     private User updatedBy;
 }
