@@ -6,18 +6,19 @@ import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.proxy.HibernateProxy;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "employment_statuses")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@EqualsAndHashCode
 public class EmploymentStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,31 +26,38 @@ public class EmploymentStatus {
     private String name;
     private String color;
     private String description;
-
     @ManyToMany(fetch = FetchType.LAZY, targetEntity = Branch.class)
     @JoinTable(
             name = "employment_statuses_branches",
             joinColumns = {@JoinColumn(name = "employment_status_id")},
             inverseJoinColumns = {@JoinColumn(name = "branch_id")})
     @JsonIgnore
-    private Set<Branch> branches;
-    @JoinColumn(nullable = false, name = "company_id")
+    private ArrayList<Branch> branches;
+    @JoinColumn(nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     private Tenant tenant;
     private boolean active;
-
-    @Column(name = "created_at")
     private LocalDateTime createdAt;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by")
     private User createdBy;
-
-    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "updated_by")
     private User updatedBy;
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
+        EmploymentStatus that = (EmploymentStatus) o;
+        return getId() != null && Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public final int hashCode() {
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    }
 }

@@ -24,19 +24,14 @@ public interface SaleMasterRepository extends PagingAndSortingRepository<SaleMas
             "ORDER BY DATE_FORMAT(e.createdAt, '%Y')")
     List<LineChartModel> yearlyIncomes(@Param("id") Long id);
 
-    @Query("SELECT DATE_FORMAT(CONCAT(YEAR(CURDATE()), '-', months.month, '-01'), '%Y %M') AS period, " +
-            "COALESCE(SUM(e.amountPaid), 0) AS totalValue " +
-            "FROM ( " +
-            "    SELECT '01' AS month UNION ALL SELECT '02' UNION ALL SELECT '03' UNION ALL SELECT '04' UNION ALL " +
-            "    SELECT '05' UNION ALL SELECT '06' UNION ALL SELECT '07' UNION ALL SELECT '08' UNION ALL " +
-            "    SELECT '09' UNION ALL SELECT '10' UNION ALL SELECT '11' UNION ALL SELECT '12' " +
-            ") AS months " +
-            "LEFT JOIN SaleMaster e ON DATE_FORMAT(e.createdAt, '%Y-%m') = DATE_FORMAT(CONCAT(YEAR(CURDATE()), '-', months.month, '-01'), '%Y-%m') " +
-            "AND e.tenant.id = :id " +
+    @Query(value = "SELECT TO_CHAR(TO_DATE(CONCAT(EXTRACT(YEAR FROM CURRENT_DATE), '-', months.month, '-01'), 'YYYY-MM-DD'), 'YYYY Month') AS period, COALESCE(SUM(i.amount_received), 0) AS totalValue " +
+            "FROM (SELECT '01' AS month UNION ALL SELECT '02' UNION ALL SELECT '03' UNION ALL SELECT '04' UNION ALL " +
+            "SELECT '05' UNION ALL SELECT '06' UNION ALL SELECT '07' UNION ALL SELECT '08' UNION ALL " +
+            "SELECT '09' UNION ALL SELECT '10' UNION ALL SELECT '11' UNION ALL SELECT '12') AS months " +
+            "LEFT JOIN income_master i ON TO_CHAR(i.created_at, 'YYYY-MM') = CONCAT(EXTRACT(YEAR FROM CURRENT_DATE), '-', months.month) " +
+            "AND i.tenant_id = :id " +
             "GROUP BY months.month " +
-            "ORDER BY FIELD(DATE_FORMAT(CONCAT(YEAR(CURDATE()), '-', months.month, '-01'), '%M'), " +
-            "'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December') " +
-            "LIMIT 12")
+            "ORDER BY months.month::int", nativeQuery = true)
     List<LineChartModel> monthlyIncomes(@Param("id") Long id);
 
     @Query("SELECT DATE_FORMAT(e.createdAt, '%M') AS period, SUM(e.amountPaid) AS totalValue " +
