@@ -14,6 +14,7 @@ import io.nomard.spoty_api_v1.services.interfaces.PaymentTransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
 
     @Override
     public Page<PaymentTransaction> getAll(int pageNo, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
+        PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
         return paymentTransactionRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 

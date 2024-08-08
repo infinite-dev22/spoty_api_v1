@@ -10,6 +10,7 @@ import io.nomard.spoty_api_v1.services.interfaces.deductions.TaxService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +32,7 @@ public class TaxServiceImpl implements TaxService {
 
     @Override
     public Page<Tax> getAll(int pageNo, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
+        PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
         return taxRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 

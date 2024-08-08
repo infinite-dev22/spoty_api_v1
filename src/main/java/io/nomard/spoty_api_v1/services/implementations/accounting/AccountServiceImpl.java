@@ -12,6 +12,7 @@ import io.nomard.spoty_api_v1.services.interfaces.accounting.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +36,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Page<Account> getAll(int pageNo, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
+        PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
         return accountRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
