@@ -33,10 +33,9 @@ public class UserServiceImpl implements UserService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<User> getAll(int pageNo, int pageSize) {
+    public Page<User> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<User> page = userRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return userRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

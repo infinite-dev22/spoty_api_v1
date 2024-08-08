@@ -37,10 +37,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Cacheable("products")
     @Transactional(readOnly = true)
-    public List<Product> getAll(int pageNo, int pageSize) {
+    public Page<Product> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<Product> page = productRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return productRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

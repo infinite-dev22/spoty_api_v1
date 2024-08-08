@@ -9,6 +9,7 @@ import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.returns.sale_returns.SaleReturnMasterServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +23,7 @@ public class SaleReturnController {
 
     // ADJUSTMENT MASTERS.
     @GetMapping("/all")
-    public List<SaleReturnMaster> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
+    public Page<SaleReturnMaster> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
                                                 @RequestParam(defaultValue = "50") Integer pageSize) {
         return saleReturnMasterService.getAll(pageNo, pageSize);
     }

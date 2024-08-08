@@ -29,10 +29,9 @@ public class SaleTermAndConditionServiceImpl implements SaleTermAndConditionServ
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<SaleTermAndCondition> getAll(int pageNo, int pageSize) {
+    public Page<SaleTermAndCondition> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<SaleTermAndCondition> page = saleTermAndConditionRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return saleTermAndConditionRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

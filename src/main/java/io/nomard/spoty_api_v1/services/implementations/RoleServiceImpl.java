@@ -35,10 +35,9 @@ public class RoleServiceImpl implements RoleService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Role> getAll(int pageNo, int pageSize) {
+    public Page<Role> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<Role> page = roleRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return roleRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

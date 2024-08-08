@@ -30,10 +30,9 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<ProductCategory> getAll(int pageNo, int pageSize) {
+    public Page<ProductCategory> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<ProductCategory> page = productCategoryRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return productCategoryRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

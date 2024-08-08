@@ -28,10 +28,9 @@ public class StockReportServiceImpl implements StockReportService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<StockReport> getAll(int pageNo, int pageSize) {
+    public Page<StockReport> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<StockReport> page = stockReportRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return stockReportRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

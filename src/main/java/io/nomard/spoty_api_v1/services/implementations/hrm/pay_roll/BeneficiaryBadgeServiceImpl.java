@@ -30,10 +30,9 @@ public class BeneficiaryBadgeServiceImpl implements BeneficiaryBadgeService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<BeneficiaryBadge> getAll(int pageNo, int pageSize) {
+    public Page<BeneficiaryBadge> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<BeneficiaryBadge> page = beneficiaryBadgeRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return beneficiaryBadgeRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

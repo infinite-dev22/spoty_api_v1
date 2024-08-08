@@ -30,10 +30,9 @@ public class BranchServiceImpl implements BranchService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Branch> getAll(int pageNo, int pageSize) {
+    public Page<Branch> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<Branch> page = branchRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return branchRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

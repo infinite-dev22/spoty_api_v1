@@ -3,12 +3,13 @@ package io.nomard.spoty_api_v1.services.interfaces.returns.sale_returns;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.returns.sale_returns.SaleReturnMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface SaleReturnMasterService {
-    List<SaleReturnMaster> getAll(int pageNo, int pageSize);
+    Page<SaleReturnMaster> getAll(int pageNo, int pageSize);
 
     SaleReturnMaster getById(Long id) throws NotFoundException;
 

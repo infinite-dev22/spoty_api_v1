@@ -9,6 +9,7 @@ import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.stock_ins.StockInMasterServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public class StockInController {
     private StockInMasterServiceImpl stockInMasterService;
 
     @GetMapping("/all")
-    public List<StockInMaster> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
+    public Page<StockInMaster> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
                                              @RequestParam(defaultValue = "50") Integer pageSize) {
         return stockInMasterService.getAll(pageNo, pageSize);
     }

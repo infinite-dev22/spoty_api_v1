@@ -29,10 +29,9 @@ public class AdjustmentDetailServiceImpl implements AdjustmentDetailService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<AdjustmentDetail> getAll(int pageNo, int pageSize) {
+    public Page<AdjustmentDetail> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<AdjustmentDetail> page = adjustmentDetailRepo.findAll(pageRequest);
-        return page.getContent();
+        return adjustmentDetailRepo.findAll(pageRequest);
     }
 
     @Override

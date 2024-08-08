@@ -30,10 +30,9 @@ public class BeneficiaryTypeServiceImpl implements BeneficiaryTypeService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<BeneficiaryType> getAll(int pageNo, int pageSize) {
+    public Page<BeneficiaryType> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<BeneficiaryType> page = beneficiaryTypeRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return beneficiaryTypeRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

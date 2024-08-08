@@ -9,6 +9,7 @@ import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.purchases.PurchaseMasterServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public class PurchaseController {
     private PurchaseMasterServiceImpl purchaseMasterService;
 
     @GetMapping("/all")
-    public List<PurchaseMaster> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
+    public Page<PurchaseMaster> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
                                               @RequestParam(defaultValue = "50") Integer pageSize) {
         return purchaseMasterService.getAll(pageNo, pageSize);
     }

@@ -3,13 +3,14 @@ package io.nomard.spoty_api_v1.services.interfaces;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.UnitOfMeasure;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public interface UnitOfMeasureService {
-    List<UnitOfMeasure> getAll(int pageNo, int pageSize);
+    Page<UnitOfMeasure> getAll(int pageNo, int pageSize);
 
     UnitOfMeasure getById(Long id) throws NotFoundException;
 

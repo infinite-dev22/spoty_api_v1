@@ -36,10 +36,9 @@ public class TransferMasterServiceImpl implements TransferMasterService {
     @Override
     @Cacheable("transfer_masters")
     @Transactional(readOnly = true)
-    public List<TransferMaster> getAll(int pageNo, int pageSize) {
+    public Page<TransferMaster> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<TransferMaster> page = transferMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return transferMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

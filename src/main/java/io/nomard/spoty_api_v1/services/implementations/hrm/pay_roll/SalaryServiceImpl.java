@@ -30,10 +30,9 @@ public class SalaryServiceImpl implements SalaryService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Salary> getAll(int pageNo, int pageSize) {
+    public Page<Salary> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<Salary> page = salaryRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return salaryRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

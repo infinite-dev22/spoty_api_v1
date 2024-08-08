@@ -29,10 +29,9 @@ public class LeaveTypeServiceImpl implements LeaveTypeService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<LeaveType> getAll(int pageNo, int pageSize) {
+    public Page<LeaveType> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<LeaveType> page = leaveTypeRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return leaveTypeRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

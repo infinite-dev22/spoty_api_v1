@@ -30,10 +30,9 @@ public class PurchaseReturnMasterServiceImpl implements PurchaseReturnMasterServ
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<PurchaseReturnMaster> getAll(int pageNo, int pageSize) {
+    public Page<PurchaseReturnMaster> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<PurchaseReturnMaster> page = purchaseReturnMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return purchaseReturnMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

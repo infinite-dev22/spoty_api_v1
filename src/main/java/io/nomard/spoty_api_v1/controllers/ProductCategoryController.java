@@ -8,6 +8,7 @@ import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.ProductCategoryServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public class ProductCategoryController {
     private ProductCategoryServiceImpl productCategoryService;
 
     @GetMapping("/all")
-    public List<ProductCategory> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+    public Page<ProductCategory> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                         @RequestParam(defaultValue = "50") Integer pageSize) {
         return productCategoryService.getAll(pageNo, pageSize);
     }

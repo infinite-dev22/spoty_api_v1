@@ -39,10 +39,9 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
     private PaymentTransaction paymentTransaction;
 
     @Override
-    public List<PaymentTransaction> getAll(int pageNo, int pageSize) {
+    public Page<PaymentTransaction> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<PaymentTransaction> page = paymentTransactionRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return paymentTransactionRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

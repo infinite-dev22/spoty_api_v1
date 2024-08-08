@@ -35,10 +35,9 @@ public class ExpenseServiceImpl implements ExpenseService {
     private AccountServiceImpl accountService;
 
     @Override
-    public List<Expense> getAll(int pageNo, int pageSize) {
+    public Page<Expense> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<Expense> page = expenseRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return expenseRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

@@ -30,10 +30,9 @@ public class SupplierServiceImpl implements SupplierService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Supplier> getAll(int pageNo, int pageSize) {
+    public Page<Supplier> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<Supplier> page = supplierRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return supplierRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

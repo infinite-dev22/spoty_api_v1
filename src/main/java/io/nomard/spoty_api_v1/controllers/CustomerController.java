@@ -8,6 +8,7 @@ import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.CustomerServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public class CustomerController {
     private CustomerServiceImpl customerService;
 
     @GetMapping("/all")
-    public List<Customer> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+    public Page<Customer> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                  @RequestParam(defaultValue = "50") Integer pageSize) {
         return customerService.getAll(pageNo, pageSize);
     }

@@ -30,10 +30,9 @@ public class EmploymentStatusServiceImpl implements EmploymentStatusService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<EmploymentStatus> getAll(int pageNo, int pageSize) {
+    public Page<EmploymentStatus> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<EmploymentStatus> page = employmentStatusRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return employmentStatusRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

@@ -30,10 +30,9 @@ public class CustomerServiceImpl implements CustomerService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Customer> getAll(int pageNo, int pageSize) {
+    public Page<Customer> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<Customer> page = customerRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return customerRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

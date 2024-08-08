@@ -32,10 +32,9 @@ public class StockInMasterServiceImpl implements StockInMasterService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<StockInMaster> getAll(int pageNo, int pageSize) {
+    public Page<StockInMaster> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<StockInMaster> page = stockInMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return stockInMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

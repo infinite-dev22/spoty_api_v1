@@ -10,6 +10,7 @@ import io.nomard.spoty_api_v1.services.implementations.accounting.AccountService
 import io.nomard.spoty_api_v1.services.implementations.accounting.AccountTransactionServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,7 @@ public class AccountController {
     private AccountTransactionServiceImpl accountTransactionService;
 
     @GetMapping("/all")
-    public List<Account> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+    public Page<Account> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                 @RequestParam(defaultValue = "50") Integer pageSize) {
         return accountService.getAll(pageNo, pageSize);
     }
@@ -61,7 +62,7 @@ public class AccountController {
     }
 
     @GetMapping("/transactions")
-    public List<AccountTransaction> getTransactions(@RequestParam(defaultValue = "0") Integer pageNo,
+    public Page<AccountTransaction> getTransactions(@RequestParam(defaultValue = "0") Integer pageNo,
                                                     @RequestParam(defaultValue = "50") Integer pageSize) {
         return accountTransactionService.getAll(pageNo, pageSize);
     }

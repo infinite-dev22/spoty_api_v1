@@ -30,10 +30,9 @@ public class CurrencyServiceImpl implements CurrencyService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Currency> getAll(int pageNo, int pageSize) {
+    public Page<Currency> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<Currency> page = currencyRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return currencyRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

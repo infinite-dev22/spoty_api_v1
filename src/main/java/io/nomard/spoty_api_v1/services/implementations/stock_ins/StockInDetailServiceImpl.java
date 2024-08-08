@@ -29,10 +29,9 @@ public class StockInDetailServiceImpl implements StockInDetailService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<StockInDetail> getAll(int pageNo, int pageSize) {
+    public Page<StockInDetail> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<StockInDetail> page = stockInDetailRepo.findAll(pageRequest);
-        return page.getContent();
+        return stockInDetailRepo.findAll(pageRequest);
     }
 
     @Override

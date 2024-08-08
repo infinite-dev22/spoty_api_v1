@@ -5,13 +5,14 @@ import io.nomard.spoty_api_v1.entities.PaymentTransaction;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.payments.CardModel;
 import io.nomard.spoty_api_v1.models.payments.MoMoModel;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public interface PaymentTransactionService {
-    List<PaymentTransaction> getAll(int pageNo, int pageSize);
+    Page<PaymentTransaction> getAll(int pageNo, int pageSize);
 
     PaymentTransaction getById(Long id) throws NotFoundException;
 

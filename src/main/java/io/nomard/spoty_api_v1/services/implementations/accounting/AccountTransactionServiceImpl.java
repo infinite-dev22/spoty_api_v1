@@ -31,10 +31,9 @@ public class AccountTransactionServiceImpl implements AccountTransactionService 
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<AccountTransaction> getAll(int pageNo, int pageSize) {
+    public Page<AccountTransaction> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<AccountTransaction> page = accountTransactionRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return accountTransactionRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

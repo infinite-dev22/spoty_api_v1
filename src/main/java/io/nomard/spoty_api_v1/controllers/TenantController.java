@@ -7,6 +7,7 @@ import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.services.implementations.TenantServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +20,7 @@ public class TenantController {
     private TenantServiceImpl tenantService;
 
     @GetMapping("/all")
-    public List<Tenant> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+    public Page<Tenant> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                @RequestParam(defaultValue = "50") Integer pageSize) {
         return tenantService.getAll(pageNo, pageSize);
     }

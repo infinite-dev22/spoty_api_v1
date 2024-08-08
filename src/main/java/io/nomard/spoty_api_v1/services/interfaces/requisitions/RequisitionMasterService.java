@@ -3,12 +3,13 @@ package io.nomard.spoty_api_v1.services.interfaces.requisitions;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.requisitions.RequisitionMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface RequisitionMasterService {
-    List<RequisitionMaster> getAll(int pageNo, int pageSize);
+    Page<RequisitionMaster> getAll(int pageNo, int pageSize);
 
     RequisitionMaster getById(Long id) throws NotFoundException;
 

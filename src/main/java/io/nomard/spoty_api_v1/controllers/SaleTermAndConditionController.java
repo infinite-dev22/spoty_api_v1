@@ -7,6 +7,7 @@ import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.services.implementations.SaleTermAndConditionServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,7 @@ public class SaleTermAndConditionController {
     private SaleTermAndConditionServiceImpl saleTermAndConditionService;
 
     @GetMapping("/all")
-    public List<SaleTermAndCondition> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+    public Page<SaleTermAndCondition> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                              @RequestParam(defaultValue = "50") Integer pageSize) {
         return saleTermAndConditionService.getAll(pageNo, pageSize);
     }

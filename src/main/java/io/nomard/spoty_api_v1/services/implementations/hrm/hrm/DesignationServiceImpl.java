@@ -30,10 +30,9 @@ public class DesignationServiceImpl implements DesignationService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Designation> getAll(int pageNo, int pageSize) {
+    public Page<Designation> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<Designation> page = designationRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return designationRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

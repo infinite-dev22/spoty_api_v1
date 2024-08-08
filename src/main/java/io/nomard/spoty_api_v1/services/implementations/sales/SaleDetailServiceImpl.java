@@ -29,10 +29,9 @@ public class SaleDetailServiceImpl implements SaleDetailService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<SaleDetail> getAll(int pageNo, int pageSize) {
+    public Page<SaleDetail> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<SaleDetail> page = saleDetailRepo.findAll(pageRequest);
-        return page.getContent();
+        return saleDetailRepo.findAll(pageRequest);
     }
 
     @Override

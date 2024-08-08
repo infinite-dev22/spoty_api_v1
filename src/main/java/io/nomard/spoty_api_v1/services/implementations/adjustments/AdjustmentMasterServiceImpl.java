@@ -35,10 +35,9 @@ public class AdjustmentMasterServiceImpl implements AdjustmentMasterService {
     @Override
     @Cacheable("adjustment_masters")
     @Transactional(readOnly = true)
-    public List<AdjustmentMaster> getAll(int pageNo, int pageSize) {
+    public Page<AdjustmentMaster> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<AdjustmentMaster> page = adjustmentMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return adjustmentMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

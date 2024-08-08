@@ -34,10 +34,9 @@ public class AccountServiceImpl implements AccountService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Account> getAll(int pageNo, int pageSize) {
+    public Page<Account> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<Account> page = accountRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return accountRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

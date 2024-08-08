@@ -30,10 +30,9 @@ public class PermissionServiceImpl implements PermissionService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Permission> getAll(int pageNo, int pageSize) {
+    public Page<Permission> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<Permission> page = permissionRepo.findAll(pageRequest);
-        return page.getContent();
+        return permissionRepo.findAll(pageRequest);
     }
 
     @Override

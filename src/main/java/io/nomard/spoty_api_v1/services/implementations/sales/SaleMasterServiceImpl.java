@@ -43,10 +43,9 @@ public class SaleMasterServiceImpl implements SaleMasterService {
     @Override
     @Cacheable("sale_masters")
     @Transactional(readOnly = true)
-    public List<SaleMaster> getAll(int pageNo, int pageSize) {
+    public Page<SaleMaster> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<SaleMaster> page = saleMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return saleMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

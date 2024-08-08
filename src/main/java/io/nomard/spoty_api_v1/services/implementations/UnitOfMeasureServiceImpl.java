@@ -30,10 +30,9 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<UnitOfMeasure> getAll(int pageNo, int pageSize) {
+    public Page<UnitOfMeasure> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<UnitOfMeasure> page = uomRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return uomRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

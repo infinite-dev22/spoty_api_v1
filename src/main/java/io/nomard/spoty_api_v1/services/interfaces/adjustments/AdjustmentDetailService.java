@@ -3,12 +3,13 @@ package io.nomard.spoty_api_v1.services.interfaces.adjustments;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.adjustments.AdjustmentDetail;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface AdjustmentDetailService {
-    List<AdjustmentDetail> getAll(int pageNo, int pageSize);
+    Page<AdjustmentDetail> getAll(int pageNo, int pageSize);
 
     AdjustmentDetail getById(Long id) throws NotFoundException;
 

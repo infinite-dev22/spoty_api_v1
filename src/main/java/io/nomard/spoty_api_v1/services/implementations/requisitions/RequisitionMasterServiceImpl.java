@@ -30,10 +30,9 @@ public class RequisitionMasterServiceImpl implements RequisitionMasterService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<RequisitionMaster> getAll(int pageNo, int pageSize) {
+    public Page<RequisitionMaster> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<RequisitionMaster> page = requisitionMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return requisitionMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

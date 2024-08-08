@@ -30,10 +30,9 @@ public class TaxServiceImpl implements TaxService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Tax> getAll(int pageNo, int pageSize) {
+    public Page<Tax> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<Tax> page = taxRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return taxRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

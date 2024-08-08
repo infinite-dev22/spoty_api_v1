@@ -8,6 +8,7 @@ import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.CurrencyServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public class CurrencyController {
     private CurrencyServiceImpl currencyService;
 
     @GetMapping("/all")
-    public List<Currency> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+    public Page<Currency> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                  @RequestParam(defaultValue = "50") Integer pageSize) {
         return currencyService.getAll(pageNo, pageSize);
     }

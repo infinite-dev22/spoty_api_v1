@@ -7,6 +7,7 @@ import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.services.implementations.hrm.leave.LeaveTypeServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,7 @@ public class LeaveTypeController {
     private LeaveTypeServiceImpl leaveTypeService;
 
     @GetMapping("/all")
-    public List<LeaveType> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+    public Page<LeaveType> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                   @RequestParam(defaultValue = "50") Integer pageSize) {
         return leaveTypeService.getAll(pageNo, pageSize);
     }
@@ -31,7 +32,7 @@ public class LeaveTypeController {
     }
 
 //    @GetMapping("/search")
-//    public List<LeaveType> getByContains(@RequestBody SearchModel searchModel) {
+//    public Page<LeaveType> getByContains(@RequestBody SearchModel searchModel) {
 //        return leaveTypeService.getByContains(searchModel.getSearch());
 //    }
 

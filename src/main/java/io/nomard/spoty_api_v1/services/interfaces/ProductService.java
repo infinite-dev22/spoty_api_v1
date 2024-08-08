@@ -3,6 +3,7 @@ package io.nomard.spoty_api_v1.services.interfaces;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Product;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface ProductService {
-    List<Product> getAll(int pageNo, int pageSize);
+    Page<Product> getAll(int pageNo, int pageSize);
 
     Product getById(Long id) throws NotFoundException;
 

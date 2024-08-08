@@ -10,6 +10,7 @@ import io.nomard.spoty_api_v1.services.implementations.sales.SaleDetailServiceIm
 import io.nomard.spoty_api_v1.services.implementations.sales.SaleMasterServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,7 @@ public class SaleController {
 
     // ADJUSTMENT MASTERS.
     @GetMapping("/all")
-    public List<SaleMaster> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
+    public Page<SaleMaster> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
                                           @RequestParam(defaultValue = "50") Integer pageSize) {
         return saleMasterService.getAll(pageNo, pageSize);
     }

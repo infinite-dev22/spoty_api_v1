@@ -30,10 +30,9 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<QuotationMaster> getAll(int pageNo, int pageSize) {
+    public Page<QuotationMaster> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<QuotationMaster> page = quotationMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return quotationMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

@@ -29,10 +29,9 @@ public class TransferDetailServiceImpl implements TransferDetailService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<TransferDetail> getAll(int pageNo, int pageSize) {
+    public Page<TransferDetail> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<TransferDetail> page = transferDetailRepo.findAll(pageRequest);
-        return page.getContent();
+        return transferDetailRepo.findAll(pageRequest);
     }
 
     @Override

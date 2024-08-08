@@ -30,10 +30,9 @@ public class DiscountServiceImpl implements DiscountService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Discount> getAll(int pageNo, int pageSize) {
+    public Page<Discount> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<Discount> page = discountRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return discountRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

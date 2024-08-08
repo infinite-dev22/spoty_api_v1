@@ -37,10 +37,9 @@ public class PurchaseMasterServiceImpl implements PurchaseMasterService {
     private AccountServiceImpl accountService;
 
     @Override
-    public List<PurchaseMaster> getAll(int pageNo, int pageSize) {
+    public Page<PurchaseMaster> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<PurchaseMaster> page = purchaseMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return purchaseMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

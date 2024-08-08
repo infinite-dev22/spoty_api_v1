@@ -29,10 +29,9 @@ public class PurchaseDetailServiceImpl implements PurchaseDetailService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<PurchaseDetail> getAll(int pageNo, int pageSize) {
+    public Page<PurchaseDetail> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<PurchaseDetail> page = purchaseDetailRepo.findAll(pageRequest);
-        return page.getContent();
+        return purchaseDetailRepo.findAll(pageRequest);
     }
 
     @Override

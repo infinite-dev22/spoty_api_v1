@@ -9,6 +9,7 @@ import io.nomard.spoty_api_v1.models.payments.MoMoModel;
 import io.nomard.spoty_api_v1.services.implementations.PaymentTransactionServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public class PaymentTransactionController {
     private PaymentTransactionServiceImpl paymentTransactionService;
 
     @GetMapping("/all")
-    public List<PaymentTransaction> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+    public Page<PaymentTransaction> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                            @RequestParam(defaultValue = "50") Integer pageSize) {
         return paymentTransactionService.getAll(pageNo, pageSize);
     }

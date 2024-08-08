@@ -29,10 +29,9 @@ public class QuotationDetailServiceImpl implements QuotationDetailService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<QuotationDetail> getAll(int pageNo, int pageSize) {
+    public Page<QuotationDetail> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<QuotationDetail> page = quotationDetailRepo.findAll(pageRequest);
-        return page.getContent();
+        return quotationDetailRepo.findAll(pageRequest);
     }
 
     @Override

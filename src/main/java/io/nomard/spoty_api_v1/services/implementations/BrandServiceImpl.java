@@ -30,10 +30,9 @@ public class BrandServiceImpl implements BrandService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Brand> getAll(int pageNo, int pageSize) {
+    public Page<Brand> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<Brand> page = brandRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return brandRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

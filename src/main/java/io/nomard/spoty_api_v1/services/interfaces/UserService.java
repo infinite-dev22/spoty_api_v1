@@ -4,12 +4,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.User;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.UserModel;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface UserService {
-    List<User> getAll(int pageNo, int pageSize);
+    Page<User> getAll(int pageNo, int pageSize);
 
     User getById(Long id) throws NotFoundException;
 

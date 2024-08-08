@@ -30,10 +30,9 @@ public class TenantServiceImpl implements TenantService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<Tenant> getAll(int pageNo, int pageSize) {
+    public Page<Tenant> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<Tenant> page = tenantRepo.findAll(pageRequest);
-        return page.getContent();
+        return tenantRepo.findAll(pageRequest);
     }
 
     @Override

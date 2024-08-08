@@ -10,6 +10,7 @@ import io.nomard.spoty_api_v1.services.implementations.PermissionServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.RoleServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ public class RoleController {
     private RoleServiceImpl roleService;
 
     @GetMapping("/all")
-    public List<Role> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
+    public Page<Role> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
                                     @RequestParam(defaultValue = "50") Integer pageSize) {
         return roleService.getAll(pageNo, pageSize);
     }
@@ -50,7 +51,7 @@ public class RoleController {
     }
 
     @GetMapping("/permissions")
-    public List<Permission> getAllDetails(@RequestParam(defaultValue = "0") Integer pageNo,
+    public Page<Permission> getAllDetails(@RequestParam(defaultValue = "0") Integer pageNo,
                                           @RequestParam(defaultValue = "50") Integer pageSize) {
         return permissionService.getAll(pageNo, pageSize);
     }

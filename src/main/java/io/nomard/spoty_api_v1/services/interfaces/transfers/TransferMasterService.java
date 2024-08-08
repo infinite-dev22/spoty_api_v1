@@ -3,12 +3,13 @@ package io.nomard.spoty_api_v1.services.interfaces.transfers;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.transfers.TransferMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface TransferMasterService {
-    List<TransferMaster> getAll(int pageNo, int pageSize);
+    Page<TransferMaster> getAll(int pageNo, int pageSize);
 
     TransferMaster getById(Long id) throws NotFoundException;
 

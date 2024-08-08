@@ -29,10 +29,9 @@ public class PaySlipServiceImpl implements PaySlipService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<PaySlip> getAll(int pageNo, int pageSize) {
+    public Page<PaySlip> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<PaySlip> page = paySlipRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
-        return page.getContent();
+        return paySlipRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override

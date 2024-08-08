@@ -29,10 +29,9 @@ public class PurchaseReturnDetailServiceImpl implements PurchaseReturnDetailServ
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<PurchaseReturnDetail> getAll(int pageNo, int pageSize) {
+    public Page<PurchaseReturnDetail> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<PurchaseReturnDetail> page = purchaseReturnDetailRepo.findAll(pageRequest);
-        return page.getContent();
+        return purchaseReturnDetailRepo.findAll(pageRequest);
     }
 
     @Override

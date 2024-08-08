@@ -3,12 +3,13 @@ package io.nomard.spoty_api_v1.services.interfaces.stock_ins;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.stock_ins.StockInDetail;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface StockInDetailService {
-    List<StockInDetail> getAll(int pageNo, int pageSize);
+    Page<StockInDetail> getAll(int pageNo, int pageSize);
 
     StockInDetail getById(Long id) throws NotFoundException;
 

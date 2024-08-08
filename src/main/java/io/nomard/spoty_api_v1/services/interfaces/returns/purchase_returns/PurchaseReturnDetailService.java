@@ -3,12 +3,13 @@ package io.nomard.spoty_api_v1.services.interfaces.returns.purchase_returns;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.returns.purchase_returns.PurchaseReturnDetail;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface PurchaseReturnDetailService {
-    List<PurchaseReturnDetail> getAll(int pageNo, int pageSize);
+    Page<PurchaseReturnDetail> getAll(int pageNo, int pageSize);
 
     PurchaseReturnDetail getById(Long id) throws NotFoundException;
 

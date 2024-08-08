@@ -29,10 +29,9 @@ public class RequisitionDetailServiceImpl implements RequisitionDetailService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public List<RequisitionDetail> getAll(int pageNo, int pageSize) {
+    public Page<RequisitionDetail> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<RequisitionDetail> page = requisitionDetailRepo.findAll(pageRequest);
-        return page.getContent();
+        return requisitionDetailRepo.findAll(pageRequest);
     }
 
     @Override
