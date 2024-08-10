@@ -29,6 +29,11 @@ public class ProductController {
         return productService.getAll(pageNo, pageSize);
     }
 
+    @GetMapping("/all/non_paged")
+    public ArrayList<Product> getAllNonPaged() {
+        return productService.getAllNonPaged();
+    }
+
     @GetMapping("/single")
     public Product getById(@RequestBody FindModel findModel) throws NotFoundException {
         return productService.getById(findModel.getId());

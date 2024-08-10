@@ -11,6 +11,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -30,6 +31,9 @@ public interface ProductRepository extends PagingAndSortingRepository<Product, L
 
     @Query("select p from Product p where p.tenant.id = :id")
     Page<Product> findAllByTenantId(@Param("id") Long id, Pageable pageable);
+
+    @Query("select p from Product p where p.tenant.id = :id")
+    ArrayList<Product> findAllByTenantIdNonPaged(@Param("id") Long id);
 
     @Query("SELECT new io.nomard.spoty_api_v1.models.StockAlertModel(p.name, p.quantity, p.costPrice) " +
             "FROM Product p " +

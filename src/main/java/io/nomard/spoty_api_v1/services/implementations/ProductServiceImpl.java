@@ -44,6 +44,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable("products_no_paged")
+    @Transactional(readOnly = true)
+    public ArrayList<Product> getAllNonPaged() {
+        return productRepo.findAllByTenantIdNonPaged(authService.authUser().getTenant().getId());
+    }
+
+    @Override
     @Cacheable("products")
     @Transactional(readOnly = true)
     public Product getById(Long id) throws NotFoundException {

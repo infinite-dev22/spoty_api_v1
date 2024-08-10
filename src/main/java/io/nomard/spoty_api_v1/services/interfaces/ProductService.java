@@ -13,6 +13,8 @@ import java.util.List;
 public interface ProductService {
     Page<Product> getAll(int pageNo, int pageSize);
 
+    ArrayList<Product> getAllNonPaged();
+
     Product getById(Long id) throws NotFoundException;
 
     List<Product> getByContains(String search);
