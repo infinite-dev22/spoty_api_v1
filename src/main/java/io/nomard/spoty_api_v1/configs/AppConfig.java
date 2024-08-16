@@ -44,7 +44,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 
 @Configuration
 public class AppConfig {
-    @Value("jwt.secret")
+    @Value("${jwt.secret}")
     private String secret;
 
     @Bean

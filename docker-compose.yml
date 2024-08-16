@@ -16,6 +16,8 @@ services:
       SPRING_DATASOURCE_USERNAME: '${POSTGRESQL_USER}'
       SPRING_DATASOURCE_PASSWORD: '${POSTGRES_PASSWORD}'
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    volumes:
+      - static-files:/var/lib/opencore/static/uploads
     depends_on:
       db:
         condition: service_healthy
@@ -65,6 +67,8 @@ volumes:
   postgres-data:
     driver: local
   pgadmin-data:
+    driver: local
+  static-files:
     driver: local
 
 networks:
