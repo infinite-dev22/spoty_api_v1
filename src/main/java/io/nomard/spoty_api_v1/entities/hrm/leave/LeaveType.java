@@ -30,7 +30,8 @@ public class LeaveType {
             joinColumns = {@JoinColumn(name = "leave_type_id")},
             inverseJoinColumns = {@JoinColumn(name = "branch_id")})
     @JsonIgnore
-    private ArrayList<Branch> branches;
+    @Builder.Default
+    private List<Branch> branches = new ArrayList<>();
     @JoinColumn(nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore

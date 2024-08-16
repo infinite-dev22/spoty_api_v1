@@ -10,6 +10,7 @@ import org.hibernate.proxy.HibernateProxy;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -29,7 +30,8 @@ public class BeneficiaryType {
             joinColumns = {@JoinColumn(name = "employment_status_id")},
             inverseJoinColumns = {@JoinColumn(name = "branch_id")})
     @JsonIgnore
-    private ArrayList<Branch> branches;
+    @Builder.Default
+    private List<Branch> branches = new ArrayList<>();
     @JoinColumn(nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore

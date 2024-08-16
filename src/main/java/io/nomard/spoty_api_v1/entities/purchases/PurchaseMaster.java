@@ -58,7 +58,8 @@ public class PurchaseMaster implements Serializable {
     @JsonIgnore
     private Tenant tenant;
     @OneToMany(orphanRemoval = true, mappedBy = "purchase", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private ArrayList<PurchaseDetail> purchaseDetails;
+    @Builder.Default
+    private List<PurchaseDetail> purchaseDetails = new ArrayList<>();
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tax_id")
     private Tax tax;

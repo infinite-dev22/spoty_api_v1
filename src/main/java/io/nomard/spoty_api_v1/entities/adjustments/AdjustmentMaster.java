@@ -48,7 +48,8 @@ public class AdjustmentMaster implements Serializable {
     @JsonIgnore
     private Tenant tenant;
     @OneToMany(orphanRemoval = true, mappedBy = "adjustment", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private ArrayList<AdjustmentDetail> adjustmentDetails;
+    @Builder.Default
+    private List<AdjustmentDetail> adjustmentDetails = new ArrayList<>();
     private String notes;
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)

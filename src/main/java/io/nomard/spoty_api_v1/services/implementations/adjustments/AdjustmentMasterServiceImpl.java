@@ -60,7 +60,7 @@ public class AdjustmentMasterServiceImpl implements AdjustmentMasterService {
     }
 
     @Override
-    @Transactional
+//    @Transactional
     public ResponseEntity<ObjectNode> save(AdjustmentMaster adjustmentMaster) {
         try {
             for (int i = 0; i < adjustmentMaster.getAdjustmentDetails().size(); i++) {
