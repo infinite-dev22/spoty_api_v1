@@ -63,12 +63,36 @@ services:
     networks:
       - api-net
 
+  mail:
+    container_name: 'stalwart-mail'
+    image: 'stalwartlabs/mail-server:latest'
+    restart: unless-stopped
+    ports:
+      - "80:8080"
+      - "443:443"
+      - "25:25"
+      - "587:587"
+      - "465:465"
+      - "143:143"
+      - "993:993"
+      - "4190:4190"
+      - "110:110"
+      - "995:995"
+    volumes:
+      - mail-data:/opt/stalwart-mail
+    tty: true
+    stdin_open: true
+    networks:
+      - api-net
+
 volumes:
   postgres-data:
     driver: local
   pgadmin-data:
     driver: local
   static-files:
+    driver: local
+  mail-data:
     driver: local
 
 networks:
