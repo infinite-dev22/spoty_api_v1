@@ -6,6 +6,7 @@ import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.models.reportmodels.SalesReportModel;
+import io.nomard.spoty_api_v1.models.reportmodels.purchases.PurchasesReportModel;
 import io.nomard.spoty_api_v1.services.implementations.CurrencyServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.ReportServiceImpl;
 import jakarta.validation.Valid;
@@ -31,9 +32,10 @@ public class ReportController {
         return reportService.getSalesReport(startDate, endDate);
     }
 
-    @GetMapping("/single")
-    public Currency getById(@RequestBody FindModel findModel) throws NotFoundException {
-        return currencyService.getById(findModel.getId());
+    @GetMapping("/purchases")
+    public PurchasesReportModel purchasesReport(@RequestParam LocalDateTime startDate,
+                                        @RequestParam LocalDateTime endDate) {
+        return reportService.getPurchasesReport(startDate, endDate);
     }
 
     @GetMapping("/search")

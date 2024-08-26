@@ -7,8 +7,10 @@ import io.nomard.spoty_api_v1.entities.quotations.QuotationMaster;
 import io.nomard.spoty_api_v1.entities.stock_ins.StockInMaster;
 import io.nomard.spoty_api_v1.models.DashboardKPIModel;
 import io.nomard.spoty_api_v1.models.reportmodels.SalesReportModel;
+import io.nomard.spoty_api_v1.models.reportmodels.purchases.PurchasesReportModel;
 import io.nomard.spoty_api_v1.repositories.adjustments.AdjustmentMasterRepository;
 import io.nomard.spoty_api_v1.repositories.purchases.PurchaseMasterRepository;
+import io.nomard.spoty_api_v1.repositories.reports.PurchaseReportRepository;
 import io.nomard.spoty_api_v1.repositories.reports.SaleReportRepository;
 import io.nomard.spoty_api_v1.repositories.sales.SaleMasterRepository;
 import io.nomard.spoty_api_v1.repositories.stock_ins.StockInMasterRepository;
@@ -40,6 +42,8 @@ public class ReportServiceImpl implements ReportService {
     private AccountTransactionServiceImpl accountTransactionService;
     @Autowired
     private SaleReportRepository saleReportRepository;
+    @Autowired
+    private PurchaseReportRepository purchaseReportRepository;
 
     @Override
     public SalesReportModel getSalesReport(LocalDateTime startDate, LocalDateTime endDate) {
@@ -61,8 +65,22 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Page<PurchaseMaster> getPurchasesReport(LocalDateTime startDate, LocalDateTime endDate) {
-        return null;
+    public PurchasesReportModel getPurchasesReport(LocalDateTime startDate, LocalDateTime endDate) {
+        try{
+            var totalPurchases = purchaseReportRepository.countPurchases(authService.authUser().getId(), startDate, endDate);
+            var expenditures = purchaseReportRepository.totalExpenditures(authService.authUser().getId(), startDate, endDate);
+            var costOnProducts = purchaseReportRepository.totalCostOnProducts(authService.authUser().getId(), startDate, endDate);
+            var profit = new DashboardKPIModel("Profit", /*(Double) expenditures.getValue() - (Double) costOnProducts.getValue()*/0.00);
+            var kpis = List.of(totalPurchases, expenditures, profit, costOnProducts);
+
+            var purchasesRevenue = purchaseReportRepository.getPurchasesRevenue(authService.authUser().getId(), startDate, endDate);
+            var productSales = purchaseReportRepository.findAllByTenantIdAndCreatedAtBetweenAndGroupByProduct(authService.authUser().getId(), startDate, endDate);
+            var customerSales = purchaseReportRepository.findAllByTenantIdAndCreatedAtBetweenAndGroupByCustomer(authService.authUser().getId(), startDate, endDate);
+            var orders = purchaseReportRepository.findAllByTenantIdAndCreatedAtBetween(authService.authUser().getId(), startDate, endDate);
+            return new PurchasesReportModel(kpis, purchasesRevenue, productSales, customerSales, orders);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
