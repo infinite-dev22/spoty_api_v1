@@ -26,9 +26,12 @@ public class Account {
     private Tenant tenant;
     private String accountName;
     private String accountNumber;
-    private Double balance;
-    private Double credit;
-    private Double debit;
+    @Builder.Default
+    private Double balance = 0d;
+    @Builder.Default
+    private Double credit = 0d;
+    @Builder.Default
+    private Double debit = 0d;
     private String description;
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
