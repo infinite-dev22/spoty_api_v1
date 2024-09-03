@@ -1,9 +1,11 @@
 package io.nomard.spoty_api_v1.models.reportmodels;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 public record ReportLineChartModel(
-        LocalDateTime period,
+        Date period,
         Double totalValue
 ) {
 }

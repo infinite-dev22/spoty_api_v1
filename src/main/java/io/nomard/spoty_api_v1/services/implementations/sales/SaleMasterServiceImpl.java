@@ -89,19 +89,17 @@ public class SaleMasterServiceImpl implements SaleMasterService {
         if (Objects.isNull(saleMaster.getBranch())) {
             saleMaster.setBranch(authService.authUser().getBranch());
         }
-        if (!Objects.equals(total, 0d)) {
-            var account = accountService.getByContains(authService.authUser().getTenant(), "Default Account");
-            var accountTransaction = new AccountTransaction();
-            accountTransaction.setTenant(authService.authUser().getTenant());
-            accountTransaction.setTransactionDate(LocalDateTime.now());
-            accountTransaction.setAccount(account);
-            accountTransaction.setAmount(total);
-            accountTransaction.setTransactionType("Sale");
-            accountTransaction.setNote("Sale made");
-            accountTransaction.setCreatedBy(authService.authUser());
-            accountTransaction.setCreatedAt(LocalDateTime.now());
-            accountTransactionService.save(accountTransaction);
-        }
+        var account = accountService.getByContains(authService.authUser().getTenant(), "Default Account");
+        var accountTransaction = new AccountTransaction();
+        accountTransaction.setTenant(authService.authUser().getTenant());
+        accountTransaction.setTransactionDate(LocalDateTime.now());
+        accountTransaction.setAccount(account);
+        accountTransaction.setAmount(total);
+        accountTransaction.setTransactionType("Sale");
+        accountTransaction.setNote("Sale made");
+        accountTransaction.setCreatedBy(authService.authUser());
+        accountTransaction.setCreatedAt(LocalDateTime.now());
+        accountTransactionService.save(accountTransaction);
         saleMaster.setCreatedBy(authService.authUser());
         saleMaster.setCreatedAt(LocalDateTime.now());
         try {

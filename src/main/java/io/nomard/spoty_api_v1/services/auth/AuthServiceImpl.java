@@ -141,7 +141,6 @@ public class AuthServiceImpl implements AuthService {
         var account = new Account();
         account.setAccountName("Default Account");
         account.setAccountNumber("ACC000000000001");
-        account.setBalance(0d);
         account.setDescription("Default account for sales, purchases, payroll, etc.");
         account.setTenant(tenant);
 

@@ -2,9 +2,9 @@ package io.nomard.spoty_api_v1.controllers.reports;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Currency;
+import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
-import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.models.reportmodels.SalesReportModel;
 import io.nomard.spoty_api_v1.models.reportmodels.purchases.PurchasesReportModel;
 import io.nomard.spoty_api_v1.services.implementations.CurrencyServiceImpl;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("/reports")
@@ -34,13 +33,14 @@ public class ReportController {
 
     @GetMapping("/purchases")
     public PurchasesReportModel purchasesReport(@RequestParam LocalDateTime startDate,
-                                        @RequestParam LocalDateTime endDate) {
+                                                @RequestParam LocalDateTime endDate) {
         return reportService.getPurchasesReport(startDate, endDate);
     }
 
-    @GetMapping("/search")
-    public List<Currency> getByContains(@RequestBody SearchModel searchModel) {
-        return currencyService.getByContains(searchModel.getSearch());
+    @GetMapping("/accounts/receivable")
+    public ArrayList<AccountTransaction> getByContains(@RequestParam LocalDateTime startDate,
+                                                       @RequestParam LocalDateTime endDate) {
+        return reportService.getAccountsReport(startDate, endDate);
     }
 
     @PostMapping("/add")
