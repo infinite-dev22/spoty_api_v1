@@ -87,7 +87,7 @@ public class DocumentServiceImpl implements DocumentService {
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
             log.log(Level.INFO, "File saved successfully at {}", filePath.toString());
             return ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/documents/show/image")
+                    .path("/documents/show/image/")
                     .path(fileCode + '-' + fileName)
                     .toUriString();
         } catch (IOException ioe) {
