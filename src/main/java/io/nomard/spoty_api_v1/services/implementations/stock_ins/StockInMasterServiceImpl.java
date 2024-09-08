@@ -7,10 +7,13 @@ import io.nomard.spoty_api_v1.repositories.stock_ins.StockInMasterRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.stock_ins.StockInMasterService;
+import io.nomard.spoty_api_v1.utils.CoreUtils;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,8 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.logging.Level;
 
 @Service
+@Log
 public class StockInMasterServiceImpl implements StockInMasterService {
     @Autowired
     private StockInMasterRepository stockInMasterRepo;
@@ -67,6 +72,7 @@ public class StockInMasterServiceImpl implements StockInMasterService {
             }
             stockInMaster.setCreatedBy(authService.authUser());
             stockInMaster.setCreatedAt(LocalDateTime.now());
+            stockInMaster.setRef(CoreUtils.referenceNumberGenerator("STK"));
             stockInMasterRepo.saveAndFlush(stockInMaster);
 
             if (!stockInMaster.getStockInDetails().isEmpty()) {
@@ -76,7 +82,8 @@ public class StockInMasterServiceImpl implements StockInMasterService {
             }
             return spotyResponseImpl.created();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 
@@ -122,7 +129,8 @@ public class StockInMasterServiceImpl implements StockInMasterService {
             stockInMasterRepo.saveAndFlush(stockInMaster);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 
@@ -133,7 +141,8 @@ public class StockInMasterServiceImpl implements StockInMasterService {
             stockInMasterRepo.deleteById(id);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 
@@ -143,7 +152,8 @@ public class StockInMasterServiceImpl implements StockInMasterService {
             stockInMasterRepo.deleteAllById(idList);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 }
