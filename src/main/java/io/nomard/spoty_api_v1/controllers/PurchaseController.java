@@ -22,38 +22,38 @@ public class PurchaseController {
     private PurchaseMasterServiceImpl purchaseMasterService;
 
     @GetMapping("/all")
-    public Page<PurchaseMaster> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
+    public Page<PurchaseMaster> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                               @RequestParam(defaultValue = "50") Integer pageSize) {
         return purchaseMasterService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public PurchaseMaster getMastersById(@RequestBody FindModel findModel) throws NotFoundException {
+    public PurchaseMaster getById(@RequestBody FindModel findModel) throws NotFoundException {
         return purchaseMasterService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<PurchaseMaster> getMastersByContains(@RequestBody SearchModel searchModel) {
+    public List<PurchaseMaster> getByContains(@RequestBody SearchModel searchModel) {
         return purchaseMasterService.getByContains(searchModel.getSearch());
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ObjectNode> saveMaster(@Valid @RequestBody PurchaseMaster purchaseMaster) {
+    public ResponseEntity<ObjectNode> save(@Valid @RequestBody PurchaseMaster purchaseMaster) throws NotFoundException {
         return purchaseMasterService.save(purchaseMaster);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ObjectNode> updateMaster(@Valid @RequestBody PurchaseMaster purchaseMaster) throws NotFoundException {
+    public ResponseEntity<ObjectNode> update(@Valid @RequestBody PurchaseMaster purchaseMaster) throws NotFoundException {
         return purchaseMasterService.update(purchaseMaster);
     }
 
     @DeleteMapping("/delete/single")
-    public ResponseEntity<ObjectNode> deleteMaster(@RequestBody FindModel findModel) {
+    public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return purchaseMasterService.delete(findModel.getId());
     }
 
     @DeleteMapping("/delete/multiple")
-    public ResponseEntity<ObjectNode> deleteMasters(@RequestBody List<Long> idList) {
+    public ResponseEntity<ObjectNode> delete(@RequestBody List<Long> idList) {
         return purchaseMasterService.deleteMultiple(idList);
     }
 }

@@ -21,8 +21,8 @@ public class PurchaseDetail implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private double cost;
-    private double subTotalCost;
+    private double unitCost;
+    private double totalCost;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "purchase_id")
     @JsonIgnore

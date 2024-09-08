@@ -15,7 +15,7 @@ public interface PurchaseMasterService {
 
     List<PurchaseMaster> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(PurchaseMaster purchaseMaster);
+    ResponseEntity<ObjectNode> save(PurchaseMaster purchaseMaster) throws NotFoundException;
 
     ResponseEntity<ObjectNode> update(PurchaseMaster purchaseMaster) throws NotFoundException;
 

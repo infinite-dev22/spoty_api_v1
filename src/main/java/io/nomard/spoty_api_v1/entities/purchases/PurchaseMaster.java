@@ -66,6 +66,8 @@ public class PurchaseMaster implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "discount_id")
     private Discount discount;
+    private double taxAmount;
+    private double discountAmount;
     @Builder.Default
     private double shippingFee = 0.0;
     private double amountPaid;
