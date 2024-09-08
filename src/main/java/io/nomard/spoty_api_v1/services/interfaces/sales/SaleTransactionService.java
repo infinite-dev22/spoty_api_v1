@@ -11,7 +11,7 @@ import java.util.List;
 public interface SaleTransactionService {
     SaleTransaction getById(Long id) throws NotFoundException;
 
-    ResponseEntity<ObjectNode> save(SaleDetail saleDetail);
+    ResponseEntity<ObjectNode> save(SaleDetail saleDetail) throws NotFoundException;
 
     ResponseEntity<ObjectNode> update(SaleDetail saleDetail) throws NotFoundException;
 

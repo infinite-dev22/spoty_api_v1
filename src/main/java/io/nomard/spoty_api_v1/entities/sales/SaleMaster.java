@@ -62,6 +62,8 @@ public class SaleMaster implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "discount_id")
     private Discount discount;
+    private double taxAmount;
+    private double discountAmount;
     @Column
     @Builder.Default
     private double total = 0.0;
@@ -71,8 +73,6 @@ public class SaleMaster implements Serializable {
     private double amountPaid = 0.0;
     @Builder.Default
     private double amountDue = 0.0;
-    @Builder.Default
-    private double changeAmount = 0.0;
     @Builder.Default
     private double shippingFee = 0.0;
     @Column(nullable = false)

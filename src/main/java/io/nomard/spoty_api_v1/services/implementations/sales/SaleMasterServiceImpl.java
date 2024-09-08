@@ -9,13 +9,19 @@ import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.accounting.AccountServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.accounting.AccountTransactionServiceImpl;
+import io.nomard.spoty_api_v1.services.implementations.deductions.DiscountServiceImpl;
+import io.nomard.spoty_api_v1.services.implementations.deductions.TaxServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.sales.SaleMasterService;
+import io.nomard.spoty_api_v1.utils.CoreCalculations;
+import io.nomard.spoty_api_v1.utils.CoreUtils;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,8 +31,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.logging.Level;
 
 @Service
+@Log
 public class SaleMasterServiceImpl implements SaleMasterService {
     @Autowired
     private SaleMasterRepository saleMasterRepo;
@@ -40,6 +48,10 @@ public class SaleMasterServiceImpl implements SaleMasterService {
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
+    @Autowired
+    private TaxServiceImpl taxService;
+    @Autowired
+    private DiscountServiceImpl discountService;
 
     @Override
     @Cacheable("sale_masters")
@@ -68,48 +80,46 @@ public class SaleMasterServiceImpl implements SaleMasterService {
     }
 
     @Override
-    @Transactional
-    public ResponseEntity<ObjectNode> save(SaleMaster saleMaster) {
-        var subTotal = 0.00;
-        var total = 0.00;
-        for (int i = 0; i < saleMaster.getSaleDetails().size(); i++) {
-            saleMaster.getSaleDetails().get(i).setSale(saleMaster);
-            subTotal += saleMaster.getSaleDetails().get(i).getSubTotalPrice();
-            total = subTotal;
+//    @Transactional
+    public ResponseEntity<ObjectNode> save(SaleMaster sale) throws NotFoundException {
+        // Perform calculations
+        var calculationService = new CoreCalculations.SaleCalculationService(taxService, discountService);
+        calculationService.calculate(sale);
+
+        // Set additional details
+        sale.setTenant(authService.authUser().getTenant());
+        if (Objects.isNull(sale.getBranch())) {
+            sale.setBranch(authService.authUser().getBranch());
         }
-        if (Objects.nonNull(saleMaster.getTax()) && saleMaster.getTax().getPercentage() > 0.0) {
-            total += total * (saleMaster.getTax().getPercentage() / 100);
-        }
-        if (Objects.nonNull(saleMaster.getDiscount()) && saleMaster.getDiscount().getPercentage() > 0.0) {
-            total += total * (saleMaster.getDiscount().getPercentage() / 100);
-        }
-        saleMaster.setSubTotal(subTotal);
-        saleMaster.setTotal(total);
-        saleMaster.setTenant(authService.authUser().getTenant());
-        if (Objects.isNull(saleMaster.getBranch())) {
-            saleMaster.setBranch(authService.authUser().getBranch());
-        }
-        var account = accountService.getByContains(authService.authUser().getTenant(), "Default Account");
-        var accountTransaction = new AccountTransaction();
-        accountTransaction.setTenant(authService.authUser().getTenant());
-        accountTransaction.setTransactionDate(LocalDateTime.now());
-        accountTransaction.setAccount(account);
-        accountTransaction.setAmount(total);
-        accountTransaction.setTransactionType("Sale");
-        accountTransaction.setNote("Sale made");
-        accountTransaction.setCreatedBy(authService.authUser());
-        accountTransaction.setCreatedAt(LocalDateTime.now());
-        accountTransactionService.save(accountTransaction);
-        saleMaster.setCreatedBy(authService.authUser());
-        saleMaster.setCreatedAt(LocalDateTime.now());
+        sale.setRef(CoreUtils.referenceNumberGenerator("SAL"));
+        sale.setCreatedBy(authService.authUser());
+        sale.setCreatedAt(LocalDateTime.now());
+
         try {
-            saleMasterRepo.saveAndFlush(saleMaster);
-            for (int i = 0; i < saleMaster.getSaleDetails().size(); i++) {
-                saleTransactionService.save(saleMaster.getSaleDetails().get(i));
+            saleMasterRepo.saveAndFlush(sale);
+
+            // Create account transaction of this sale.
+            var account = accountService.getByContains(authService.authUser().getTenant(), "Default Account");
+            var accountTransaction = new AccountTransaction();
+            accountTransaction.setTenant(authService.authUser().getTenant());
+            accountTransaction.setTransactionDate(LocalDateTime.now());
+            accountTransaction.setAccount(account);
+            accountTransaction.setAmount(sale.getTotal());
+            accountTransaction.setTransactionType("Sale");
+            accountTransaction.setNote("Sale made");
+            accountTransaction.setCreatedBy(authService.authUser());
+            accountTransaction.setCreatedAt(LocalDateTime.now());
+            accountTransactionService.save(accountTransaction);
+
+            // Save a sale transaction for each sale detail/product sale.
+            for (int i = 0; i < sale.getSaleDetails().size(); i++) {
+                saleTransactionService.save(sale.getSaleDetails().get(i));
             }
+
             return spotyResponseImpl.created();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 
@@ -117,79 +127,59 @@ public class SaleMasterServiceImpl implements SaleMasterService {
     @CacheEvict(value = "sale_masters", key = "#data.id")
     public ResponseEntity<ObjectNode> update(SaleMaster data) throws NotFoundException {
         var opt = saleMasterRepo.findById(data.getId());
-        var subTotal = 0.00;
-        var total = 0.00;
         if (opt.isEmpty()) {
             throw new NotFoundException();
         }
-        var saleMaster = opt.get();
+        var sale = opt.get();
+
+        // Update fields as needed
         if (Objects.nonNull(data.getRef()) && !"".equalsIgnoreCase(data.getRef())) {
-            saleMaster.setRef(data.getRef());
+            sale.setRef(data.getRef());
         }
-        if (!Objects.equals(saleMaster.getCustomer(), data.getCustomer()) && Objects.nonNull(data.getCustomer())) {
-            saleMaster.setCustomer(data.getCustomer());
+        if (!Objects.equals(sale.getCustomer(), data.getCustomer()) && Objects.nonNull(data.getCustomer())) {
+            sale.setCustomer(data.getCustomer());
         }
-        if (!Objects.equals(saleMaster.getBranch(), data.getBranch()) && Objects.nonNull(data.getBranch())) {
-            saleMaster.setBranch(data.getBranch());
+        if (!Objects.equals(sale.getBranch(), data.getBranch()) && Objects.nonNull(data.getBranch())) {
+            sale.setBranch(data.getBranch());
         }
         if (Objects.nonNull(data.getSaleDetails()) && !data.getSaleDetails().isEmpty()) {
-            saleMaster.setSaleDetails(data.getSaleDetails());
-            if (Objects.nonNull(data.getTax())
-                    && !Objects.equals(saleMaster.getTax().getPercentage(), data.getTax().getPercentage())
-                    && saleMaster.getTax().getPercentage() > 0.0) {
-                total += subTotal * (data.getTax().getPercentage() / 100);
-            }
-            if (Objects.nonNull(data.getDiscount())
-                    && !Objects.equals(saleMaster.getDiscount().getPercentage(), data.getDiscount().getPercentage())
-                    && saleMaster.getTax().getPercentage() > 0.0) {
-                total += subTotal * (data.getDiscount().getPercentage() / 100);
-            }
-            for (int i = 0; i < data.getSaleDetails().size(); i++) {
-                if (Objects.isNull(data.getSaleDetails().get(i).getSale())) {
-                    data.getSaleDetails().get(i).setSale(saleMaster);
-                }
-                subTotal += data.getSaleDetails().get(i).getSubTotalPrice();
-                try {
-                    saleTransactionService.update(saleMaster.getSaleDetails().get(i));
-                } catch (NotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+            sale.setSaleDetails(data.getSaleDetails());
         }
-        if (!Objects.equals(data.getTax(), saleMaster.getTax()) && Objects.nonNull(data.getTax())) {
-            saleMaster.setTax(data.getTax());
+
+        // Perform calculations
+        var calculationService = new CoreCalculations.SaleCalculationService(taxService, discountService);
+        calculationService.calculate(sale);
+
+        // Update other fields
+        if (!Objects.equals(data.getTax(), sale.getTax()) && Objects.nonNull(data.getTax())) {
+            sale.setTax(data.getTax());
         }
-        if (!Objects.equals(data.getDiscount(), saleMaster.getDiscount()) && Objects.nonNull(data.getDiscount())) {
-            saleMaster.setDiscount(data.getDiscount());
+        if (!Objects.equals(data.getDiscount(), sale.getDiscount()) && Objects.nonNull(data.getDiscount())) {
+            sale.setDiscount(data.getDiscount());
         }
-        if (!Objects.equals(data.getTotal(), total)) {
-            saleMaster.setTotal(total);
+        if (!Objects.equals(data.getAmountPaid(), sale.getAmountPaid())) {
+            sale.setAmountPaid(data.getAmountPaid());
         }
-        if (!Objects.equals(data.getSubTotal(), subTotal)) {
-            saleMaster.setSubTotal(subTotal);
-        }
-        if (!Objects.equals(data.getAmountPaid(), saleMaster.getAmountPaid())) {
-            saleMaster.setAmountPaid(data.getAmountPaid());
-        }
-        if (!Objects.equals(data.getAmountDue(), saleMaster.getAmountDue())) {
-            saleMaster.setAmountDue(data.getAmountDue());
+        if (!Objects.equals(data.getAmountDue(), sale.getAmountDue())) {
+            sale.setAmountDue(data.getAmountDue());
         }
         if (Objects.nonNull(data.getPaymentStatus()) && !"".equalsIgnoreCase(data.getPaymentStatus())) {
-            saleMaster.setPaymentStatus(data.getPaymentStatus());
+            sale.setPaymentStatus(data.getPaymentStatus());
         }
         if (Objects.nonNull(data.getSaleStatus()) && !"".equalsIgnoreCase(data.getSaleStatus())) {
-            saleMaster.setSaleStatus(data.getSaleStatus());
+            sale.setSaleStatus(data.getSaleStatus());
         }
         if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
-            saleMaster.setNotes(data.getNotes());
+            sale.setNotes(data.getNotes());
         }
-        saleMaster.setUpdatedBy(authService.authUser());
-        saleMaster.setUpdatedAt(LocalDateTime.now());
+        sale.setUpdatedBy(authService.authUser());
+        sale.setUpdatedAt(LocalDateTime.now());
         try {
-            saleMasterRepo.saveAndFlush(saleMaster);
+            saleMasterRepo.saveAndFlush(sale);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 
@@ -200,7 +190,8 @@ public class SaleMasterServiceImpl implements SaleMasterService {
             saleMasterRepo.deleteById(id);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 
@@ -210,7 +201,8 @@ public class SaleMasterServiceImpl implements SaleMasterService {
             saleMasterRepo.deleteAllById(idList);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 }

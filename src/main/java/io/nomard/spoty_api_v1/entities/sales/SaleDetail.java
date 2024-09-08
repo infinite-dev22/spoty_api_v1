@@ -43,7 +43,11 @@ public class SaleDetail implements Serializable {
     @JoinColumn(nullable = false, name = "product_id")
     private Product product;
     @Column(nullable = false)
-    private double subTotalPrice;
+    @Builder.Default
+    private double totalPrice = 0;
+    @Column(nullable = false)
+    @Builder.Default
+    private double unitPrice = 0;
     @Column(nullable = false)
     private Long quantity;
     private LocalDateTime createdAt;

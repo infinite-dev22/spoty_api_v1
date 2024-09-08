@@ -15,7 +15,7 @@ public interface SaleMasterService {
 
     List<SaleMaster> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(SaleMaster saleMaster);
+    ResponseEntity<ObjectNode> save(SaleMaster saleMaster) throws NotFoundException;
 
     ResponseEntity<ObjectNode> update(SaleMaster saleMaster) throws NotFoundException;
 

@@ -9,6 +9,7 @@ import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.ProductServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.sales.SaleTransactionService;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -21,8 +22,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.logging.Level;
 
 @Service
+@Log
 public class SaleTransactionServiceImpl implements SaleTransactionService {
     @Autowired
     private SaleTransactionRepository saleTransactionRepo;
@@ -46,19 +49,19 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> save(SaleDetail saleDetail) {
-        if (saleDetail.getProduct().getQuantity() > 0 && saleDetail.getProduct().getQuantity() >= saleDetail.getQuantity()) {
+    public ResponseEntity<ObjectNode> save(SaleDetail saleDetail) throws NotFoundException {
+        var product = productService.getById(saleDetail.getProduct().getId());
+        if (product.getQuantity() > 0 && product.getQuantity() >= saleDetail.getQuantity()) {
             try {
                 var productQuantity =
-                        productService.getById(saleDetail.getProduct().getId()).getQuantity() - saleDetail.getQuantity();
+                        productService.getById(product.getId()).getQuantity() - saleDetail.getQuantity();
 
-                var product = saleDetail.getProduct();
                 product.setQuantity(productQuantity);
                 productService.update(product, null);
 
                 SaleTransaction saleTransaction = new SaleTransaction();
                 saleTransaction.setBranch(saleDetail.getSale().getBranch());
-                saleTransaction.setProduct(saleDetail.getProduct());
+                saleTransaction.setProduct(product);
                 saleTransaction.setSaleDetail(saleDetail);
                 saleTransaction.setDate(LocalDateTime.now());
                 saleTransaction.setSaleQuantity(saleDetail.getQuantity());
@@ -69,7 +72,8 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
                 saleTransactionRepo.saveAndFlush(saleTransaction);
                 return spotyResponseImpl.created();
             } catch (Exception e) {
-                return spotyResponseImpl.error(e);
+                log.log(Level.ALL, e.getMessage(), e);
+                return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
             }
         }
         return spotyResponseImpl.custom(HttpStatus.NOT_ACCEPTABLE, "Product quantity is too low");
