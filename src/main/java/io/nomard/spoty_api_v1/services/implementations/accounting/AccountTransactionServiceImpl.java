@@ -60,7 +60,7 @@ public class AccountTransactionServiceImpl implements AccountTransactionService 
                     || Objects.equals(accountTransaction.getTransactionType().toLowerCase(), "sale returns")
                     || Objects.equals(accountTransaction.getTransactionType().toLowerCase(), "purchase")) {
                 accountTransaction.setDebit(accountTransaction.getAmount());
-                account.setDebit(account.getDebit() - accountTransaction.getAmount());
+                account.setDebit(account.getDebit() + accountTransaction.getAmount());
                 account.setBalance(account.getBalance() - accountTransaction.getAmount());
             }
             account.setUpdatedAt(LocalDateTime.now());
