@@ -23,6 +23,8 @@ public interface ProductService {
 
     ResponseEntity<ObjectNode> save(Product product, MultipartFile file);
 
+    ResponseEntity<ObjectNode> save(Product product);
+
     ResponseEntity<ObjectNode> update(Product product, MultipartFile file) throws NotFoundException;
 
     ResponseEntity<ObjectNode> delete(Long id);
