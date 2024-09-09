@@ -54,8 +54,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    links:
-      - db
     ports:
       - '${PGADMIN_LOCAL_PORT}:${PGADMIN_DOCKER_PORT}'
     volumes:
