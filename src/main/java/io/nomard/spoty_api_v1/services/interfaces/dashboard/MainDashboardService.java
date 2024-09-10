@@ -21,6 +21,10 @@ public interface MainDashboardService {
 
     List<LineChartModel> getMonthlyIncomes();
 
+    List<LineChartModel> getWeeklyIncomes();
+
+    List<LineChartModel> getYearlyRevenue();
+
     List<LineChartModel> getMonthlyRevenue();
 
     List<LineChartModel> getWeeklyRevenue();

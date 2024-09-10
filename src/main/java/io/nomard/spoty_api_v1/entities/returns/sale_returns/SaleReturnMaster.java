@@ -50,7 +50,7 @@ public class SaleReturnMaster implements Serializable {
     @JoinColumn(name = "branch_id", nullable = false)
     @JsonIgnore
     private Branch branch;
-    @JoinColumn(name = "company_id", nullable = false)
+    @JoinColumn(name = "tenant_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     private Tenant tenant;

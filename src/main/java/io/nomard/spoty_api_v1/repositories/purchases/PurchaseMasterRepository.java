@@ -16,11 +16,11 @@ import java.util.List;
 
 @Repository
 public interface PurchaseMasterRepository extends PagingAndSortingRepository<PurchaseMaster, Long>, JpaRepository<PurchaseMaster, Long> {
-    @Query("SELECT DATE_FORMAT(e.createdAt, '%Y') AS period, SUM(e.amountPaid) AS totalValue " +
+    @Query("SELECT DATE_PART('year', CAST(e.createdAt AS date)) AS period, SUM(e.amountPaid) AS totalValue " +
             "FROM PurchaseMaster e " +
             "WHERE e.tenant.id = :id " +
             "GROUP BY period " +
-            "ORDER BY DATE_FORMAT(e.createdAt, '%Y')")
+            "ORDER BY DATE_PART('year', CAST(e.createdAt AS date))")
     List<LineChartModel> yearlyExpenses(@Param("id") Long id);
 
     @Query(value = "SELECT TO_CHAR(TO_DATE(CONCAT(EXTRACT(YEAR FROM CURRENT_DATE), '-', months.month, '-01'), 'YYYY-MM-DD'), 'YYYY Month') AS period, COALESCE(SUM(e.amount_paid), 0) AS totalValue " +
@@ -33,11 +33,11 @@ public interface PurchaseMasterRepository extends PagingAndSortingRepository<Pur
             "ORDER BY months.month::int", nativeQuery = true)
     List<LineChartModel> monthlyExpenses(@Param("id") Long id);
 
-    @Query("SELECT DATE_FORMAT(e.createdAt, '%Y-%m-%u') AS period, SUM(e.amountPaid) AS totalValue " +
+    @Query("SELECT CAST(e.createdAt AS date) AS period, SUM(e.amountPaid) AS totalValue " +
             "FROM PurchaseMaster e " +
             "WHERE e.tenant.id = :id " +
             "GROUP BY period " +
-            "ORDER BY DATE_FORMAT(e.createdAt, '%Y-%m-%u')")
+            "ORDER BY CAST(e.createdAt AS date)")
     List<LineChartModel> weeklyExpenses(@Param("id") Long id);
 
     @Query("SELECT pm FROM PurchaseMaster pm WHERE pm.tenant.id = :tenantId " +

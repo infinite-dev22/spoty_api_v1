@@ -39,7 +39,7 @@ public class Role {
     private String name;
     private String label;
     private String description;
-    @JoinColumn(name = "company_id")
+    @JoinColumn(name = "tenant_id")
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     private Tenant tenant;

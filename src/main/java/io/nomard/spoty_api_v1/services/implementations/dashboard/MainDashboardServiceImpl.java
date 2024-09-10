@@ -72,6 +72,20 @@ public class MainDashboardServiceImpl implements MainDashboardService {
         return saleMasterRepo.monthlyIncomes(authService.authUser().getTenant().getId());
     }
 
+    @Cacheable("weekly_incomes")
+    @Transactional(readOnly = true)
+    @Override
+    public List<LineChartModel> getWeeklyIncomes() {
+        return saleMasterRepo.weeklyIncomes(authService.authUser().getTenant().getId());
+    }
+
+    @Override
+    @Cacheable("monthly_revenue")
+    @Transactional(readOnly = true)
+    public List<LineChartModel> getYearlyRevenue() {
+        return saleMasterRepo.yearlyRevenue(authService.authUser().getTenant().getId());
+    }
+
     @Override
     @Cacheable("monthly_revenue")
     @Transactional(readOnly = true)

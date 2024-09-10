@@ -17,35 +17,49 @@ import java.util.List;
 
 @Repository
 public interface SaleMasterRepository extends PagingAndSortingRepository<SaleMaster, Long>, JpaRepository<SaleMaster, Long> {
-    @Query("SELECT DATE_FORMAT(e.createdAt, '%Y') AS period, SUM(e.amountPaid) AS totalValue " +
+    @Query("SELECT DATE_PART('year', CAST(e.createdAt AS date)) AS period, SUM(e.amountPaid) AS totalValue " +
             "FROM SaleMaster e " +
             "WHERE e.tenant.id = :id " +
             "GROUP BY period " +
-            "ORDER BY DATE_FORMAT(e.createdAt, '%Y')")
+            "ORDER BY DATE_PART('year', CAST(e.createdAt AS date))")
     List<LineChartModel> yearlyIncomes(@Param("id") Long id);
 
-    @Query(value = "SELECT TO_CHAR(TO_DATE(CONCAT(EXTRACT(YEAR FROM CURRENT_DATE), '-', months.month, '-01'), 'YYYY-MM-DD'), 'YYYY Month') AS period, COALESCE(SUM(i.amount_received), 0) AS totalValue " +
+    @Query(value = "SELECT TO_CHAR(TO_DATE(CONCAT(EXTRACT(YEAR FROM CURRENT_DATE), '-', months.month, '-01'), 'YYYY-MM-DD'), 'YYYY Month') AS period, COALESCE(SUM(sm.amount_paid), 0) AS totalValue " +
             "FROM (SELECT '01' AS month UNION ALL SELECT '02' UNION ALL SELECT '03' UNION ALL SELECT '04' UNION ALL " +
             "SELECT '05' UNION ALL SELECT '06' UNION ALL SELECT '07' UNION ALL SELECT '08' UNION ALL " +
             "SELECT '09' UNION ALL SELECT '10' UNION ALL SELECT '11' UNION ALL SELECT '12') AS months " +
-            "LEFT JOIN income_master i ON TO_CHAR(i.created_at, 'YYYY-MM') = CONCAT(EXTRACT(YEAR FROM CURRENT_DATE), '-', months.month) " +
-            "AND i.tenant_id = :id " +
+            "LEFT JOIN sale_master sm ON TO_CHAR(sm.created_at, 'YYYY-MM') = CONCAT(EXTRACT(YEAR FROM CURRENT_DATE), '-', months.month) " +
+            "AND sm.tenant_id = :id " +
             "GROUP BY months.month " +
             "ORDER BY months.month::int", nativeQuery = true)
     List<LineChartModel> monthlyIncomes(@Param("id") Long id);
 
-    @Query("SELECT DATE_FORMAT(e.createdAt, '%M') AS period, SUM(e.amountPaid) AS totalValue " +
+    @Query("SELECT CAST(e.createdAt AS date) AS period, SUM(e.amountPaid) AS totalValue " +
             "FROM SaleMaster e " +
             "WHERE e.tenant.id = :id " +
             "GROUP BY period " +
-            "ORDER BY DATE_FORMAT(e.createdAt, '%M')")
+            "ORDER BY CAST(e.createdAt AS date)")
+    List<LineChartModel> weeklyIncomes(@Param("id") Long id);
+
+    @Query("SELECT DATE_PART('year', CAST(e.createdAt AS date)) AS period, SUM(e.amountPaid) AS totalValue " +
+            "FROM SaleMaster e " +
+            "WHERE e.tenant.id = :id " +
+            "GROUP BY period " +
+            "ORDER BY DATE_PART('year', CAST(e.createdAt AS date))")
+    List<LineChartModel> yearlyRevenue(@Param("id") Long id);
+
+    @Query("SELECT DATE_PART('month', CAST(e.createdAt AS date)) AS period, SUM(e.amountPaid) AS totalValue " +
+            "FROM SaleMaster e " +
+            "WHERE e.tenant.id = :id " +
+            "GROUP BY period " +
+            "ORDER BY DATE_PART('month', CAST(e.createdAt AS date))")
     List<LineChartModel> monthlyRevenue(@Param("id") Long id);
 
-    @Query("SELECT DATE_FORMAT(e.createdAt, '%a') AS period, SUM(e.amountPaid) AS totalValue " +
+    @Query("SELECT CAST(e.createdAt AS date) AS period, SUM(e.amountPaid) AS totalValue " +
             "FROM SaleMaster e " +
             "WHERE e.tenant.id = :id " +
             "GROUP BY period " +
-            "ORDER BY DATE_FORMAT(e.createdAt, '%a')")
+            "ORDER BY CAST(e.createdAt AS date)")
     List<LineChartModel> weeklyRevenue(@Param("id") Long id);
 
     @Query("SELECT new io.nomard.spoty_api_v1.models.ProductSalesModel(p.name, SUM(sd.quantity), p.salePrice, p.costPrice) " +
