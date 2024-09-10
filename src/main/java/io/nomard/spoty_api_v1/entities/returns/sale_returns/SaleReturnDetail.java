@@ -39,7 +39,7 @@ public class SaleReturnDetail implements Serializable {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "sale_return_id", nullable = false)
     @JsonIgnore
-    private SaleReturnMaster sale;
+    private SaleReturnMaster saleReturnMaster;
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "product_id")
     private Product product;

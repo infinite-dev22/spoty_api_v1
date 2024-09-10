@@ -41,7 +41,7 @@ public class PurchaseReturnDetail implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "purchase_return_id")
     @JsonIgnore
-    private PurchaseReturnMaster purchaseReturn;
+    private PurchaseReturnMaster purchaseReturnMaster;
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Product product;
     private int quantity;

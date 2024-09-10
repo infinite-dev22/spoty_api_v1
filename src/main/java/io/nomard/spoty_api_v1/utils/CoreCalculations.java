@@ -65,7 +65,7 @@ public class CoreCalculations {
 
             // Calculate subTotal
             for (int i = 0; i < purchaseReturn.getPurchaseReturnDetails().size(); i++) {
-                purchaseReturn.getPurchaseReturnDetails().get(i).setPurchaseReturn(purchaseReturn);
+                purchaseReturn.getPurchaseReturnDetails().get(i).setPurchaseReturnMaster(purchaseReturn);
                 subTotal += purchaseReturn.getPurchaseReturnDetails().get(i).getUnitCost() * purchaseReturn.getPurchaseReturnDetails().get(i).getQuantity();
                 purchaseReturn.getPurchaseReturnDetails().get(i).setTotalCost(subTotal);
             }
@@ -146,7 +146,7 @@ public class CoreCalculations {
 
             // Calculate subTotal
             for (int i = 0; i < saleReturn.getSaleReturnDetails().size(); i++) {
-                saleReturn.getSaleReturnDetails().get(i).setSale(saleReturn);
+                saleReturn.getSaleReturnDetails().get(i).setSaleReturnMaster(saleReturn);
                 subTotal += saleReturn.getSaleReturnDetails().get(i).getUnitPrice() * saleReturn.getSaleReturnDetails().get(i).getQuantity();
                 saleReturn.getSaleReturnDetails().get(i).setTotalPrice(subTotal);
             }

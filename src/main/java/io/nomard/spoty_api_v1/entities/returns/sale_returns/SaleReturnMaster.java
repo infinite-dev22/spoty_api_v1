@@ -54,7 +54,7 @@ public class SaleReturnMaster implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     private Tenant tenant;
-    @OneToMany(orphanRemoval = true, mappedBy = "sale_return", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(orphanRemoval = true, mappedBy = "saleReturnMaster", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default
     private List<SaleReturnDetail> saleReturnDetails = new LinkedList<>();
     @ManyToOne(fetch = FetchType.LAZY)

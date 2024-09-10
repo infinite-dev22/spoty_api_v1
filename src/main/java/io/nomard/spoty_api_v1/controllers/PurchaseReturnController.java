@@ -38,7 +38,7 @@ public class PurchaseReturnController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ObjectNode> save(@Valid @RequestBody PurchaseReturnMaster purchaseReturn) {
+    public ResponseEntity<ObjectNode> save(@Valid @RequestBody PurchaseReturnMaster purchaseReturn) throws NotFoundException {
         return purchaseReturnService.save(purchaseReturn);
     }
 

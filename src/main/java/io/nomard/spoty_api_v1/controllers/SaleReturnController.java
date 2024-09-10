@@ -39,7 +39,7 @@ public class SaleReturnController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ObjectNode> save(@Valid @RequestBody SaleReturnMaster saleReturn) {
+    public ResponseEntity<ObjectNode> save(@Valid @RequestBody SaleReturnMaster saleReturn) throws NotFoundException {
         return saleReturnService.save(saleReturn);
     }
 
