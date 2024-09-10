@@ -10,6 +10,7 @@ import io.nomard.spoty_api_v1.services.implementations.deductions.DiscountServic
 import io.nomard.spoty_api_v1.services.implementations.deductions.TaxServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.quotations.QuotationService;
 import io.nomard.spoty_api_v1.utils.CoreCalculations;
+import io.nomard.spoty_api_v1.utils.CoreUtils;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -69,6 +70,7 @@ public class QuotationServiceImpl implements QuotationService {
         calculationService.calculate(quotation);
 
         // Set additional details
+        quotation.setRef(CoreUtils.referenceNumberGenerator("QUO"));
         quotation.setTenant(authService.authUser().getTenant());
         quotation.setCreatedBy(authService.authUser());
         quotation.setCreatedAt(LocalDateTime.now());
