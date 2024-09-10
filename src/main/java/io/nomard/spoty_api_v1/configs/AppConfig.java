@@ -218,11 +218,6 @@ public class AppConfig {
     }
 
     @Bean
-    public SaleTermAndCondition saleTermAndCondition() {
-        return new SaleTermAndCondition();
-    }
-
-    @Bean
     public ObjectMapper objectMapper() {
         var objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());

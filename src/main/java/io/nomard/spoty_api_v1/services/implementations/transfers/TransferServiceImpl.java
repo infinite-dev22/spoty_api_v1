@@ -7,6 +7,8 @@ import io.nomard.spoty_api_v1.repositories.transfers.TransferMasterRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.transfers.TransferService;
+import io.nomard.spoty_api_v1.utils.CoreCalculations;
+import io.nomard.spoty_api_v1.utils.CoreUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -64,18 +66,15 @@ public class TransferServiceImpl implements TransferService {
     @Transactional
     public ResponseEntity<ObjectNode> save(TransferMaster transferMaster) {
         try {
-            for (int i = 0; i < transferMaster.getTransferDetails().size(); i++) {
-                transferMaster.getTransferDetails().get(i).setTransfer(transferMaster);
-            }
+            CoreCalculations.TransferCalculationService.calculate(transferMaster);
+            transferMaster.setRef(CoreUtils.referenceNumberGenerator("TRF"));
             transferMaster.setTenant(authService.authUser().getTenant());
             transferMaster.setCreatedBy(authService.authUser());
             transferMaster.setCreatedAt(LocalDateTime.now());
             transferMasterRepo.save(transferMaster);
-
             for (int i = 0; i < transferMaster.getTransferDetails().size(); i++) {
                 transferTransactionService.save(transferMaster.getTransferDetails().get(i));
             }
-
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -86,64 +85,37 @@ public class TransferServiceImpl implements TransferService {
     @CacheEvict(value = "transfer_masters", key = "#data.id")
     public ResponseEntity<ObjectNode> update(TransferMaster data) throws NotFoundException {
         var opt = transferMasterRepo.findById(data.getId());
-
         if (opt.isEmpty()) {
             throw new NotFoundException();
         }
         var transferMaster = opt.get();
-
         if (Objects.nonNull(data.getRef()) && !"".equalsIgnoreCase(data.getRef())) {
             transferMaster.setRef(data.getRef());
         }
-
         if (!Objects.equals(transferMaster.getDate(), data.getDate()) && Objects.nonNull(data.getDate())) {
             transferMaster.setDate(data.getDate());
         }
-
         if (!Objects.equals(transferMaster.getFromBranch(), data.getFromBranch()) && Objects.nonNull(data.getFromBranch())) {
             transferMaster.setFromBranch(data.getFromBranch());
         }
-
         if (!Objects.equals(transferMaster.getToBranch(), data.getToBranch()) && Objects.nonNull(data.getToBranch())) {
             transferMaster.setToBranch(data.getToBranch());
         }
-
         if (Objects.nonNull(data.getTransferDetails()) && !data.getTransferDetails().isEmpty()) {
             transferMaster.setTransferDetails(data.getTransferDetails());
-
-            for (int i = 0; i < transferMaster.getTransferDetails().size(); i++) {
-                transferMaster.getTransferDetails().get(i).setTransfer(transferMaster);
-                try {
-                    transferTransactionService.update(transferMaster.getTransferDetails().get(i));
-                } catch (NotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+            CoreCalculations.TransferCalculationService.calculate(transferMaster);
         }
-
-        if (Objects.nonNull(data.getShipping()) && !"".equalsIgnoreCase(data.getShipping())) {
-            transferMaster.setShipping(data.getShipping());
-        }
-
-        if (!Objects.equals(data.getTotal(), transferMaster.getTotal())) {
-            transferMaster.setTotal(data.getTotal());
-        }
-
         if (Objects.nonNull(data.getStatus()) && !"".equalsIgnoreCase(data.getStatus())) {
             transferMaster.setStatus(data.getStatus());
         }
-
         if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
             transferMaster.setNotes(data.getNotes());
         }
-
         if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
             transferMaster.setNotes(data.getNotes());
         }
-
         transferMaster.setUpdatedBy(authService.authUser());
         transferMaster.setUpdatedAt(LocalDateTime.now());
-
         try {
             transferMasterRepo.save(transferMaster);
             return spotyResponseImpl.ok();

@@ -54,9 +54,6 @@ public class TransferMaster implements Serializable {
     @OneToMany(orphanRemoval = true, mappedBy = "transfer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default
     private List<TransferDetail> transferDetails = new LinkedList<>();
-    private String shipping;
-    @Column(nullable = false)
-    private double total;
     @Column(nullable = false)
     private String status;
     private String notes;

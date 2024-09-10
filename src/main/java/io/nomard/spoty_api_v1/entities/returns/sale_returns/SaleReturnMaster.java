@@ -19,14 +19,18 @@ import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Customer;
 import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.User;
+import io.nomard.spoty_api_v1.entities.deductions.Discount;
+import io.nomard.spoty_api_v1.entities.deductions.Tax;
+import io.nomard.spoty_api_v1.entities.sales.SaleMaster;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -38,10 +42,6 @@ public class SaleReturnMaster implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User user_detail;
-    @Column(nullable = false)
-    private LocalDateTime date;
     private String ref;
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "customer_id")
@@ -50,23 +50,36 @@ public class SaleReturnMaster implements Serializable {
     @JoinColumn(name = "branch_id", nullable = false)
     @JsonIgnore
     private Branch branch;
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "company_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     private Tenant tenant;
-    @OneToMany(orphanRemoval = true, mappedBy = "saleReturn", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<SaleReturnDetail> saleReturnDetails;
-    private double taxRate;
-    private double netTax;
-    private double discount;
-    @Column(nullable = false)
-    private double total;
-    @Column(nullable = false)
-    private double paid;
+    @OneToMany(orphanRemoval = true, mappedBy = "sale_return", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<SaleReturnDetail> saleReturnDetails = new LinkedList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tax_id")
+    private Tax tax;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "discount_id")
+    private Discount discount;
+    private double taxAmount;
+    private double discountAmount;
+    @Column
+    @Builder.Default
+    private double total = 0.0;
+    @Builder.Default
+    private double subTotal = 0.0;
+    @Builder.Default
+    private double amountPaid = 0.0;
+    @Builder.Default
+    private double amountDue = 0.0;
+    @Builder.Default
+    private double shippingFee = 0.0;
     @Column(nullable = false)
     private String paymentStatus;
     @Column(nullable = false)
-    private String status;
+    private String saleStatus;
     private String notes;
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -82,7 +95,7 @@ public class SaleReturnMaster implements Serializable {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        SaleReturnMaster that = (SaleReturnMaster) o;
+        SaleMaster that = (SaleMaster) o;
         return getId() != null && Objects.equals(getId(), that.getId());
     }
 

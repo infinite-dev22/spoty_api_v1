@@ -7,6 +7,7 @@ import io.nomard.spoty_api_v1.repositories.stock_ins.StockInMasterRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.stock_ins.StockInService;
+import io.nomard.spoty_api_v1.utils.CoreCalculations;
 import io.nomard.spoty_api_v1.utils.CoreUtils;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ import java.util.logging.Level;
 @Log
 public class StockInServiceImpl implements StockInService {
     @Autowired
-    private StockInMasterRepository stockInMasterRepo;
+    private StockInMasterRepository stockInRepo;
     @Autowired
     private StockInTransactionServiceImpl stockInTransactionService;
     @Autowired
@@ -40,44 +41,40 @@ public class StockInServiceImpl implements StockInService {
     @Override
     public Page<StockInMaster> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return stockInMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+        return stockInRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override
     public StockInMaster getById(Long id) throws NotFoundException {
-        Optional<StockInMaster> stockInMaster = stockInMasterRepo.findById(id);
-        if (stockInMaster.isEmpty()) {
+        Optional<StockInMaster> stockIn = stockInRepo.findById(id);
+        if (stockIn.isEmpty()) {
             throw new NotFoundException();
         }
-        return stockInMaster.get();
+        return stockIn.get();
     }
 
     @Override
     public ArrayList<StockInMaster> getByContains(String search) {
-        return stockInMasterRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
+        return stockInRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> save(StockInMaster stockInMaster) {
+    public ResponseEntity<ObjectNode> save(StockInMaster stockIn) {
         try {
-            if (!stockInMaster.getStockInDetails().isEmpty()) {
-                for (int i = 0; i < stockInMaster.getStockInDetails().size(); i++) {
-                    stockInMaster.getStockInDetails().get(i).setStockIn(stockInMaster);
-                }
+            CoreCalculations.StockInCalculationService.calculate(stockIn);
+            stockIn.setTenant(authService.authUser().getTenant());
+            if (Objects.isNull(stockIn.getBranch())) {
+                stockIn.setBranch(authService.authUser().getBranch());
             }
-            stockInMaster.setTenant(authService.authUser().getTenant());
-            if (Objects.isNull(stockInMaster.getBranch())) {
-                stockInMaster.setBranch(authService.authUser().getBranch());
-            }
-            stockInMaster.setCreatedBy(authService.authUser());
-            stockInMaster.setCreatedAt(LocalDateTime.now());
-            stockInMaster.setRef(CoreUtils.referenceNumberGenerator("STK"));
-            stockInMasterRepo.save(stockInMaster);
+            stockIn.setCreatedBy(authService.authUser());
+            stockIn.setCreatedAt(LocalDateTime.now());
+            stockIn.setRef(CoreUtils.referenceNumberGenerator("STK"));
+            stockInRepo.save(stockIn);
 
-            if (!stockInMaster.getStockInDetails().isEmpty()) {
-                for (int i = 0; i < stockInMaster.getStockInDetails().size(); i++) {
-                    stockInTransactionService.save(stockInMaster.getStockInDetails().get(i));
+            if (!stockIn.getStockInDetails().isEmpty()) {
+                for (int i = 0; i < stockIn.getStockInDetails().size(); i++) {
+                    stockInTransactionService.save(stockIn.getStockInDetails().get(i));
                 }
             }
             return spotyResponseImpl.created();
@@ -90,43 +87,35 @@ public class StockInServiceImpl implements StockInService {
     @Override
     @Transactional
     public ResponseEntity<ObjectNode> update(StockInMaster data) throws NotFoundException {
-        var opt = stockInMasterRepo.findById(data.getId());
+        var opt = stockInRepo.findById(data.getId());
 
         if (opt.isEmpty()) {
             throw new NotFoundException();
         }
-        var stockInMaster = opt.get();
+        var stockIn = opt.get();
 
         if (Objects.nonNull(data.getRef()) && !"".equalsIgnoreCase(data.getRef())) {
-            stockInMaster.setRef(data.getRef());
+            stockIn.setRef(data.getRef());
         }
 
-        if (!Objects.equals(stockInMaster.getBranch(), data.getBranch()) && Objects.nonNull(data.getBranch())) {
-            stockInMaster.setBranch(data.getBranch());
+        if (!Objects.equals(stockIn.getBranch(), data.getBranch()) && Objects.nonNull(data.getBranch())) {
+            stockIn.setBranch(data.getBranch());
         }
 
         if (Objects.nonNull(data.getStockInDetails()) && !data.getStockInDetails().isEmpty()) {
-            stockInMaster.setStockInDetails(data.getStockInDetails());
-
-            for (int i = 0; i < stockInMaster.getStockInDetails().size(); i++) {
-                stockInMaster.getStockInDetails().get(i).setStockIn(stockInMaster);
-                try {
-                    stockInTransactionService.update(stockInMaster.getStockInDetails().get(i));
-                } catch (NotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+            stockIn.setStockInDetails(data.getStockInDetails());
+            CoreCalculations.StockInCalculationService.calculate(stockIn);
         }
 
         if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
-            stockInMaster.setNotes(data.getNotes());
+            stockIn.setNotes(data.getNotes());
         }
 
-        stockInMaster.setUpdatedBy(authService.authUser());
-        stockInMaster.setUpdatedAt(LocalDateTime.now());
+        stockIn.setUpdatedBy(authService.authUser());
+        stockIn.setUpdatedAt(LocalDateTime.now());
 
         try {
-            stockInMasterRepo.save(stockInMaster);
+            stockInRepo.save(stockIn);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
@@ -138,7 +127,7 @@ public class StockInServiceImpl implements StockInService {
     @Transactional
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
-            stockInMasterRepo.deleteById(id);
+            stockInRepo.deleteById(id);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
@@ -149,7 +138,7 @@ public class StockInServiceImpl implements StockInService {
     @Override
     public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) {
         try {
-            stockInMasterRepo.deleteAllById(idList);
+            stockInRepo.deleteAllById(idList);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);

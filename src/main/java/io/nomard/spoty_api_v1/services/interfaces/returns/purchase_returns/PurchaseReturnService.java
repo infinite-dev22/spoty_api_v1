@@ -15,7 +15,7 @@ public interface PurchaseReturnService {
 
     List<PurchaseReturnMaster> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(PurchaseReturnMaster purchaseReturnMaster);
+    ResponseEntity<ObjectNode> save(PurchaseReturnMaster purchaseReturnMaster) throws NotFoundException;
 
     ResponseEntity<ObjectNode> update(PurchaseReturnMaster purchaseReturnMaster) throws NotFoundException;
 

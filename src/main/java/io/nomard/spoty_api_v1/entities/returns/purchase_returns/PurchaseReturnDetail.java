@@ -16,8 +16,8 @@ package io.nomard.spoty_api_v1.entities.returns.purchase_returns;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Product;
-import io.nomard.spoty_api_v1.entities.UnitOfMeasure;
 import io.nomard.spoty_api_v1.entities.User;
+import io.nomard.spoty_api_v1.entities.purchases.PurchaseDetail;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
@@ -36,27 +36,15 @@ public class PurchaseReturnDetail implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
-    private double cost;
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, name = "purchase_unit_id")
-    private UnitOfMeasure purchaseUnit;
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "purchase_return_master_id", nullable = false)
+    private double unitCost;
+    private double totalCost;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "purchase_return_id")
     @JsonIgnore
     private PurchaseReturnMaster purchaseReturn;
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, name = "product_id")
     private Product product;
-    private double netTax;
-    private String taxType;
-    private double discount;
-    private String discountType;
-    @Column(nullable = false)
     private int quantity;
-    @Column(nullable = false)
-    private double total;
-    private String serialNumber;
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
     private User createdBy;
@@ -71,7 +59,7 @@ public class PurchaseReturnDetail implements Serializable {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        PurchaseReturnDetail that = (PurchaseReturnDetail) o;
+        PurchaseDetail that = (PurchaseDetail) o;
         return getId() != null && Objects.equals(getId(), that.getId());
     }
 

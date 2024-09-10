@@ -15,7 +15,7 @@ public interface SaleReturnService {
 
     List<SaleReturnMaster> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(SaleReturnMaster saleMaster);
+    ResponseEntity<ObjectNode> save(SaleReturnMaster saleMaster) throws NotFoundException;
 
     ResponseEntity<ObjectNode> update(SaleReturnMaster saleMaster) throws NotFoundException;
 

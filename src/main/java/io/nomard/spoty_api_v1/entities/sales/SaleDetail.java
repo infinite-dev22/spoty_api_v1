@@ -36,7 +36,7 @@ public class SaleDetail implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "saleMaster_id", nullable = false)
+    @JoinColumn(name = "sale_id", nullable = false)
     @JsonIgnore
     private SaleMaster sale;
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
