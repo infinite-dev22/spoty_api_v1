@@ -103,7 +103,7 @@ public class ProductServiceImpl implements ProductService {
         product.setCreatedBy(authService.authUser());
         product.setCreatedAt(LocalDateTime.now());
         try {
-            productRepo.saveAndFlush(product);
+            productRepo.save(product);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
@@ -188,7 +188,7 @@ public class ProductServiceImpl implements ProductService {
         product.setUpdatedAt(LocalDateTime.now());
 
         try {
-            productRepo.saveAndFlush(product);
+            productRepo.save(product);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);

@@ -7,4 +7,5 @@ public record SaleMasterSummary(
         SaleMaster sale,
         Customer customer,
         Long total
-) {}
+) {
+}

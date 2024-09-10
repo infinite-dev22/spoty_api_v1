@@ -51,7 +51,7 @@ public class SaleTermAndConditionServiceImpl implements SaleTermAndConditionServ
             saleTermAndCondition.setTenant(authService.authUser().getTenant());
             saleTermAndCondition.setCreatedBy(authService.authUser());
             saleTermAndCondition.setCreatedAt(LocalDateTime.now());
-            saleTermAndConditionRepo.saveAndFlush(saleTermAndCondition);
+            saleTermAndConditionRepo.save(saleTermAndCondition);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -80,7 +80,7 @@ public class SaleTermAndConditionServiceImpl implements SaleTermAndConditionServ
         saleTermAndCondition.setUpdatedAt(LocalDateTime.now());
 
         try {
-            saleTermAndConditionRepo.saveAndFlush(saleTermAndCondition);
+            saleTermAndConditionRepo.save(saleTermAndCondition);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

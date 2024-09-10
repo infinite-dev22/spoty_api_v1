@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -60,7 +59,7 @@ public class CustomerServiceImpl implements CustomerService {
             }
             customer.setCreatedBy(authService.authUser());
             customer.setCreatedAt(LocalDateTime.now());
-            customerRepo.saveAndFlush(customer);
+            customerRepo.save(customer);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -113,7 +112,7 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setUpdatedAt(LocalDateTime.now());
 
         try {
-            customerRepo.saveAndFlush(customer);
+            customerRepo.save(customer);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

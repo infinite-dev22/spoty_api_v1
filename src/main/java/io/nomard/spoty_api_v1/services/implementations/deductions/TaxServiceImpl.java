@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -53,7 +52,7 @@ public class TaxServiceImpl implements TaxService {
             tax.setBranch(authService.authUser().getBranch());
             tax.setCreatedBy(authService.authUser());
             tax.setCreatedAt(LocalDateTime.now());
-            taxRepo.saveAndFlush(tax);
+            taxRepo.save(tax);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -77,7 +76,7 @@ public class TaxServiceImpl implements TaxService {
         tax.setUpdatedBy(authService.authUser());
         tax.setUpdatedAt(LocalDateTime.now());
         try {
-            taxRepo.saveAndFlush(tax);
+            taxRepo.save(tax);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

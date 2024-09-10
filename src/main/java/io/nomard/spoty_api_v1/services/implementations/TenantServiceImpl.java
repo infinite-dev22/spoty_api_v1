@@ -89,7 +89,7 @@ public class TenantServiceImpl implements TenantService {
     public ResponseEntity<ObjectNode> save(Tenant tenant) {
         try {
             tenant.setCreatedAt(LocalDateTime.now());
-            tenantRepo.saveAndFlush(tenant);
+            tenantRepo.save(tenant);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
@@ -107,7 +107,7 @@ public class TenantServiceImpl implements TenantService {
         tenant.setCanTry(false);
         tenant.setUpdatedAt(LocalDateTime.now());
         try {
-            tenantRepo.saveAndFlush(tenant);
+            tenantRepo.save(tenant);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
@@ -139,7 +139,7 @@ public class TenantServiceImpl implements TenantService {
         tenant.setUpdatedAt(LocalDateTime.now());
 
         try {
-            tenantRepo.saveAndFlush(tenant);
+            tenantRepo.save(tenant);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);

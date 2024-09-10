@@ -11,7 +11,7 @@ import io.nomard.spoty_api_v1.services.implementations.accounting.AccountService
 import io.nomard.spoty_api_v1.services.implementations.accounting.AccountTransactionServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.deductions.DiscountServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.deductions.TaxServiceImpl;
-import io.nomard.spoty_api_v1.services.interfaces.sales.SaleMasterService;
+import io.nomard.spoty_api_v1.services.interfaces.sales.SaleService;
 import io.nomard.spoty_api_v1.utils.CoreCalculations;
 import io.nomard.spoty_api_v1.utils.CoreUtils;
 import lombok.extern.java.Log;
@@ -35,7 +35,7 @@ import java.util.logging.Level;
 
 @Service
 @Log
-public class SaleMasterServiceImpl implements SaleMasterService {
+public class SaleServiceImpl implements SaleService {
     @Autowired
     private SaleMasterRepository saleMasterRepo;
     @Autowired
@@ -96,7 +96,7 @@ public class SaleMasterServiceImpl implements SaleMasterService {
         sale.setCreatedAt(LocalDateTime.now());
 
         try {
-            saleMasterRepo.saveAndFlush(sale);
+            saleMasterRepo.save(sale);
 
             // Create account transaction of this sale.
             var account = accountService.getByContains(authService.authUser().getTenant(), "Default Account");
@@ -175,7 +175,7 @@ public class SaleMasterServiceImpl implements SaleMasterService {
         sale.setUpdatedBy(authService.authUser());
         sale.setUpdatedAt(LocalDateTime.now());
         try {
-            saleMasterRepo.saveAndFlush(sale);
+            saleMasterRepo.save(sale);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);

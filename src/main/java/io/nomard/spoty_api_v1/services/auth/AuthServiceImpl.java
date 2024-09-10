@@ -160,10 +160,10 @@ public class AuthServiceImpl implements AuthService {
         user.setRole(roleRepo.searchAllByNameContainingIgnoreCase("admin").get(0));
 
         try {
-            tenantRepo.saveAndFlush(tenant);
-            accountRepo.saveAndFlush(account);
-            branchRepo.saveAndFlush(branch);
-            userProfileRepo.saveAndFlush(userProfile);
+            tenantRepo.save(tenant);
+            accountRepo.save(account);
+            branchRepo.save(branch);
+            userProfileRepo.save(userProfile);
             userRepo.save(user);
             return spotyResponseImpl.created();
         } catch (Exception e) {

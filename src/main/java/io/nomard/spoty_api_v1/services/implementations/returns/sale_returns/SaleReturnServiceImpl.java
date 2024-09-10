@@ -6,7 +6,7 @@ import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.returns.sale_returns.SaleReturnMasterRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
-import io.nomard.spoty_api_v1.services.interfaces.returns.sale_returns.SaleReturnMasterService;
+import io.nomard.spoty_api_v1.services.interfaces.returns.sale_returns.SaleReturnService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,7 +22,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
-public class SaleReturnMasterServiceImpl implements SaleReturnMasterService {
+public class SaleReturnServiceImpl implements SaleReturnService {
     @Autowired
     private SaleReturnMasterRepository saleReturnMasterRepo;
     @Autowired
@@ -60,7 +60,7 @@ public class SaleReturnMasterServiceImpl implements SaleReturnMasterService {
             }
             saleReturnMaster.setCreatedBy(authService.authUser());
             saleReturnMaster.setCreatedAt(LocalDateTime.now());
-            saleReturnMasterRepo.saveAndFlush(saleReturnMaster);
+            saleReturnMasterRepo.save(saleReturnMaster);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -141,7 +141,7 @@ public class SaleReturnMasterServiceImpl implements SaleReturnMasterService {
         saleReturnMaster.setUpdatedAt(LocalDateTime.now());
 
         try {
-            saleReturnMasterRepo.saveAndFlush(saleReturnMaster);
+            saleReturnMasterRepo.save(saleReturnMaster);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

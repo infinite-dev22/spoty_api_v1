@@ -13,7 +13,7 @@ import io.nomard.spoty_api_v1.services.implementations.accounting.AccountService
 import io.nomard.spoty_api_v1.services.implementations.accounting.AccountTransactionServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.deductions.DiscountServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.deductions.TaxServiceImpl;
-import io.nomard.spoty_api_v1.services.interfaces.purchases.PurchaseMasterService;
+import io.nomard.spoty_api_v1.services.interfaces.purchases.PurchaseService;
 import io.nomard.spoty_api_v1.utils.CoreCalculations;
 import io.nomard.spoty_api_v1.utils.CoreUtils;
 import lombok.extern.java.Log;
@@ -35,7 +35,7 @@ import java.util.logging.Level;
 
 @Service
 @Log
-public class PurchaseMasterServiceImpl implements PurchaseMasterService {
+public class PurchaseServiceImpl implements PurchaseService {
     @Autowired
     private PurchaseMasterRepository purchaseMasterRepo;
     @Autowired
@@ -90,7 +90,7 @@ public class PurchaseMasterServiceImpl implements PurchaseMasterService {
         purchaseMaster.setCreatedAt(LocalDateTime.now());
 
         try {
-            purchaseMasterRepo.saveAndFlush(purchaseMaster);
+            purchaseMasterRepo.save(purchaseMaster);
 
             // Create account transaction of this purchase.
             var account = accountService.getByContains(authService.authUser().getTenant(), "Default Account");
@@ -166,7 +166,7 @@ public class PurchaseMasterServiceImpl implements PurchaseMasterService {
         purchaseMaster.setUpdatedAt(LocalDateTime.now());
 
         try {
-            purchaseMasterRepo.saveAndFlush(purchaseMaster);
+            purchaseMasterRepo.save(purchaseMaster);
 
             // Check if product cost price needs to be updated.
             for (PurchaseDetail detail : purchaseMaster.getPurchaseDetails()) {
@@ -263,7 +263,7 @@ public class PurchaseMasterServiceImpl implements PurchaseMasterService {
         purchaseMaster.setUpdatedBy(authService.authUser());
         purchaseMaster.setUpdatedAt(LocalDateTime.now());
         try {
-            purchaseMasterRepo.saveAndFlush(purchaseMaster);
+            purchaseMasterRepo.save(purchaseMaster);
             // Check if product cost price for each product in the purchase is still the same else update it.
             for (int i = 0; i < purchaseMaster.getPurchaseDetails().size(); i++) {
                 var product = productService.getById(purchaseMaster.getPurchaseDetails().get(i).getProduct().getId());

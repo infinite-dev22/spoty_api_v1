@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -56,9 +55,9 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
         uom.setTenant(authService.authUser().getTenant());
         uom.setCreatedBy(authService.authUser());
         uom.setCreatedAt(LocalDateTime.now());
-        uomRepo.saveAndFlush(uom);
+        uomRepo.save(uom);
         try {
-            uomRepo.saveAndFlush(uom);
+            uomRepo.save(uom);
 
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -100,7 +99,7 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
         uom.setUpdatedAt(LocalDateTime.now());
 
         try {
-            uomRepo.saveAndFlush(uom);
+            uomRepo.save(uom);
 
             return spotyResponseImpl.ok();
         } catch (Exception e) {

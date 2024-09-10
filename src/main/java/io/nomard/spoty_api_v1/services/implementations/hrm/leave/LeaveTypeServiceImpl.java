@@ -51,7 +51,7 @@ public class LeaveTypeServiceImpl implements LeaveTypeService {
             leaveType.setTenant(authService.authUser().getTenant());
             leaveType.setCreatedBy(authService.authUser());
             leaveType.setCreatedAt(LocalDateTime.now());
-            leaveTypeRepo.saveAndFlush(leaveType);
+            leaveTypeRepo.save(leaveType);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -88,7 +88,7 @@ public class LeaveTypeServiceImpl implements LeaveTypeService {
         leaveType.setUpdatedAt(LocalDateTime.now());
 
         try {
-            leaveTypeRepo.saveAndFlush(leaveType);
+            leaveTypeRepo.save(leaveType);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

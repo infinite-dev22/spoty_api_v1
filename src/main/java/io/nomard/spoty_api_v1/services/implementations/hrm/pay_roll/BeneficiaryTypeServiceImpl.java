@@ -60,7 +60,7 @@ public class BeneficiaryTypeServiceImpl implements BeneficiaryTypeService {
             beneficiaryType.setTenant(authService.authUser().getTenant());
             beneficiaryType.setCreatedBy(authService.authUser());
             beneficiaryType.setCreatedAt(LocalDateTime.now());
-            beneficiaryTypeRepo.saveAndFlush(beneficiaryType);
+            beneficiaryTypeRepo.save(beneficiaryType);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -97,7 +97,7 @@ public class BeneficiaryTypeServiceImpl implements BeneficiaryTypeService {
         beneficiaryType.setUpdatedAt(LocalDateTime.now());
 
         try {
-            beneficiaryTypeRepo.saveAndFlush(beneficiaryType);
+            beneficiaryTypeRepo.save(beneficiaryType);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

@@ -60,7 +60,7 @@ public class DesignationServiceImpl implements DesignationService {
             }
             designation.setCreatedBy(authService.authUser());
             designation.setCreatedAt(LocalDateTime.now());
-            designationRepo.saveAndFlush(designation);
+            designationRepo.save(designation);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -93,7 +93,7 @@ public class DesignationServiceImpl implements DesignationService {
         designation.setUpdatedAt(LocalDateTime.now());
 
         try {
-            designationRepo.saveAndFlush(designation);
+            designationRepo.save(designation);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

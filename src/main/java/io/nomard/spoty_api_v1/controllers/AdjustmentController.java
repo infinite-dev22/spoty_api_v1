@@ -6,7 +6,7 @@ import io.nomard.spoty_api_v1.entities.adjustments.AdjustmentMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
-import io.nomard.spoty_api_v1.services.implementations.adjustments.AdjustmentMasterServiceImpl;
+import io.nomard.spoty_api_v1.services.implementations.adjustments.AdjustmentServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,7 +19,7 @@ import java.util.List;
 @RequestMapping("adjustments")
 public class AdjustmentController {
     @Autowired
-    private AdjustmentMasterServiceImpl adjustmentMasterService;
+    private AdjustmentServiceImpl adjustmentMasterService;
 
     // ADJUSTMENT MASTERS.
     @GetMapping("/all")

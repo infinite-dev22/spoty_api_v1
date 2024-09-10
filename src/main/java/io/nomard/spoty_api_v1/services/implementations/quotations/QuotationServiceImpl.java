@@ -6,11 +6,16 @@ import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.quotations.QuotationMasterRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
-import io.nomard.spoty_api_v1.services.interfaces.quotations.QuotationMasterService;
+import io.nomard.spoty_api_v1.services.implementations.deductions.DiscountServiceImpl;
+import io.nomard.spoty_api_v1.services.implementations.deductions.TaxServiceImpl;
+import io.nomard.spoty_api_v1.services.interfaces.quotations.QuotationService;
+import io.nomard.spoty_api_v1.utils.CoreCalculations;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,15 +25,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.logging.Level;
 
 @Service
-public class QuotationMasterServiceImpl implements QuotationMasterService {
+@Log
+public class QuotationServiceImpl implements QuotationService {
     @Autowired
     private QuotationMasterRepository quotationMasterRepo;
     @Autowired
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
+    @Autowired
+    private TaxServiceImpl taxService;
+    @Autowired
+    private DiscountServiceImpl discountService;
 
     @Override
     public Page<QuotationMaster> getAll(int pageNo, int pageSize) {
@@ -52,27 +63,24 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
 
     @Override
 //    @Transactional
-    public ResponseEntity<ObjectNode> save(QuotationMaster quotationMaster) {
-        var total = 0.00;
-        if (!quotationMaster.getQuotationDetails().isEmpty()) {
-            for (int i = 0; i < quotationMaster.getQuotationDetails().size(); i++) {
-                var quotationDetail = quotationMaster.getQuotationDetails().get(i);
-                quotationDetail.setQuotation(quotationMaster);
-                total += quotationDetail.getSubTotal();
-            }
+    public ResponseEntity<ObjectNode> save(QuotationMaster quotation) throws NotFoundException {
+        // Perform calculations
+        var calculationService = new CoreCalculations.QuotationCalculationService(taxService, discountService);
+        calculationService.calculate(quotation);
+
+        // Set additional details
+        quotation.setTenant(authService.authUser().getTenant());
+        quotation.setCreatedBy(authService.authUser());
+        quotation.setCreatedAt(LocalDateTime.now());
+        if (Objects.isNull(quotation.getBranch())) {
+            quotation.setBranch(authService.authUser().getBranch());
         }
-        quotationMaster.setTotal(total);
-        quotationMaster.setTenant(authService.authUser().getTenant());
-        if (Objects.isNull(quotationMaster.getBranch())) {
-            quotationMaster.setBranch(authService.authUser().getBranch());
-        }
-        quotationMaster.setCreatedBy(authService.authUser());
-        quotationMaster.setCreatedAt(LocalDateTime.now());
         try {
-            quotationMasterRepo.saveAndFlush(quotationMaster);
+            quotationMasterRepo.save(quotation);
             return spotyResponseImpl.created();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 
@@ -80,65 +88,58 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
     @Transactional
     public ResponseEntity<ObjectNode> update(QuotationMaster data) throws NotFoundException {
         var opt = quotationMasterRepo.findById(data.getId());
-        var total = 0.00;
 
         if (opt.isEmpty()) {
             throw new NotFoundException();
         }
-        var quotationMaster = opt.get();
+        var quotation = opt.get();
 
         if (Objects.nonNull(data.getRef()) && !"".equalsIgnoreCase(data.getRef())) {
-            quotationMaster.setRef(data.getRef());
+            quotation.setRef(data.getRef());
         }
 
-        if (Objects.nonNull(data.getCustomer()) && !Objects.equals(data.getCustomer(), quotationMaster.getCustomer())) {
-            quotationMaster.setCustomer(data.getCustomer());
+        if (Objects.nonNull(data.getCustomer()) && !Objects.equals(data.getCustomer(), quotation.getCustomer())) {
+            quotation.setCustomer(data.getCustomer());
         }
 
-        if (Objects.nonNull(data.getBranch()) && !Objects.equals(data.getBranch(), quotationMaster.getBranch())) {
-            quotationMaster.setBranch(data.getBranch());
+        if (Objects.nonNull(data.getBranch()) && !Objects.equals(data.getBranch(), quotation.getBranch())) {
+            quotation.setBranch(data.getBranch());
         }
 
         if (Objects.nonNull(data.getQuotationDetails()) && !data.getQuotationDetails().isEmpty()) {
-            quotationMaster.setQuotationDetails(data.getQuotationDetails());
-
-            for (int i = 0; i < data.getQuotationDetails().size(); i++) {
-                var quotationDetail = data.getQuotationDetails().get(i);
-                if (Objects.isNull(quotationDetail.getQuotation())) {
-                    quotationDetail.setQuotation(quotationMaster);
-                }
-                total += quotationDetail.getSubTotal();
-            }
+            quotation.setQuotationDetails(data.getQuotationDetails());
         }
 
-        if (!Objects.equals(data.getTax(), quotationMaster.getTax())) {
-            quotationMaster.setTax(data.getTax());
+        // Perform calculations
+        var calculationService = new CoreCalculations.QuotationCalculationService(taxService, discountService);
+        calculationService.calculate(quotation);
+
+        // Update other fields
+        if (!Objects.equals(data.getTax(), quotation.getTax())) {
+            quotation.setTax(data.getTax());
         }
 
-        if (!Objects.equals(data.getDiscount(), quotationMaster.getDiscount())) {
-            quotationMaster.setDiscount(data.getDiscount());
-        }
-
-        if (!Objects.equals(data.getTotal(), quotationMaster.getTotal())) {
-            quotationMaster.setTotal(total);
+        if (!Objects.equals(data.getDiscount(), quotation.getDiscount())) {
+            quotation.setDiscount(data.getDiscount());
         }
 
         if (Objects.nonNull(data.getStatus()) && !"".equalsIgnoreCase(data.getStatus())) {
-            quotationMaster.setStatus(data.getStatus());
+            quotation.setStatus(data.getStatus());
         }
 
         if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
-            quotationMaster.setNotes(data.getNotes());
+            quotation.setNotes(data.getNotes());
         }
 
-        quotationMaster.setUpdatedBy(authService.authUser());
-        quotationMaster.setUpdatedAt(LocalDateTime.now());
+        quotation.setUpdatedBy(authService.authUser());
+        quotation.setUpdatedAt(LocalDateTime.now());
 
         try {
-            quotationMasterRepo.saveAndFlush(quotationMaster);
+            quotationMasterRepo.save(quotation);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 
@@ -149,7 +150,8 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
             quotationMasterRepo.deleteById(id);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 
@@ -159,7 +161,8 @@ public class QuotationMasterServiceImpl implements QuotationMasterService {
             quotationMasterRepo.deleteAllById(idList);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 }

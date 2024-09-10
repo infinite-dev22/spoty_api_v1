@@ -69,7 +69,7 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
                 saleTransaction.setBranch(authService.authUser().getBranch());
                 saleTransaction.setCreatedBy(authService.authUser());
                 saleTransaction.setCreatedAt(LocalDateTime.now());
-                saleTransactionRepo.saveAndFlush(saleTransaction);
+                saleTransactionRepo.save(saleTransaction);
                 return spotyResponseImpl.created();
             } catch (Exception e) {
                 log.log(Level.ALL, e.getMessage(), e);
@@ -124,7 +124,7 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
         saleTransaction.setUpdatedAt(LocalDateTime.now());
 
         try {
-            saleTransactionRepo.saveAndFlush(saleTransaction);
+            saleTransactionRepo.save(saleTransaction);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

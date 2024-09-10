@@ -13,9 +13,14 @@ import java.util.ArrayList;
 
 public interface ReportService {
     SalesReportModel getSalesReport(LocalDateTime startDate, LocalDateTime endDate);
+
     PurchasesReportModel getPurchasesReport(LocalDateTime startDate, LocalDateTime endDate);
+
     Page<StockInMaster> getStockInsReport(LocalDateTime startDate, LocalDateTime endDate);
+
     Page<QuotationMaster> getQuotationsReport(LocalDateTime startDate, LocalDateTime endDate);
+
     Page<AdjustmentMaster> getAdjustmentsReport(LocalDateTime startDate, LocalDateTime endDate);
+
     ArrayList<AccountTransaction> getAccountsReport(LocalDateTime startDate, LocalDateTime endDate);
 }

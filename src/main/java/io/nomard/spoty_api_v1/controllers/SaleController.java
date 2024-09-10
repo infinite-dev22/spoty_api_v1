@@ -6,7 +6,7 @@ import io.nomard.spoty_api_v1.entities.sales.SaleMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
-import io.nomard.spoty_api_v1.services.implementations.sales.SaleMasterServiceImpl;
+import io.nomard.spoty_api_v1.services.implementations.sales.SaleServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,42 +19,42 @@ import java.util.List;
 @RequestMapping("sales")
 public class SaleController {
     @Autowired
-    private SaleMasterServiceImpl saleMasterService;
+    private SaleServiceImpl saleService;
 
     // ADJUSTMENT MASTERS.
     @GetMapping("/all")
     public Page<SaleMaster> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                          @RequestParam(defaultValue = "50") Integer pageSize) {
-        return saleMasterService.getAll(pageNo, pageSize);
+                                   @RequestParam(defaultValue = "50") Integer pageSize) {
+        return saleService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
     public SaleMaster getById(@RequestBody FindModel findModel) throws NotFoundException {
-        return saleMasterService.getById(findModel.getId());
+        return saleService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
     public List<SaleMaster> getByContains(@RequestBody SearchModel searchModel) {
-        return saleMasterService.getByContains(searchModel.getSearch());
+        return saleService.getByContains(searchModel.getSearch());
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ObjectNode> save(@Valid @RequestBody SaleMaster saleMaster) throws NotFoundException {
-        return saleMasterService.save(saleMaster);
+    public ResponseEntity<ObjectNode> save(@Valid @RequestBody SaleMaster sale) throws NotFoundException {
+        return saleService.save(sale);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ObjectNode> update(@Valid @RequestBody SaleMaster saleMaster) throws NotFoundException {
-        return saleMasterService.update(saleMaster);
+    public ResponseEntity<ObjectNode> update(@Valid @RequestBody SaleMaster sale) throws NotFoundException {
+        return saleService.update(sale);
     }
 
     @DeleteMapping("/delete/single")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
-        return saleMasterService.delete(findModel.getId());
+        return saleService.delete(findModel.getId());
     }
 
     @DeleteMapping("/delete/multiple")
     public ResponseEntity<ObjectNode> delete(@RequestBody List<Long> idList) {
-        return saleMasterService.deleteMultiple(idList);
+        return saleService.deleteMultiple(idList);
     }
 }

@@ -54,7 +54,7 @@ public class LeaveServiceImpl implements LeaveService {
             }
             leave.setCreatedBy(authService.authUser());
             leave.setCreatedAt(LocalDateTime.now());
-            leaveStatusRepo.saveAndFlush(leave);
+            leaveStatusRepo.save(leave);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -115,7 +115,7 @@ public class LeaveServiceImpl implements LeaveService {
         leaveStatus.setUpdatedAt(LocalDateTime.now());
 
         try {
-            leaveStatusRepo.saveAndFlush(leaveStatus);
+            leaveStatusRepo.save(leaveStatus);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

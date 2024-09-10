@@ -6,7 +6,7 @@ import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.transfers.TransferMasterRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
-import io.nomard.spoty_api_v1.services.interfaces.transfers.TransferMasterService;
+import io.nomard.spoty_api_v1.services.interfaces.transfers.TransferService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -24,7 +24,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
-public class TransferMasterServiceImpl implements TransferMasterService {
+public class TransferServiceImpl implements TransferService {
     @Autowired
     private TransferMasterRepository transferMasterRepo;
     @Autowired
@@ -70,7 +70,7 @@ public class TransferMasterServiceImpl implements TransferMasterService {
             transferMaster.setTenant(authService.authUser().getTenant());
             transferMaster.setCreatedBy(authService.authUser());
             transferMaster.setCreatedAt(LocalDateTime.now());
-            transferMasterRepo.saveAndFlush(transferMaster);
+            transferMasterRepo.save(transferMaster);
 
             for (int i = 0; i < transferMaster.getTransferDetails().size(); i++) {
                 transferTransactionService.save(transferMaster.getTransferDetails().get(i));
@@ -145,7 +145,7 @@ public class TransferMasterServiceImpl implements TransferMasterService {
         transferMaster.setUpdatedAt(LocalDateTime.now());
 
         try {
-            transferMasterRepo.saveAndFlush(transferMaster);
+            transferMasterRepo.save(transferMaster);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

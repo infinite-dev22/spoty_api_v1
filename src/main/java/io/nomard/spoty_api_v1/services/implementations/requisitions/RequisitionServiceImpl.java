@@ -6,7 +6,7 @@ import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.requisitions.RequisitionMasterRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
-import io.nomard.spoty_api_v1.services.interfaces.requisitions.RequisitionMasterService;
+import io.nomard.spoty_api_v1.services.interfaces.requisitions.RequisitionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,7 +22,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
-public class RequisitionMasterServiceImpl implements RequisitionMasterService {
+public class RequisitionServiceImpl implements RequisitionService {
     @Autowired
     private RequisitionMasterRepository requisitionMasterRepo;
     @Autowired
@@ -65,7 +65,7 @@ public class RequisitionMasterServiceImpl implements RequisitionMasterService {
             }
             requisitionMaster.setCreatedBy(authService.authUser());
             requisitionMaster.setCreatedAt(LocalDateTime.now());
-            requisitionMasterRepo.saveAndFlush(requisitionMaster);
+            requisitionMasterRepo.save(requisitionMaster);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -138,7 +138,7 @@ public class RequisitionMasterServiceImpl implements RequisitionMasterService {
         requisitionMaster.setUpdatedAt(LocalDateTime.now());
 
         try {
-            requisitionMasterRepo.saveAndFlush(requisitionMaster);
+            requisitionMasterRepo.save(requisitionMaster);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

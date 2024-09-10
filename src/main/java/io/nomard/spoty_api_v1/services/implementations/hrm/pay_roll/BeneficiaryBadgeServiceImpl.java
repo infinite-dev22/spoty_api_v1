@@ -57,7 +57,7 @@ public class BeneficiaryBadgeServiceImpl implements BeneficiaryBadgeService {
             beneficiaryBadge.setTenant(authService.authUser().getTenant());
             beneficiaryBadge.setCreatedBy(authService.authUser());
             beneficiaryBadge.setCreatedAt(LocalDateTime.now());
-            beneficiaryBadgeRepo.saveAndFlush(beneficiaryBadge);
+            beneficiaryBadgeRepo.save(beneficiaryBadge);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -98,7 +98,7 @@ public class BeneficiaryBadgeServiceImpl implements BeneficiaryBadgeService {
         beneficiaryBadge.setUpdatedAt(LocalDateTime.now());
 
         try {
-            beneficiaryBadgeRepo.saveAndFlush(beneficiaryBadge);
+            beneficiaryBadgeRepo.save(beneficiaryBadge);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

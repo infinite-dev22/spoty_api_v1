@@ -6,7 +6,7 @@ import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.adjustments.AdjustmentMasterRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
-import io.nomard.spoty_api_v1.services.interfaces.adjustments.AdjustmentMasterService;
+import io.nomard.spoty_api_v1.services.interfaces.adjustments.AdjustmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -23,7 +23,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
-public class AdjustmentMasterServiceImpl implements AdjustmentMasterService {
+public class AdjustmentServiceImpl implements AdjustmentService {
     @Autowired
     private AdjustmentMasterRepository adjustmentMasterRepo;
     @Autowired
@@ -73,7 +73,7 @@ public class AdjustmentMasterServiceImpl implements AdjustmentMasterService {
             }
             adjustmentMaster.setCreatedBy(authService.authUser());
             adjustmentMaster.setCreatedAt(LocalDateTime.now());
-            adjustmentMasterRepo.saveAndFlush(adjustmentMaster);
+            adjustmentMasterRepo.save(adjustmentMaster);
 
             for (int i = 0; i < adjustmentMaster.getAdjustmentDetails().size(); i++) {
                 adjustmentTransactionService.save(adjustmentMaster.getAdjustmentDetails().get(i));
@@ -124,7 +124,7 @@ public class AdjustmentMasterServiceImpl implements AdjustmentMasterService {
         adjustmentMaster.setUpdatedAt(LocalDateTime.now());
 
         try {
-            adjustmentMasterRepo.saveAndFlush(adjustmentMaster);
+            adjustmentMasterRepo.save(adjustmentMaster);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

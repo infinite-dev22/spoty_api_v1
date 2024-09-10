@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-public interface TransferMasterService {
+public interface TransferService {
     Page<TransferMaster> getAll(int pageNo, int pageSize);
 
     TransferMaster getById(Long id) throws NotFoundException;

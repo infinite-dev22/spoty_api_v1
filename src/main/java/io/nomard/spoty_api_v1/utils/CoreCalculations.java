@@ -1,6 +1,7 @@
 package io.nomard.spoty_api_v1.utils;
 
 import io.nomard.spoty_api_v1.entities.purchases.PurchaseMaster;
+import io.nomard.spoty_api_v1.entities.quotations.QuotationMaster;
 import io.nomard.spoty_api_v1.entities.sales.SaleMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.services.interfaces.deductions.DiscountService;
@@ -52,6 +53,7 @@ public class CoreCalculations {
             purchaseMaster.setAmountDue(total - purchaseMaster.getAmountPaid());
         }
     }
+
     public static class SaleCalculationService {
 
         private final TaxService taxService;
@@ -98,4 +100,48 @@ public class CoreCalculations {
         }
     }
 
+    public static class QuotationCalculationService {
+
+        private final TaxService taxService;
+        private final DiscountService discountService;
+
+        public QuotationCalculationService(TaxService taxService, DiscountService discountService) {
+            this.taxService = taxService;
+            this.discountService = discountService;
+        }
+
+        public void calculate(QuotationMaster quotation) throws NotFoundException {
+            double subTotal = 0.00;
+            double total = 0.00;
+
+            // Calculate subTotal
+            for (int i = 0; i < quotation.getQuotationDetails().size(); i++) {
+                quotation.getQuotationDetails().get(i).setQuotation(quotation);
+                subTotal += quotation.getQuotationDetails().get(i).getUnitPrice() * quotation.getQuotationDetails().get(i).getQuantity();
+                quotation.getQuotationDetails().get(i).setTotalPrice(subTotal);
+            }
+            total += subTotal;
+
+            // Apply tax if applicable
+            if (quotation.getTax() != null) {
+                double tax = Math.round(subTotal * (taxService.getById(quotation.getTax().getId()).getPercentage() / 100.0));
+                quotation.setTaxAmount(tax);
+                total += tax;
+            }
+
+            // Apply discount if applicable
+            if (quotation.getDiscount() != null) {
+                double discount = Math.round(subTotal * (discountService.getById(quotation.getDiscount().getId()).getPercentage() / 100.0));
+                quotation.setDiscountAmount(discount);
+                total -= discount;
+            }
+
+            // Add shipping fee
+            total += quotation.getShippingFee();
+
+            // Set the calculated values
+            quotation.setSubTotal(subTotal);
+            quotation.setTotal(total);
+        }
+    }
 }

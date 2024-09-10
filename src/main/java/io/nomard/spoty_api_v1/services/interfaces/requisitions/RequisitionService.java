@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-public interface RequisitionMasterService {
+public interface RequisitionService {
     Page<RequisitionMaster> getAll(int pageNo, int pageSize);
 
     RequisitionMaster getById(Long id) throws NotFoundException;

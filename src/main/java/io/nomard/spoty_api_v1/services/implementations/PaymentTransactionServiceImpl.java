@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -77,7 +76,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
             paymentTransaction.setTenant(authService.authUser().getTenant());
             paymentTransaction.setCreatedBy(authService.authUser());
             paymentTransaction.setCreatedAt(LocalDateTime.now());
-            paymentTransactionRepo.saveAndFlush(paymentTransaction);
+            paymentTransactionRepo.save(paymentTransaction);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -106,7 +105,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
             paymentTransaction.setTenant(authService.authUser().getTenant());
             paymentTransaction.setCreatedBy(authService.authUser());
             paymentTransaction.setCreatedAt(LocalDateTime.now());
-            paymentTransactionRepo.saveAndFlush(paymentTransaction);
+            paymentTransactionRepo.save(paymentTransaction);
             return spotyResponseImpl.created();
         }
         return spotyResponseImpl.custom(HttpStatus.BAD_REQUEST, "Could not initiate mobile money payment.");

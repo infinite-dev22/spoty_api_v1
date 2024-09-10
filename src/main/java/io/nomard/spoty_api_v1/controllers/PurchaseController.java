@@ -6,7 +6,7 @@ import io.nomard.spoty_api_v1.entities.purchases.PurchaseMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
-import io.nomard.spoty_api_v1.services.implementations.purchases.PurchaseMasterServiceImpl;
+import io.nomard.spoty_api_v1.services.implementations.purchases.PurchaseServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,41 +19,41 @@ import java.util.List;
 @RequestMapping("purchases")
 public class PurchaseController {
     @Autowired
-    private PurchaseMasterServiceImpl purchaseMasterService;
+    private PurchaseServiceImpl purchaseService;
 
     @GetMapping("/all")
     public Page<PurchaseMaster> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                              @RequestParam(defaultValue = "50") Integer pageSize) {
-        return purchaseMasterService.getAll(pageNo, pageSize);
+                                       @RequestParam(defaultValue = "50") Integer pageSize) {
+        return purchaseService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
     public PurchaseMaster getById(@RequestBody FindModel findModel) throws NotFoundException {
-        return purchaseMasterService.getById(findModel.getId());
+        return purchaseService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
     public List<PurchaseMaster> getByContains(@RequestBody SearchModel searchModel) {
-        return purchaseMasterService.getByContains(searchModel.getSearch());
+        return purchaseService.getByContains(searchModel.getSearch());
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ObjectNode> save(@Valid @RequestBody PurchaseMaster purchaseMaster) throws NotFoundException {
-        return purchaseMasterService.save(purchaseMaster);
+    public ResponseEntity<ObjectNode> save(@Valid @RequestBody PurchaseMaster purchase) throws NotFoundException {
+        return purchaseService.save(purchase);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ObjectNode> update(@Valid @RequestBody PurchaseMaster purchaseMaster) throws NotFoundException {
-        return purchaseMasterService.update(purchaseMaster);
+    public ResponseEntity<ObjectNode> update(@Valid @RequestBody PurchaseMaster purchase) throws NotFoundException {
+        return purchaseService.update(purchase);
     }
 
     @DeleteMapping("/delete/single")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
-        return purchaseMasterService.delete(findModel.getId());
+        return purchaseService.delete(findModel.getId());
     }
 
     @DeleteMapping("/delete/multiple")
     public ResponseEntity<ObjectNode> delete(@RequestBody List<Long> idList) {
-        return purchaseMasterService.deleteMultiple(idList);
+        return purchaseService.deleteMultiple(idList);
     }
 }

@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -57,7 +56,7 @@ public class BranchServiceImpl implements BranchService {
             branch.setTenant(authService.authUser().getTenant());
             branch.setCreatedBy(authService.authUser());
             branch.setCreatedAt(LocalDateTime.now());
-            branchRepo.saveAndFlush(branch);
+            branchRepo.save(branch);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

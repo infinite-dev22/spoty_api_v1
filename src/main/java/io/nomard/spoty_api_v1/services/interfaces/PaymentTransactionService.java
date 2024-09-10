@@ -9,7 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public interface PaymentTransactionService {
     Page<PaymentTransaction> getAll(int pageNo, int pageSize);

@@ -64,7 +64,7 @@ public class StockInTransactionServiceImpl implements StockInTransactionService 
             stockInTransaction.setBranch(authService.authUser().getBranch());
             stockInTransaction.setCreatedBy(authService.authUser());
             stockInTransaction.setCreatedAt(LocalDateTime.now());
-            stockInTransactionRepo.saveAndFlush(stockInTransaction);
+            stockInTransactionRepo.save(stockInTransaction);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -114,7 +114,7 @@ public class StockInTransactionServiceImpl implements StockInTransactionService 
         stockInTransaction.setUpdatedAt(LocalDateTime.now());
 
         try {
-            stockInTransactionRepo.saveAndFlush(stockInTransaction);
+            stockInTransactionRepo.save(stockInTransaction);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

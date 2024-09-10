@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -117,7 +116,7 @@ public class UserServiceImpl implements UserService {
         user.setUpdatedAt(LocalDateTime.now());
 
         try {
-            userRepo.saveAndFlush(user);
+            userRepo.save(user);
 
             return spotyResponseImpl.ok();
         } catch (Exception e) {

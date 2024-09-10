@@ -8,14 +8,14 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-public interface QuotationMasterService {
+public interface QuotationService {
     Page<QuotationMaster> getAll(int pageNo, int pageSize);
 
     QuotationMaster getById(Long id) throws NotFoundException;
 
     List<QuotationMaster> getByContains(String search);
 
-    ResponseEntity<ObjectNode> save(QuotationMaster quotationMaster);
+    ResponseEntity<ObjectNode> save(QuotationMaster quotationMaster) throws NotFoundException;
 
     ResponseEntity<ObjectNode> update(QuotationMaster quotationMaster) throws NotFoundException;
 

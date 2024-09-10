@@ -76,7 +76,7 @@ public class ExpenseServiceImpl implements ExpenseService {
             accountTransactionService.save(accountTransaction);
             expense.setCreatedBy(authService.authUser());
             expense.setCreatedAt(LocalDateTime.now());
-            expenseRepo.saveAndFlush(expense);
+            expenseRepo.save(expense);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -121,7 +121,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         expense.setUpdatedAt(LocalDateTime.now());
 
         try {
-            expenseRepo.saveAndFlush(expense);
+            expenseRepo.save(expense);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

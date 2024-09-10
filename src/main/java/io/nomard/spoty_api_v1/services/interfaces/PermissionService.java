@@ -7,7 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public interface PermissionService {
     Page<Permission> getAll(int pageNo, int pageSize);

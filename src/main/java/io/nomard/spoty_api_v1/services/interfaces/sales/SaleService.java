@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-public interface SaleMasterService {
+public interface SaleService {
     Page<SaleMaster> getAll(int pageNo, int pageSize);
 
     SaleMaster getById(Long id) throws NotFoundException;

@@ -7,7 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public interface TenantService {
     Page<Tenant> getAll(int pageNo, int pageSize);

@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-public interface PurchaseReturnMasterService {
+public interface PurchaseReturnService {
     Page<PurchaseReturnMaster> getAll(int pageNo, int pageSize);
 
     PurchaseReturnMaster getById(Long id) throws NotFoundException;

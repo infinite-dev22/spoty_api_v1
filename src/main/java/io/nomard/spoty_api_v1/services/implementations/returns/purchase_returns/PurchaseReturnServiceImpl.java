@@ -6,7 +6,7 @@ import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.returns.purchase_returns.PurchaseReturnMasterRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
-import io.nomard.spoty_api_v1.services.interfaces.returns.purchase_returns.PurchaseReturnMasterService;
+import io.nomard.spoty_api_v1.services.interfaces.returns.purchase_returns.PurchaseReturnService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,7 +22,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
-public class PurchaseReturnMasterServiceImpl implements PurchaseReturnMasterService {
+public class PurchaseReturnServiceImpl implements PurchaseReturnService {
     @Autowired
     private PurchaseReturnMasterRepository purchaseReturnMasterRepo;
     @Autowired
@@ -60,7 +60,7 @@ public class PurchaseReturnMasterServiceImpl implements PurchaseReturnMasterServ
             }
             purchaseReturnMaster.setCreatedBy(authService.authUser());
             purchaseReturnMaster.setCreatedAt(LocalDateTime.now());
-            purchaseReturnMasterRepo.saveAndFlush(purchaseReturnMaster);
+            purchaseReturnMasterRepo.save(purchaseReturnMaster);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -141,7 +141,7 @@ public class PurchaseReturnMasterServiceImpl implements PurchaseReturnMasterServ
         purchaseReturnMaster.setUpdatedAt(LocalDateTime.now());
 
         try {
-            purchaseReturnMasterRepo.saveAndFlush(purchaseReturnMaster);
+            purchaseReturnMasterRepo.save(purchaseReturnMaster);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

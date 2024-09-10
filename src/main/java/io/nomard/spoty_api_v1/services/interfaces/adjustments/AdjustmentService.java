@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-public interface AdjustmentMasterService {
+public interface AdjustmentService {
     Page<AdjustmentMaster> getAll(int pageNo, int pageSize);
 
     AdjustmentMaster getById(Long id) throws NotFoundException;

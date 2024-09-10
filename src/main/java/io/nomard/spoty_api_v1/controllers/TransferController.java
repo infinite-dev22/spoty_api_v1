@@ -6,7 +6,7 @@ import io.nomard.spoty_api_v1.entities.transfers.TransferMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
-import io.nomard.spoty_api_v1.services.implementations.transfers.TransferMasterServiceImpl;
+import io.nomard.spoty_api_v1.services.implementations.transfers.TransferServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,41 +19,41 @@ import java.util.List;
 @RequestMapping("transfers")
 public class TransferController {
     @Autowired
-    private TransferMasterServiceImpl transferMasterService;
+    private TransferServiceImpl transferService;
 
     @GetMapping("/all")
-    public Page<TransferMaster> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
-                                              @RequestParam(defaultValue = "50") Integer pageSize) {
-        return transferMasterService.getAll(pageNo, pageSize);
+    public Page<TransferMaster> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                       @RequestParam(defaultValue = "50") Integer pageSize) {
+        return transferService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public TransferMaster getMastersById(@RequestBody FindModel findModel) throws NotFoundException {
-        return transferMasterService.getById(findModel.getId());
+    public TransferMaster getById(@RequestBody FindModel findModel) throws NotFoundException {
+        return transferService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<TransferMaster> getMastersByContains(@RequestBody SearchModel searchModel) {
-        return transferMasterService.getByContains(searchModel.getSearch());
+    public List<TransferMaster> getByContains(@RequestBody SearchModel searchModel) {
+        return transferService.getByContains(searchModel.getSearch());
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ObjectNode> saveMaster(@Valid @RequestBody TransferMaster transferMaster) {
-        return transferMasterService.save(transferMaster);
+    public ResponseEntity<ObjectNode> save(@Valid @RequestBody TransferMaster transfer) {
+        return transferService.save(transfer);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ObjectNode> updateMaster(@Valid @RequestBody TransferMaster transferMaster) throws NotFoundException {
-        return transferMasterService.update(transferMaster);
+    public ResponseEntity<ObjectNode> update(@Valid @RequestBody TransferMaster transfer) throws NotFoundException {
+        return transferService.update(transfer);
     }
 
     @DeleteMapping("/delete/single")
-    public ResponseEntity<ObjectNode> deleteMaster(@RequestBody FindModel findModel) {
-        return transferMasterService.delete(findModel.getId());
+    public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
+        return transferService.delete(findModel.getId());
     }
 
     @DeleteMapping("/delete/multiple")
-    public ResponseEntity<ObjectNode> deleteMasters(@RequestBody List<Long> idList) {
-        return transferMasterService.deleteMultiple(idList);
+    public ResponseEntity<ObjectNode> delete(@RequestBody List<Long> idList) {
+        return transferService.deleteMultiple(idList);
     }
 }

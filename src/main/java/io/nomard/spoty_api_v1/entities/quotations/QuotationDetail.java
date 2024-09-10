@@ -56,7 +56,9 @@ public class QuotationDetail implements Serializable {
     private Discount discount;
     @Column(nullable = false)
     @Builder.Default
-    private double subTotal = 0;
+    private double unitPrice = 0;
+    @Builder.Default
+    private double totalPrice = 0;
     @Column(nullable = false)
     @Builder.Default
     private int quantity = 0;

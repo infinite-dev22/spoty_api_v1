@@ -50,7 +50,7 @@ public class StockReportServiceImpl implements StockReportService {
             stockReport.setTenant(authService.authUser().getTenant());
             stockReport.setCreatedBy(authService.authUser());
             stockReport.setCreatedAt(LocalDateTime.now());
-            stockReportRepo.saveAndFlush(stockReport);
+            stockReportRepo.save(stockReport);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -103,7 +103,7 @@ public class StockReportServiceImpl implements StockReportService {
         stockReport.setUpdatedAt(LocalDateTime.now());
 
         try {
-            stockReportRepo.saveAndFlush(stockReport);
+            stockReportRepo.save(stockReport);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

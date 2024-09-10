@@ -33,7 +33,7 @@ public interface PurchaseReportRepository extends JpaRepository<PurchaseMaster, 
             @Param("endDate") LocalDate endDate
     );
 
-    @Query("SELECT new io.nomard.spoty_api_v1.models.DashboardKPIModel('Product Costs', SUM(pm.cost)) " +
+    @Query("SELECT new io.nomard.spoty_api_v1.models.DashboardKPIModel('Product Costs', SUM(pm.unitCost)) " +
             "FROM PurchaseDetail pm " +
             "WHERE pm.purchase.tenant.id = :id AND CAST(pm.createdAt AS DATE) BETWEEN :startDate AND :endDate")
     DashboardKPIModel totalCostOnProducts(
@@ -53,7 +53,7 @@ public interface PurchaseReportRepository extends JpaRepository<PurchaseMaster, 
             @Param("endDate") LocalDate endDate
     );
 
-    @Query("SELECT new io.nomard.spoty_api_v1.models.reportmodels.purchases.PurchaseDetailSummary(pm.purchase, pm.product, SUM(pm.subTotalCost), SUM(pm.quantity)) " +
+    @Query("SELECT new io.nomard.spoty_api_v1.models.reportmodels.purchases.PurchaseDetailSummary(pm.purchase, pm.product, SUM(pm.unitCost), SUM(pm.quantity)) " +
             "FROM PurchaseDetail pm " +
             "WHERE pm.purchase.tenant.id = :id AND CAST(pm.purchase.createdAt AS DATE) BETWEEN :startDate AND :endDate " +
             "GROUP BY pm.product, pm.purchase")

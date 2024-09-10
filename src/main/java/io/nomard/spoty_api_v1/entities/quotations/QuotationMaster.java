@@ -41,8 +41,6 @@ public class QuotationMaster implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User user_detail;
     private String ref;
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "customer_id")
@@ -60,6 +58,8 @@ public class QuotationMaster implements Serializable {
     private List<QuotationDetail> quotationDetails = new LinkedList<>();
     @Column(nullable = false)
     @Builder.Default
+    private double subTotal = 0;
+    @Builder.Default
     private double total = 0;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tax_id")
@@ -67,6 +67,10 @@ public class QuotationMaster implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "discount_id")
     private Discount discount;
+    @Builder.Default
+    private double taxAmount = 0;
+    @Builder.Default
+    private double discountAmount = 0;
     @Column(nullable = false)
     @Builder.Default
     private double shippingFee = 0;

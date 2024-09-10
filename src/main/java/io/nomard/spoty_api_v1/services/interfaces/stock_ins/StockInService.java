@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-public interface StockInMasterService {
+public interface StockInService {
     Page<StockInMaster> getAll(int pageNo, int pageSize);
 
     StockInMaster getById(Long id) throws NotFoundException;

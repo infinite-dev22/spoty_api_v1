@@ -65,7 +65,7 @@ public class RoleServiceImpl implements RoleService {
             role.setTenant(authService.authUser().getTenant());
             role.setCreatedBy(authService.authUser());
             role.setCreatedAt(LocalDateTime.now());
-            roleRepo.saveAndFlush(role);
+            roleRepo.save(role);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -104,7 +104,7 @@ public class RoleServiceImpl implements RoleService {
         role.setUpdatedAt(LocalDateTime.now());
 
         try {
-            roleRepo.saveAndFlush(role);
+            roleRepo.save(role);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

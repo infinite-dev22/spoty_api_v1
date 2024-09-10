@@ -6,7 +6,7 @@ import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.stock_ins.StockInMasterRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
-import io.nomard.spoty_api_v1.services.interfaces.stock_ins.StockInMasterService;
+import io.nomard.spoty_api_v1.services.interfaces.stock_ins.StockInService;
 import io.nomard.spoty_api_v1.utils.CoreUtils;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ import java.util.logging.Level;
 
 @Service
 @Log
-public class StockInMasterServiceImpl implements StockInMasterService {
+public class StockInServiceImpl implements StockInService {
     @Autowired
     private StockInMasterRepository stockInMasterRepo;
     @Autowired
@@ -73,7 +73,7 @@ public class StockInMasterServiceImpl implements StockInMasterService {
             stockInMaster.setCreatedBy(authService.authUser());
             stockInMaster.setCreatedAt(LocalDateTime.now());
             stockInMaster.setRef(CoreUtils.referenceNumberGenerator("STK"));
-            stockInMasterRepo.saveAndFlush(stockInMaster);
+            stockInMasterRepo.save(stockInMaster);
 
             if (!stockInMaster.getStockInDetails().isEmpty()) {
                 for (int i = 0; i < stockInMaster.getStockInDetails().size(); i++) {
@@ -126,7 +126,7 @@ public class StockInMasterServiceImpl implements StockInMasterService {
         stockInMaster.setUpdatedAt(LocalDateTime.now());
 
         try {
-            stockInMasterRepo.saveAndFlush(stockInMaster);
+            stockInMasterRepo.save(stockInMaster);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
