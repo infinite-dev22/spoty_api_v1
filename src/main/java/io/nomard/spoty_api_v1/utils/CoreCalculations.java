@@ -2,6 +2,7 @@ package io.nomard.spoty_api_v1.utils;
 
 import io.nomard.spoty_api_v1.entities.purchases.PurchaseMaster;
 import io.nomard.spoty_api_v1.entities.quotations.QuotationMaster;
+import io.nomard.spoty_api_v1.entities.requisitions.RequisitionMaster;
 import io.nomard.spoty_api_v1.entities.sales.SaleMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.services.interfaces.deductions.DiscountService;
@@ -142,6 +143,15 @@ public class CoreCalculations {
             // Set the calculated values
             quotation.setSubTotal(subTotal);
             quotation.setTotal(total);
+        }
+    }
+
+    public static class RequisitionCalculationService {
+        public static void calculate(RequisitionMaster quotation) {
+            // Calculate subTotal
+            for (int i = 0; i < quotation.getRequisitionDetails().size(); i++) {
+                quotation.getRequisitionDetails().get(i).setRequisition(quotation);
+            }
         }
     }
 }

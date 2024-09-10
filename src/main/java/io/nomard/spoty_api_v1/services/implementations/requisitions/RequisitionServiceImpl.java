@@ -7,10 +7,14 @@ import io.nomard.spoty_api_v1.repositories.requisitions.RequisitionMasterReposit
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.requisitions.RequisitionService;
+import io.nomard.spoty_api_v1.utils.CoreCalculations;
+import io.nomard.spoty_api_v1.utils.CoreUtils;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,11 +24,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.logging.Level;
 
 @Service
+@Log
 public class RequisitionServiceImpl implements RequisitionService {
     @Autowired
-    private RequisitionMasterRepository requisitionMasterRepo;
+    private RequisitionMasterRepository requisitionRepo;
     @Autowired
     private AuthServiceImpl authService;
     @Autowired
@@ -33,115 +39,87 @@ public class RequisitionServiceImpl implements RequisitionService {
     @Override
     public Page<RequisitionMaster> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return requisitionMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+        return requisitionRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override
     public RequisitionMaster getById(Long id) throws NotFoundException {
-        Optional<RequisitionMaster> requisitionMaster = requisitionMasterRepo.findById(id);
-        if (requisitionMaster.isEmpty()) {
+        Optional<RequisitionMaster> requisition = requisitionRepo.findById(id);
+        if (requisition.isEmpty()) {
             throw new NotFoundException();
         }
-        return requisitionMaster.get();
+        return requisition.get();
     }
 
     @Override
     public ArrayList<RequisitionMaster> getByContains(String search) {
-        return requisitionMasterRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
+        return requisitionRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
     }
 
     @Override
-    @Transactional
-    public ResponseEntity<ObjectNode> save(RequisitionMaster requisitionMaster) {
+//    @Transactional
+    public ResponseEntity<ObjectNode> save(RequisitionMaster requisition) {
         try {
-            if (!requisitionMaster.getRequisitionDetails().isEmpty()) {
-                for (int i = 0; i < requisitionMaster.getRequisitionDetails().size(); i++) {
-                    requisitionMaster.getRequisitionDetails().get(i).setRequisition(requisitionMaster);
-                }
+            CoreCalculations.RequisitionCalculationService.calculate(requisition);
+            requisition.setRef(CoreUtils.referenceNumberGenerator("REQ"));
+            requisition.setTenant(authService.authUser().getTenant());
+            if (Objects.isNull(requisition.getBranch())) {
+                requisition.setBranch(authService.authUser().getBranch());
             }
-            requisitionMaster.setTenant(authService.authUser().getTenant());
-            if (Objects.isNull(requisitionMaster.getBranch())) {
-                requisitionMaster.setBranch(authService.authUser().getBranch());
-            }
-            requisitionMaster.setCreatedBy(authService.authUser());
-            requisitionMaster.setCreatedAt(LocalDateTime.now());
-            requisitionMasterRepo.save(requisitionMaster);
+            requisition.setCreatedBy(authService.authUser());
+            requisition.setCreatedAt(LocalDateTime.now());
+            requisitionRepo.save(requisition);
             return spotyResponseImpl.created();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 
     @Override
     @Transactional
     public ResponseEntity<ObjectNode> update(RequisitionMaster data) throws NotFoundException {
-        var opt = requisitionMasterRepo.findById(data.getId());
+        var opt = requisitionRepo.findById(data.getId());
 
         if (opt.isEmpty()) {
             throw new NotFoundException();
         }
-        var requisitionMaster = opt.get();
+        var requisition = opt.get();
 
         if (Objects.nonNull(data.getRef()) && !"".equalsIgnoreCase(data.getRef())) {
-            requisitionMaster.setRef(data.getRef());
+            requisition.setRef(data.getRef());
         }
 
-        if (Objects.nonNull(data.getDate()) && !Objects.equals(data.getDate(), requisitionMaster.getDate())) {
-            requisitionMaster.setDate(data.getDate());
+        if (Objects.nonNull(data.getSupplier()) && !Objects.equals(data.getSupplier(), requisition.getSupplier())) {
+            requisition.setSupplier(data.getSupplier());
         }
 
-        if (Objects.nonNull(data.getSupplier()) && !Objects.equals(data.getSupplier(), requisitionMaster.getSupplier())) {
-            requisitionMaster.setSupplier(data.getSupplier());
-        }
-
-        if (Objects.nonNull(data.getBranch()) && !Objects.equals(data.getBranch(), requisitionMaster.getBranch())) {
-            requisitionMaster.setBranch(data.getBranch());
+        if (Objects.nonNull(data.getBranch()) && !Objects.equals(data.getBranch(), requisition.getBranch())) {
+            requisition.setBranch(data.getBranch());
         }
 
         if (Objects.nonNull(data.getRequisitionDetails()) && !data.getRequisitionDetails().isEmpty()) {
-            requisitionMaster.setRequisitionDetails(data.getRequisitionDetails());
-
-            for (int i = 0; i < requisitionMaster.getRequisitionDetails().size(); i++) {
-                requisitionMaster.getRequisitionDetails().get(i).setRequisition(requisitionMaster);
-            }
-        }
-
-        if (Objects.nonNull(data.getShipVia()) && !"".equalsIgnoreCase(data.getShipVia())) {
-            requisitionMaster.setShipVia(data.getShipVia());
-        }
-
-        if (Objects.nonNull(data.getShipMethod()) && !"".equalsIgnoreCase(data.getShipMethod())) {
-            requisitionMaster.setShipMethod(data.getShipMethod());
-        }
-
-        if (Objects.nonNull(data.getShippingTerms()) && !"".equalsIgnoreCase(data.getShippingTerms())) {
-            requisitionMaster.setShippingTerms(data.getShippingTerms());
-        }
-
-        if (Objects.nonNull(data.getDeliveryDate()) && !Objects.equals(data.getDeliveryDate(), requisitionMaster.getDeliveryDate())) {
-            requisitionMaster.setDeliveryDate(data.getDeliveryDate());
+            requisition.setRequisitionDetails(data.getRequisitionDetails());
+            CoreCalculations.RequisitionCalculationService.calculate(requisition);
         }
 
         if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
-            requisitionMaster.setNotes(data.getNotes());
+            requisition.setNotes(data.getNotes());
         }
 
         if (Objects.nonNull(data.getStatus()) && !"".equalsIgnoreCase(data.getStatus())) {
-            requisitionMaster.setStatus(data.getStatus());
+            requisition.setStatus(data.getStatus());
         }
 
-        if (!Objects.equals(data.getTotalCost(), requisitionMaster.getTotalCost())) {
-            requisitionMaster.setTotalCost(data.getTotalCost());
-        }
-
-        requisitionMaster.setUpdatedBy(authService.authUser());
-        requisitionMaster.setUpdatedAt(LocalDateTime.now());
+        requisition.setUpdatedBy(authService.authUser());
+        requisition.setUpdatedAt(LocalDateTime.now());
 
         try {
-            requisitionMasterRepo.save(requisitionMaster);
+            requisitionRepo.save(requisition);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 
@@ -149,20 +127,22 @@ public class RequisitionServiceImpl implements RequisitionService {
     @Transactional
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
-            requisitionMasterRepo.deleteById(id);
+            requisitionRepo.deleteById(id);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 
     @Override
     public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) {
         try {
-            requisitionMasterRepo.deleteAllById(idList);
+            requisitionRepo.deleteAllById(idList);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 }

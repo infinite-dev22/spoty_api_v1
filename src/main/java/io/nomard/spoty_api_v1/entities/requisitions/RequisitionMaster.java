@@ -40,8 +40,6 @@ public class RequisitionMaster implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String ref;
-    @Column(nullable = false)
-    private LocalDateTime date;
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "supplier_id")
     private Supplier supplier;
@@ -56,15 +54,9 @@ public class RequisitionMaster implements Serializable {
     @OneToMany(orphanRemoval = true, mappedBy = "requisition", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default
     private List<RequisitionDetail> requisitionDetails = new LinkedList<>();
-    private String shipVia;
-    private String shipMethod;
-    private String shippingTerms;
-    private LocalDateTime deliveryDate;
     private String notes;
     @Column(nullable = false)
     private String status;
-    @Column(nullable = false)
-    private double totalCost;
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
     private User createdBy;
