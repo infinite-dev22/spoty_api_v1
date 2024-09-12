@@ -6,7 +6,7 @@ import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.hrm.hrm.DesignationRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
-import io.nomard.spoty_api_v1.services.interfaces.DesignationService;
+import io.nomard.spoty_api_v1.services.interfaces.hrm.hrm.DesignationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
