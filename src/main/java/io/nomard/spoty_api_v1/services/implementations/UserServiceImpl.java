@@ -169,6 +169,7 @@ public class UserServiceImpl implements UserService {
         user.setTenant(data.getTenant());
         user.setBranch(data.getBranch());
         user.setEmail(data.getEmail());
+        user.setSalary(data.getSalary());
         user.setPassword(new BCryptPasswordEncoder(8).encode(UUID.randomUUID().toString().substring(0, 12)));
         user.setRole(data.getRole());
         user.setActive(data.isActive());
