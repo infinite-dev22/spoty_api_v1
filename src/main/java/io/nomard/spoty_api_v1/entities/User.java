@@ -15,6 +15,7 @@
 package io.nomard.spoty_api_v1.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.nomard.spoty_api_v1.entities.hrm.hrm.EmploymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
@@ -33,7 +34,7 @@ public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne(optional = false, targetEntity = UserProfile.class, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToOne(optional = false, targetEntity = UserProfile.class, orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private UserProfile userProfile;
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
@@ -44,12 +45,17 @@ public class User implements Serializable {
     @JsonIgnore
     private Branch branch;
     private String email;
+    private String salary;
     @JsonIgnore
     private String password;
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     @JsonIgnore
     private Role role;
+    @JoinColumn
+    @JsonIgnore
+    @OneToOne(fetch = FetchType.LAZY)
+    private EmploymentStatus employmentStatus;
     @Column(nullable = false)
     @Builder.Default
     private boolean active = true;

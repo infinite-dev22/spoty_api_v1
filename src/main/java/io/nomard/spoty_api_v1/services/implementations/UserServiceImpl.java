@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -92,12 +93,20 @@ public class UserServiceImpl implements UserService {
             user.setEmail(data.getEmail());
         }
 
+        if (!Objects.equals(user.getSalary(), data.getSalary()) && Objects.nonNull(data.getSalary()) && !"".equalsIgnoreCase(data.getSalary())) {
+            user.setSalary(data.getSalary());
+        }
+
         if (!Objects.equals(userProfile.getPhone(), data.getPhone()) && Objects.nonNull(data.getPhone()) && !"".equalsIgnoreCase(data.getPhone())) {
             userProfile.setPhone(data.getPhone());
         }
 
         if (!Objects.equals(user.getRole(), data.getRole()) && Objects.nonNull(data.getRole())) {
             user.setRole(data.getRole());
+        }
+
+        if (!Objects.equals(user.getEmploymentStatus(), data.getEmploymentStatus()) && Objects.nonNull(data.getEmploymentStatus())) {
+            user.setEmploymentStatus(data.getEmploymentStatus());
         }
 
         if (!Objects.equals(user.isActive(), data.isActive())) {
@@ -160,7 +169,7 @@ public class UserServiceImpl implements UserService {
         user.setTenant(data.getTenant());
         user.setBranch(data.getBranch());
         user.setEmail(data.getEmail());
-        user.setPassword(new BCryptPasswordEncoder(8).encode("new_user"));
+        user.setPassword(new BCryptPasswordEncoder(8).encode(UUID.randomUUID().toString().substring(0, 12)));
         user.setRole(data.getRole());
         user.setActive(data.isActive());
         user.setLocked(data.isLocked());

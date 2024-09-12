@@ -17,6 +17,7 @@ package io.nomard.spoty_api_v1.models;
 import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Role;
 import io.nomard.spoty_api_v1.entities.Tenant;
+import io.nomard.spoty_api_v1.entities.hrm.hrm.EmploymentStatus;
 import lombok.*;
 
 import java.io.Serializable;
@@ -35,8 +36,10 @@ public class UserModel implements Serializable {
     private String lastName;
     private String otherName;
     private String email;
+    private String salary;
     private String phone;
     private Role role;
+    private EmploymentStatus employmentStatus;
     @Builder.Default
     private boolean active = true;
     @Builder.Default
