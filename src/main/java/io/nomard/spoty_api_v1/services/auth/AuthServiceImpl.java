@@ -157,7 +157,7 @@ public class AuthServiceImpl implements AuthService {
         user.setBranch(branch);
         user.setEmail(signUpDetails.getEmail());
         user.setPassword(passwordEncoder.encode(signUpDetails.getPassword()));
-        user.setRole(roleRepo.searchAllByNameContainingIgnoreCase("admin").get(0));
+        user.setRole(roleRepo.searchAllByNameContainingIgnoreCase("admin").getFirst());
 
         try {
             tenantRepo.save(tenant);
