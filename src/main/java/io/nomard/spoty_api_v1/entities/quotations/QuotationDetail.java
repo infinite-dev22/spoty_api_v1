@@ -62,11 +62,15 @@ public class QuotationDetail implements Serializable {
     @Column(nullable = false)
     @Builder.Default
     private int quantity = 0;
+    @JsonIgnore
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private User createdBy;
+    @JsonIgnore
     private LocalDateTime updatedAt;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private User updatedBy;
 
     @Override

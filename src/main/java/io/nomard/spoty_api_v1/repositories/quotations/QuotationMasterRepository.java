@@ -17,6 +17,6 @@ public interface QuotationMasterRepository extends PagingAndSortingRepository<Qu
             "AND TRIM(LOWER(qm.ref)) LIKE %:search%")
     ArrayList<QuotationMaster> searchAll(@Param("tenantId") Long tenantId, @Param("search") String search);
 
-    @Query("select p from QuotationMaster p where p.tenant.id = :id")
-    Page<QuotationMaster> findAllByTenantId(@Param("id") Long id, Pageable pageable);
+    @Query("select qm from QuotationMaster qm where qm.tenant.id = :tenantId AND (qm.approved = true OR qm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId) > 0)")
+    Page<QuotationMaster> findAllByTenantId(@Param("tenantId") Long tenantId, @Param("userId") Long userId, Pageable pageable);
 }

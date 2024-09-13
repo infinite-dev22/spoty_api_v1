@@ -1,11 +1,15 @@
 package io.nomard.spoty_api_v1.services.implementations.quotations;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.Approver;
 import io.nomard.spoty_api_v1.entities.quotations.QuotationMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.models.ApprovalModel;
 import io.nomard.spoty_api_v1.repositories.quotations.QuotationMasterRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
+import io.nomard.spoty_api_v1.services.implementations.ApproverServiceImpl;
+import io.nomard.spoty_api_v1.services.implementations.TenantSettingsServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.deductions.DiscountServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.deductions.TaxServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.quotations.QuotationService;
@@ -13,6 +17,7 @@ import io.nomard.spoty_api_v1.utils.CoreCalculations;
 import io.nomard.spoty_api_v1.utils.CoreUtils;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -32,7 +37,7 @@ import java.util.logging.Level;
 @Log
 public class QuotationServiceImpl implements QuotationService {
     @Autowired
-    private QuotationMasterRepository quotationMasterRepo;
+    private QuotationMasterRepository quotationRepo;
     @Autowired
     private AuthServiceImpl authService;
     @Autowired
@@ -41,25 +46,29 @@ public class QuotationServiceImpl implements QuotationService {
     private TaxServiceImpl taxService;
     @Autowired
     private DiscountServiceImpl discountService;
+    @Autowired
+    private TenantSettingsServiceImpl settingsService;
+    @Autowired
+    private ApproverServiceImpl approverService;
 
     @Override
     public Page<QuotationMaster> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return quotationMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+        return quotationRepo.findAllByTenantId(authService.authUser().getTenant().getId(), authService.authUser().getId(), pageRequest);
     }
 
     @Override
     public QuotationMaster getById(Long id) throws NotFoundException {
-        Optional<QuotationMaster> quotationMaster = quotationMasterRepo.findById(id);
-        if (quotationMaster.isEmpty()) {
+        Optional<QuotationMaster> quotation = quotationRepo.findById(id);
+        if (quotation.isEmpty()) {
             throw new NotFoundException();
         }
-        return quotationMaster.get();
+        return quotation.get();
     }
 
     @Override
     public ArrayList<QuotationMaster> getByContains(String search) {
-        return quotationMasterRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
+        return quotationRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
     }
 
     @Override
@@ -77,8 +86,28 @@ public class QuotationServiceImpl implements QuotationService {
         if (Objects.isNull(quotation.getBranch())) {
             quotation.setBranch(authService.authUser().getBranch());
         }
+        if (settingsService.getSettings().getApproveAdjustments()) {
+            Approver approver = null;
+            try {
+                approver = approverService.getByUserId(authService.authUser().getId());
+            } catch (NotFoundException e) {
+                log.log(Level.ALL, e.getMessage(), e);
+            }
+            if (Objects.nonNull(approver)) {
+                quotation.getApprovers().add(approver);
+                quotation.setLatestApprovedLevel(approver.getLevel());
+                if (approver.getLevel() >= settingsService.getSettings().getApprovalLevels()) {
+                    quotation.setApproved(true);
+                }
+            } else {
+                quotation.setApproved(false);
+            }
+            quotation.setApprovalStatus("Pending");
+        } else {
+            quotation.setApproved(true);
+        }
         try {
-            quotationMasterRepo.save(quotation);
+            quotationRepo.save(quotation);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
@@ -89,7 +118,7 @@ public class QuotationServiceImpl implements QuotationService {
     @Override
     @Transactional
     public ResponseEntity<ObjectNode> update(QuotationMaster data) throws NotFoundException {
-        var opt = quotationMasterRepo.findById(data.getId());
+        var opt = quotationRepo.findById(data.getId());
 
         if (opt.isEmpty()) {
             throw new NotFoundException();
@@ -133,11 +162,59 @@ public class QuotationServiceImpl implements QuotationService {
             quotation.setNotes(data.getNotes());
         }
 
+        if (Objects.nonNull(data.getApprovers()) && !data.getApprovers().isEmpty()) {
+            quotation.getApprovers().add(data.getApprovers().getFirst());
+            if (quotation.getLatestApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+                quotation.setApproved(true);
+            }
+        }
+
         quotation.setUpdatedBy(authService.authUser());
         quotation.setUpdatedAt(LocalDateTime.now());
 
         try {
-            quotationMasterRepo.save(quotation);
+            quotationRepo.save(quotation);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+        }
+    }
+
+    @Override
+    @CacheEvict(value = "adjustment_masters", key = "#approvalModel.id")
+    @Transactional
+    public ResponseEntity<ObjectNode> approve(ApprovalModel approvalModel) throws NotFoundException {
+        var opt = quotationRepo.findById(approvalModel.getId());
+        if (opt.isEmpty()) {
+            throw new NotFoundException();
+        }
+        var adjustmentMaster = opt.get();
+
+        if (Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")) {
+            adjustmentMaster.setApproved(false);
+            adjustmentMaster.setApprovalStatus("Returned");
+        }
+
+        if (Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")) {
+            var approver = approverService.getByUserId(authService.authUser().getId());
+            adjustmentMaster.getApprovers().add(approver);
+            adjustmentMaster.setLatestApprovedLevel(approver.getLevel());
+            if (adjustmentMaster.getLatestApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+                adjustmentMaster.setApproved(true);
+            }
+        }
+
+        if (Objects.equals(approvalModel.getStatus().toLowerCase(), "rejected")) {
+            adjustmentMaster.setApproved(false);
+            adjustmentMaster.setApprovalStatus("Rejected");
+            adjustmentMaster.setLatestApprovedLevel(0);
+        }
+
+        adjustmentMaster.setUpdatedBy(authService.authUser());
+        adjustmentMaster.setUpdatedAt(LocalDateTime.now());
+        try {
+            quotationRepo.save(adjustmentMaster);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
@@ -149,7 +226,7 @@ public class QuotationServiceImpl implements QuotationService {
     @Transactional
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
-            quotationMasterRepo.deleteById(id);
+            quotationRepo.deleteById(id);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
@@ -160,7 +237,7 @@ public class QuotationServiceImpl implements QuotationService {
     @Override
     public ResponseEntity<ObjectNode> deleteMultiple(List<Long> idList) {
         try {
-            quotationMasterRepo.deleteAllById(idList);
+            quotationRepo.deleteAllById(idList);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
