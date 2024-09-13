@@ -9,10 +9,12 @@ import io.nomard.spoty_api_v1.repositories.UserRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.UserService;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,8 +25,10 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.logging.Level;
 
 @Service
+@Log
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepo;
@@ -34,6 +38,8 @@ public class UserServiceImpl implements UserService {
     private SpotyResponseImpl spotyResponseImpl;
     @Autowired
     private EmailServiceImpl emailServiceImpl;
+    @Autowired
+    private TenantSettingsServiceImpl settingsService;
 
     @Override
     public Page<User> getAll(int pageNo, int pageSize) {
@@ -131,7 +137,8 @@ public class UserServiceImpl implements UserService {
 
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 
@@ -143,7 +150,8 @@ public class UserServiceImpl implements UserService {
 
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 
@@ -186,15 +194,21 @@ public class UserServiceImpl implements UserService {
 
         try {
             userRepo.save(user);
+        } catch (Exception e) {
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+        }
 
+        try {
             var content = "<html><h1>These are your employment details</h1><p>Email: " + user.getEmail() + "</p><p>Password: " + password + "</p></html>";
 
-            emailServiceImpl.sendSimpleMessage("mwigojm@gmail.com", user.getEmail(), "Employment Letter & Work Details", content);
-            emailServiceImpl.sendMessageWithAttachment("mwigojm@gmail.com", user.getEmail(), "Employment Letter & Work Details", content, "/home/infinite/Documents/Job_Search/Resume_Jonathan_Mark_Mwigo.pdf");
-
-            return spotyResponseImpl.created();
+            emailServiceImpl.sendSimpleMessage(settingsService.getSettings().getHrEmail(), user.getEmail(), "Employment Letter & Work Details", content);
+            emailServiceImpl.sendMessageWithAttachment(settingsService.getSettings().getHrEmail(), user.getEmail(), "Employment Letter & Work Details", content, "/home/infinite/Documents/Job_Search/Resume_Jonathan_Mark_Mwigo.pdf");
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
+
+        return spotyResponseImpl.created();
     }
 }
