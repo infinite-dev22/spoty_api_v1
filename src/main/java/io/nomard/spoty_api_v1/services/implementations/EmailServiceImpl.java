@@ -38,7 +38,7 @@ public class EmailServiceImpl implements EmailService {
         helper.setFrom(from);
         helper.setTo(to);
         helper.setSubject(subject);
-        helper.setText(body);
+        helper.setText(body, true);
         helper.addAttachment("Attachment", file);
 
         emailSender.send(message);
