@@ -17,6 +17,6 @@ public interface AdjustmentMasterRepository extends PagingAndSortingRepository<A
             "AND TRIM(LOWER(am.ref)) LIKE %:search%")
     List<AdjustmentMaster> searchAll(@Param("tenantId") Long tenantId, @Param("search") String search);
 
-    @Query("select p from AdjustmentMaster p where p.tenant.id = :id")
-    Page<AdjustmentMaster> findAllByTenantId(@Param("id") Long id, Pageable pageable);
+    @Query("SELECT am FROM AdjustmentMaster am WHERE am.tenant.id = :tenantId AND (am.approved = true OR am.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId) > 0)")
+    Page<AdjustmentMaster> findAllByTenantId(@Param("tenantId") Long tenantId, @Param("userId") Long userId, Pageable pageable);
 }

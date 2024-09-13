@@ -4,6 +4,7 @@ package io.nomard.spoty_api_v1.controllers;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.adjustments.AdjustmentMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.models.ApprovalModel;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.adjustments.AdjustmentServiceImpl;
@@ -46,6 +47,11 @@ public class AdjustmentController {
     @PutMapping("/update")
     public ResponseEntity<ObjectNode> updateMaster(@Valid @RequestBody AdjustmentMaster adjustmentMaster) throws NotFoundException {
         return adjustmentMasterService.update(adjustmentMaster);
+    }
+
+    @PutMapping("/approve")
+    public ResponseEntity<ObjectNode> approve(@RequestBody ApprovalModel approvalModel) throws NotFoundException {
+        return adjustmentMasterService.approve(approvalModel);
     }
 
     @DeleteMapping("/delete/single")
