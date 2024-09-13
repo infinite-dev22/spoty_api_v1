@@ -44,8 +44,10 @@ public interface PurchaseMasterRepository extends PagingAndSortingRepository<Pur
             "AND TRIM(LOWER(pm.ref)) LIKE %:search%")
     ArrayList<PurchaseMaster> searchAll(@Param("tenantId") Long tenantId, @Param("search") String search);
 
-    @Query("select p from PurchaseMaster p where p.tenant.id = :id")
-    Page<PurchaseMaster> findAllByTenantId(@Param("id") Long id, Pageable pageable);
+    @Query("select pm from PurchaseMaster pm where pm.tenant.id = :tenantId " +
+            "AND (pm.approved = true OR pm.createdBy.id = :userId OR " +
+            "(SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId) > 0)")
+    Page<PurchaseMaster> findAllByTenantId(@Param("tenantId") Long tenantId, @Param("userId") Long userId, Pageable pageable);
 
     @Query("SELECT new io.nomard.spoty_api_v1.models.DashboardKPIModel('Total Purchases', SUM(s.amountPaid)) " +
             "FROM PurchaseMaster s " +
