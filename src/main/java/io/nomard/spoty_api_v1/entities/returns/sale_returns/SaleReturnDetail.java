@@ -51,11 +51,15 @@ public class SaleReturnDetail implements Serializable {
     private double unitPrice = 0;
     @Column(nullable = false)
     private Long quantity;
+    @JsonIgnore
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private User createdBy;
+    @JsonIgnore
     private LocalDateTime updatedAt;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private User updatedBy;
 
     @Override

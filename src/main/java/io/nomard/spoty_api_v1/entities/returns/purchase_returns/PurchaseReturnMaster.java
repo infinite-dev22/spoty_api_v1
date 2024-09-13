@@ -15,10 +15,7 @@
 package io.nomard.spoty_api_v1.entities.returns.purchase_returns;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.nomard.spoty_api_v1.entities.Branch;
-import io.nomard.spoty_api_v1.entities.Supplier;
-import io.nomard.spoty_api_v1.entities.Tenant;
-import io.nomard.spoty_api_v1.entities.User;
+import io.nomard.spoty_api_v1.entities.*;
 import io.nomard.spoty_api_v1.entities.deductions.Discount;
 import io.nomard.spoty_api_v1.entities.deductions.Tax;
 import io.nomard.spoty_api_v1.entities.purchases.PurchaseMaster;
@@ -77,6 +74,14 @@ public class PurchaseReturnMaster implements Serializable {
     private String purchaseStatus;
     private String paymentStatus;
     private String notes;
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @Builder.Default
+    private List<Approver> approvers = new ArrayList<>();
+    @Builder.Default
+    private Boolean approved = false;
+    @Builder.Default
+    private Integer latestApprovedLevel = 0;
+    private String approvalStatus;
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
     private User createdBy;
