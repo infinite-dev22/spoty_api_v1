@@ -15,11 +15,22 @@
 package io.nomard.spoty_api_v1.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.nomard.spoty_api_v1.entities.adjustments.AdjustmentMaster;
+import io.nomard.spoty_api_v1.entities.purchases.PurchaseMaster;
+import io.nomard.spoty_api_v1.entities.quotations.QuotationMaster;
+import io.nomard.spoty_api_v1.entities.requisitions.RequisitionMaster;
+import io.nomard.spoty_api_v1.entities.returns.purchase_returns.PurchaseReturnMaster;
+import io.nomard.spoty_api_v1.entities.returns.sale_returns.SaleReturnMaster;
+import io.nomard.spoty_api_v1.entities.sales.SaleMaster;
+import io.nomard.spoty_api_v1.entities.stock_ins.StockInMaster;
+import io.nomard.spoty_api_v1.entities.transfers.TransferMaster;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -41,12 +52,52 @@ public class Approver {
     private Branch branch;
     @ManyToOne(fetch = FetchType.LAZY)
     private User employee;
+    @ManyToMany(mappedBy = "approvers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @Builder.Default
+    @JsonIgnore
+    private List<AdjustmentMaster> adjustments = new ArrayList<>();
+    @ManyToMany(mappedBy = "approvers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @Builder.Default
+    @JsonIgnore
+    private List<PurchaseMaster> purchases = new ArrayList<>();
+    @ManyToMany(mappedBy = "approvers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @Builder.Default
+    @JsonIgnore
+    private List<QuotationMaster> quotations = new ArrayList<>();
+    @ManyToMany(mappedBy = "approvers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @Builder.Default
+    @JsonIgnore
+    private List<RequisitionMaster> requisitions = new ArrayList<>();
+    @ManyToMany(mappedBy = "approvers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @Builder.Default
+    @JsonIgnore
+    private List<SaleMaster> sales = new ArrayList<>();
+    @ManyToMany(mappedBy = "approvers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @Builder.Default
+    @JsonIgnore
+    private List<StockInMaster> stockIns = new ArrayList<>();
+    @ManyToMany(mappedBy = "approvers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @Builder.Default
+    @JsonIgnore
+    private List<TransferMaster> transfers = new ArrayList<>();
+    @ManyToMany(mappedBy = "approvers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @Builder.Default
+    @JsonIgnore
+    private List<SaleReturnMaster> saleReturns = new ArrayList<>();
+    @ManyToMany(mappedBy = "approvers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @Builder.Default
+    @JsonIgnore
+    private List<PurchaseReturnMaster> purchaseReturns = new ArrayList<>();
     private Integer level;
+    @JsonIgnore
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private User createdBy;
+    @JsonIgnore
     private LocalDateTime updatedAt;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private User updatedBy;
 
     @Override

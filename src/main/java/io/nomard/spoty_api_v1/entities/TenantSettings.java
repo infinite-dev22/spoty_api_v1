@@ -38,6 +38,22 @@ public class TenantSettings {
     private String facebook;
     private String linkedIn;
     @Builder.Default
+    private Boolean approveAdjustments = true;
+    @Builder.Default
+    private Boolean approveRequisitions = true;
+    @Builder.Default
+    private Boolean approveTransfers = true;
+    @Builder.Default
+    private Boolean approveStockIns = false;
+    @Builder.Default
+    private Boolean approveQuotations = false;
+    @Builder.Default
+    private Boolean approvePurchases = false;
+    @Builder.Default
+    private Boolean approveSaleReturns = false;
+    @Builder.Default
+    private Boolean approvePurchaseReturns = false;
+    @Builder.Default
     private Integer approvalLevels = 0;
     @OneToMany(orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default

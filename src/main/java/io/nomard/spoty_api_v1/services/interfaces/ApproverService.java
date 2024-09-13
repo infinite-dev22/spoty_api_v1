@@ -12,6 +12,8 @@ public interface ApproverService {
 
     Approver getById(Long id) throws NotFoundException;
 
+    Approver getByUserId(Long id) throws NotFoundException;
+
     ResponseEntity<ObjectNode> save(Approver approver);
 
     ResponseEntity<ObjectNode> delete(Long id);

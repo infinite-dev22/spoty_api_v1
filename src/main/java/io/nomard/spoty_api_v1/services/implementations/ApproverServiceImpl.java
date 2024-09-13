@@ -41,6 +41,15 @@ public class ApproverServiceImpl implements ApproverService {
     }
 
     @Override
+    public Approver getByUserId(Long id) throws NotFoundException {
+        Optional<Approver> approver = approverRepo.findByUserId(id);
+        if (approver.isEmpty()) {
+            throw new NotFoundException("User is not an approver");
+        }
+        return approver.get();
+    }
+
+    @Override
     @Transactional
     public ResponseEntity<ObjectNode> save(Approver approver) {
         try {
