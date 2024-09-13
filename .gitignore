@@ -38,3 +38,5 @@ out/
 
 ### Profiler ###
 .profileconfig.json
+
+data

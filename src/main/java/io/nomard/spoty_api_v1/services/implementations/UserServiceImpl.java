@@ -32,6 +32,8 @@ public class UserServiceImpl implements UserService {
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
+    @Autowired
+    private EmailServiceImpl emailServiceImpl;
 
     @Override
     public Page<User> getAll(int pageNo, int pageSize) {
@@ -165,15 +167,16 @@ public class UserServiceImpl implements UserService {
         userProfile.setCreatedBy(authService.authUser());
         userProfile.setCreatedAt(LocalDateTime.now());
 
+        var password = UUID.randomUUID().toString().substring(0, 12);
         user.setUserProfile(userProfile);
         user.setTenant(data.getTenant());
         user.setBranch(data.getBranch());
         user.setEmail(data.getEmail());
         user.setSalary(data.getSalary());
-        user.setPassword(new BCryptPasswordEncoder(8).encode(UUID.randomUUID().toString().substring(0, 12)));
+        user.setPassword(new BCryptPasswordEncoder(8).encode(password));
         user.setRole(data.getRole());
-        user.setActive(data.isActive());
-        user.setLocked(data.isLocked());
+        user.setActive(true);
+        user.setLocked(false);
         if (Objects.isNull(user.getBranch())) {
             user.setBranch(authService.authUser().getBranch());
         }
@@ -183,6 +186,11 @@ public class UserServiceImpl implements UserService {
 
         try {
             userRepo.save(user);
+
+            var content = "<html><h1>These are your employment details</h1><p>Email: " + user.getEmail() + "</p><p>Password: " + password + "</p></html>";
+
+            emailServiceImpl.sendSimpleMessage("mwigojm@gmail.com", user.getEmail(), "Employment Letter & Work Details", content);
+            emailServiceImpl.sendMessageWithAttachment("mwigojm@gmail.com", user.getEmail(), "Employment Letter & Work Details", content, "/home/infinite/Documents/Job_Search/Resume_Jonathan_Mark_Mwigo.pdf");
 
             return spotyResponseImpl.created();
         } catch (Exception e) {
