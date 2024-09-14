@@ -1,14 +1,18 @@
 package io.nomard.spoty_api_v1.services.implementations.returns.purchase_returns;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.Approver;
 import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
 import io.nomard.spoty_api_v1.entities.returns.purchase_returns.PurchaseReturnDetail;
 import io.nomard.spoty_api_v1.entities.returns.purchase_returns.PurchaseReturnMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.models.ApprovalModel;
 import io.nomard.spoty_api_v1.repositories.returns.purchase_returns.PurchaseReturnMasterRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
+import io.nomard.spoty_api_v1.services.implementations.ApproverServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.ProductServiceImpl;
+import io.nomard.spoty_api_v1.services.implementations.TenantSettingsServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.accounting.AccountServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.accounting.AccountTransactionServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.deductions.DiscountServiceImpl;
@@ -17,6 +21,7 @@ import io.nomard.spoty_api_v1.services.interfaces.returns.purchase_returns.Purch
 import io.nomard.spoty_api_v1.utils.CoreCalculations;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -51,11 +56,15 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
     private TaxServiceImpl taxService;
     @Autowired
     private DiscountServiceImpl discountService;
+    @Autowired
+    private TenantSettingsServiceImpl settingsService;
+    @Autowired
+    private ApproverServiceImpl approverService;
 
     @Override
     public Page<PurchaseReturnMaster> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return purchaseReturnRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+        return purchaseReturnRepo.findAllByTenantId(authService.authUser().getTenant().getId(), authService.authUser().getId(), pageRequest);
     }
 
     @Override
@@ -84,34 +93,37 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
         if (purchase.getBranch() == null) {
             purchase.setBranch(authService.authUser().getBranch());
         }
+        if (settingsService.getSettings().getApproveAdjustments()) {
+            Approver approver = null;
+            try {
+                approver = approverService.getByUserId(authService.authUser().getId());
+            } catch (NotFoundException e) {
+                log.log(Level.ALL, e.getMessage(), e);
+            }
+            if (Objects.nonNull(approver)) {
+                purchase.getApprovers().add(approver);
+                purchase.setLatestApprovedLevel(approver.getLevel());
+                if (approver.getLevel() >= settingsService.getSettings().getApprovalLevels()) {
+                    purchase.setApproved(true);
+                    purchase.setApprovalStatus("Approved");
+                    createAccountTransaction(purchase);
+                    updateProductCost(purchase);
+                }
+            } else {
+                purchase.setApproved(false);
+            }
+            purchase.setApprovalStatus("Pending");
+        } else {
+            purchase.setApproved(true);
+            purchase.setApprovalStatus("Approved");
+            createAccountTransaction(purchase);
+            updateProductCost(purchase);
+        }
         purchase.setCreatedBy(authService.authUser());
         purchase.setCreatedAt(LocalDateTime.now());
 
         try {
             purchaseReturnRepo.save(purchase);
-
-            // Create account transaction of this purchase.
-            var account = accountService.getByContains(authService.authUser().getTenant(), "Default Account");
-            var accountTransaction = new AccountTransaction();
-            accountTransaction.setTenant(authService.authUser().getTenant());
-            accountTransaction.setTransactionDate(LocalDateTime.now());
-            accountTransaction.setAccount(account);
-            accountTransaction.setAmount(purchase.getTotal());
-            accountTransaction.setTransactionType("Purchase");
-            accountTransaction.setNote("Purchase made");
-            accountTransaction.setCreatedBy(authService.authUser());
-            accountTransaction.setCreatedAt(LocalDateTime.now());
-            accountTransactionService.save(accountTransaction);
-
-            // Check if product cost price needs to be updated.
-            for (PurchaseReturnDetail detail : purchase.getPurchaseReturnDetails()) {
-                var product = productService.getById(detail.getProduct().getId());
-                if (!Objects.equals(product.getCostPrice(), detail.getUnitCost())) {
-                    product.setCostPrice(detail.getUnitCost());
-                    productService.save(product);
-                }
-            }
-
             return spotyResponseImpl.created();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
@@ -159,6 +171,15 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
         if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
             purchase.setNotes(data.getNotes());
         }
+        if (Objects.nonNull(data.getApprovers()) && !data.getApprovers().isEmpty()) {
+            purchase.getApprovers().add(data.getApprovers().getFirst());
+            if (purchase.getLatestApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+                purchase.setApproved(true);
+                purchase.setApprovalStatus("Approved");
+                createAccountTransaction(purchase);
+                updateProductCost(purchase);
+            }
+        }
 
         purchase.setUpdatedBy(authService.authUser());
         purchase.setUpdatedAt(LocalDateTime.now());
@@ -175,6 +196,50 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
                 }
             }
 
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+        }
+    }
+
+    @Override
+    @CacheEvict(value = "purchase_masters", key = "#approvalModel.id")
+    @Transactional
+    public ResponseEntity<ObjectNode> approve(ApprovalModel approvalModel) throws NotFoundException {
+        var opt = purchaseReturnRepo.findById(approvalModel.getId());
+        if (opt.isEmpty()) {
+            throw new NotFoundException();
+        }
+        var purchase = opt.get();
+
+        if (Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")) {
+            purchase.setApproved(false);
+            purchase.setApprovalStatus("Returned");
+        }
+
+        if (Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")) {
+            var approver = approverService.getByUserId(authService.authUser().getId());
+            purchase.getApprovers().add(approver);
+            purchase.setLatestApprovedLevel(approver.getLevel());
+            if (purchase.getLatestApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+                purchase.setApproved(true);
+                purchase.setApprovalStatus("Approved");
+                createAccountTransaction(purchase);
+                updateProductCost(purchase);
+            }
+        }
+
+        if (Objects.equals(approvalModel.getStatus().toLowerCase(), "rejected")) {
+            purchase.setApproved(false);
+            purchase.setApprovalStatus("Rejected");
+            purchase.setLatestApprovedLevel(0);
+        }
+
+        purchase.setUpdatedBy(authService.authUser());
+        purchase.setUpdatedAt(LocalDateTime.now());
+        try {
+            purchaseReturnRepo.save(purchase);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
@@ -202,6 +267,32 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+        }
+    }
+
+    public void createAccountTransaction(PurchaseReturnMaster purchase) {
+        // Create account transaction of this purchase.
+        var account = accountService.getByContains(authService.authUser().getTenant(), "Default Account");
+        var accountTransaction = new AccountTransaction();
+        accountTransaction.setTenant(authService.authUser().getTenant());
+        accountTransaction.setTransactionDate(LocalDateTime.now());
+        accountTransaction.setAccount(account);
+        accountTransaction.setAmount(purchase.getTotal());
+        accountTransaction.setTransactionType("Purchase Returns");
+        accountTransaction.setNote("Purchase return made");
+        accountTransaction.setCreatedBy(authService.authUser());
+        accountTransaction.setCreatedAt(LocalDateTime.now());
+        accountTransactionService.save(accountTransaction);
+    }
+
+    public void updateProductCost(PurchaseReturnMaster purchase) throws NotFoundException {
+        // Check if product cost price needs to be updated.
+        for (PurchaseReturnDetail detail : purchase.getPurchaseReturnDetails()) {
+            var product = productService.getById(detail.getProduct().getId());
+            if (!Objects.equals(product.getCostPrice(), detail.getUnitCost())) {
+                product.setCostPrice(detail.getUnitCost());
+                productService.save(product);
+            }
         }
     }
 }
