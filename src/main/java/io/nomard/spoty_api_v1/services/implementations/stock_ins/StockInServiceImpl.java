@@ -168,6 +168,7 @@ public class StockInServiceImpl implements StockInService {
 
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")) {
             stockIn.setApproved(false);
+            stockIn.setLatestApprovedLevel(stockIn.getLatestApprovedLevel() - 1);
             stockIn.setApprovalStatus("Returned");
         }
 

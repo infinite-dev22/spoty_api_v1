@@ -212,6 +212,7 @@ public class SaleReturnServiceImpl implements SaleReturnService {
 
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")) {
             sale.setApproved(false);
+            sale.setLatestApprovedLevel(sale.getLatestApprovedLevel() - 1);
             sale.setApprovalStatus("Returned");
         }
 

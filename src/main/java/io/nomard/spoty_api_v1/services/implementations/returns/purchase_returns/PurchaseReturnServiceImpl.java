@@ -215,6 +215,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
 
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")) {
             purchase.setApproved(false);
+            purchase.setLatestApprovedLevel(purchase.getLatestApprovedLevel() - 1);
             purchase.setApprovalStatus("Returned");
         }
 

@@ -196,6 +196,7 @@ public class QuotationServiceImpl implements QuotationService {
 
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")) {
             quotation.setApproved(false);
+            quotation.setLatestApprovedLevel(quotation.getLatestApprovedLevel() - 1);
             quotation.setApprovalStatus("Returned");
         }
 

@@ -177,6 +177,7 @@ public class TransferServiceImpl implements TransferService {
 
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")) {
             transfer.setApproved(false);
+            transfer.setLatestApprovedLevel(transfer.getLatestApprovedLevel() - 1);
             transfer.setApprovalStatus("Returned");
         }
 

@@ -173,6 +173,7 @@ public class RequisitionServiceImpl implements RequisitionService {
 
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")) {
             requisition.setApproved(false);
+            requisition.setLatestApprovedLevel(requisition.getLatestApprovedLevel() - 1);
             requisition.setApprovalStatus("Returned");
         }
 

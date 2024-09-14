@@ -171,6 +171,7 @@ public class AdjustmentServiceImpl implements AdjustmentService {
 
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")) {
             adjustment.setApproved(false);
+            adjustment.setLatestApprovedLevel(adjustment.getLatestApprovedLevel() - 1);
             adjustment.setApprovalStatus("Returned");
         }
 
