@@ -120,7 +120,7 @@ public class MainDashboardServiceImpl implements MainDashboardService {
     @Transactional(readOnly = true)
     public List<SaleMaster> getRecentOrders(@RequestParam(defaultValue = "10") Integer limit) {
         PageRequest pageRequest = PageRequest.of(0, limit, Sort.by("createdAt").descending());
-        return saleMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest).getContent();
+        return saleMasterRepo.findAllByTenantId(authService.authUser().getTenant().getId(), authService.authUser().getId(), pageRequest).getContent();
     }
 
     @Override

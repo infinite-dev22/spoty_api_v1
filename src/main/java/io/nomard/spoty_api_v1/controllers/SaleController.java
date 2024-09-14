@@ -4,6 +4,7 @@ package io.nomard.spoty_api_v1.controllers;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.sales.SaleMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.models.ApprovalModel;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.sales.SaleServiceImpl;
@@ -46,6 +47,11 @@ public class SaleController {
     @PutMapping("/update")
     public ResponseEntity<ObjectNode> update(@Valid @RequestBody SaleMaster sale) throws NotFoundException {
         return saleService.update(sale);
+    }
+
+    @PutMapping("/approve")
+    public ResponseEntity<ObjectNode> approve(@RequestBody ApprovalModel approvalModel) throws NotFoundException {
+        return saleService.approve(approvalModel);
     }
 
     @DeleteMapping("/delete/single")
