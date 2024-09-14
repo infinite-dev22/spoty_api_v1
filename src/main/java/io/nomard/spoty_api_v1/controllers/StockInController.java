@@ -4,6 +4,7 @@ package io.nomard.spoty_api_v1.controllers;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.stock_ins.StockInMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.models.ApprovalModel;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.stock_ins.StockInServiceImpl;
@@ -45,6 +46,11 @@ public class StockInController {
     @PutMapping("/update")
     public ResponseEntity<ObjectNode> update(@Valid @RequestBody StockInMaster stockIn) throws NotFoundException {
         return stockInService.update(stockIn);
+    }
+
+    @PutMapping("/approve")
+    public ResponseEntity<ObjectNode> approve(@RequestBody ApprovalModel approvalModel) throws NotFoundException {
+        return stockInService.approve(approvalModel);
     }
 
     @DeleteMapping("/delete/single")
