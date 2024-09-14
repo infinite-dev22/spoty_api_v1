@@ -17,6 +17,6 @@ public interface SaleReturnMasterRepository extends PagingAndSortingRepository<S
             "AND TRIM(LOWER(srm.ref)) LIKE %:search%")
     ArrayList<SaleReturnMaster> searchAll(@Param("tenantId") Long tenantId, @Param("search") String search);
 
-    @Query("select p from SaleReturnMaster p where p.tenant.id = :id")
-    Page<SaleReturnMaster> findAllByTenantId(@Param("id") Long id, Pageable pageable);
+    @Query("select srm from SaleReturnMaster srm where srm.tenant.id = :tenantId AND (srm.approved = true OR srm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId) > 0)")
+    Page<SaleReturnMaster> findAllByTenantId(@Param("tenantId") Long tenantId, @Param("userId") Long userId, Pageable pageable);
 }

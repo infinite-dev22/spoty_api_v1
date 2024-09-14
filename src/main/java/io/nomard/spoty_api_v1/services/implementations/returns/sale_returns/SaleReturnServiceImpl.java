@@ -1,17 +1,20 @@
 package io.nomard.spoty_api_v1.services.implementations.returns.sale_returns;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.Approver;
 import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
 import io.nomard.spoty_api_v1.entities.returns.sale_returns.SaleReturnMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.models.ApprovalModel;
 import io.nomard.spoty_api_v1.repositories.returns.sale_returns.SaleReturnMasterRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
+import io.nomard.spoty_api_v1.services.implementations.ApproverServiceImpl;
+import io.nomard.spoty_api_v1.services.implementations.TenantSettingsServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.accounting.AccountServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.accounting.AccountTransactionServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.deductions.DiscountServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.deductions.TaxServiceImpl;
-import io.nomard.spoty_api_v1.services.implementations.sales.SaleTransactionServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.returns.sale_returns.SaleReturnService;
 import io.nomard.spoty_api_v1.utils.CoreCalculations;
 import lombok.extern.java.Log;
@@ -39,8 +42,6 @@ public class SaleReturnServiceImpl implements SaleReturnService {
     @Autowired
     private SaleReturnMasterRepository saleReturnRepo;
     @Autowired
-    private SaleTransactionServiceImpl saleTransactionService;
-    @Autowired
     private AccountTransactionServiceImpl accountTransactionService;
     @Autowired
     private AccountServiceImpl accountService;
@@ -52,13 +53,17 @@ public class SaleReturnServiceImpl implements SaleReturnService {
     private TaxServiceImpl taxService;
     @Autowired
     private DiscountServiceImpl discountService;
+    @Autowired
+    private TenantSettingsServiceImpl settingsService;
+    @Autowired
+    private ApproverServiceImpl approverService;
 
     @Override
     @Cacheable("sale_masters")
     @Transactional(readOnly = true)
     public Page<SaleReturnMaster> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return saleReturnRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+        return saleReturnRepo.findAllByTenantId(authService.authUser().getTenant().getId(), authService.authUser().getId(), pageRequest);
     }
 
     @Override
@@ -91,25 +96,35 @@ public class SaleReturnServiceImpl implements SaleReturnService {
         if (Objects.isNull(sale.getBranch())) {
             sale.setBranch(authService.authUser().getBranch());
         }
+        if (settingsService.getSettings().getApproveAdjustments()) {
+            Approver approver = null;
+            try {
+                approver = approverService.getByUserId(authService.authUser().getId());
+            } catch (NotFoundException e) {
+                log.log(Level.ALL, e.getMessage(), e);
+            }
+            if (Objects.nonNull(approver)) {
+                sale.getApprovers().add(approver);
+                sale.setLatestApprovedLevel(approver.getLevel());
+                if (approver.getLevel() >= settingsService.getSettings().getApprovalLevels()) {
+                    sale.setApproved(true);
+                    sale.setApprovalStatus("Approved");
+                    createAccountTransaction(sale);
+                }
+            } else {
+                sale.setApproved(false);
+            }
+            sale.setApprovalStatus("Pending");
+        } else {
+            sale.setApproved(true);
+            sale.setApprovalStatus("Approved");
+            createAccountTransaction(sale);
+        }
         sale.setCreatedBy(authService.authUser());
         sale.setCreatedAt(LocalDateTime.now());
 
         try {
             saleReturnRepo.save(sale);
-
-            // Create account transaction of this sale.
-            var account = accountService.getByContains(authService.authUser().getTenant(), "Default Account");
-            var accountTransaction = new AccountTransaction();
-            accountTransaction.setTenant(authService.authUser().getTenant());
-            accountTransaction.setTransactionDate(LocalDateTime.now());
-            accountTransaction.setAccount(account);
-            accountTransaction.setAmount(sale.getTotal());
-            accountTransaction.setTransactionType("Sale");
-            accountTransaction.setNote("Sale made");
-            accountTransaction.setCreatedBy(authService.authUser());
-            accountTransaction.setCreatedAt(LocalDateTime.now());
-            accountTransactionService.save(accountTransaction);
-
             return spotyResponseImpl.created();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
@@ -166,6 +181,57 @@ public class SaleReturnServiceImpl implements SaleReturnService {
         if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
             sale.setNotes(data.getNotes());
         }
+        if (Objects.nonNull(data.getApprovers()) && !data.getApprovers().isEmpty()) {
+            sale.getApprovers().add(data.getApprovers().getFirst());
+            if (sale.getLatestApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+                sale.setApproved(true);
+                sale.setApprovalStatus("Approved");
+                createAccountTransaction(sale);
+            }
+        }
+        sale.setUpdatedBy(authService.authUser());
+        sale.setUpdatedAt(LocalDateTime.now());
+        try {
+            saleReturnRepo.save(sale);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+        }
+    }
+
+    @Override
+    @CacheEvict(value = "sale_masters", key = "#approvalModel.id")
+    @Transactional
+    public ResponseEntity<ObjectNode> approve(ApprovalModel approvalModel) throws NotFoundException {
+        var opt = saleReturnRepo.findById(approvalModel.getId());
+        if (opt.isEmpty()) {
+            throw new NotFoundException();
+        }
+        var sale = opt.get();
+
+        if (Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")) {
+            sale.setApproved(false);
+            sale.setApprovalStatus("Returned");
+        }
+
+        if (Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")) {
+            var approver = approverService.getByUserId(authService.authUser().getId());
+            sale.getApprovers().add(approver);
+            sale.setLatestApprovedLevel(approver.getLevel());
+            if (sale.getLatestApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+                sale.setApproved(true);
+                sale.setApprovalStatus("Approved");
+                createAccountTransaction(sale);
+            }
+        }
+
+        if (Objects.equals(approvalModel.getStatus().toLowerCase(), "rejected")) {
+            sale.setApproved(false);
+            sale.setApprovalStatus("Rejected");
+            sale.setLatestApprovedLevel(0);
+        }
+
         sale.setUpdatedBy(authService.authUser());
         sale.setUpdatedAt(LocalDateTime.now());
         try {
@@ -198,5 +264,20 @@ public class SaleReturnServiceImpl implements SaleReturnService {
             log.log(Level.ALL, e.getMessage(), e);
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
+    }
+
+    public void createAccountTransaction(SaleReturnMaster sale) {
+        // Create account transaction of this sale.
+        var account = accountService.getByContains(authService.authUser().getTenant(), "Default Account");
+        var accountTransaction = new AccountTransaction();
+        accountTransaction.setTenant(authService.authUser().getTenant());
+        accountTransaction.setTransactionDate(LocalDateTime.now());
+        accountTransaction.setAccount(account);
+        accountTransaction.setAmount(sale.getTotal());
+        accountTransaction.setTransactionType("Sale Returns");
+        accountTransaction.setNote("Sale return made");
+        accountTransaction.setCreatedBy(authService.authUser());
+        accountTransaction.setCreatedAt(LocalDateTime.now());
+        accountTransactionService.save(accountTransaction);
     }
 }
