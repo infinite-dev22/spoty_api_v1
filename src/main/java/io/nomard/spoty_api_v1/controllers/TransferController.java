@@ -4,6 +4,7 @@ package io.nomard.spoty_api_v1.controllers;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.transfers.TransferMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.models.ApprovalModel;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.transfers.TransferServiceImpl;
@@ -45,6 +46,11 @@ public class TransferController {
     @PutMapping("/update")
     public ResponseEntity<ObjectNode> update(@Valid @RequestBody TransferMaster transfer) throws NotFoundException {
         return transferService.update(transfer);
+    }
+
+    @PutMapping("/approve")
+    public ResponseEntity<ObjectNode> approve(@RequestBody ApprovalModel approvalModel) throws NotFoundException {
+        return transferService.approve(approvalModel);
     }
 
     @DeleteMapping("/delete/single")

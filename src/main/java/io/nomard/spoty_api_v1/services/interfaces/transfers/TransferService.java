@@ -3,6 +3,7 @@ package io.nomard.spoty_api_v1.services.interfaces.transfers;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.transfers.TransferMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.models.ApprovalModel;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
@@ -18,6 +19,8 @@ public interface TransferService {
     ResponseEntity<ObjectNode> save(TransferMaster transferMaster);
 
     ResponseEntity<ObjectNode> update(TransferMaster transferMaster) throws NotFoundException;
+
+    ResponseEntity<ObjectNode> approve(ApprovalModel approvalModel) throws NotFoundException;
 
     ResponseEntity<ObjectNode> delete(Long id);
 
