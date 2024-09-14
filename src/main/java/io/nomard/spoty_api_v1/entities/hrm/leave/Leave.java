@@ -37,15 +37,15 @@ public class Leave {
     @ManyToOne
     @JoinColumn(name = "designation_id")
     private Designation designation;
-    private String description;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private Duration duration;
-    @ManyToOne
-    @JoinColumn(name = "leave_type_id")
-    private LeaveType leaveType;
+    @Column(name = "leave_type")
+    private String leaveType;
     private String attachment;
-    private char status;
+    private String leaveStatus;
+    private Boolean approved;
+    private String reason;
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
     private User createdBy;
