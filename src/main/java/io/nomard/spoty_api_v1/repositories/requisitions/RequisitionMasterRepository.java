@@ -17,6 +17,6 @@ public interface RequisitionMasterRepository extends PagingAndSortingRepository<
             "AND TRIM(LOWER(rm.ref)) LIKE %:search%")
     ArrayList<RequisitionMaster> searchAll(@Param("tenantId") Long tenantId, @Param("search") String search);
 
-    @Query("select p from RequisitionMaster p where p.tenant.id = :id")
-    Page<RequisitionMaster> findAllByTenantId(@Param("id") Long id, Pageable pageable);
+    @Query("select pm from RequisitionMaster pm where pm.tenant.id = :tenantId AND (pm.approved = true OR pm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId) > 0)")
+    Page<RequisitionMaster> findAllByTenantId(@Param("tenantId") Long tenantId, @Param("userId") Long userId, Pageable pageable);
 }

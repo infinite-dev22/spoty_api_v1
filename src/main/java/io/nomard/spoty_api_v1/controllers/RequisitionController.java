@@ -4,6 +4,7 @@ package io.nomard.spoty_api_v1.controllers;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.requisitions.RequisitionMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.models.ApprovalModel;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.requisitions.RequisitionServiceImpl;
@@ -45,6 +46,11 @@ public class RequisitionController {
     @PutMapping("/update")
     public ResponseEntity<ObjectNode> update(@Valid @RequestBody RequisitionMaster requisition) throws NotFoundException {
         return requisitionService.update(requisition);
+    }
+
+    @PutMapping("/approve")
+    public ResponseEntity<ObjectNode> approve(@RequestBody ApprovalModel approvalModel) throws NotFoundException {
+        return requisitionService.approve(approvalModel);
     }
 
     @DeleteMapping("/delete/single")
