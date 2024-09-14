@@ -38,7 +38,7 @@ public class RequisitionMaster implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String ref;
-    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "supplier_id")
     private Supplier supplier;
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
