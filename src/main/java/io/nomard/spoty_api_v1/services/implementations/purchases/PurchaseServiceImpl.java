@@ -106,6 +106,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                 purchase.setLatestApprovedLevel(approver.getLevel());
                 if (approver.getLevel() >= settingsService.getSettings().getApprovalLevels()) {
                     purchase.setApproved(true);
+                    purchase.setApprovalStatus("Approved");
                 }
             } else {
                 purchase.setApproved(false);
@@ -113,6 +114,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchase.setApprovalStatus("Pending");
         } else {
             purchase.setApproved(true);
+            purchase.setApprovalStatus("Approved");
 
             // Create account transaction of this purchase.
             var account = accountService.getByContains(authService.authUser().getTenant(), "Default Account");
@@ -193,6 +195,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchase.getApprovers().add(data.getApprovers().getFirst());
             if (purchase.getLatestApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
                 purchase.setApproved(true);
+                purchase.setApprovalStatus("Approved");
             }
         }
 
@@ -334,6 +337,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchase.setLatestApprovedLevel(approver.getLevel());
             if (purchase.getLatestApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
                 purchase.setApproved(true);
+                purchase.setApprovalStatus("Approved");
 
                 // Create account transaction of this purchase.
                 var account = accountService.getByContains(authService.authUser().getTenant(), "Default Account");
