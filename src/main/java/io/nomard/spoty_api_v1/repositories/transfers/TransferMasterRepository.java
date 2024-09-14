@@ -14,9 +14,9 @@ import java.util.ArrayList;
 @Repository
 public interface TransferMasterRepository extends PagingAndSortingRepository<TransferMaster, Long>, JpaRepository<TransferMaster, Long> {
     @Query("SELECT tm FROM TransferMaster tm WHERE tm.tenant.id = :tenantId " +
-            "AND TRIM(LOWER(tm.ref)) LIKE %:search% AND (tm.approved = true OR tm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId) > 0)")
+            "AND TRIM(LOWER(tm.ref)) LIKE %:search% AND (tm.approved = true OR tm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId AND a.level = tm.latestApprovedLevel) > 0)")
     ArrayList<TransferMaster> searchAll(@Param("tenantId") Long tenantId, @Param("search") String search);
 
-    @Query("select tm from TransferMaster tm where tm.tenant.id = :tenantId AND (tm.approved = true OR tm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId) > 0)")
+    @Query("select tm from TransferMaster tm where tm.tenant.id = :tenantId AND (tm.approved = true OR tm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId AND a.level = tm.latestApprovedLevel) > 0)")
     Page<TransferMaster> findAllByTenantId(@Param("tenantId") Long tenantId, @Param("userId") Long userId, Pageable pageable);
 }

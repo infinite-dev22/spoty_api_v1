@@ -41,12 +41,12 @@ public interface PurchaseMasterRepository extends PagingAndSortingRepository<Pur
     List<LineChartModel> weeklyExpenses(@Param("id") Long id);
 
     @Query("SELECT pm FROM PurchaseMaster pm WHERE pm.tenant.id = :tenantId " +
-            "AND TRIM(LOWER(pm.ref)) LIKE %:search% AND (pm.approved = true OR pm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId) > 0)")
+            "AND TRIM(LOWER(pm.ref)) LIKE %:search% AND (pm.approved = true OR pm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId AND a.level = pm.latestApprovedLevel) > 0)")
     ArrayList<PurchaseMaster> searchAll(@Param("tenantId") Long tenantId, @Param("search") String search);
 
     @Query("SELECT pm FROM PurchaseMaster pm WHERE pm.tenant.id = :tenantId " +
             "AND (pm.approved = true OR pm.createdBy.id = :userId OR " +
-            "(SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId) > 0)")
+            "(SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId AND a.level = pm.latestApprovedLevel) > 0)")
     Page<PurchaseMaster> findAllByTenantId(@Param("tenantId") Long tenantId, @Param("userId") Long userId, Pageable pageable);
 
     @Query("SELECT new io.nomard.spoty_api_v1.models.DashboardKPIModel('Total Purchases', SUM(pm.amountPaid)) " +
