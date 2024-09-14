@@ -98,6 +98,7 @@ public class QuotationServiceImpl implements QuotationService {
                 quotation.setLatestApprovedLevel(approver.getLevel());
                 if (approver.getLevel() >= settingsService.getSettings().getApprovalLevels()) {
                     quotation.setApproved(true);
+                    quotation.setApprovalStatus("Approved");
                 }
             } else {
                 quotation.setApproved(false);
@@ -105,6 +106,7 @@ public class QuotationServiceImpl implements QuotationService {
             quotation.setApprovalStatus("Pending");
         } else {
             quotation.setApproved(true);
+            quotation.setApprovalStatus("Approved");
         }
         try {
             quotationRepo.save(quotation);
@@ -166,6 +168,7 @@ public class QuotationServiceImpl implements QuotationService {
             quotation.getApprovers().add(data.getApprovers().getFirst());
             if (quotation.getLatestApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
                 quotation.setApproved(true);
+                quotation.setApprovalStatus("Approved");
             }
         }
 
@@ -189,32 +192,33 @@ public class QuotationServiceImpl implements QuotationService {
         if (opt.isEmpty()) {
             throw new NotFoundException();
         }
-        var adjustmentMaster = opt.get();
+        var quotation = opt.get();
 
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")) {
-            adjustmentMaster.setApproved(false);
-            adjustmentMaster.setApprovalStatus("Returned");
+            quotation.setApproved(false);
+            quotation.setApprovalStatus("Returned");
         }
 
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")) {
             var approver = approverService.getByUserId(authService.authUser().getId());
-            adjustmentMaster.getApprovers().add(approver);
-            adjustmentMaster.setLatestApprovedLevel(approver.getLevel());
-            if (adjustmentMaster.getLatestApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
-                adjustmentMaster.setApproved(true);
+            quotation.getApprovers().add(approver);
+            quotation.setLatestApprovedLevel(approver.getLevel());
+            if (quotation.getLatestApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+                quotation.setApproved(true);
+                quotation.setApprovalStatus("Approved");
             }
         }
 
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "rejected")) {
-            adjustmentMaster.setApproved(false);
-            adjustmentMaster.setApprovalStatus("Rejected");
-            adjustmentMaster.setLatestApprovedLevel(0);
+            quotation.setApproved(false);
+            quotation.setApprovalStatus("Rejected");
+            quotation.setLatestApprovedLevel(0);
         }
 
-        adjustmentMaster.setUpdatedBy(authService.authUser());
-        adjustmentMaster.setUpdatedAt(LocalDateTime.now());
+        quotation.setUpdatedBy(authService.authUser());
+        quotation.setUpdatedAt(LocalDateTime.now());
         try {
-            quotationRepo.save(adjustmentMaster);
+            quotationRepo.save(quotation);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
