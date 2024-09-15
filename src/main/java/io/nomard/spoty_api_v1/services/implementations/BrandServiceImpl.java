@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -60,7 +59,7 @@ public class BrandServiceImpl implements BrandService {
             }
             brand.setCreatedBy(authService.authUser());
             brand.setCreatedAt(LocalDateTime.now());
-            brandRepo.saveAndFlush(brand);
+            brandRepo.save(brand);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -92,7 +91,7 @@ public class BrandServiceImpl implements BrandService {
         brand.setUpdatedAt(LocalDateTime.now());
 
         try {
-            brandRepo.saveAndFlush(brand);
+            brandRepo.save(brand);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

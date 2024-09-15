@@ -47,11 +47,15 @@ public class UserProfile implements Serializable {
     private String phone;
     @Column(unique = true)
     private String avatar;
+    @JsonIgnore
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private User createdBy;
+    @JsonIgnore
     private LocalDateTime updatedAt;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private User updatedBy;
 
     @Override

@@ -46,6 +46,16 @@ public class DashboardController {
         return mainDashboardService.getMonthlyIncomes();
     }
 
+    @GetMapping("/income/weekly")
+    public List<LineChartModel> incomeWeeklySse() {
+        return mainDashboardService.getWeeklyIncomes();
+    }
+
+    @GetMapping("/revenue/yearly")
+    public List<LineChartModel> revenueYearlySse() {
+        return mainDashboardService.getYearlyRevenue();
+    }
+
     @GetMapping("/revenue/monthly")
     public List<LineChartModel> revenueMonthlySse() {
         return mainDashboardService.getMonthlyRevenue();

@@ -11,6 +11,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LeaveRepository extends PagingAndSortingRepository<Leave, Long>, JpaRepository<Leave, Long> {
-    @Query("select p from Leave p where p.tenant.id = :id")
-    Page<Leave> findAllByTenantId(@Param("id") Long id, Pageable pageable);
+    @Query("select l from Leave l where l.tenant.id = :tenantId AND (l.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId) > 0)")
+    Page<Leave> findAllByTenantId(@Param("tenantId") Long tenantId, @Param("userId") Long userId, Pageable pageable);
 }

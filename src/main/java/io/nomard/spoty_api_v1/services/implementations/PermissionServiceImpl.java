@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -51,7 +50,7 @@ public class PermissionServiceImpl implements PermissionService {
         try {
             permission.setCreatedBy(authService.authUser());
             permission.setCreatedAt(LocalDateTime.now());
-            permissionRepo.saveAndFlush(permission);
+            permissionRepo.save(permission);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -84,7 +83,7 @@ public class PermissionServiceImpl implements PermissionService {
         permission.setUpdatedAt(LocalDateTime.now());
 
         try {
-            permissionRepo.saveAndFlush(permission);
+            permissionRepo.save(permission);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

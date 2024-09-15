@@ -66,7 +66,7 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
                 transferTransaction.setTenant(authService.authUser().getTenant());
                 transferTransaction.setCreatedBy(authService.authUser());
                 transferTransaction.setCreatedAt(LocalDateTime.now());
-                transferTransactionRepo.saveAndFlush(transferTransaction);
+                transferTransactionRepo.save(transferTransaction);
                 return spotyResponseImpl.created();
             } catch (Exception e) {
                 return spotyResponseImpl.error(e);
@@ -124,7 +124,7 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
         transferTransaction.setUpdatedAt(LocalDateTime.now());
 
         try {
-            transferTransactionRepo.saveAndFlush(transferTransaction);
+            transferTransactionRepo.save(transferTransaction);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

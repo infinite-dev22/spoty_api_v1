@@ -73,7 +73,7 @@ public class AdjustmentTransactionServiceImpl implements AdjustmentTransactionSe
             adjustmentTransaction.setBranch(authService.authUser().getBranch());
             adjustmentTransaction.setCreatedBy(authService.authUser());
             adjustmentTransaction.setCreatedAt(LocalDateTime.now());
-            adjustmentTransactionRepo.saveAndFlush(adjustmentTransaction);
+            adjustmentTransactionRepo.save(adjustmentTransaction);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -139,7 +139,7 @@ public class AdjustmentTransactionServiceImpl implements AdjustmentTransactionSe
         adjustmentTransaction.setUpdatedAt(LocalDateTime.now());
 
         try {
-            adjustmentTransactionRepo.saveAndFlush(adjustmentTransaction);
+            adjustmentTransactionRepo.save(adjustmentTransaction);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

@@ -15,6 +15,7 @@
 package io.nomard.spoty_api_v1.entities.stock_ins;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.nomard.spoty_api_v1.entities.Approver;
 import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.User;
@@ -24,6 +25,7 @@ import org.hibernate.proxy.HibernateProxy;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -43,7 +45,7 @@ public class StockInMaster implements Serializable {
     @JoinColumn(name = "branch_id", nullable = false)
     @JsonIgnore
     private Branch branch;
-    @JoinColumn(name = "company_id", nullable = false)
+    @JoinColumn(name = "tenant_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     private Tenant tenant;
@@ -51,6 +53,14 @@ public class StockInMaster implements Serializable {
     @Builder.Default
     private List<StockInDetail> stockInDetails = new LinkedList<>();
     private String notes;
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @Builder.Default
+    private List<Approver> approvers = new ArrayList<>();
+    @Builder.Default
+    private Boolean approved = false;
+    @Builder.Default
+    private Integer latestApprovedLevel = 0;
+    private String approvalStatus;
     private LocalDateTime createdAt;
     @ManyToOne
     private User createdBy;

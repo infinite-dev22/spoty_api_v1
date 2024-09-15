@@ -5,8 +5,6 @@ import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
-import java.util.List;
-
 public interface AccountTransactionService {
     Page<AccountTransaction> getAll(int pageNo, int pageSize);
 

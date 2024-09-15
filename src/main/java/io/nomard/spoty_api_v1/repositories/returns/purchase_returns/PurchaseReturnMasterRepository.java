@@ -14,9 +14,9 @@ import java.util.ArrayList;
 @Repository
 public interface PurchaseReturnMasterRepository extends PagingAndSortingRepository<PurchaseReturnMaster, Long>, JpaRepository<PurchaseReturnMaster, Long> {
     @Query("SELECT prm FROM PurchaseReturnMaster prm WHERE prm.tenant.id = :tenantId " +
-            "AND TRIM(LOWER(prm.ref)) LIKE %:search%")
+            "AND TRIM(LOWER(prm.ref)) LIKE %:search% AND (prm.approved = true OR prm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId AND a.level = prm.latestApprovedLevel) > 0)")
     ArrayList<PurchaseReturnMaster> searchAll(@Param("tenantId") Long tenantId, @Param("search") String search);
 
-    @Query("select p from PurchaseReturnMaster p where p.tenant.id = :id")
-    Page<PurchaseReturnMaster> findAllByTenantId(@Param("id") Long id, Pageable pageable);
+    @Query("select prm from PurchaseReturnMaster prm where prm.tenant.id = :tenantId AND (prm.approved = true OR prm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId AND a.level = prm.latestApprovedLevel) > 0)")
+    Page<PurchaseReturnMaster> findAllByTenantId(@Param("tenantId") Long tenantId, @Param("userId") Long userId, Pageable pageable);
 }

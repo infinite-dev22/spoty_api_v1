@@ -59,7 +59,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
             }
             productCategory.setCreatedBy(authService.authUser());
             productCategory.setCreatedAt(LocalDateTime.now());
-            productCategoryRepo.saveAndFlush(productCategory);
+            productCategoryRepo.save(productCategory);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -88,7 +88,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         productCategory.setUpdatedAt(LocalDateTime.now());
 
         try {
-            productCategoryRepo.saveAndFlush(productCategory);
+            productCategoryRepo.save(productCategory);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

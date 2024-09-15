@@ -45,11 +45,15 @@ public class RequisitionDetail implements Serializable {
     @Column(nullable = false)
     private int quantity;
     private String description;
+    @JsonIgnore
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private User createdBy;
+    @JsonIgnore
     private LocalDateTime updatedAt;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private User updatedBy;
 
     @Override

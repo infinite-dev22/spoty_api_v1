@@ -7,12 +7,14 @@ import io.nomard.spoty_api_v1.repositories.ProductRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.ProductService;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,8 +25,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.logging.Level;
 
 @Service
+@Log
 public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository productRepo;
@@ -41,6 +45,13 @@ public class ProductServiceImpl implements ProductService {
     public Page<Product> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
         return productRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+    }
+
+    @Override
+    @Cacheable("products_no_paged")
+    @Transactional(readOnly = true)
+    public ArrayList<Product> getAllNonPaged() {
+        return productRepo.findAllByTenantIdNonPaged(authService.authUser().getTenant().getId());
     }
 
     @Override
@@ -69,25 +80,34 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-//    @Transactional
     public ResponseEntity<ObjectNode> save(Product product, MultipartFile file) {
         var fileURL = "";
         try {
-            product.setTenant(authService.authUser().getTenant());
             if (Objects.nonNull(file)) {
                 fileURL = String.valueOf(documentService.save(file));
                 product.setImage(fileURL);
             }
+        } catch (Exception e) {
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+        }
+        return save(product);
+    }
 
-            if (Objects.isNull(product.getBranch())) {
-                product.setBranch(authService.authUser().getBranch());
-            }
-            product.setCreatedBy(authService.authUser());
-            product.setCreatedAt(LocalDateTime.now());
-            productRepo.saveAndFlush(product);
+    @Override
+    public ResponseEntity<ObjectNode> save(Product product) {
+        product.setTenant(authService.authUser().getTenant());
+        if (Objects.isNull(product.getBranch())) {
+            product.setBranch(authService.authUser().getBranch());
+        }
+        product.setCreatedBy(authService.authUser());
+        product.setCreatedAt(LocalDateTime.now());
+        try {
+            productRepo.save(product);
             return spotyResponseImpl.created();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 
@@ -158,7 +178,8 @@ public class ProductServiceImpl implements ProductService {
                 documentService.delete(product.getImage());
                 fileURL = String.valueOf(documentService.save(file));
             } catch (Exception e) {
-                return spotyResponseImpl.error(e);
+                log.log(Level.ALL, e.getMessage(), e);
+                return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
             }
             product.setImage(fileURL);
         }
@@ -167,10 +188,11 @@ public class ProductServiceImpl implements ProductService {
         product.setUpdatedAt(LocalDateTime.now());
 
         try {
-            productRepo.saveAndFlush(product);
+            productRepo.save(product);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 
@@ -181,7 +203,8 @@ public class ProductServiceImpl implements ProductService {
             productRepo.deleteById(id);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 
@@ -191,7 +214,8 @@ public class ProductServiceImpl implements ProductService {
             productRepo.deleteAllById(idList);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 }

@@ -10,6 +10,7 @@ import org.hibernate.proxy.HibernateProxy;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -28,7 +29,8 @@ public class PaySlipType {
             joinColumns = {@JoinColumn(name = "employment_status_id")},
             inverseJoinColumns = {@JoinColumn(name = "branch_id")})
     @JsonIgnore
-    private ArrayList<Branch> branches;
+    @Builder.Default
+    private List<Branch> branches = new ArrayList<>();
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     private Tenant tenant;

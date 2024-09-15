@@ -15,6 +15,7 @@
 package io.nomard.spoty_api_v1.entities.adjustments;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.nomard.spoty_api_v1.entities.Approver;
 import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.User;
@@ -25,7 +26,6 @@ import org.hibernate.proxy.HibernateProxy;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -48,8 +48,18 @@ public class AdjustmentMaster implements Serializable {
     @JsonIgnore
     private Tenant tenant;
     @OneToMany(orphanRemoval = true, mappedBy = "adjustment", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private ArrayList<AdjustmentDetail> adjustmentDetails;
+    @Builder.Default
+    private List<AdjustmentDetail> adjustmentDetails = new ArrayList<>();
     private String notes;
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @Builder.Default
+    private List<Approver> approvers = new ArrayList<>();
+    @Builder.Default
+    private Boolean approved = false;
+    @Builder.Default
+    private Integer latestApprovedLevel = 0;
+    private String approvalStatus;
+    private String adjustmentStatus;
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
     private User createdBy;

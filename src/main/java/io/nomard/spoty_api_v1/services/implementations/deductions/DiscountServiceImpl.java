@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -53,7 +52,7 @@ public class DiscountServiceImpl implements DiscountService {
             discount.setBranch(authService.authUser().getBranch());
             discount.setCreatedBy(authService.authUser());
             discount.setCreatedAt(LocalDateTime.now());
-            discountRepo.saveAndFlush(discount);
+            discountRepo.save(discount);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -77,7 +76,7 @@ public class DiscountServiceImpl implements DiscountService {
         discount.setUpdatedBy(authService.authUser());
         discount.setUpdatedAt(LocalDateTime.now());
         try {
-            discountRepo.saveAndFlush(discount);
+            discountRepo.save(discount);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

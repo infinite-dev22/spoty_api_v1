@@ -60,7 +60,7 @@ public class SalaryServiceImpl implements SalaryService {
             }
             salary.setCreatedBy(authService.authUser());
             salary.setCreatedAt(LocalDateTime.now());
-            salaryRepo.saveAndFlush(salary);
+            salaryRepo.save(salary);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -113,7 +113,7 @@ public class SalaryServiceImpl implements SalaryService {
         salary.setUpdatedAt(LocalDateTime.now());
 
         try {
-            salaryRepo.saveAndFlush(salary);
+            salaryRepo.save(salary);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

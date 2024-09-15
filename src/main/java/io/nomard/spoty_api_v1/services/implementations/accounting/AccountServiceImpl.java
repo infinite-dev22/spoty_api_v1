@@ -63,7 +63,7 @@ public class AccountServiceImpl implements AccountService {
             account.setBalance(0d);
             account.setCreatedBy(authService.authUser());
             account.setCreatedAt(LocalDateTime.now());
-            accountRepo.saveAndFlush(account);
+            accountRepo.save(account);
             if (Objects.nonNull(amount) && !Objects.equals(amount, 0d)) {
                 var accountTransaction = new AccountTransaction();
                 accountTransaction.setTenant(authService.authUser().getTenant());
@@ -116,7 +116,7 @@ public class AccountServiceImpl implements AccountService {
         account.setUpdatedAt(LocalDateTime.now());
 
         try {
-            accountRepo.saveAndFlush(account);
+            accountRepo.save(account);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

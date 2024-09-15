@@ -36,21 +36,29 @@ public class SaleDetail implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "saleMaster_id", nullable = false)
+    @JoinColumn(name = "sale_id", nullable = false)
     @JsonIgnore
     private SaleMaster sale;
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "product_id")
     private Product product;
     @Column(nullable = false)
-    private double subTotalPrice;
+    @Builder.Default
+    private double totalPrice = 0;
+    @Column(nullable = false)
+    @Builder.Default
+    private double unitPrice = 0;
     @Column(nullable = false)
     private Long quantity;
+    @JsonIgnore
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private User createdBy;
+    @JsonIgnore
     private LocalDateTime updatedAt;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private User updatedBy;
 
     @Override

@@ -4,9 +4,10 @@ package io.nomard.spoty_api_v1.controllers;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.quotations.QuotationMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.models.ApprovalModel;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
-import io.nomard.spoty_api_v1.services.implementations.quotations.QuotationMasterServiceImpl;
+import io.nomard.spoty_api_v1.services.implementations.quotations.QuotationServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,41 +20,46 @@ import java.util.List;
 @RequestMapping("quotations")
 public class QuotationController {
     @Autowired
-    private QuotationMasterServiceImpl quotationMasterService;
+    private QuotationServiceImpl quotationService;
 
     @GetMapping("/all")
-    public Page<QuotationMaster> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
-                                               @RequestParam(defaultValue = "50") Integer pageSize) {
-        return quotationMasterService.getAll(pageNo, pageSize);
+    public Page<QuotationMaster> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                        @RequestParam(defaultValue = "50") Integer pageSize) {
+        return quotationService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public QuotationMaster getMastersById(@RequestBody FindModel findModel) throws NotFoundException {
-        return quotationMasterService.getById(findModel.getId());
+    public QuotationMaster getById(@RequestBody FindModel findModel) throws NotFoundException {
+        return quotationService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<QuotationMaster> getMastersByContains(@RequestBody SearchModel searchModel) {
-        return quotationMasterService.getByContains(searchModel.getSearch());
+    public List<QuotationMaster> getByContains(@RequestBody SearchModel searchModel) {
+        return quotationService.getByContains(searchModel.getSearch());
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ObjectNode> saveMaster(@Valid @RequestBody QuotationMaster quotationMaster) {
-        return quotationMasterService.save(quotationMaster);
+    public ResponseEntity<ObjectNode> save(@Valid @RequestBody QuotationMaster quotation) throws NotFoundException {
+        return quotationService.save(quotation);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ObjectNode> updateMaster(@Valid @RequestBody QuotationMaster quotationMaster) throws NotFoundException {
-        return quotationMasterService.update(quotationMaster);
+    public ResponseEntity<ObjectNode> update(@Valid @RequestBody QuotationMaster quotation) throws NotFoundException {
+        return quotationService.update(quotation);
+    }
+
+    @PutMapping("/approve")
+    public ResponseEntity<ObjectNode> approve(@RequestBody ApprovalModel approvalModel) throws NotFoundException {
+        return quotationService.approve(approvalModel);
     }
 
     @DeleteMapping("/delete/single")
-    public ResponseEntity<ObjectNode> deleteMaster(@RequestBody FindModel findModel) {
-        return quotationMasterService.delete(findModel.getId());
+    public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
+        return quotationService.delete(findModel.getId());
     }
 
     @DeleteMapping("/delete/multiple")
-    public ResponseEntity<ObjectNode> deleteMasters(@RequestBody List<Long> idList) {
-        return quotationMasterService.deleteMultiple(idList);
+    public ResponseEntity<ObjectNode> delete(@RequestBody List<Long> idList) {
+        return quotationService.deleteMultiple(idList);
     }
 }

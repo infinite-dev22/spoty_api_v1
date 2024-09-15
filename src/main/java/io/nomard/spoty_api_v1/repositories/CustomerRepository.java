@@ -24,11 +24,11 @@ public interface CustomerRepository extends PagingAndSortingRepository<Customer,
             "TRIM(LOWER(c.country))) LIKE %:search%")
     ArrayList<Customer> searchAll(@Param("tenantId") Long tenantId, @Param("search") String search);
 
-    @Query("select p from Customer p where p.tenant.id = :id")
+    @Query("select p from Customer p where p.tenant.id = :id OR p.tenant IS NULL")
     Page<Customer> findAllByTenantId(@Param("id") Long id, Pageable pageable);
 
     @Query("SELECT new io.nomard.spoty_api_v1.models.DashboardKPIModel('Total Customers', COUNT(s)) " +
             "FROM Customer s " +
-            "WHERE s.tenant.id = :id")
+            "WHERE s.tenant.id = :id OR s.tenant IS NULL")
     DashboardKPIModel countCustomers(@Param("id") Long tenantId);
 }

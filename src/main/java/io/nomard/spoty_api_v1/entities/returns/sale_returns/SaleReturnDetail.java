@@ -16,8 +16,8 @@ package io.nomard.spoty_api_v1.entities.returns.sale_returns;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Product;
-import io.nomard.spoty_api_v1.entities.UnitOfMeasure;
 import io.nomard.spoty_api_v1.entities.User;
+import io.nomard.spoty_api_v1.entities.sales.SaleDetail;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
@@ -37,31 +37,29 @@ public class SaleReturnDetail implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "saleReturnMaster_id", nullable = false)
+    @JoinColumn(name = "sale_return_id", nullable = false)
     @JsonIgnore
-    private SaleReturnMaster saleReturn;
+    private SaleReturnMaster saleReturnMaster;
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "product_id")
     private Product product;
     @Column(nullable = false)
-    private double price;
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, name = "sale_unit_id")
-    private UnitOfMeasure saleUnit;
-    private double netTax;
-    private String taxType;
-    private double discount;
-    private String discountType;
-    private String serialNumber;
+    @Builder.Default
+    private double totalPrice = 0;
     @Column(nullable = false)
-    private int quantity;
+    @Builder.Default
+    private double unitPrice = 0;
     @Column(nullable = false)
-    private double total;
+    private Long quantity;
+    @JsonIgnore
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private User createdBy;
+    @JsonIgnore
     private LocalDateTime updatedAt;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private User updatedBy;
 
     @Override
@@ -71,7 +69,7 @@ public class SaleReturnDetail implements Serializable {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        SaleReturnDetail that = (SaleReturnDetail) o;
+        SaleDetail that = (SaleDetail) o;
         return getId() != null && Objects.equals(getId(), that.getId());
     }
 

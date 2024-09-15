@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.3.1'
+    id 'org.springframework.boot' version '3.3.3'
     id 'io.spring.dependency-management' version '1.1.5'
     id 'org.hibernate.orm' version '6.5.2.Final'
     id 'org.graalvm.buildtools.native' version '0.10.2'
@@ -11,7 +11,7 @@ group = 'io.nomard'
 version = '0.0.21-SNAPSHOT'
 
 java {
-    sourceCompatibility = '17'
+    sourceCompatibility = '22'
 }
 
 graalvmNative {
@@ -132,6 +132,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
     testImplementation 'org.springframework.security:spring-security-test'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -139,7 +140,6 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-//    runtimeOnly 'com.mysql:mysql-connector-j'
     runtimeOnly 'org.springframework.boot:spring-boot-docker-compose'
     runtimeOnly 'org.postgresql:postgresql'
 }

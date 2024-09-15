@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -60,15 +59,15 @@ public class AccountTransactionServiceImpl implements AccountTransactionService 
                     || Objects.equals(accountTransaction.getTransactionType().toLowerCase(), "sale returns")
                     || Objects.equals(accountTransaction.getTransactionType().toLowerCase(), "purchase")) {
                 accountTransaction.setDebit(accountTransaction.getAmount());
-                account.setDebit(account.getDebit() - accountTransaction.getAmount());
+                account.setDebit(account.getDebit() + accountTransaction.getAmount());
                 account.setBalance(account.getBalance() - accountTransaction.getAmount());
             }
             account.setUpdatedAt(LocalDateTime.now());
             account.setUpdatedBy(authService.authUser());
-            accountRepo.saveAndFlush(account);
+            accountRepo.save(account);
             accountTransaction.setCreatedBy(authService.authUser());
             accountTransaction.setCreatedAt(LocalDateTime.now());
-            accountTransactionRepo.saveAndFlush(accountTransaction);
+            accountTransactionRepo.save(accountTransaction);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

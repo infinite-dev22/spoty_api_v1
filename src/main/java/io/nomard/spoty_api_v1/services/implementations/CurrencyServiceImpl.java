@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -57,7 +56,7 @@ public class CurrencyServiceImpl implements CurrencyService {
             currency.setTenant(authService.authUser().getTenant());
             currency.setCreatedBy(authService.authUser());
             currency.setCreatedAt(LocalDateTime.now());
-            currencyRepo.saveAndFlush(currency);
+            currencyRepo.save(currency);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -90,7 +89,7 @@ public class CurrencyServiceImpl implements CurrencyService {
         currency.setUpdatedAt(LocalDateTime.now());
 
         try {
-            currencyRepo.saveAndFlush(currency);
+            currencyRepo.save(currency);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

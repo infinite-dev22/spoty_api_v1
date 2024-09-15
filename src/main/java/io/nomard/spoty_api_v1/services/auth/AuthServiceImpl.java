@@ -141,7 +141,6 @@ public class AuthServiceImpl implements AuthService {
         var account = new Account();
         account.setAccountName("Default Account");
         account.setAccountNumber("ACC000000000001");
-        account.setBalance(0d);
         account.setDescription("Default account for sales, purchases, payroll, etc.");
         account.setTenant(tenant);
 
@@ -158,13 +157,13 @@ public class AuthServiceImpl implements AuthService {
         user.setBranch(branch);
         user.setEmail(signUpDetails.getEmail());
         user.setPassword(passwordEncoder.encode(signUpDetails.getPassword()));
-        user.setRole(roleRepo.searchAllByNameContainingIgnoreCase("admin").get(0));
+        user.setRole(roleRepo.searchAllByNameContainingIgnoreCase("admin").getFirst());
 
         try {
-            tenantRepo.saveAndFlush(tenant);
-            accountRepo.saveAndFlush(account);
-            branchRepo.saveAndFlush(branch);
-            userProfileRepo.saveAndFlush(userProfile);
+            tenantRepo.save(tenant);
+            accountRepo.save(account);
+            branchRepo.save(branch);
+            userProfileRepo.save(userProfile);
             userRepo.save(user);
             return spotyResponseImpl.created();
         } catch (Exception e) {

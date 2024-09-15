@@ -51,7 +51,7 @@ public class PaySlipTypeServiceImpl implements PaySlipTypeService {
             paySlipType.setTenant(authService.authUser().getTenant());
             paySlipType.setCreatedBy(authService.authUser());
             paySlipType.setCreatedAt(LocalDateTime.now());
-            paySlipTypeRepo.saveAndFlush(paySlipType);
+            paySlipTypeRepo.save(paySlipType);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -88,7 +88,7 @@ public class PaySlipTypeServiceImpl implements PaySlipTypeService {
         paySlipType.setUpdatedAt(LocalDateTime.now());
 
         try {
-            paySlipTypeRepo.saveAndFlush(paySlipType);
+            paySlipTypeRepo.save(paySlipType);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

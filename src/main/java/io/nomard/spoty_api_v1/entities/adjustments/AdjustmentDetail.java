@@ -43,11 +43,15 @@ public class AdjustmentDetail implements Serializable {
     private AdjustmentMaster adjustment;
     private Long quantity;
     private String adjustmentType;
+    @JsonIgnore
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private User createdBy;
+    @JsonIgnore
     private LocalDateTime updatedAt;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private User updatedBy;
 
     @Override

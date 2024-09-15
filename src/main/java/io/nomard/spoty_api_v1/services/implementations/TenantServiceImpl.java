@@ -7,21 +7,24 @@ import io.nomard.spoty_api_v1.repositories.TenantRepository;
 import io.nomard.spoty_api_v1.repositories.UserRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.interfaces.TenantService;
-import io.nomard.spoty_api_v1.utils.DateUtils;
+import io.nomard.spoty_api_v1.utils.CoreUtils;
+import lombok.extern.java.Log;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
 
 @Service
+@Log
 public class TenantServiceImpl implements TenantService {
     @Autowired
     private TenantRepository tenantRepo;
@@ -86,10 +89,11 @@ public class TenantServiceImpl implements TenantService {
     public ResponseEntity<ObjectNode> save(Tenant tenant) {
         try {
             tenant.setCreatedAt(LocalDateTime.now());
-            tenantRepo.saveAndFlush(tenant);
+            tenantRepo.save(tenant);
             return spotyResponseImpl.created();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 
@@ -98,15 +102,16 @@ public class TenantServiceImpl implements TenantService {
     public ResponseEntity<ObjectNode> startTrial(Long tenantId) throws NotFoundException {
         Tenant tenant = tenantRepo.findById(tenantId).orElseThrow(NotFoundException::new);
         tenant.setTrial(true);
-        tenant.setTrialEndDate(DateUtils.addDays(7));
-        tenant.setSubscriptionEndDate(DateUtils.addDays(7));
+        tenant.setTrialEndDate(CoreUtils.DateCalculations.addDays(7));
+        tenant.setSubscriptionEndDate(CoreUtils.DateCalculations.addDays(7));
         tenant.setCanTry(false);
         tenant.setUpdatedAt(LocalDateTime.now());
         try {
-            tenantRepo.saveAndFlush(tenant);
+            tenantRepo.save(tenant);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 
@@ -134,10 +139,11 @@ public class TenantServiceImpl implements TenantService {
         tenant.setUpdatedAt(LocalDateTime.now());
 
         try {
-            tenantRepo.saveAndFlush(tenant);
+            tenantRepo.save(tenant);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 
@@ -148,7 +154,8 @@ public class TenantServiceImpl implements TenantService {
             tenantRepo.deleteById(id);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 }

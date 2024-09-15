@@ -13,6 +13,8 @@ import java.util.List;
 public interface ProductService {
     Page<Product> getAll(int pageNo, int pageSize);
 
+    ArrayList<Product> getAllNonPaged();
+
     Product getById(Long id) throws NotFoundException;
 
     List<Product> getByContains(String search);
@@ -20,6 +22,8 @@ public interface ProductService {
     List<Product> getWarning();
 
     ResponseEntity<ObjectNode> save(Product product, MultipartFile file);
+
+    ResponseEntity<ObjectNode> save(Product product);
 
     ResponseEntity<ObjectNode> update(Product product, MultipartFile file) throws NotFoundException;
 

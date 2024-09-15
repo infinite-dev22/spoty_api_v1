@@ -17,42 +17,56 @@ import java.util.List;
 
 @Repository
 public interface SaleMasterRepository extends PagingAndSortingRepository<SaleMaster, Long>, JpaRepository<SaleMaster, Long> {
-    @Query("SELECT DATE_FORMAT(e.createdAt, '%Y') AS period, SUM(e.amountPaid) AS totalValue " +
-            "FROM SaleMaster e " +
-            "WHERE e.tenant.id = :id " +
+    @Query("SELECT DATE_PART('year', CAST(sm.createdAt AS date)) AS period, SUM(sm.amountPaid) AS totalValue " +
+            "FROM SaleMaster sm " +
+            "WHERE sm.tenant.id = :id AND sm.approved = true " +
             "GROUP BY period " +
-            "ORDER BY DATE_FORMAT(e.createdAt, '%Y')")
+            "ORDER BY DATE_PART('year', CAST(sm.createdAt AS date))")
     List<LineChartModel> yearlyIncomes(@Param("id") Long id);
 
-    @Query(value = "SELECT TO_CHAR(TO_DATE(CONCAT(EXTRACT(YEAR FROM CURRENT_DATE), '-', months.month, '-01'), 'YYYY-MM-DD'), 'YYYY Month') AS period, COALESCE(SUM(i.amount_received), 0) AS totalValue " +
+    @Query(value = "SELECT TO_CHAR(TO_DATE(CONCAT(EXTRACT(YEAR FROM CURRENT_DATE), '-', months.month, '-01'), 'YYYY-MM-DD'), 'YYYY Month') AS period, COALESCE(SUM(sm.amount_paid), 0) AS totalValue " +
             "FROM (SELECT '01' AS month UNION ALL SELECT '02' UNION ALL SELECT '03' UNION ALL SELECT '04' UNION ALL " +
             "SELECT '05' UNION ALL SELECT '06' UNION ALL SELECT '07' UNION ALL SELECT '08' UNION ALL " +
             "SELECT '09' UNION ALL SELECT '10' UNION ALL SELECT '11' UNION ALL SELECT '12') AS months " +
-            "LEFT JOIN income_master i ON TO_CHAR(i.created_at, 'YYYY-MM') = CONCAT(EXTRACT(YEAR FROM CURRENT_DATE), '-', months.month) " +
-            "AND i.tenant_id = :id " +
+            "LEFT JOIN sale_master sm ON TO_CHAR(sm.created_at, 'YYYY-MM') = CONCAT(EXTRACT(YEAR FROM CURRENT_DATE), '-', months.month) " +
+            "AND sm.tenant_id = :id AND sm.approved = true " +
             "GROUP BY months.month " +
             "ORDER BY months.month::int", nativeQuery = true)
     List<LineChartModel> monthlyIncomes(@Param("id") Long id);
 
-    @Query("SELECT DATE_FORMAT(e.createdAt, '%M') AS period, SUM(e.amountPaid) AS totalValue " +
-            "FROM SaleMaster e " +
-            "WHERE e.tenant.id = :id " +
+    @Query("SELECT CAST(sm.createdAt AS date) AS period, SUM(sm.amountPaid) AS totalValue " +
+            "FROM SaleMaster sm " +
+            "WHERE sm.tenant.id = :id AND sm.approved = true " +
             "GROUP BY period " +
-            "ORDER BY DATE_FORMAT(e.createdAt, '%M')")
+            "ORDER BY CAST(sm.createdAt AS date)")
+    List<LineChartModel> weeklyIncomes(@Param("id") Long id);
+
+    @Query("SELECT DATE_PART('year', CAST(sm.createdAt AS date)) AS period, SUM(sm.amountPaid) AS totalValue " +
+            "FROM SaleMaster sm " +
+            "WHERE sm.tenant.id = :id AND sm.approved = true " +
+            "GROUP BY period " +
+            "ORDER BY DATE_PART('year', CAST(sm.createdAt AS date))")
+    List<LineChartModel> yearlyRevenue(@Param("id") Long id);
+
+    @Query("SELECT DATE_PART('month', CAST(sm.createdAt AS date)) AS period, SUM(sm.amountPaid) AS totalValue " +
+            "FROM SaleMaster sm " +
+            "WHERE sm.tenant.id = :id AND sm.approved = true " +
+            "GROUP BY period " +
+            "ORDER BY DATE_PART('month', CAST(sm.createdAt AS date))")
     List<LineChartModel> monthlyRevenue(@Param("id") Long id);
 
-    @Query("SELECT DATE_FORMAT(e.createdAt, '%a') AS period, SUM(e.amountPaid) AS totalValue " +
-            "FROM SaleMaster e " +
-            "WHERE e.tenant.id = :id " +
+    @Query("SELECT CAST(sm.createdAt AS date) AS period, SUM(sm.amountPaid) AS totalValue " +
+            "FROM SaleMaster sm " +
+            "WHERE sm.tenant.id = :id AND sm.approved = true " +
             "GROUP BY period " +
-            "ORDER BY DATE_FORMAT(e.createdAt, '%a')")
+            "ORDER BY CAST(sm.createdAt AS date)")
     List<LineChartModel> weeklyRevenue(@Param("id") Long id);
 
     @Query("SELECT new io.nomard.spoty_api_v1.models.ProductSalesModel(p.name, SUM(sd.quantity), p.salePrice, p.costPrice) " +
             "FROM SaleDetail sd " +
             "JOIN sd.product p " +
             "JOIN sd.sale s " +
-            "WHERE s.tenant.id = :id " +
+            "WHERE s.tenant.id = :id AND s.approved = true " +
             "GROUP BY p.id, p.name, p.salePrice, p.costPrice " +
             "ORDER BY SUM(sd.quantity) DESC")
     List<ProductSalesModel> findTopProductsSold(@Param("id") Long id, Pageable pageable);
@@ -62,15 +76,15 @@ public interface SaleMasterRepository extends PagingAndSortingRepository<SaleMas
 //            "WHERE s.tenant.id = :id")
 //    DashboardKPIModel countOrders(@Param("id") Long id);
 
-    @Query("SELECT new io.nomard.spoty_api_v1.models.DashboardKPIModel('Total Earnings', SUM(s.amountPaid)) " +
-            "FROM SaleMaster s " +
-            "WHERE s.tenant.id = :id ")
+    @Query("SELECT new io.nomard.spoty_api_v1.models.DashboardKPIModel('Total Earnings', SUM(sm.amountPaid)) " +
+            "FROM SaleMaster sm " +
+            "WHERE sm.tenant.id = :id AND sm.approved = true")
     DashboardKPIModel totalEarnings(@Param("id") Long id);
 
     @Query("SELECT sm FROM SaleMaster sm WHERE sm.tenant.id = :tenantId " +
-            "AND TRIM(LOWER(sm.ref)) LIKE %:search%")
+            "AND TRIM(LOWER(sm.ref)) LIKE %:search% AND (sm.approved = true OR sm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId AND a.level = sm.latestApprovedLevel) > 0)")
     ArrayList<SaleMaster> searchAll(@Param("tenantId") Long tenantId, @Param("search") String search);
 
-    @Query("select p from SaleMaster p where p.tenant.id = :id")
-    Page<SaleMaster> findAllByTenantId(@Param("id") Long id, Pageable pageable);
+    @Query("SELECT sm FROM SaleMaster sm WHERE sm.tenant.id = :tenantId AND (sm.approved = true OR sm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId AND a.level = sm.latestApprovedLevel) > 0)")
+    Page<SaleMaster> findAllByTenantId(@Param("tenantId") Long tenantId, @Param("userId") Long userId, Pageable pageable);
 }

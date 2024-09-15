@@ -37,7 +37,7 @@ public class Currency {
     @Column(nullable = false)
     private String name;
     private String symbol;
-    @JoinColumn(name = "company_id")
+    @JoinColumn(name = "tenant_id")
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     private Tenant tenant;

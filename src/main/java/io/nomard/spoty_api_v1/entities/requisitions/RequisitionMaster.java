@@ -15,16 +15,14 @@
 package io.nomard.spoty_api_v1.entities.requisitions;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.nomard.spoty_api_v1.entities.Branch;
-import io.nomard.spoty_api_v1.entities.Supplier;
-import io.nomard.spoty_api_v1.entities.Tenant;
-import io.nomard.spoty_api_v1.entities.User;
+import io.nomard.spoty_api_v1.entities.*;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -40,9 +38,7 @@ public class RequisitionMaster implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String ref;
-    @Column(nullable = false)
-    private LocalDateTime date;
-    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "supplier_id")
     private Supplier supplier;
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -56,15 +52,17 @@ public class RequisitionMaster implements Serializable {
     @OneToMany(orphanRemoval = true, mappedBy = "requisition", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default
     private List<RequisitionDetail> requisitionDetails = new LinkedList<>();
-    private String shipVia;
-    private String shipMethod;
-    private String shippingTerms;
-    private LocalDateTime deliveryDate;
     private String notes;
     @Column(nullable = false)
     private String status;
-    @Column(nullable = false)
-    private double totalCost;
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @Builder.Default
+    private List<Approver> approvers = new ArrayList<>();
+    @Builder.Default
+    private Boolean approved = false;
+    @Builder.Default
+    private Integer latestApprovedLevel = 0;
+    private String approvalStatus;
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
     private User createdBy;

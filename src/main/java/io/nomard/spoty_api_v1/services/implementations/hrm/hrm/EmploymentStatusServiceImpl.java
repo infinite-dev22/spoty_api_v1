@@ -57,7 +57,7 @@ public class EmploymentStatusServiceImpl implements EmploymentStatusService {
             employmentStatus.setTenant(authService.authUser().getTenant());
             employmentStatus.setCreatedBy(authService.authUser());
             employmentStatus.setCreatedAt(LocalDateTime.now());
-            employmentStatusRepo.saveAndFlush(employmentStatus);
+            employmentStatusRepo.save(employmentStatus);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -90,7 +90,7 @@ public class EmploymentStatusServiceImpl implements EmploymentStatusService {
         employmentStatus.setUpdatedAt(LocalDateTime.now());
 
         try {
-            employmentStatusRepo.saveAndFlush(employmentStatus);
+            employmentStatusRepo.save(employmentStatus);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

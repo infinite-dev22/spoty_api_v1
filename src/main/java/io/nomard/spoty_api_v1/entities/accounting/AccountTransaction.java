@@ -25,9 +25,12 @@ public class AccountTransaction {
     @ManyToOne
     private Account account;
     private LocalDateTime transactionDate;
-    private Double credit;
-    private Double debit;
-    private Double amount;
+    @Builder.Default
+    private Double credit = 0d;
+    @Builder.Default
+    private Double debit = 0d;
+    @Builder.Default
+    private Double amount = 0d;
     private String note;
     // Deposit, Sale, Payroll, Purchase Returns, Sale Returns, Purchase, Transfer, Expense
     private String transactionType;

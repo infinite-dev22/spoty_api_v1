@@ -12,6 +12,7 @@ import io.nomard.spoty_api_v1.entities.adjustments.AdjustmentMaster;
 import io.nomard.spoty_api_v1.entities.adjustments.AdjustmentTransaction;
 import io.nomard.spoty_api_v1.entities.deductions.Discount;
 import io.nomard.spoty_api_v1.entities.deductions.Tax;
+import io.nomard.spoty_api_v1.entities.hrm.hrm.Department;
 import io.nomard.spoty_api_v1.entities.hrm.hrm.Designation;
 import io.nomard.spoty_api_v1.entities.hrm.pay_roll.Salary;
 import io.nomard.spoty_api_v1.entities.purchases.PurchaseDetail;
@@ -44,7 +45,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 
 @Configuration
 public class AppConfig {
-    @Value("jwt.secret")
+    @Value("${jwt.secret}")
     private String secret;
 
     @Bean
@@ -213,13 +214,13 @@ public class AppConfig {
     }
 
     @Bean
-    public Salary salary() {
-        return new Salary();
+    public Department department() {
+        return new Department();
     }
 
     @Bean
-    public SaleTermAndCondition saleTermAndCondition() {
-        return new SaleTermAndCondition();
+    public Salary salary() {
+        return new Salary();
     }
 
     @Bean

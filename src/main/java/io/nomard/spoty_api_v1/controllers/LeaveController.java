@@ -3,6 +3,7 @@ package io.nomard.spoty_api_v1.controllers;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.hrm.leave.Leave;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.models.ApprovalModel;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.services.implementations.hrm.leave.LeaveServiceImpl;
 import jakarta.validation.Valid;
@@ -12,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("/leaves")
@@ -39,6 +39,11 @@ public class LeaveController {
     @PutMapping("/update")
     public ResponseEntity<ObjectNode> update(@Valid @RequestBody Leave leave) throws NotFoundException {
         return leaveStatusService.update(leave);
+    }
+
+    @PutMapping("/approve")
+    public ResponseEntity<ObjectNode> approve(@Valid @RequestBody ApprovalModel approvalModel) throws NotFoundException {
+        return leaveStatusService.approve(approvalModel);
     }
 
     @DeleteMapping("/delete/single")

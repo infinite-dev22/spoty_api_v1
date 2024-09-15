@@ -16,6 +16,8 @@ services:
       SPRING_DATASOURCE_USERNAME: '${POSTGRESQL_USER}'
       SPRING_DATASOURCE_PASSWORD: '${POSTGRES_PASSWORD}'
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    volumes:
+      - static-files:/var/lib/opencore/static/uploads
     depends_on:
       db:
         condition: service_healthy
@@ -52,8 +54,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    links:
-      - db
     ports:
       - '${PGADMIN_LOCAL_PORT}:${PGADMIN_DOCKER_PORT}'
     volumes:
@@ -61,10 +61,53 @@ services:
     networks:
       - api-net
 
+  mail:
+    container_name: 'stalwart-mail'
+    image: 'stalwartlabs/mail-server:latest'
+    restart: unless-stopped
+    ports:
+      - "80:8080"
+      - "443:443"
+      - "25:25"
+      - "587:587"
+      - "465:465"
+      - "143:143"
+      - "993:993"
+      - "4190:4190"
+      - "110:110"
+      - "995:995"
+    volumes:
+      - mail-data:/opt/stalwart-mail
+    tty: true
+    stdin_open: true
+    networks:
+      - api-net
+
+  mail_test:
+    image: 'axllent/mailpit:latest'
+    container_name: 'mailpit'
+    restart: unless-stopped
+    volumes:
+      - ./data:/data
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_DATABASE: /data/mailpit.db
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    networks:
+      - api-net
+
 volumes:
   postgres-data:
     driver: local
   pgadmin-data:
+    driver: local
+  static-files:
+    driver: local
+  mail-data:
     driver: local
 
 networks:
