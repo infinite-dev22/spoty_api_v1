@@ -49,7 +49,7 @@ public class SpotyRequestFilter extends OncePerRequestFilter {
         try {
             final UserDetails userDetails = spotyUserDetailsService.loadUserByUsername(username);
             final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    userDetails, null);
+                    userDetails, null, userDetails.getAuthorities());
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (RuntimeException e) {
