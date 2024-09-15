@@ -3,7 +3,6 @@ package io.nomard.spoty_api_v1.services.implementations;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
-import io.nomard.spoty_api_v1.repositories.EmployeeRepository;
 import io.nomard.spoty_api_v1.repositories.TenantRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.interfaces.TenantService;
@@ -29,8 +28,6 @@ public class TenantServiceImpl implements TenantService {
     @Autowired
     private TenantRepository tenantRepo;
     @Autowired
-    private EmployeeRepository employeeRepo;
-    @Autowired
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
@@ -41,7 +38,7 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public Tenant getById(Long id) throws NotFoundException {
-        return tenantRepo.findById(id).orElseThrow(NotFoundException::new);
+        return tenantRepo.findById(id).orElseThrow(() -> new NotFoundException("Tenant not found"));
     }
 
     @Override
@@ -54,17 +51,17 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public boolean isTrial(Long id) throws NotFoundException {
-        return employeeRepo.findById(id).orElseThrow(NotFoundException::new).getTenant().isTrial();
+        return tenantRepo.findById(id).orElseThrow(() -> new NotFoundException("Tenant not found")).isTrial();
     }
 
     @Override
     public boolean canTry(Long id) throws NotFoundException {
-        return employeeRepo.findById(id).orElseThrow(NotFoundException::new).getTenant().isCanTry();
+        return tenantRepo.findById(id).orElseThrow(() -> new NotFoundException("Tenant not found")).isCanTry();
     }
 
     @Override
     public boolean isNewTenancy(Long id) throws NotFoundException {
-        return employeeRepo.findById(id).orElseThrow(NotFoundException::new).getTenant().isNewTenancy();
+        return tenantRepo.findById(id).orElseThrow(() -> new NotFoundException("Tenant not found")).isNewTenancy();
     }
 
     @Override
@@ -75,8 +72,8 @@ public class TenantServiceImpl implements TenantService {
         return now.isBefore(gracePeriodEnd);
     }
 
-    private int getGracePeriodDays() {
-        return 7; // Adjust this value as needed
+    public int getGracePeriodDays() {
+        return 7;
     }
 
     @Override
@@ -95,7 +92,7 @@ public class TenantServiceImpl implements TenantService {
     @Override
     @Transactional
     public ResponseEntity<ObjectNode> startTrial(Long tenantId) throws NotFoundException {
-        Tenant tenant = tenantRepo.findById(tenantId).orElseThrow(NotFoundException::new);
+        Tenant tenant = tenantRepo.findById(tenantId).orElseThrow(() -> new NotFoundException("Tenant not found"));
         tenant.setTrial(true);
         tenant.setSubscriptionEndDate(CoreUtils.DateCalculations.addMonths(1));
         tenant.setCanTry(false);
@@ -112,7 +109,7 @@ public class TenantServiceImpl implements TenantService {
     @Override
     @Transactional
     public ResponseEntity<ObjectNode> update(Tenant data) throws NotFoundException {
-        Tenant tenant = tenantRepo.findById(data.getId()).orElseThrow(NotFoundException::new);
+        Tenant tenant = tenantRepo.findById(data.getId()).orElseThrow(() -> new NotFoundException("Tenant not found"));
 
         if (!Objects.equals(tenant.getName(), data.getName()) && Objects.nonNull(data.getName()) && !data.getName().isEmpty()) {
             tenant.setName(data.getName());

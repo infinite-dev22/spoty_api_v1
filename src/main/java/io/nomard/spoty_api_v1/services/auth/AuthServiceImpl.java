@@ -148,8 +148,4 @@ public class AuthServiceImpl implements AuthService {
         var principal = (SpotyUserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return employeeRepository.findByEmail(principal.getUsername());
     }
-
-    private int getGracePeriodDays() {
-        return 7; // Retrieve grace period duration from configuration
-    }
 }

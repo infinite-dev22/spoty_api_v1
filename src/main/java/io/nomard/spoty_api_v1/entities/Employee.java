@@ -25,7 +25,6 @@ public class Employee implements Serializable {
     private Branch branch;
     @JoinColumn(nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
     private Tenant tenant;
     private String firstName;
     private String lastName;

@@ -1,6 +1,7 @@
 package io.nomard.spoty_api_v1.controllers;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.services.implementations.TenantSubscriptionServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,7 @@ public class TenantSubscriptionController {
     private TenantSubscriptionServiceImpl subscriptionService;
 
     @GetMapping("/status")
-    public ResponseEntity<ObjectNode> checkSubscriptionStatus() {
+    public ResponseEntity<ObjectNode> checkSubscriptionStatus() throws NotFoundException {
         return subscriptionService.checkSubscriptionStatus();
     }
 }
