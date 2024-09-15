@@ -32,7 +32,7 @@ public class SupplierServiceImpl implements SupplierService {
     @Override
     public Page<Supplier> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return supplierRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+        return supplierRepo.findByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override
@@ -46,19 +46,19 @@ public class SupplierServiceImpl implements SupplierService {
 
     @Override
     public ArrayList<Supplier> getByContains(String search) {
-        return supplierRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
+        return supplierRepo.search(authService.authUser().getTenant().getId(), search.toLowerCase());
     }
 
     @Override
     @Transactional
     public ResponseEntity<ObjectNode> save(Supplier supplier) {
+        supplier.setTenant(authService.authUser().getTenant());
+        if (Objects.isNull(supplier.getBranch())) {
+            supplier.setBranch(authService.authUser().getBranch());
+        }
+        supplier.setCreatedBy(authService.authUser());
+        supplier.setCreatedAt(LocalDateTime.now());
         try {
-            supplier.setTenant(authService.authUser().getTenant());
-            if (Objects.isNull(supplier.getBranch())) {
-                supplier.setBranch(authService.authUser().getBranch());
-            }
-            supplier.setCreatedBy(authService.authUser());
-            supplier.setCreatedAt(LocalDateTime.now());
             supplierRepo.save(supplier);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -76,32 +76,36 @@ public class SupplierServiceImpl implements SupplierService {
         }
         var supplier = opt.get();
 
-        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
-            supplier.setName(data.getName());
+        if (Objects.nonNull(data.getFirstName()) && !"".equalsIgnoreCase(data.getFirstName())) {
+            supplier.setFirstName(data.getFirstName());
+        }
+
+        if (Objects.nonNull(data.getOtherName()) && !"".equalsIgnoreCase(data.getOtherName())) {
+            supplier.setOtherName(data.getOtherName());
+        }
+
+        if (Objects.nonNull(data.getLastName()) && !"".equalsIgnoreCase(data.getLastName())) {
+            supplier.setLastName(data.getLastName());
         }
 
         if (Objects.nonNull(data.getEmail()) && !"".equalsIgnoreCase(data.getEmail())) {
             supplier.setEmail(data.getEmail());
         }
 
-        if (Objects.nonNull(data.getCity()) && !"".equalsIgnoreCase(data.getCity())) {
-            supplier.setCity(data.getCity());
-        }
-
         if (Objects.nonNull(data.getPhone()) && !"".equalsIgnoreCase(data.getPhone())) {
             supplier.setPhone(data.getPhone());
-        }
-
-        if (Objects.nonNull(data.getAddress()) && !"".equalsIgnoreCase(data.getAddress())) {
-            supplier.setAddress(data.getAddress());
         }
 
         if (Objects.nonNull(data.getCountry()) && !"".equalsIgnoreCase(data.getCountry())) {
             supplier.setCountry(data.getCountry());
         }
 
-        if (Objects.nonNull(data.getCode()) && !"".equalsIgnoreCase(data.getCode())) {
-            supplier.setCode(data.getCode());
+        if (Objects.nonNull(data.getCity()) && !"".equalsIgnoreCase(data.getCity())) {
+            supplier.setCity(data.getCity());
+        }
+
+        if (Objects.nonNull(data.getAddress()) && !"".equalsIgnoreCase(data.getAddress())) {
+            supplier.setAddress(data.getAddress());
         }
 
         if (Objects.nonNull(data.getTaxNumber()) && !"".equalsIgnoreCase(data.getTaxNumber())) {

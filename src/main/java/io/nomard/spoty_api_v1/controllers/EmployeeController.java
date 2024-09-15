@@ -1,12 +1,12 @@
 package io.nomard.spoty_api_v1.controllers;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.User;
+import io.nomard.spoty_api_v1.entities.Employee;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.models.UserModel;
-import io.nomard.spoty_api_v1.services.implementations.UserServiceImpl;
+import io.nomard.spoty_api_v1.services.implementations.EmployeeServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,24 +16,24 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
-public class UserController {
+@RequestMapping("/employees")
+public class EmployeeController {
     @Autowired
-    private UserServiceImpl userService;
+    private EmployeeServiceImpl userService;
 
     @GetMapping("/all")
-    public Page<User> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+    public Page<Employee> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                              @RequestParam(defaultValue = "50") Integer pageSize) {
         return userService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public User getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public Employee getById(@RequestBody FindModel findModel) throws NotFoundException {
         return userService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<User> getByContains(@RequestBody SearchModel searchModel) {
+    public List<Employee> getByContains(@RequestBody SearchModel searchModel) {
         return userService.getByContains(searchModel.getSearch());
     }
 

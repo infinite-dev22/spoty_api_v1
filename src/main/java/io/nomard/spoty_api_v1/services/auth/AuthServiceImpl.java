@@ -3,9 +3,9 @@ package io.nomard.spoty_api_v1.services.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Branch;
+import io.nomard.spoty_api_v1.entities.Employee;
 import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.User;
-import io.nomard.spoty_api_v1.entities.UserProfile;
 import io.nomard.spoty_api_v1.entities.accounting.Account;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.LoginModel;
@@ -46,7 +46,7 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private BranchRepository branchRepo;
     @Autowired
-    private UserProfileRepository userProfileRepo;
+    private EmployeeRepository employeeRepository;
     @Autowired
     private UserRepository userRepo;
     @Autowired
@@ -69,7 +69,7 @@ public class AuthServiceImpl implements AuthService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             var userDetails = spotyUserDetailsService.loadUserByUsername(loginDetails.getEmail());
-            var user = userRepo.findUserByEmail(loginDetails.getEmail());
+            var user = employeeRepository.findByEmail(loginDetails.getEmail());
             var tenantId = user.getTenant().getId();
             var now = LocalDateTime.now();
             var gracePeriodEnd = tenantService.getSubscriptionEndDate(tenantId).plusDays(getGracePeriodDays());
@@ -144,27 +144,26 @@ public class AuthServiceImpl implements AuthService {
         account.setDescription("Default account for sales, purchases, payroll, etc.");
         account.setTenant(tenant);
 
-        var userProfile = new UserProfile();
-        userProfile.setFirstName(signUpDetails.getFirstName());
-        userProfile.setLastName(signUpDetails.getLastName());
-        userProfile.setOtherName(signUpDetails.getOtherName());
-        userProfile.setPhone(signUpDetails.getPhone());
-        userProfile.setTenant(tenant);
-
         var user = new User();
-        user.setUserProfile(userProfile);
-        user.setTenant(tenant);
-        user.setBranch(branch);
         user.setEmail(signUpDetails.getEmail());
         user.setPassword(passwordEncoder.encode(signUpDetails.getPassword()));
-        user.setRole(roleRepo.searchAllByNameContainingIgnoreCase("admin").getFirst());
+
+        var employee = new Employee();
+        employee.setFirstName(signUpDetails.getFirstName());
+        employee.setLastName(signUpDetails.getLastName());
+        employee.setOtherName(signUpDetails.getOtherName());
+        employee.setPhone(signUpDetails.getPhone());
+        employee.setTenant(tenant);
+        employee.setBranch(branch);
+        employee.setUser(user);
+        employee.setRole(roleRepo.searchAllByNameContainingIgnoreCase("admin").getFirst());
 
         try {
             tenantRepo.save(tenant);
             accountRepo.save(account);
             branchRepo.save(branch);
-            userProfileRepo.save(userProfile);
             userRepo.save(user);
+            employeeRepository.save(employee);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);
@@ -172,9 +171,9 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public User authUser() {
+    public Employee authUser() {
         var principal = (SpotyUserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userRepo.findUserByEmail(principal.getUsername());
+        return employeeRepository.findByEmail(principal.getUsername());
     }
 
     private int getGracePeriodDays() {
