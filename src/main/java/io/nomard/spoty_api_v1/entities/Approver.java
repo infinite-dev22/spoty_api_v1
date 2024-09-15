@@ -51,7 +51,7 @@ public class Approver {
     @JsonIgnore
     private Branch branch;
     @ManyToOne(fetch = FetchType.LAZY)
-    private User employee;
+    private Employee employee;
     @ManyToMany(mappedBy = "approvers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @Builder.Default
     @JsonIgnore
@@ -93,12 +93,12 @@ public class Approver {
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
-    private User createdBy;
+    private Employee createdBy;
     @JsonIgnore
     private LocalDateTime updatedAt;
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
-    private User updatedBy;
+    private Employee updatedBy;
 
     @Override
     public final boolean equals(Object o) {

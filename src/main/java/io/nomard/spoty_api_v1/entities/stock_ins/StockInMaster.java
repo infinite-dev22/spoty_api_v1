@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Approver;
 import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Tenant;
-import io.nomard.spoty_api_v1.entities.User;
+import io.nomard.spoty_api_v1.entities.Employee;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
@@ -63,10 +63,10 @@ public class StockInMaster implements Serializable {
     private String approvalStatus;
     private LocalDateTime createdAt;
     @ManyToOne
-    private User createdBy;
+    private Employee createdBy;
     private LocalDateTime updatedAt;
     @ManyToOne
-    private User updatedBy;
+    private Employee updatedBy;
 
     @Override
     public final boolean equals(Object o) {

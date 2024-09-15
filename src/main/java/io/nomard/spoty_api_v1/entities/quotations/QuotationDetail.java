@@ -17,7 +17,7 @@ package io.nomard.spoty_api_v1.entities.quotations;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Product;
 import io.nomard.spoty_api_v1.entities.UnitOfMeasure;
-import io.nomard.spoty_api_v1.entities.User;
+import io.nomard.spoty_api_v1.entities.Employee;
 import io.nomard.spoty_api_v1.entities.deductions.Discount;
 import io.nomard.spoty_api_v1.entities.deductions.Tax;
 import jakarta.persistence.*;
@@ -66,12 +66,12 @@ public class QuotationDetail implements Serializable {
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
-    private User createdBy;
+    private Employee createdBy;
     @JsonIgnore
     private LocalDateTime updatedAt;
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
-    private User updatedBy;
+    private Employee updatedBy;
 
     @Override
     public final boolean equals(Object o) {

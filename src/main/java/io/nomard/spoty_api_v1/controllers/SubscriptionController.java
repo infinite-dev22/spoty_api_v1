@@ -3,8 +3,8 @@ package io.nomard.spoty_api_v1.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.services.interfaces.EmployeeService;
 import io.nomard.spoty_api_v1.services.interfaces.TenantService;
-import io.nomard.spoty_api_v1.services.interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,13 +22,13 @@ public class SubscriptionController {
     private TenantService tenantService;
 
     @Autowired
-    private UserService userService;
+    private EmployeeService employeeService;
     @Autowired
     private ObjectMapper objectMapper;
 
     @GetMapping("/status")
     public ResponseEntity<ObjectNode> getSubscriptionStatus(@RequestParam String email) throws NotFoundException {
-        Long userId = userService.getByEmail(email).getId();
+        Long userId = employeeService.getByEmail(email).getId();
         var trialEndDate = tenantService.getTrialEndDate(userId);
         boolean isTrial = tenantService.isTrial(userId);
         boolean canTry = tenantService.canTry(userId);

@@ -3,7 +3,7 @@ package io.nomard.spoty_api_v1.entities.hrm.pay_roll;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Tenant;
-import io.nomard.spoty_api_v1.entities.User;
+import io.nomard.spoty_api_v1.entities.Employee;
 import io.nomard.spoty_api_v1.entities.hrm.hrm.Designation;
 import jakarta.persistence.*;
 import lombok.*;
@@ -31,7 +31,7 @@ public class Salary {
     @JsonIgnore
     private Tenant tenant;
     @ManyToOne
-    private User employee;
+    private Employee employee;
     @ManyToOne
     private Designation designation;
     private String period;
@@ -44,10 +44,10 @@ public class Salary {
     private String netSalary;
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
-    private User createdBy;
+    private Employee createdBy;
     private LocalDateTime updatedAt;
     @ManyToOne(fetch = FetchType.LAZY)
-    private User updatedBy;
+    private Employee updatedBy;
 
     @Override
     public final boolean equals(Object o) {

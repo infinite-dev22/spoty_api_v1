@@ -34,12 +34,12 @@ public class Tenant {
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
-    private User createdBy;
+    private Employee createdBy;
     @JsonIgnore
     private LocalDateTime updatedAt;
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
-    private User updatedBy;
+    private Employee updatedBy;
 
     @Override
     public final boolean equals(Object o) {

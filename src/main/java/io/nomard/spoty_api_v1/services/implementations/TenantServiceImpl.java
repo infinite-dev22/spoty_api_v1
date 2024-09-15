@@ -3,6 +3,7 @@ package io.nomard.spoty_api_v1.services.implementations;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
+import io.nomard.spoty_api_v1.repositories.EmployeeRepository;
 import io.nomard.spoty_api_v1.repositories.TenantRepository;
 import io.nomard.spoty_api_v1.repositories.UserRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
@@ -29,7 +30,7 @@ public class TenantServiceImpl implements TenantService {
     @Autowired
     private TenantRepository tenantRepo;
     @Autowired
-    private UserRepository userRepo;
+    private EmployeeRepository employeeRepo;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
 
@@ -54,22 +55,22 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public LocalDateTime getTrialEndDate(Long id) throws NotFoundException {
-        return userRepo.findById(id).orElseThrow(NotFoundException::new).getTenant().getTrialEndDate();
+        return employeeRepo.findById(id).orElseThrow(NotFoundException::new).getTenant().getTrialEndDate();
     }
 
     @Override
     public boolean isTrial(Long id) throws NotFoundException {
-        return userRepo.findById(id).orElseThrow(NotFoundException::new).getTenant().isTrial();
+        return employeeRepo.findById(id).orElseThrow(NotFoundException::new).getTenant().isTrial();
     }
 
     @Override
     public boolean canTry(Long id) throws NotFoundException {
-        return userRepo.findById(id).orElseThrow(NotFoundException::new).getTenant().isCanTry();
+        return employeeRepo.findById(id).orElseThrow(NotFoundException::new).getTenant().isCanTry();
     }
 
     @Override
     public boolean isNewTenancy(Long id) throws NotFoundException {
-        return userRepo.findById(id).orElseThrow(NotFoundException::new).getTenant().isNewTenancy();
+        return employeeRepo.findById(id).orElseThrow(NotFoundException::new).getTenant().isNewTenancy();
     }
 
     @Override

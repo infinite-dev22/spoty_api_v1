@@ -7,6 +7,7 @@ import org.hibernate.proxy.HibernateProxy;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.List;
 import java.util.Objects;
 
@@ -58,8 +59,6 @@ public class TenantSettings {
     @OneToMany(orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default
     private List<Approver> approvers = new ArrayList<>();
-    @OneToOne(targetEntity = Currency.class, fetch = FetchType.LAZY)
-    @JsonIgnore
     private Currency defaultCurrency;
     private String logo;
     @JoinColumn(nullable = false)
@@ -68,10 +67,10 @@ public class TenantSettings {
     private Tenant tenant;
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
-    private User createdBy;
+    private Employee createdBy;
     private LocalDateTime updatedAt;
     @ManyToOne(fetch = FetchType.LAZY)
-    private User updatedBy;
+    private Employee updatedBy;
 
     @Override
     public final boolean equals(Object o) {
