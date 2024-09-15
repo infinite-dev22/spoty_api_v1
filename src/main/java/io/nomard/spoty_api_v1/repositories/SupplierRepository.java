@@ -14,19 +14,19 @@ import java.util.ArrayList;
 
 @Repository
 public interface SupplierRepository extends PagingAndSortingRepository<Supplier, Long>, JpaRepository<Supplier, Long> {
-    @Query("select s from Supplier s where s.tenant.id = :tenantId " +
-            "AND concat(" +
-            "trim(lower(s.name))," +
-            "trim(lower(s.code))," +
-            "trim(lower(s.city))," +
-            "trim(lower(s.phone))," +
-            "trim(lower(s.email))," +
-            "trim(lower(s.address))," +
-            "trim(lower(s.country))) like %:search%")
-    ArrayList<Supplier> searchAll(@Param("tenantId") Long tenantId, @Param("search") String search);
+    @Query("SELECT c FROM Customer c WHERE c.tenant.id = :tenantId " +
+            "AND CONCAT(" +
+            "TRIM(LOWER(c.firstName))," +
+            "TRIM(LOWER(c.otherName))," +
+            "TRIM(LOWER(c.lastName))," +
+            "TRIM(LOWER(c.city))," +
+            "TRIM(LOWER(c.phone))," +
+            "TRIM(LOWER(c.address))," +
+            "TRIM(LOWER(c.country))) LIKE %:search%")
+    ArrayList<Supplier> search(@Param("tenantId") Long tenantId, @Param("search") String search);
 
     @Query("select p from Supplier p where p.tenant.id = :id OR p.tenant IS NULL")
-    Page<Supplier> findAllByTenantId(@Param("id") Long id, Pageable pageable);
+    Page<Supplier> findByTenantId(@Param("id") Long id, Pageable pageable);
 
     @Query("SELECT new io.nomard.spoty_api_v1.models.DashboardKPIModel('Total Suppliers', COUNT(s)) " +
             "FROM Supplier s " +
