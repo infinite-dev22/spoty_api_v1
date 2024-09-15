@@ -15,48 +15,54 @@
 package io.nomard.spoty_api_v1.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.nomard.spoty_api_v1.entities.hrm.hrm.EmploymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+@Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity
-public class Customer {
+public class Customer implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
-    private String name;
-    private String code;
-    private String email;
-    @Column(nullable = false)
-    private String phone;
-    private String city;
-    private String address;
-    private String taxNumber;
-    private String avatar;
     @ManyToOne(targetEntity = Branch.class, fetch = FetchType.LAZY)
     @JsonIgnore
     private Branch branch;
-    @JoinColumn(name = "tenant_id")
+    @JoinColumn
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     private Tenant tenant;
-    @Column(nullable = false)
+    private String firstName;
+    private String lastName;
+    private String otherName;
+    private String email;
+    private String phone;
+    @Column(unique = true)
+    private String avatar;
+    private String salary;
     private String country;
+    private String city;
+    private String address;
+    private String taxNumber;
+    @JoinColumn
+    @OneToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    private User user;
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
-    private User createdBy;
+    private Employee createdBy;
     private LocalDateTime updatedAt;
     @ManyToOne(fetch = FetchType.LAZY)
-    private User updatedBy;
+    private Employee updatedBy;
 
     @Override
     public final boolean equals(Object o) {
@@ -65,8 +71,8 @@ public class Customer {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Customer customer = (Customer) o;
-        return getId() != null && Objects.equals(getId(), customer.getId());
+        Customer user = (Customer) o;
+        return getId() != null && Objects.equals(getId(), user.getId());
     }
 
     @Override
