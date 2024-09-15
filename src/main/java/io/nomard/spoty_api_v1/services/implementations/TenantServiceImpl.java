@@ -5,7 +5,6 @@ import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.EmployeeRepository;
 import io.nomard.spoty_api_v1.repositories.TenantRepository;
-import io.nomard.spoty_api_v1.repositories.UserRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.interfaces.TenantService;
 import io.nomard.spoty_api_v1.utils.CoreUtils;
@@ -54,11 +53,6 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    public LocalDateTime getTrialEndDate(Long id) throws NotFoundException {
-        return employeeRepo.findById(id).orElseThrow(NotFoundException::new).getTenant().getTrialEndDate();
-    }
-
-    @Override
     public boolean isTrial(Long id) throws NotFoundException {
         return employeeRepo.findById(id).orElseThrow(NotFoundException::new).getTenant().isTrial();
     }
@@ -103,8 +97,7 @@ public class TenantServiceImpl implements TenantService {
     public ResponseEntity<ObjectNode> startTrial(Long tenantId) throws NotFoundException {
         Tenant tenant = tenantRepo.findById(tenantId).orElseThrow(NotFoundException::new);
         tenant.setTrial(true);
-        tenant.setTrialEndDate(CoreUtils.DateCalculations.addDays(7));
-        tenant.setSubscriptionEndDate(CoreUtils.DateCalculations.addDays(7));
+        tenant.setSubscriptionEndDate(CoreUtils.DateCalculations.addMonths(1));
         tenant.setCanTry(false);
         tenant.setUpdatedAt(LocalDateTime.now());
         try {
@@ -127,10 +120,6 @@ public class TenantServiceImpl implements TenantService {
 
         if (!Objects.equals(tenant.isTrial(), data.isTrial())) {
             tenant.setTrial(data.isTrial());
-        }
-
-        if (!Objects.equals(tenant.getTrialEndDate(), data.getTrialEndDate()) && Objects.nonNull(data.getTrialEndDate())) {
-            tenant.setTrialEndDate(data.getTrialEndDate());
         }
 
         if (!Objects.equals(tenant.isNewTenancy(), data.isNewTenancy())) {

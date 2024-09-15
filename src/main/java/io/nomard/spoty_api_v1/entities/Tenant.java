@@ -21,13 +21,14 @@ public class Tenant {
     @Column(nullable = false)
     private String name;
     @Column(nullable = false)
+    private String email;
+    @Column(nullable = false)
     @Basic(fetch = FetchType.EAGER)
     private LocalDateTime subscriptionEndDate;
     @Builder.Default
     private boolean trial = false;
     @Builder.Default
     private boolean canTry = true;
-    private LocalDateTime trialEndDate;
     @Builder.Default
     private boolean newTenancy = true;
     @JsonIgnore

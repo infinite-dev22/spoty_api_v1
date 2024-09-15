@@ -59,7 +59,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee getByEmail(String email) {
-        return employeeRepo.findByEmail(authService.authUser().getTenant().getId(), email);
+        return employeeRepo.findByEmail(email);
     }
 
     @Override
