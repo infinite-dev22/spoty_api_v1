@@ -36,7 +36,7 @@ public class TenantSubscriptionServiceImpl {
 
         var response = objectMapper.createObjectNode();
         response.put("canTry", tenantService.canTry(tenantId));
-        response.put("block_access", subscriptionEndDate.isAfter(now));
+        response.put("block_access", subscriptionEndDate.isBefore(now));
 
         if (trial && activeTenancyWarning && Objects.equals(authService.authUser().getEmail(), authService.authUser().getTenant().getEmail())) {
             response.put("show_trial_soon_ends", true);

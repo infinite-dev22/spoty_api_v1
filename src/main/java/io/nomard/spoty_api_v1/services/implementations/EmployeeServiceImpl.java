@@ -86,6 +86,14 @@ public class EmployeeServiceImpl implements EmployeeService {
             employee.setBranch(data.getBranch());
         }
 
+        if (!Objects.equals(employee.getDepartment(), data.getDepartment()) && Objects.nonNull(data.getDepartment())) {
+            employee.setDepartment(data.getDepartment());
+        }
+
+        if (!Objects.equals(employee.getDesignation(), data.getDesignation()) && Objects.nonNull(data.getDesignation())) {
+            employee.setDesignation(data.getDesignation());
+        }
+
         if (!Objects.equals(employee.getFirstName(), data.getFirstName()) && Objects.nonNull(data.getFirstName()) && !"".equalsIgnoreCase(data.getFirstName())) {
             employee.setFirstName(data.getFirstName());
         }

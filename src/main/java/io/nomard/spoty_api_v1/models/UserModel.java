@@ -17,6 +17,8 @@ package io.nomard.spoty_api_v1.models;
 import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Role;
 import io.nomard.spoty_api_v1.entities.Tenant;
+import io.nomard.spoty_api_v1.entities.hrm.hrm.Department;
+import io.nomard.spoty_api_v1.entities.hrm.hrm.Designation;
 import io.nomard.spoty_api_v1.entities.hrm.hrm.EmploymentStatus;
 import lombok.*;
 
@@ -40,6 +42,8 @@ public class UserModel implements Serializable {
     private String phone;
     private Role role;
     private EmploymentStatus employmentStatus;
+    private Department department;
+    private Designation designation;
     @Builder.Default
     private boolean active = true;
     @Builder.Default

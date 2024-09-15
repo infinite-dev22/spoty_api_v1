@@ -1,6 +1,8 @@
 package io.nomard.spoty_api_v1.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.nomard.spoty_api_v1.entities.hrm.hrm.Department;
+import io.nomard.spoty_api_v1.entities.hrm.hrm.Designation;
 import io.nomard.spoty_api_v1.entities.hrm.hrm.EmploymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,6 +28,22 @@ public class Employee implements Serializable {
     @JoinColumn(nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Tenant tenant;
+    @JoinColumn
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Department department;
+    @JoinColumn
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Designation designation;
+    @JoinColumn
+    @ManyToOne(fetch = FetchType.LAZY)
+    private EmploymentStatus employmentStatus;
+    @JoinColumn(nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    private User user;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
+    private Role role;
     private String firstName;
     private String lastName;
     private String otherName;
@@ -34,18 +52,7 @@ public class Employee implements Serializable {
     private String avatar;
     private String email;
     private String salary;
-    @JoinColumn(nullable = false)
-    @OneToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
-    private User user;
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
-    @JsonIgnore
-    private Role role;
     @JoinColumn
-    @JsonIgnore
-    @OneToOne(fetch = FetchType.LAZY)
-    private EmploymentStatus employmentStatus;
     @Column(nullable = false)
     @Builder.Default
     private boolean active = true;
