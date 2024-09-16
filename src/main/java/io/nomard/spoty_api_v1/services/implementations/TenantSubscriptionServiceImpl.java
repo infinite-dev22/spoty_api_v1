@@ -36,22 +36,22 @@ public class TenantSubscriptionServiceImpl {
 
         var response = objectMapper.createObjectNode();
         response.put("canTry", tenantService.canTry(tenantId));
-        response.put("block_access", subscriptionEndDate.isBefore(now));
+        response.put("blockAccess", subscriptionEndDate.isBefore(now));
 
         if (trial && activeTenancyWarning && Objects.equals(authService.authUser().getEmail(), authService.authUser().getTenant().getEmail())) {
-            response.put("show_trial_soon_ends", true);
-            response.put("time_left", ChronoUnit.DAYS.between(gracePeriodEnd, LocalDateTime.now()));
+            response.put("showTrialSoonEnds", true);
+            response.put("timeLeft", ChronoUnit.DAYS.between(gracePeriodEnd, LocalDateTime.now()));
             response.put("message", "Your trial expires in " + ChronoUnit.DAYS.between(gracePeriodEnd, LocalDateTime.now()) + " days");
         } else if (trial && activeTenancyWarning && !Objects.equals(authService.authUser().getEmail(), authService.authUser().getTenant().getEmail())) {
-            response.put("show_trial_soon_ends", false);
+            response.put("showTrialSoonEnds", false);
             response.put("message", "Welcome to the brighter side of tech, enjoy your stay");
         }
         if (!trial && activeTenancyWarning && Objects.equals(authService.authUser().getEmail(), authService.authUser().getTenant().getEmail())) {
-            response.put("show_subscription_warning", true);
-            response.put("time_left", ChronoUnit.DAYS.between(gracePeriodEnd, LocalDateTime.now()));
+            response.put("showSubscriptionWarning", true);
+            response.put("timeLeft", ChronoUnit.DAYS.between(gracePeriodEnd, LocalDateTime.now()));
             response.put("message", "Subscription expires in " + ChronoUnit.DAYS.between(gracePeriodEnd, LocalDateTime.now()) + " days");
         } else if (!trial && activeTenancyWarning && !Objects.equals(authService.authUser().getEmail(), authService.authUser().getTenant().getEmail())) {
-            response.put("show_subscription_warning", false);
+            response.put("showSubscriptionWarning", false);
             response.put("message", "Welcome to the brighter side of tech, enjoy your stay");
         }
 
