@@ -44,6 +44,11 @@ public class TenantSubscriptionServiceImpl {
             response.put("message", "Your trial expires in " + ChronoUnit.DAYS.between(gracePeriodEnd, LocalDateTime.now()) + " days");
         } else if (trial && activeTenancyWarning && !Objects.equals(authService.authUser().getEmail(), authService.authUser().getTenant().getEmail())) {
             response.put("showTrialSoonEnds", false);
+            response.put("timeLeft", ChronoUnit.DAYS.between(gracePeriodEnd, LocalDateTime.now()));
+            response.put("message", "Welcome to the brighter side of tech, enjoy your stay");
+        } else {
+            response.put("showTrialSoonEnds", false);
+            response.put("timeLeft", ChronoUnit.DAYS.between(gracePeriodEnd, LocalDateTime.now()));
             response.put("message", "Welcome to the brighter side of tech, enjoy your stay");
         }
         if (!trial && activeTenancyWarning && Objects.equals(authService.authUser().getEmail(), authService.authUser().getTenant().getEmail())) {
@@ -52,6 +57,11 @@ public class TenantSubscriptionServiceImpl {
             response.put("message", "Subscription expires in " + ChronoUnit.DAYS.between(gracePeriodEnd, LocalDateTime.now()) + " days");
         } else if (!trial && activeTenancyWarning && !Objects.equals(authService.authUser().getEmail(), authService.authUser().getTenant().getEmail())) {
             response.put("showSubscriptionWarning", false);
+            response.put("timeLeft", ChronoUnit.DAYS.between(gracePeriodEnd, LocalDateTime.now()));
+            response.put("message", "Welcome to the brighter side of tech, enjoy your stay");
+        } else {
+            response.put("showSubscriptionWarning", false);
+            response.put("timeLeft", ChronoUnit.DAYS.between(gracePeriodEnd, LocalDateTime.now()));
             response.put("message", "Welcome to the brighter side of tech, enjoy your stay");
         }
 
