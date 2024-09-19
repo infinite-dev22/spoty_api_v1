@@ -7,6 +7,7 @@ import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.PasswordChangeModel;
 import io.nomard.spoty_api_v1.models.UserModel;
 import io.nomard.spoty_api_v1.repositories.EmployeeRepository;
+import io.nomard.spoty_api_v1.repositories.UserRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.EmployeeService;
@@ -33,6 +34,8 @@ import java.util.logging.Level;
 public class EmployeeServiceImpl implements EmployeeService {
     @Autowired
     private EmployeeRepository employeeRepo;
+    @Autowired
+    private UserRepository userRepo;
     @Autowired
     private AuthServiceImpl authService;
     @Autowired
@@ -223,6 +226,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setEmail(data.getEmail());
         employee.setSalary(data.getSalary());
         employee.setRole(data.getRole());
+        employee.setDepartment(data.getDepartment());
+        employee.setDesignation(data.getDesignation());
+        employee.setEmploymentStatus(data.getEmploymentStatus());
         employee.setActive(true);
         employee.setLocked(false);
         employee.setTenant(authService.authUser().getTenant());
@@ -233,6 +239,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setCreatedAt(LocalDateTime.now());
 
         try {
+            userRepo.save(user);
             employeeRepo.save(employee);
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
