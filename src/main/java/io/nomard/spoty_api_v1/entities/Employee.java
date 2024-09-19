@@ -48,7 +48,6 @@ public class Employee implements Serializable {
     private String lastName;
     private String otherName;
     private String phone;
-    @Column(unique = true)
     private String avatar;
     private String email;
     private String salary;
