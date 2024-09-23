@@ -7,10 +7,20 @@ import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.PasswordChangeModel;
 import io.nomard.spoty_api_v1.models.UserModel;
 import io.nomard.spoty_api_v1.repositories.EmployeeRepository;
+import io.nomard.spoty_api_v1.repositories.RoleRepository;
 import io.nomard.spoty_api_v1.repositories.UserRepository;
+import io.nomard.spoty_api_v1.repositories.hrm.hrm.DepartmentRepository;
+import io.nomard.spoty_api_v1.repositories.hrm.hrm.DesignationRepository;
+import io.nomard.spoty_api_v1.repositories.hrm.hrm.EmploymentStatusRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.EmployeeService;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.logging.Level;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,33 +32,48 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.logging.Level;
-
 @Service
 @Log
 public class EmployeeServiceImpl implements EmployeeService {
+
     @Autowired
     private EmployeeRepository employeeRepo;
+
     @Autowired
-    private UserRepository userRepo;
+    private RoleRepository roleRepo;
+
+    @Autowired
+    private DepartmentRepository departmentRepo;
+
+    @Autowired
+    private DesignationRepository designationRepo;
+
+    @Autowired
+    private EmploymentStatusRepository employmentStatusRepo;
+
     @Autowired
     private AuthServiceImpl authService;
+
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
+
     @Autowired
     private EmailServiceImpl emailServiceImpl;
+
     @Autowired
     private TenantSettingsServiceImpl settingsService;
 
     @Override
     public Page<Employee> getAll(int pageNo, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return employeeRepo.findByEmail(authService.authUser().getTenant().getId(), pageRequest);
+        PageRequest pageRequest = PageRequest.of(
+            pageNo,
+            pageSize,
+            Sort.by(Sort.Order.desc("createdAt"))
+        );
+        return employeeRepo.findByEmail(
+            authService.authUser().getTenant().getId(),
+            pageRequest
+        );
     }
 
     @Override
@@ -67,12 +92,16 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public ArrayList<Employee> getByContains(String search) {
-        return employeeRepo.searchEmployee(authService.authUser().getTenant().getId(), search.toLowerCase());
+        return employeeRepo.searchEmployee(
+            authService.authUser().getTenant().getId(),
+            search.toLowerCase()
+        );
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> update(UserModel data) throws NotFoundException {
+    public ResponseEntity<ObjectNode> update(UserModel data)
+        throws NotFoundException {
         var opt = employeeRepo.findById(data.getId());
 
         if (opt.isEmpty()) {
@@ -81,52 +110,97 @@ public class EmployeeServiceImpl implements EmployeeService {
         var employee = opt.get();
         var user = employee.getUser();
 
-        if (!Objects.equals(employee.getTenant(), data.getTenant()) && Objects.nonNull(data.getTenant())) {
+        if (
+            !Objects.equals(employee.getTenant(), data.getTenant()) &&
+            Objects.nonNull(data.getTenant())
+        ) {
             employee.setTenant(data.getTenant());
         }
 
-        if (!Objects.equals(employee.getBranch(), data.getBranch()) && Objects.nonNull(data.getBranch())) {
+        if (
+            !Objects.equals(employee.getBranch(), data.getBranch()) &&
+            Objects.nonNull(data.getBranch())
+        ) {
             employee.setBranch(data.getBranch());
         }
 
-        if (!Objects.equals(employee.getDepartment(), data.getDepartment()) && Objects.nonNull(data.getDepartment())) {
+        if (
+            !Objects.equals(employee.getDepartment(), data.getDepartment()) &&
+            Objects.nonNull(data.getDepartment())
+        ) {
             employee.setDepartment(data.getDepartment());
         }
 
-        if (!Objects.equals(employee.getDesignation(), data.getDesignation()) && Objects.nonNull(data.getDesignation())) {
+        if (
+            !Objects.equals(employee.getDesignation(), data.getDesignation()) &&
+            Objects.nonNull(data.getDesignation())
+        ) {
             employee.setDesignation(data.getDesignation());
         }
 
-        if (!Objects.equals(employee.getFirstName(), data.getFirstName()) && Objects.nonNull(data.getFirstName()) && !"".equalsIgnoreCase(data.getFirstName())) {
+        if (
+            !Objects.equals(employee.getFirstName(), data.getFirstName()) &&
+            Objects.nonNull(data.getFirstName()) &&
+            !"".equalsIgnoreCase(data.getFirstName())
+        ) {
             employee.setFirstName(data.getFirstName());
         }
 
-        if (!Objects.equals(employee.getLastName(), data.getLastName()) && Objects.nonNull(data.getLastName()) && !"".equalsIgnoreCase(data.getLastName())) {
+        if (
+            !Objects.equals(employee.getLastName(), data.getLastName()) &&
+            Objects.nonNull(data.getLastName()) &&
+            !"".equalsIgnoreCase(data.getLastName())
+        ) {
             employee.setLastName(data.getLastName());
         }
 
-        if (!Objects.equals(employee.getOtherName(), data.getOtherName()) && Objects.nonNull(data.getOtherName()) && !"".equalsIgnoreCase(data.getOtherName())) {
+        if (
+            !Objects.equals(employee.getOtherName(), data.getOtherName()) &&
+            Objects.nonNull(data.getOtherName()) &&
+            !"".equalsIgnoreCase(data.getOtherName())
+        ) {
             employee.setOtherName(data.getOtherName());
         }
 
-        if (!Objects.equals(employee.getEmail(), data.getEmail()) && Objects.nonNull(data.getEmail()) && !"".equalsIgnoreCase(data.getEmail())) {
+        if (
+            !Objects.equals(employee.getEmail(), data.getEmail()) &&
+            Objects.nonNull(data.getEmail()) &&
+            !"".equalsIgnoreCase(data.getEmail())
+        ) {
             employee.setEmail(data.getEmail());
             user.setEmail(data.getEmail());
         }
 
-        if (!Objects.equals(employee.getSalary(), data.getSalary()) && Objects.nonNull(data.getSalary()) && !"".equalsIgnoreCase(data.getSalary())) {
+        if (
+            !Objects.equals(employee.getSalary(), data.getSalary()) &&
+            Objects.nonNull(data.getSalary()) &&
+            !"".equalsIgnoreCase(data.getSalary())
+        ) {
             employee.setSalary(data.getSalary());
         }
 
-        if (!Objects.equals(employee.getPhone(), data.getPhone()) && Objects.nonNull(data.getPhone()) && !"".equalsIgnoreCase(data.getPhone())) {
+        if (
+            !Objects.equals(employee.getPhone(), data.getPhone()) &&
+            Objects.nonNull(data.getPhone()) &&
+            !"".equalsIgnoreCase(data.getPhone())
+        ) {
             employee.setPhone(data.getPhone());
         }
 
-        if (!Objects.equals(employee.getRole(), data.getRole()) && Objects.nonNull(data.getRole())) {
+        if (
+            !Objects.equals(employee.getRole(), data.getRole()) &&
+            Objects.nonNull(data.getRole())
+        ) {
             employee.setRole(data.getRole());
         }
 
-        if (!Objects.equals(employee.getEmploymentStatus(), data.getEmploymentStatus()) && Objects.nonNull(data.getEmploymentStatus())) {
+        if (
+            !Objects.equals(
+                employee.getEmploymentStatus(),
+                data.getEmploymentStatus()
+            ) &&
+            Objects.nonNull(data.getEmploymentStatus())
+        ) {
             employee.setEmploymentStatus(data.getEmploymentStatus());
         }
 
@@ -138,7 +212,10 @@ public class EmployeeServiceImpl implements EmployeeService {
             employee.setLocked(data.isLocked());
         }
 
-        if (Objects.nonNull(data.getAvatar()) && !"".equalsIgnoreCase(data.getAvatar())) {
+        if (
+            Objects.nonNull(data.getAvatar()) &&
+            !"".equalsIgnoreCase(data.getAvatar())
+        ) {
             employee.setAvatar(data.getAvatar());
         }
 
@@ -151,13 +228,20 @@ public class EmployeeServiceImpl implements EmployeeService {
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
-            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+            return spotyResponseImpl.custom(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+            );
         }
     }
 
-    public ResponseEntity<ObjectNode> changePassword(PasswordChangeModel data) throws NotFoundException {
+    public ResponseEntity<ObjectNode> changePassword(PasswordChangeModel data)
+        throws NotFoundException {
         if (!Objects.equals(data.getPassword(), data.getConfirmPassword())) {
-            return spotyResponseImpl.custom(HttpStatus.CONFLICT, "Passwords do not match");
+            return spotyResponseImpl.custom(
+                HttpStatus.CONFLICT,
+                "Passwords do not match"
+            );
         }
 
         var opt = Optional.of(employeeRepo.findByEmail(data.getEmail()));
@@ -181,7 +265,10 @@ public class EmployeeServiceImpl implements EmployeeService {
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
-            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+            return spotyResponseImpl.custom(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+            );
         }
     }
 
@@ -194,16 +281,24 @@ public class EmployeeServiceImpl implements EmployeeService {
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
-            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+            return spotyResponseImpl.custom(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+            );
         }
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> add(UserModel data) throws NotFoundException {
+    public ResponseEntity<ObjectNode> add(UserModel data)
+        throws NotFoundException {
         Employee existingUser = employeeRepo.findByEmail(data.getEmail());
 
-        if (existingUser != null && existingUser.getEmail() != null && !existingUser.getEmail().isEmpty()) {
+        if (
+            existingUser != null &&
+            existingUser.getEmail() != null &&
+            !existingUser.getEmail().isEmpty()
+        ) {
             return spotyResponseImpl.taken();
         }
 
@@ -211,13 +306,34 @@ public class EmployeeServiceImpl implements EmployeeService {
         user.setEmail(data.getEmail());
         var password = UUID.randomUUID().toString().substring(0, 12);
         user.setPassword(new BCryptPasswordEncoder(8).encode(password));
+        user.setUserType("Employee");
         user.setCreatedBy(authService.authUser());
         user.setCreatedAt(LocalDateTime.now());
 
+        var roleOpt = roleRepo.findById(data.getRole().getId());
+        if (roleOpt.isEmpty()) {
+            throw new NotFoundException();
+        }
+
+        var departmentOpt = departmentRepo.findById(data.getRole().getId());
+        if (departmentOpt.isEmpty()) {
+            throw new NotFoundException();
+        }
+
+        var designationOpt = designationRepo.findById(data.getRole().getId());
+        if (designationOpt.isEmpty()) {
+            throw new NotFoundException();
+        }
+
+        var employmentStatusOpt = employmentStatusRepo.findById(
+            data.getRole().getId()
+        );
+        if (employmentStatusOpt.isEmpty()) {
+            throw new NotFoundException();
+        }
+
         var employee = new Employee();
         employee.setUser(user);
-        employee.setTenant(data.getTenant());
-        employee.setBranch(data.getBranch());
         employee.setFirstName(data.getFirstName());
         employee.setLastName(data.getLastName());
         employee.setOtherName(data.getOtherName());
@@ -225,10 +341,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setAvatar(data.getAvatar());
         employee.setEmail(data.getEmail());
         employee.setSalary(data.getSalary());
-        employee.setRole(data.getRole());
-        employee.setDepartment(data.getDepartment());
-        employee.setDesignation(data.getDesignation());
-        employee.setEmploymentStatus(data.getEmploymentStatus());
+        employee.setRole(roleOpt.get());
+        employee.setDepartment(departmentOpt.get());
+        employee.setDesignation(designationOpt.get());
+        employee.setEmploymentStatus(employmentStatusOpt.get());
         employee.setActive(true);
         employee.setLocked(false);
         employee.setTenant(authService.authUser().getTenant());
@@ -239,21 +355,42 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setCreatedAt(LocalDateTime.now());
 
         try {
-            userRepo.save(user);
             employeeRepo.save(employee);
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
-            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+            return spotyResponseImpl.custom(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+            );
         }
 
         try {
-            var content = "<html><h1>These are your employment details</h1><p>Email: " + employee.getEmail() + "</p><p>Password: " + password + "</p></html>";
+            var content =
+                "<html><h1>These are your employment details</h1><p>Email: " +
+                employee.getEmail() +
+                "</p><p>Password: " +
+                password +
+                "</p></html>";
 
-            emailServiceImpl.sendSimpleMessage(settingsService.getSettings().getHrEmail(), employee.getEmail(), "Employment Letter & Work Details", content);
-            emailServiceImpl.sendMessageWithAttachment(settingsService.getSettings().getHrEmail(), employee.getEmail(), "Employment Letter & Work Details", content, "/home/infinite/Documents/Job_Search/Resume_Jonathan_Mark_Mwigo.pdf");
+            emailServiceImpl.sendSimpleMessage(
+                settingsService.getSettings().getHrEmail(),
+                employee.getEmail(),
+                "Employment Letter & Work Details",
+                content
+            );
+            emailServiceImpl.sendMessageWithAttachment(
+                settingsService.getSettings().getHrEmail(),
+                employee.getEmail(),
+                "Employment Letter & Work Details",
+                content,
+                "/home/infinite/Documents/Job_Search/Resume_Jonathan_Mark_Mwigo.pdf"
+            );
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
-            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+            return spotyResponseImpl.custom(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+            );
         }
 
         return spotyResponseImpl.created();

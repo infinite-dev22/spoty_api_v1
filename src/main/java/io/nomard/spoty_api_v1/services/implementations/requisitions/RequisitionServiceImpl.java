@@ -13,6 +13,12 @@ import io.nomard.spoty_api_v1.services.implementations.TenantSettingsServiceImpl
 import io.nomard.spoty_api_v1.services.interfaces.requisitions.RequisitionService;
 import io.nomard.spoty_api_v1.utils.CoreCalculations;
 import io.nomard.spoty_api_v1.utils.CoreUtils;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.logging.Level;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -24,31 +30,37 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.logging.Level;
-
 @Service
 @Log
 public class RequisitionServiceImpl implements RequisitionService {
+
     @Autowired
     private RequisitionMasterRepository requisitionRepo;
+
     @Autowired
     private AuthServiceImpl authService;
+
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
+
     @Autowired
     private TenantSettingsServiceImpl settingsService;
+
     @Autowired
     private ApproverServiceImpl approverService;
 
     @Override
     public Page<RequisitionMaster> getAll(int pageNo, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return requisitionRepo.findAllByTenantId(authService.authUser().getTenant().getId(), authService.authUser().getId(), pageRequest);
+        PageRequest pageRequest = PageRequest.of(
+            pageNo,
+            pageSize,
+            Sort.by(Sort.Order.desc("createdAt"))
+        );
+        return requisitionRepo.findAllByTenantId(
+            authService.authUser().getTenant().getId(),
+            authService.authUser().getId(),
+            pageRequest
+        );
     }
 
     @Override
@@ -62,14 +74,19 @@ public class RequisitionServiceImpl implements RequisitionService {
 
     @Override
     public ArrayList<RequisitionMaster> getByContains(String search) {
-        return requisitionRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
+        return requisitionRepo.searchAll(
+            authService.authUser().getTenant().getId(),
+            search.toLowerCase()
+        );
     }
 
     @Override
-//    @Transactional
+    //    @Transactional
     public ResponseEntity<ObjectNode> save(RequisitionMaster requisition) {
         try {
-            CoreCalculations.RequisitionCalculationService.calculate(requisition);
+            CoreCalculations.RequisitionCalculationService.calculate(
+                requisition
+            );
             requisition.setRef(CoreUtils.referenceNumberGenerator("REQ"));
             requisition.setTenant(authService.authUser().getTenant());
             if (Objects.isNull(requisition.getBranch())) {
@@ -78,14 +95,19 @@ public class RequisitionServiceImpl implements RequisitionService {
             if (settingsService.getSettings().getApproveAdjustments()) {
                 Approver approver = null;
                 try {
-                    approver = approverService.getByUserId(authService.authUser().getId());
+                    approver = approverService.getByUserId(
+                        authService.authUser().getId()
+                    );
                 } catch (NotFoundException e) {
                     log.log(Level.ALL, e.getMessage(), e);
                 }
                 if (Objects.nonNull(approver)) {
                     requisition.getApprovers().add(approver);
                     requisition.setLatestApprovedLevel(approver.getLevel());
-                    if (approver.getLevel() >= settingsService.getSettings().getApprovalLevels()) {
+                    if (
+                        approver.getLevel() >=
+                        settingsService.getSettings().getApprovalLevels()
+                    ) {
                         requisition.setApproved(true);
                         requisition.setApprovalStatus("Approved");
                     }
@@ -97,19 +119,24 @@ public class RequisitionServiceImpl implements RequisitionService {
                 requisition.setApproved(true);
                 requisition.setApprovalStatus("Approved");
             }
+            requisition.setStatus("Pending");
             requisition.setCreatedBy(authService.authUser());
             requisition.setCreatedAt(LocalDateTime.now());
             requisitionRepo.save(requisition);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
-            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+            return spotyResponseImpl.custom(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+            );
         }
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> update(RequisitionMaster data) throws NotFoundException {
+    public ResponseEntity<ObjectNode> update(RequisitionMaster data)
+        throws NotFoundException {
         var opt = requisitionRepo.findById(data.getId());
 
         if (opt.isEmpty()) {
@@ -117,33 +144,59 @@ public class RequisitionServiceImpl implements RequisitionService {
         }
         var requisition = opt.get();
 
-        if (Objects.nonNull(data.getRef()) && !"".equalsIgnoreCase(data.getRef())) {
+        if (
+            Objects.nonNull(data.getRef()) &&
+            !"".equalsIgnoreCase(data.getRef())
+        ) {
             requisition.setRef(data.getRef());
         }
 
-        if (Objects.nonNull(data.getSupplier()) && !Objects.equals(data.getSupplier(), requisition.getSupplier())) {
+        if (
+            Objects.nonNull(data.getSupplier()) &&
+            !Objects.equals(data.getSupplier(), requisition.getSupplier())
+        ) {
             requisition.setSupplier(data.getSupplier());
         }
 
-        if (Objects.nonNull(data.getBranch()) && !Objects.equals(data.getBranch(), requisition.getBranch())) {
+        if (
+            Objects.nonNull(data.getBranch()) &&
+            !Objects.equals(data.getBranch(), requisition.getBranch())
+        ) {
             requisition.setBranch(data.getBranch());
         }
 
-        if (Objects.nonNull(data.getRequisitionDetails()) && !data.getRequisitionDetails().isEmpty()) {
+        if (
+            Objects.nonNull(data.getRequisitionDetails()) &&
+            !data.getRequisitionDetails().isEmpty()
+        ) {
             requisition.setRequisitionDetails(data.getRequisitionDetails());
-            CoreCalculations.RequisitionCalculationService.calculate(requisition);
+            CoreCalculations.RequisitionCalculationService.calculate(
+                requisition
+            );
         }
 
-        if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
+        if (
+            Objects.nonNull(data.getNotes()) &&
+            !"".equalsIgnoreCase(data.getNotes())
+        ) {
             requisition.setNotes(data.getNotes());
         }
 
-        if (Objects.nonNull(data.getStatus()) && !"".equalsIgnoreCase(data.getStatus())) {
+        if (
+            Objects.nonNull(data.getStatus()) &&
+            !"".equalsIgnoreCase(data.getStatus())
+        ) {
             requisition.setStatus(data.getStatus());
         }
-        if (Objects.nonNull(data.getApprovers()) && !data.getApprovers().isEmpty()) {
+        if (
+            Objects.nonNull(data.getApprovers()) &&
+            !data.getApprovers().isEmpty()
+        ) {
             requisition.getApprovers().add(data.getApprovers().getFirst());
-            if (requisition.getLatestApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            if (
+                requisition.getLatestApprovedLevel() >=
+                settingsService.getSettings().getApprovalLevels()
+            ) {
                 requisition.setApproved(true);
                 requisition.setApprovalStatus("Approved");
             }
@@ -157,37 +210,54 @@ public class RequisitionServiceImpl implements RequisitionService {
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
-            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+            return spotyResponseImpl.custom(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+            );
         }
     }
 
     @Override
     @CacheEvict(value = "requisitions", key = "#approvalModel.id")
     @Transactional
-    public ResponseEntity<ObjectNode> approve(ApprovalModel approvalModel) throws NotFoundException {
+    public ResponseEntity<ObjectNode> approve(ApprovalModel approvalModel)
+        throws NotFoundException {
         var opt = requisitionRepo.findById(approvalModel.getId());
         if (opt.isEmpty()) {
             throw new NotFoundException();
         }
         var requisition = opt.get();
 
-        if (Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")) {
+        if (
+            Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")
+        ) {
             requisition.setApproved(false);
-            requisition.setLatestApprovedLevel(requisition.getLatestApprovedLevel() - 1);
+            requisition.setLatestApprovedLevel(
+                requisition.getLatestApprovedLevel() - 1
+            );
             requisition.setApprovalStatus("Returned");
         }
 
-        if (Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")) {
-            var approver = approverService.getByUserId(authService.authUser().getId());
+        if (
+            Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")
+        ) {
+            var approver = approverService.getByUserId(
+                authService.authUser().getId()
+            );
             requisition.getApprovers().add(approver);
             requisition.setLatestApprovedLevel(approver.getLevel());
-            if (requisition.getLatestApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            if (
+                requisition.getLatestApprovedLevel() >=
+                settingsService.getSettings().getApprovalLevels()
+            ) {
                 requisition.setApproved(true);
                 requisition.setApprovalStatus("Approved");
             }
         }
 
-        if (Objects.equals(approvalModel.getStatus().toLowerCase(), "rejected")) {
+        if (
+            Objects.equals(approvalModel.getStatus().toLowerCase(), "rejected")
+        ) {
             requisition.setApproved(false);
             requisition.setApprovalStatus("Rejected");
             requisition.setLatestApprovedLevel(0);
@@ -200,7 +270,10 @@ public class RequisitionServiceImpl implements RequisitionService {
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
-            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+            return spotyResponseImpl.custom(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+            );
         }
     }
 
@@ -212,7 +285,10 @@ public class RequisitionServiceImpl implements RequisitionService {
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
-            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+            return spotyResponseImpl.custom(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+            );
         }
     }
 
@@ -223,7 +299,10 @@ public class RequisitionServiceImpl implements RequisitionService {
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
-            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+            return spotyResponseImpl.custom(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+            );
         }
     }
 }
