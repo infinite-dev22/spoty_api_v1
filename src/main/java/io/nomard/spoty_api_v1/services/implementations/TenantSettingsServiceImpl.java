@@ -35,7 +35,7 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
     @Override
     @Transactional
     public ResponseEntity<ObjectNode> save(TenantSettings settings) {
-        var opt = Optional.of(settingsRepo.findByTenantId(authService.authUser().getTenant().getId()));
+        var opt = Optional.ofNullable(settingsRepo.findByTenantId(authService.authUser().getTenant().getId()));
         if (opt.isEmpty()) {
             try {
                 for (int i = 0; i < settings.getApprovers().size(); i++) {

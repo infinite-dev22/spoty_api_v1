@@ -244,7 +244,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             );
         }
 
-        var opt = Optional.of(employeeRepo.findByEmail(data.getEmail()));
+        var opt = Optional.ofNullable(employeeRepo.findByEmail(data.getEmail()));
 
         if (opt.isEmpty()) {
             throw new NotFoundException();
