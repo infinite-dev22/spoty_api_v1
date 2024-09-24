@@ -51,7 +51,7 @@ public interface PurchaseMasterRepository
 
     @Query(
         "SELECT pm FROM PurchaseMaster pm WHERE pm.tenant.id = :tenantId " +
-        "AND TRIM(LOWER(pm.ref)) LIKE %:search% AND (pm.approved = true OR pm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId AND a.level = pm.latestApprovedLevel - 1) > 0)"
+        "AND TRIM(LOWER(pm.ref)) LIKE %:search% AND (pm.approved = true OR pm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId AND pm.latestApprovedLevel = a.level - 1) > 0)"
     )
     ArrayList<PurchaseMaster> searchAll(
         @Param("tenantId") Long tenantId,
@@ -61,7 +61,7 @@ public interface PurchaseMasterRepository
     @Query(
         "SELECT pm FROM PurchaseMaster pm WHERE pm.tenant.id = :tenantId " +
         "AND (pm.approved = true OR pm.createdBy.id = :userId OR " +
-        "(SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId AND a.level = pm.latestApprovedLevel - 1) > 0)"
+        "(SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId AND pm.latestApprovedLevel = a.level - 1) > 0)"
     )
     Page<PurchaseMaster> findAllByTenantId(
         @Param("tenantId") Long tenantId,

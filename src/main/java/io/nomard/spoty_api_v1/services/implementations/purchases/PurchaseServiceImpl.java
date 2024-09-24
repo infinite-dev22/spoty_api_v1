@@ -137,11 +137,14 @@ public class PurchaseServiceImpl implements PurchaseService {
                 ) {
                     purchase.setApproved(true);
                     purchase.setApprovalStatus("Approved");
+                    purchase.setPurchaseStatus("Ordered");
                 }
             } else {
                 purchase.setApproved(false);
             }
             purchase.setApprovalStatus("Pending");
+            purchase.setPurchaseStatus("Pending");
+            purchase.setPaymentStatus("UnPaid");
         } else {
             purchase.setApproved(true);
             purchase.setApprovalStatus("Approved");
@@ -265,6 +268,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             ) {
                 purchase.setApproved(true);
                 purchase.setApprovalStatus("Approved");
+                purchase.setPurchaseStatus("Ordered");
             }
         }
 
@@ -430,6 +434,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             ) {
                 purchase.setApproved(true);
                 purchase.setApprovalStatus("Approved");
+                purchase.setPurchaseStatus("Ordered");
 
                 // Create account transaction of this purchase.
                 var account = accountService.getByContains(
