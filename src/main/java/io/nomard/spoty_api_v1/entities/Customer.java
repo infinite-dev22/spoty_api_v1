@@ -48,7 +48,6 @@ public class Customer implements Serializable {
     private String phone;
     @Column(unique = true)
     private String avatar;
-    private String salary;
     private String country;
     private String city;
     private String address;
