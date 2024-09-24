@@ -86,12 +86,13 @@ public class StockInServiceImpl implements StockInService {
                 }
                 if (Objects.nonNull(approver)) {
                     stockIn.getApprovers().add(approver);
-                    stockIn.setLatestApprovedLevel(approver.getLevel());
+                    stockIn.setNextApprovedLevel(approver.getLevel());
                     if (approver.getLevel() >= settingsService.getSettings().getApprovalLevels()) {
                         stockIn.setApproved(true);
                         stockIn.setApprovalStatus("Approved");
                     }
                 } else {
+                    stockIn.setNextApprovedLevel(1);
                     stockIn.setApproved(false);
                 }
                 stockIn.setApprovalStatus("Pending");
@@ -139,7 +140,7 @@ public class StockInServiceImpl implements StockInService {
         }
         if (Objects.nonNull(data.getApprovers()) && !data.getApprovers().isEmpty()) {
             stockIn.getApprovers().add(data.getApprovers().getFirst());
-            if (stockIn.getLatestApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            if (stockIn.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
                 stockIn.setApproved(true);
                 stockIn.setApprovalStatus("Approved");
             }
@@ -168,15 +169,15 @@ public class StockInServiceImpl implements StockInService {
 
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")) {
             stockIn.setApproved(false);
-            stockIn.setLatestApprovedLevel(stockIn.getLatestApprovedLevel() - 1);
+            stockIn.setNextApprovedLevel(stockIn.getNextApprovedLevel() - 1);
             stockIn.setApprovalStatus("Returned");
         }
 
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")) {
             var approver = approverService.getByUserId(authService.authUser().getId());
             stockIn.getApprovers().add(approver);
-            stockIn.setLatestApprovedLevel(approver.getLevel());
-            if (stockIn.getLatestApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            stockIn.setNextApprovedLevel(approver.getLevel());
+            if (stockIn.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
                 stockIn.setApproved(true);
                 stockIn.setApprovalStatus("Approved");
             }
@@ -185,7 +186,7 @@ public class StockInServiceImpl implements StockInService {
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "rejected")) {
             stockIn.setApproved(false);
             stockIn.setApprovalStatus("Rejected");
-            stockIn.setLatestApprovedLevel(0);
+            stockIn.setNextApprovedLevel(0);
         }
 
         stockIn.setUpdatedBy(authService.authUser());

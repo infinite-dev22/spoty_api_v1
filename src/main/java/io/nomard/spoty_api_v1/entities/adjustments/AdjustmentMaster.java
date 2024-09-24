@@ -77,7 +77,7 @@ public class AdjustmentMaster implements Serializable {
     private Boolean approved = false;
 
     @Builder.Default
-    private Integer latestApprovedLevel = 0;
+    private Integer nextApprovedLevel = 0;
 
     private String approvalStatus;
     private LocalDateTime createdAt;

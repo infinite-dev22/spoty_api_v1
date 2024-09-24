@@ -130,7 +130,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             }
             if (Objects.nonNull(approver)) {
                 purchase.getApprovers().add(approver);
-                purchase.setLatestApprovedLevel(approver.getLevel());
+                purchase.setNextApprovedLevel(approver.getLevel());
                 if (
                     approver.getLevel() >=
                     settingsService.getSettings().getApprovalLevels()
@@ -140,6 +140,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                     purchase.setPurchaseStatus("Ordered");
                 }
             } else {
+                purchase.setNextApprovedLevel(1);
                 purchase.setApproved(false);
             }
             purchase.setApprovalStatus("Pending");
@@ -263,7 +264,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         ) {
             purchase.getApprovers().add(data.getApprovers().getFirst());
             if (
-                purchase.getLatestApprovedLevel() >=
+                purchase.getNextApprovedLevel() >=
                 settingsService.getSettings().getApprovalLevels()
             ) {
                 purchase.setApproved(true);
@@ -414,8 +415,8 @@ public class PurchaseServiceImpl implements PurchaseService {
             Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")
         ) {
             purchase.setApproved(false);
-            purchase.setLatestApprovedLevel(
-                purchase.getLatestApprovedLevel() - 1
+            purchase.setNextApprovedLevel(
+                purchase.getNextApprovedLevel() - 1
             );
             purchase.setApprovalStatus("Returned");
         }
@@ -427,9 +428,9 @@ public class PurchaseServiceImpl implements PurchaseService {
                 authService.authUser().getId()
             );
             purchase.getApprovers().add(approver);
-            purchase.setLatestApprovedLevel(approver.getLevel());
+            purchase.setNextApprovedLevel(approver.getLevel());
             if (
-                purchase.getLatestApprovedLevel() >=
+                purchase.getNextApprovedLevel() >=
                 settingsService.getSettings().getApprovalLevels()
             ) {
                 purchase.setApproved(true);
@@ -477,7 +478,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         ) {
             purchase.setApproved(false);
             purchase.setApprovalStatus("Rejected");
-            purchase.setLatestApprovedLevel(0);
+            purchase.setNextApprovedLevel(0);
         }
 
         purchase.setUpdatedBy(authService.authUser());

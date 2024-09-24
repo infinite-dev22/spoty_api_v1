@@ -105,13 +105,14 @@ public class SaleReturnServiceImpl implements SaleReturnService {
             }
             if (Objects.nonNull(approver)) {
                 sale.getApprovers().add(approver);
-                sale.setLatestApprovedLevel(approver.getLevel());
+                sale.setNextApprovedLevel(approver.getLevel());
                 if (approver.getLevel() >= settingsService.getSettings().getApprovalLevels()) {
                     sale.setApproved(true);
                     sale.setApprovalStatus("Approved");
                     createAccountTransaction(sale);
                 }
             } else {
+                sale.setNextApprovedLevel(1);
                 sale.setApproved(false);
             }
             sale.setApprovalStatus("Pending");
@@ -183,7 +184,7 @@ public class SaleReturnServiceImpl implements SaleReturnService {
         }
         if (Objects.nonNull(data.getApprovers()) && !data.getApprovers().isEmpty()) {
             sale.getApprovers().add(data.getApprovers().getFirst());
-            if (sale.getLatestApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            if (sale.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
                 sale.setApproved(true);
                 sale.setApprovalStatus("Approved");
                 createAccountTransaction(sale);
@@ -212,15 +213,15 @@ public class SaleReturnServiceImpl implements SaleReturnService {
 
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")) {
             sale.setApproved(false);
-            sale.setLatestApprovedLevel(sale.getLatestApprovedLevel() - 1);
+            sale.setNextApprovedLevel(sale.getNextApprovedLevel() - 1);
             sale.setApprovalStatus("Returned");
         }
 
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")) {
             var approver = approverService.getByUserId(authService.authUser().getId());
             sale.getApprovers().add(approver);
-            sale.setLatestApprovedLevel(approver.getLevel());
-            if (sale.getLatestApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            sale.setNextApprovedLevel(approver.getLevel());
+            if (sale.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
                 sale.setApproved(true);
                 sale.setApprovalStatus("Approved");
                 createAccountTransaction(sale);
@@ -230,7 +231,7 @@ public class SaleReturnServiceImpl implements SaleReturnService {
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "rejected")) {
             sale.setApproved(false);
             sale.setApprovalStatus("Rejected");
-            sale.setLatestApprovedLevel(0);
+            sale.setNextApprovedLevel(0);
         }
 
         sale.setUpdatedBy(authService.authUser());

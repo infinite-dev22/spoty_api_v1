@@ -79,7 +79,7 @@ public class PurchaseMaster implements Serializable {
     @Builder.Default
     private Boolean approved = false;
     @Builder.Default
-    private Integer latestApprovedLevel = 0;
+    private Integer nextApprovedLevel = 0;
     private String approvalStatus;
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)

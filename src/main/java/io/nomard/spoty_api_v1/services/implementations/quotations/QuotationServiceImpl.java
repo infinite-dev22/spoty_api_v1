@@ -120,7 +120,7 @@ public class QuotationServiceImpl implements QuotationService {
             }
             if (Objects.nonNull(approver)) {
                 quotation.getApprovers().add(approver);
-                quotation.setLatestApprovedLevel(approver.getLevel());
+                quotation.setNextApprovedLevel(approver.getLevel());
                 if (
                     approver.getLevel() >=
                     settingsService.getSettings().getApprovalLevels()
@@ -129,6 +129,7 @@ public class QuotationServiceImpl implements QuotationService {
                     quotation.setApprovalStatus("Approved");
                 }
             } else {
+                quotation.setNextApprovedLevel(1);
                 quotation.setApproved(false);
             }
             quotation.setApprovalStatus("Pending");
@@ -224,7 +225,7 @@ public class QuotationServiceImpl implements QuotationService {
         ) {
             quotation.getApprovers().add(data.getApprovers().getFirst());
             if (
-                quotation.getLatestApprovedLevel() >=
+                quotation.getNextApprovedLevel() >=
                 settingsService.getSettings().getApprovalLevels()
             ) {
                 quotation.setApproved(true);
@@ -262,8 +263,8 @@ public class QuotationServiceImpl implements QuotationService {
             Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")
         ) {
             quotation.setApproved(false);
-            quotation.setLatestApprovedLevel(
-                quotation.getLatestApprovedLevel() - 1
+            quotation.setNextApprovedLevel(
+                quotation.getNextApprovedLevel() - 1
             );
             quotation.setApprovalStatus("Returned");
         }
@@ -275,9 +276,9 @@ public class QuotationServiceImpl implements QuotationService {
                 authService.authUser().getId()
             );
             quotation.getApprovers().add(approver);
-            quotation.setLatestApprovedLevel(approver.getLevel());
+            quotation.setNextApprovedLevel(approver.getLevel());
             if (
-                quotation.getLatestApprovedLevel() >=
+                quotation.getNextApprovedLevel() >=
                 settingsService.getSettings().getApprovalLevels()
             ) {
                 quotation.setApproved(true);
@@ -290,7 +291,7 @@ public class QuotationServiceImpl implements QuotationService {
         ) {
             quotation.setApproved(false);
             quotation.setApprovalStatus("Rejected");
-            quotation.setLatestApprovedLevel(0);
+            quotation.setNextApprovedLevel(0);
         }
 
         quotation.setUpdatedBy(authService.authUser());

@@ -103,7 +103,7 @@ public class RequisitionServiceImpl implements RequisitionService {
                 }
                 if (Objects.nonNull(approver)) {
                     requisition.getApprovers().add(approver);
-                    requisition.setLatestApprovedLevel(approver.getLevel());
+                    requisition.setNextApprovedLevel(approver.getLevel());
                     if (
                         approver.getLevel() >=
                         settingsService.getSettings().getApprovalLevels()
@@ -112,6 +112,7 @@ public class RequisitionServiceImpl implements RequisitionService {
                         requisition.setApprovalStatus("Approved");
                     }
                 } else {
+                    requisition.setNextApprovedLevel(1);
                     requisition.setApproved(false);
                 }
                 requisition.setApprovalStatus("Pending");
@@ -194,7 +195,7 @@ public class RequisitionServiceImpl implements RequisitionService {
         ) {
             requisition.getApprovers().add(data.getApprovers().getFirst());
             if (
-                requisition.getLatestApprovedLevel() >=
+                requisition.getNextApprovedLevel() >=
                 settingsService.getSettings().getApprovalLevels()
             ) {
                 requisition.setApproved(true);
@@ -232,8 +233,8 @@ public class RequisitionServiceImpl implements RequisitionService {
             Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")
         ) {
             requisition.setApproved(false);
-            requisition.setLatestApprovedLevel(
-                requisition.getLatestApprovedLevel() - 1
+            requisition.setNextApprovedLevel(
+                requisition.getNextApprovedLevel() - 1
             );
             requisition.setApprovalStatus("Returned");
         }
@@ -245,9 +246,9 @@ public class RequisitionServiceImpl implements RequisitionService {
                 authService.authUser().getId()
             );
             requisition.getApprovers().add(approver);
-            requisition.setLatestApprovedLevel(approver.getLevel());
+            requisition.setNextApprovedLevel(approver.getLevel());
             if (
-                requisition.getLatestApprovedLevel() >=
+                requisition.getNextApprovedLevel() >=
                 settingsService.getSettings().getApprovalLevels()
             ) {
                 requisition.setApproved(true);
@@ -260,7 +261,7 @@ public class RequisitionServiceImpl implements RequisitionService {
         ) {
             requisition.setApproved(false);
             requisition.setApprovalStatus("Rejected");
-            requisition.setLatestApprovedLevel(0);
+            requisition.setNextApprovedLevel(0);
         }
 
         requisition.setUpdatedBy(authService.authUser());

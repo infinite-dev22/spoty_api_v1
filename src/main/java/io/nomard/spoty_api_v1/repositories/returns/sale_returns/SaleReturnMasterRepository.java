@@ -14,9 +14,9 @@ import java.util.ArrayList;
 @Repository
 public interface SaleReturnMasterRepository extends PagingAndSortingRepository<SaleReturnMaster, Long>, JpaRepository<SaleReturnMaster, Long> {
     @Query("SELECT srm FROM SaleReturnMaster srm WHERE srm.tenant.id = :tenantId " +
-            "AND TRIM(LOWER(srm.ref)) LIKE %:search% AND (srm.approved = true OR srm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId AND srm.latestApprovedLevel = a.level - 1) > 0)")
+            "AND TRIM(LOWER(srm.ref)) LIKE %:search% AND (srm.approved = true OR srm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId AND a.level = srm.nextApprovedLevel) > 0)")
     ArrayList<SaleReturnMaster> searchAll(@Param("tenantId") Long tenantId, @Param("search") String search);
 
-    @Query("select srm from SaleReturnMaster srm where srm.tenant.id = :tenantId AND (srm.approved = true OR srm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId AND srm.latestApprovedLevel = a.level - 1) > 0)")
+    @Query("select srm from SaleReturnMaster srm where srm.tenant.id = :tenantId AND (srm.approved = true OR srm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId AND a.level = srm.nextApprovedLevel) > 0)")
     Page<SaleReturnMaster> findAllByTenantId(@Param("tenantId") Long tenantId, @Param("userId") Long userId, Pageable pageable);
 }

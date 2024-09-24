@@ -13,12 +13,6 @@ import io.nomard.spoty_api_v1.services.implementations.TenantSettingsServiceImpl
 import io.nomard.spoty_api_v1.services.interfaces.transfers.TransferService;
 import io.nomard.spoty_api_v1.utils.CoreCalculations;
 import io.nomard.spoty_api_v1.utils.CoreUtils;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.logging.Level;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -30,6 +24,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.logging.Level;
 
 @Service
 @Log
@@ -58,14 +59,14 @@ public class TransferServiceImpl implements TransferService {
     @Transactional(readOnly = true)
     public Page<TransferMaster> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(
-            pageNo,
-            pageSize,
-            Sort.by(Sort.Order.desc("createdAt"))
+                pageNo,
+                pageSize,
+                Sort.by(Sort.Order.desc("createdAt"))
         );
         return transferRepo.findAllByTenantId(
-            authService.authUser().getTenant().getId(),
-            authService.authUser().getId(),
-            pageRequest
+                authService.authUser().getTenant().getId(),
+                authService.authUser().getId(),
+                pageRequest
         );
     }
 
@@ -85,8 +86,8 @@ public class TransferServiceImpl implements TransferService {
     @Transactional(readOnly = true)
     public ArrayList<TransferMaster> getByContains(String search) {
         return transferRepo.searchAll(
-            authService.authUser().getTenant().getId(),
-            search.toLowerCase()
+                authService.authUser().getTenant().getId(),
+                search.toLowerCase()
         );
     }
 
@@ -100,22 +101,23 @@ public class TransferServiceImpl implements TransferService {
             Approver approver = null;
             try {
                 approver = approverService.getByUserId(
-                    authService.authUser().getId()
+                        authService.authUser().getId()
                 );
             } catch (NotFoundException e) {
                 log.log(Level.ALL, e.getMessage(), e);
             }
             if (Objects.nonNull(approver)) {
                 transfer.getApprovers().add(approver);
-                transfer.setLatestApprovedLevel(approver.getLevel());
+                transfer.setNextApprovedLevel(approver.getLevel());
                 if (
-                    approver.getLevel() >=
-                    settingsService.getSettings().getApprovalLevels()
+                        approver.getLevel() >=
+                                settingsService.getSettings().getApprovalLevels()
                 ) {
                     transfer.setApproved(true);
                     transfer.setApprovalStatus("Approved");
                 }
             } else {
+                transfer.setNextApprovedLevel(1);
                 transfer.setApproved(false);
             }
             transfer.setApprovalStatus("Pending");
@@ -129,7 +131,7 @@ public class TransferServiceImpl implements TransferService {
             transferRepo.save(transfer);
             for (int i = 0; i < transfer.getTransferDetails().size(); i++) {
                 transferTransactionService.save(
-                    transfer.getTransferDetails().get(i)
+                        transfer.getTransferDetails().get(i)
                 );
             }
             return spotyResponseImpl.created();
@@ -141,63 +143,63 @@ public class TransferServiceImpl implements TransferService {
     @Override
     @CacheEvict(value = "transfer_masters", key = "#data.id")
     public ResponseEntity<ObjectNode> update(TransferMaster data)
-        throws NotFoundException {
+            throws NotFoundException {
         var opt = transferRepo.findById(data.getId());
         if (opt.isEmpty()) {
             throw new NotFoundException();
         }
         var transfer = opt.get();
         if (
-            Objects.nonNull(data.getRef()) &&
-            !"".equalsIgnoreCase(data.getRef())
+                Objects.nonNull(data.getRef()) &&
+                        !"".equalsIgnoreCase(data.getRef())
         ) {
             transfer.setRef(data.getRef());
         }
         if (
-            !Objects.equals(transfer.getDate(), data.getDate()) &&
-            Objects.nonNull(data.getDate())
+                !Objects.equals(transfer.getDate(), data.getDate()) &&
+                        Objects.nonNull(data.getDate())
         ) {
             transfer.setDate(data.getDate());
         }
         if (
-            !Objects.equals(transfer.getFromBranch(), data.getFromBranch()) &&
-            Objects.nonNull(data.getFromBranch())
+                !Objects.equals(transfer.getFromBranch(), data.getFromBranch()) &&
+                        Objects.nonNull(data.getFromBranch())
         ) {
             transfer.setFromBranch(data.getFromBranch());
         }
         if (
-            !Objects.equals(transfer.getToBranch(), data.getToBranch()) &&
-            Objects.nonNull(data.getToBranch())
+                !Objects.equals(transfer.getToBranch(), data.getToBranch()) &&
+                        Objects.nonNull(data.getToBranch())
         ) {
             transfer.setToBranch(data.getToBranch());
         }
         if (
-            Objects.nonNull(data.getTransferDetails()) &&
-            !data.getTransferDetails().isEmpty()
+                Objects.nonNull(data.getTransferDetails()) &&
+                        !data.getTransferDetails().isEmpty()
         ) {
             transfer.setTransferDetails(data.getTransferDetails());
             CoreCalculations.TransferCalculationService.calculate(transfer);
         }
         if (
-            Objects.nonNull(data.getNotes()) &&
-            !"".equalsIgnoreCase(data.getNotes())
+                Objects.nonNull(data.getNotes()) &&
+                        !"".equalsIgnoreCase(data.getNotes())
         ) {
             transfer.setNotes(data.getNotes());
         }
         if (
-            Objects.nonNull(data.getNotes()) &&
-            !"".equalsIgnoreCase(data.getNotes())
+                Objects.nonNull(data.getNotes()) &&
+                        !"".equalsIgnoreCase(data.getNotes())
         ) {
             transfer.setNotes(data.getNotes());
         }
         if (
-            Objects.nonNull(data.getApprovers()) &&
-            !data.getApprovers().isEmpty()
+                Objects.nonNull(data.getApprovers()) &&
+                        !data.getApprovers().isEmpty()
         ) {
             transfer.getApprovers().add(data.getApprovers().getFirst());
             if (
-                transfer.getLatestApprovedLevel() >=
-                settingsService.getSettings().getApprovalLevels()
+                    transfer.getNextApprovedLevel() >=
+                            settingsService.getSettings().getApprovalLevels()
             ) {
                 transfer.setApproved(true);
                 transfer.setApprovalStatus("Approved");
@@ -217,7 +219,7 @@ public class TransferServiceImpl implements TransferService {
     @CacheEvict(value = "transfers", key = "#approvalModel.id")
     @Transactional
     public ResponseEntity<ObjectNode> approve(ApprovalModel approvalModel)
-        throws NotFoundException {
+            throws NotFoundException {
         var opt = transferRepo.findById(approvalModel.getId());
         if (opt.isEmpty()) {
             throw new NotFoundException();
@@ -225,26 +227,26 @@ public class TransferServiceImpl implements TransferService {
         var transfer = opt.get();
 
         if (
-            Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")
+                Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")
         ) {
             transfer.setApproved(false);
-            transfer.setLatestApprovedLevel(
-                transfer.getLatestApprovedLevel() - 1
+            transfer.setNextApprovedLevel(
+                    transfer.getNextApprovedLevel() - 1
             );
             transfer.setApprovalStatus("Returned");
         }
 
         if (
-            Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")
+                Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")
         ) {
             var approver = approverService.getByUserId(
-                authService.authUser().getId()
+                    authService.authUser().getId()
             );
             transfer.getApprovers().add(approver);
-            transfer.setLatestApprovedLevel(approver.getLevel());
+            transfer.setNextApprovedLevel(approver.getLevel());
             if (
-                transfer.getLatestApprovedLevel() >=
-                settingsService.getSettings().getApprovalLevels()
+                    transfer.getNextApprovedLevel() >=
+                            settingsService.getSettings().getApprovalLevels()
             ) {
                 transfer.setApproved(true);
                 transfer.setApprovalStatus("Approved");
@@ -252,11 +254,11 @@ public class TransferServiceImpl implements TransferService {
         }
 
         if (
-            Objects.equals(approvalModel.getStatus().toLowerCase(), "rejected")
+                Objects.equals(approvalModel.getStatus().toLowerCase(), "rejected")
         ) {
             transfer.setApproved(false);
             transfer.setApprovalStatus("Rejected");
-            transfer.setLatestApprovedLevel(0);
+            transfer.setNextApprovedLevel(0);
         }
 
         transfer.setUpdatedBy(authService.authUser());
@@ -267,8 +269,8 @@ public class TransferServiceImpl implements TransferService {
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
             return spotyResponseImpl.custom(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
             );
         }
     }
