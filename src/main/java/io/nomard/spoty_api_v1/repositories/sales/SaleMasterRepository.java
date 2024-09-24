@@ -82,9 +82,9 @@ public interface SaleMasterRepository extends PagingAndSortingRepository<SaleMas
     DashboardKPIModel totalEarnings(@Param("id") Long id);
 
     @Query("SELECT sm FROM SaleMaster sm WHERE sm.tenant.id = :tenantId " +
-            "AND TRIM(LOWER(sm.ref)) LIKE %:search% AND (sm.approved = true OR sm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId AND a.level = sm.latestApprovedLevel) > 0)")
+            "AND TRIM(LOWER(sm.ref)) LIKE %:search% AND (sm.approved = true OR sm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId AND a.level = sm.latestApprovedLevel - 1) > 0)")
     ArrayList<SaleMaster> searchAll(@Param("tenantId") Long tenantId, @Param("search") String search);
 
-    @Query("SELECT sm FROM SaleMaster sm WHERE sm.tenant.id = :tenantId AND (sm.approved = true OR sm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId AND a.level = sm.latestApprovedLevel) > 0)")
+    @Query("SELECT sm FROM SaleMaster sm WHERE sm.tenant.id = :tenantId AND (sm.approved = true OR sm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Approver a WHERE a.employee.id = :userId AND a.level = sm.latestApprovedLevel - 1) > 0)")
     Page<SaleMaster> findAllByTenantId(@Param("tenantId") Long tenantId, @Param("userId") Long userId, Pageable pageable);
 }
