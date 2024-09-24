@@ -25,6 +25,11 @@ public class TenantSettingsController {
         return tenantSettingsService.save(tenantSettings);
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<ObjectNode> update(@Valid @RequestBody TenantSettings tenantSettings) {
+        return tenantSettingsService.update(tenantSettings);
+    }
+
     @DeleteMapping("/delete")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return tenantSettingsService.delete(findModel.getId());
