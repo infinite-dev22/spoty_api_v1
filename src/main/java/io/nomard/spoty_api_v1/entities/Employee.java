@@ -1,9 +1,11 @@
 package io.nomard.spoty_api_v1.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import io.nomard.spoty_api_v1.entities.hrm.hrm.Department;
 import io.nomard.spoty_api_v1.entities.hrm.hrm.Designation;
 import io.nomard.spoty_api_v1.entities.hrm.hrm.EmploymentStatus;
+import io.nomard.spoty_api_v1.utils.Views;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -30,18 +32,22 @@ public class Employee implements Serializable {
 
     @JoinColumn(nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonView(Views.Detailed.class)
     private Tenant tenant;
 
     @JoinColumn
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonView(Views.Moderate.class)
     private Department department;
 
     @JoinColumn
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonView(Views.Moderate.class)
     private Designation designation;
 
     @JoinColumn
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonView(Views.Moderate.class)
     private EmploymentStatus employmentStatus;
 
     @JoinColumn(nullable = false)
@@ -60,19 +66,28 @@ public class Employee implements Serializable {
         cascade = CascadeType.ALL
     )
     @JoinColumn(nullable = false)
+    @JsonView(Views.Detailed.class)
     private Role role;
 
+    @JsonView(Views.Tiny.class)
     private String firstName;
+    @JsonView(Views.Tiny.class)
     private String lastName;
+    @JsonView(Views.Tiny.class)
     private String otherName;
+    @JsonView(Views.Moderate.class)
     private String phone;
+    @JsonView(Views.Moderate.class)
     private String avatar;
+    @JsonView(Views.Moderate.class)
     private String email;
+    @JsonView(Views.Moderate.class)
     private String salary;
 
     @JoinColumn
     @Column(nullable = false)
     @Builder.Default
+    @JsonView(Views.Moderate.class)
     private boolean active = true;
 
     @Column(nullable = false)
@@ -80,14 +95,18 @@ public class Employee implements Serializable {
     @JsonIgnore
     private boolean locked = false;
 
+    @JsonView(Views.Moderate.class)
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonView(Views.Moderate.class)
     private Employee createdBy;
 
+    @JsonView(Views.Moderate.class)
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonView(Views.Moderate.class)
     private Employee updatedBy;
 
     @Override

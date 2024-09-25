@@ -7,6 +7,8 @@ import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.payments.CardModel;
 import io.nomard.spoty_api_v1.models.payments.MoMoModel;
 import io.nomard.spoty_api_v1.services.implementations.PaymentTransactionServiceImpl;
+import com.fasterxml.jackson.annotation.JsonView;
+import io.nomard.spoty_api_v1.utils.Views;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,6 +22,7 @@ public class PaymentTransactionController {
     private PaymentTransactionServiceImpl paymentTransactionService;
 
     @GetMapping("/all")
+    @JsonView(Views.Tiny.class)
     public Page<PaymentTransaction> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                            @RequestParam(defaultValue = "50") Integer pageSize) {
         return paymentTransactionService.getAll(pageNo, pageSize);

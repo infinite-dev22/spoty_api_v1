@@ -13,6 +13,12 @@ import io.nomard.spoty_api_v1.services.implementations.TenantSettingsServiceImpl
 import io.nomard.spoty_api_v1.services.interfaces.stock_ins.StockInService;
 import io.nomard.spoty_api_v1.utils.CoreCalculations;
 import io.nomard.spoty_api_v1.utils.CoreUtils;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.logging.Level;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -24,33 +30,40 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.logging.Level;
-
 @Service
 @Log
 public class StockInServiceImpl implements StockInService {
+
     @Autowired
     private StockInMasterRepository stockInRepo;
+
     @Autowired
     private StockInTransactionServiceImpl stockInTransactionService;
+
     @Autowired
     private AuthServiceImpl authService;
+
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
+
     @Autowired
     private TenantSettingsServiceImpl settingsService;
+
     @Autowired
     private ApproverServiceImpl approverService;
 
     @Override
     public Page<StockInMaster> getAll(int pageNo, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return stockInRepo.findAllByTenantId(authService.authUser().getTenant().getId(), authService.authUser().getId(), pageRequest);
+        PageRequest pageRequest = PageRequest.of(
+            pageNo,
+            pageSize,
+            Sort.by(Sort.Order.desc("createdAt"))
+        );
+        return stockInRepo.findAllByTenantId(
+            authService.authUser().getTenant().getId(),
+            authService.authUser().getId(),
+            pageRequest
+        );
     }
 
     @Override
@@ -64,7 +77,10 @@ public class StockInServiceImpl implements StockInService {
 
     @Override
     public ArrayList<StockInMaster> getByContains(String search) {
-        return stockInRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
+        return stockInRepo.searchAll(
+            authService.authUser().getTenant().getId(),
+            search.toLowerCase()
+        );
     }
 
     @Override
@@ -80,16 +96,22 @@ public class StockInServiceImpl implements StockInService {
             if (settingsService.getSettings().getApproveAdjustments()) {
                 Approver approver = null;
                 try {
-                    approver = approverService.getByUserId(authService.authUser().getId());
+                    approver = approverService.getByUserId(
+                        authService.authUser().getId()
+                    );
                 } catch (NotFoundException e) {
                     log.log(Level.ALL, e.getMessage(), e);
                 }
                 if (Objects.nonNull(approver)) {
                     stockIn.getApprovers().add(approver);
                     stockIn.setNextApprovedLevel(approver.getLevel());
-                    if (approver.getLevel() >= settingsService.getSettings().getApprovalLevels()) {
+                    if (
+                        approver.getLevel() >=
+                        settingsService.getSettings().getApprovalLevels()
+                    ) {
                         stockIn.setApproved(true);
                         stockIn.setApprovalStatus("Approved");
+                        productStockUpdate(stockIn);
                     }
                 } else {
                     stockIn.setNextApprovedLevel(1);
@@ -99,48 +121,66 @@ public class StockInServiceImpl implements StockInService {
             } else {
                 stockIn.setApproved(true);
                 stockIn.setApprovalStatus("Approved");
+                productStockUpdate(stockIn);
             }
             stockIn.setCreatedBy(authService.authUser());
             stockIn.setCreatedAt(LocalDateTime.now());
             stockInRepo.save(stockIn);
 
-            if (!stockIn.getStockInDetails().isEmpty()) {
-                for (int i = 0; i < stockIn.getStockInDetails().size(); i++) {
-                    stockInTransactionService.save(stockIn.getStockInDetails().get(i));
-                }
-            }
             return spotyResponseImpl.created();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
-            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+            return spotyResponseImpl.custom(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+            );
         }
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> update(StockInMaster data) throws NotFoundException {
+    public ResponseEntity<ObjectNode> update(StockInMaster data)
+        throws NotFoundException {
         var opt = stockInRepo.findById(data.getId());
 
         if (opt.isEmpty()) {
             throw new NotFoundException();
         }
         var stockIn = opt.get();
-        if (Objects.nonNull(data.getRef()) && !"".equalsIgnoreCase(data.getRef())) {
+        if (
+            Objects.nonNull(data.getRef()) &&
+            !"".equalsIgnoreCase(data.getRef())
+        ) {
             stockIn.setRef(data.getRef());
         }
-        if (!Objects.equals(stockIn.getBranch(), data.getBranch()) && Objects.nonNull(data.getBranch())) {
+        if (
+            !Objects.equals(stockIn.getBranch(), data.getBranch()) &&
+            Objects.nonNull(data.getBranch())
+        ) {
             stockIn.setBranch(data.getBranch());
         }
-        if (Objects.nonNull(data.getStockInDetails()) && !data.getStockInDetails().isEmpty()) {
+        if (
+            Objects.nonNull(data.getStockInDetails()) &&
+            !data.getStockInDetails().isEmpty()
+        ) {
             stockIn.setStockInDetails(data.getStockInDetails());
             CoreCalculations.StockInCalculationService.calculate(stockIn);
         }
-        if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
+        if (
+            Objects.nonNull(data.getNotes()) &&
+            !"".equalsIgnoreCase(data.getNotes())
+        ) {
             stockIn.setNotes(data.getNotes());
         }
-        if (Objects.nonNull(data.getApprovers()) && !data.getApprovers().isEmpty()) {
+        if (
+            Objects.nonNull(data.getApprovers()) &&
+            !data.getApprovers().isEmpty()
+        ) {
             stockIn.getApprovers().add(data.getApprovers().getFirst());
-            if (stockIn.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            if (
+                stockIn.getNextApprovedLevel() >=
+                settingsService.getSettings().getApprovalLevels()
+            ) {
                 stockIn.setApproved(true);
                 stockIn.setApprovalStatus("Approved");
             }
@@ -153,37 +193,53 @@ public class StockInServiceImpl implements StockInService {
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
-            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+            return spotyResponseImpl.custom(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+            );
         }
     }
 
     @Override
     @CacheEvict(value = "stock_ins", key = "#approvalModel.id")
     @Transactional
-    public ResponseEntity<ObjectNode> approve(ApprovalModel approvalModel) throws NotFoundException {
+    public ResponseEntity<ObjectNode> approve(ApprovalModel approvalModel)
+        throws NotFoundException {
         var opt = stockInRepo.findById(approvalModel.getId());
         if (opt.isEmpty()) {
             throw new NotFoundException();
         }
         var stockIn = opt.get();
 
-        if (Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")) {
+        if (
+            Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")
+        ) {
             stockIn.setApproved(false);
             stockIn.setNextApprovedLevel(stockIn.getNextApprovedLevel() - 1);
             stockIn.setApprovalStatus("Returned");
         }
 
-        if (Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")) {
-            var approver = approverService.getByUserId(authService.authUser().getId());
+        if (
+            Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")
+        ) {
+            var approver = approverService.getByUserId(
+                authService.authUser().getId()
+            );
             stockIn.getApprovers().add(approver);
             stockIn.setNextApprovedLevel(approver.getLevel());
-            if (stockIn.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            if (
+                stockIn.getNextApprovedLevel() >=
+                settingsService.getSettings().getApprovalLevels()
+            ) {
                 stockIn.setApproved(true);
                 stockIn.setApprovalStatus("Approved");
+                productStockUpdate(stockIn);
             }
         }
 
-        if (Objects.equals(approvalModel.getStatus().toLowerCase(), "rejected")) {
+        if (
+            Objects.equals(approvalModel.getStatus().toLowerCase(), "rejected")
+        ) {
             stockIn.setApproved(false);
             stockIn.setApprovalStatus("Rejected");
             stockIn.setNextApprovedLevel(0);
@@ -196,7 +252,10 @@ public class StockInServiceImpl implements StockInService {
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
-            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+            return spotyResponseImpl.custom(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+            );
         }
     }
 
@@ -208,7 +267,10 @@ public class StockInServiceImpl implements StockInService {
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
-            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+            return spotyResponseImpl.custom(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+            );
         }
     }
 
@@ -219,7 +281,20 @@ public class StockInServiceImpl implements StockInService {
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
-            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+            return spotyResponseImpl.custom(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+            );
+        }
+    }
+
+    private void productStockUpdate(StockInMaster stockIn) {
+        if (!stockIn.getStockInDetails().isEmpty()) {
+            for (int i = 0; i < stockIn.getStockInDetails().size(); i++) {
+                stockInTransactionService.save(
+                    stockIn.getStockInDetails().get(i)
+                );
+            }
         }
     }
 }
