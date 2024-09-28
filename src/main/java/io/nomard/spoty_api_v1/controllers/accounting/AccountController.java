@@ -54,6 +54,11 @@ public class AccountController {
         return accountService.update(account);
     }
 
+    @PutMapping("/deposit")
+    public ResponseEntity<ObjectNode> deposit(@Valid @RequestBody Account account) throws NotFoundException {
+        return accountService.deposit(account);
+    }
+
     @DeleteMapping("/delete/single")
     public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return accountService.delete(findModel.getId());

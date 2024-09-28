@@ -20,6 +20,8 @@ public interface AccountService {
 
     ResponseEntity<ObjectNode> update(Account account) throws NotFoundException;
 
+    ResponseEntity<ObjectNode> deposit(Account account) throws NotFoundException;
+
     ResponseEntity<ObjectNode> delete(Long id);
 
     ResponseEntity<ObjectNode> deleteMultiple(ArrayList<Long> idList) throws NotFoundException;

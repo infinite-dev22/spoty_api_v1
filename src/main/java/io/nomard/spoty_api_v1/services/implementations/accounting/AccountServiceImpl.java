@@ -125,6 +125,36 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
+    public ResponseEntity<ObjectNode> deposit(Account data) throws NotFoundException {
+        var opt = accountRepo.findById(data.getId());
+
+        if (opt.isEmpty()) {
+            throw new NotFoundException();
+        }
+        var account = opt.get();
+        var amount = data.getBalance();
+        if (Objects.nonNull(amount) && !Objects.equals(amount, 0d)) {
+            var accountTransaction = new AccountTransaction();
+            accountTransaction.setTenant(authService.authUser().getTenant());
+            accountTransaction.setTransactionDate(LocalDateTime.now());
+            accountTransaction.setAccount(account);
+            accountTransaction.setAmount(amount);
+            accountTransaction.setCredit(data.getBalance());
+            accountTransaction.setTransactionType("Deposit");
+            accountTransaction.setNote("Top-Up Deposit");
+            accountTransaction.setCreatedBy(authService.authUser());
+            accountTransaction.setCreatedAt(LocalDateTime.now());
+            try {
+                accountTransactionService.save(accountTransaction);
+            } catch (Exception e) {
+                return spotyResponseImpl.error(e);
+            }
+        }
+        return spotyResponseImpl.ok();
+    }
+
+    @Override
+    @Transactional
     public ResponseEntity<ObjectNode> delete(Long id) {
         try {
             accountRepo.deleteById(id);
