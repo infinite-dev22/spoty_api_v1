@@ -57,6 +57,8 @@ public class SaleReturnServiceImpl implements SaleReturnService {
     private TenantSettingsServiceImpl settingsService;
     @Autowired
     private ApproverServiceImpl approverService;
+    @Autowired
+    private CoreCalculations.SaleCalculationService saleCalculationService;
 
     @Override
     @Cacheable("sale_masters")
@@ -88,8 +90,7 @@ public class SaleReturnServiceImpl implements SaleReturnService {
 //    @Transactional
     public ResponseEntity<ObjectNode> save(SaleReturnMaster sale) throws NotFoundException {
         // Perform calculations
-        var calculationService = new CoreCalculations.SaleCalculationService(taxService, discountService);
-        calculationService.calculate(sale);
+        saleCalculationService.calculate(sale);
 
         // Set additional details
         sale.setTenant(authService.authUser().getTenant());
@@ -157,8 +158,7 @@ public class SaleReturnServiceImpl implements SaleReturnService {
         }
 
         // Perform calculations
-        var calculationService = new CoreCalculations.SaleCalculationService(taxService, discountService);
-        calculationService.calculate(sale);
+        saleCalculationService.calculate(sale);
 
         // Update other fields
         if (!Objects.equals(data.getTax(), sale.getTax()) && Objects.nonNull(data.getTax())) {

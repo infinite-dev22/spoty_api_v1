@@ -60,6 +60,8 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
     private TenantSettingsServiceImpl settingsService;
     @Autowired
     private ApproverServiceImpl approverService;
+    @Autowired
+    private CoreCalculations.PurchaseCalculationService purchaseCalculationService;
 
     @Override
     public Page<PurchaseReturnMaster> getAll(int pageNo, int pageSize) {
@@ -85,8 +87,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
     @Transactional
     public ResponseEntity<ObjectNode> save(PurchaseReturnMaster purchase) throws NotFoundException {
         // Perform calculations
-        var calculationService = new CoreCalculations.PurchaseCalculationService(taxService, discountService);
-        calculationService.calculate(purchase);
+        purchaseCalculationService.calculate(purchase);
 
         // Set additional details
         purchase.setTenant(authService.authUser().getTenant());
@@ -159,8 +160,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
         }
 
         // Perform calculations
-        var calculationService = new CoreCalculations.PurchaseCalculationService(taxService, discountService);
-        calculationService.calculate(purchase);
+        purchaseCalculationService.calculate(purchase);
 
         // Update other fields
         if (Objects.nonNull(data.getPurchaseStatus()) && !"".equalsIgnoreCase(data.getPurchaseStatus())) {

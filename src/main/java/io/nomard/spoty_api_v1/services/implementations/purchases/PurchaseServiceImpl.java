@@ -20,12 +20,6 @@ import io.nomard.spoty_api_v1.services.implementations.deductions.TaxServiceImpl
 import io.nomard.spoty_api_v1.services.interfaces.purchases.PurchaseService;
 import io.nomard.spoty_api_v1.utils.CoreCalculations;
 import io.nomard.spoty_api_v1.utils.CoreUtils;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.logging.Level;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -36,6 +30,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.logging.Level;
 
 @Service
 @Log
@@ -71,17 +72,20 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Autowired
     private ApproverServiceImpl approverService;
 
+    @Autowired
+    private CoreCalculations.PurchaseCalculationService purchaseCalculationService;
+
     @Override
     public Page<PurchaseMaster> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(
-            pageNo,
-            pageSize,
-            Sort.by(Sort.Order.desc("createdAt"))
+                pageNo,
+                pageSize,
+                Sort.by(Sort.Order.desc("createdAt"))
         );
         return purchaseRepo.findAllByTenantId(
-            authService.authUser().getTenant().getId(),
-            authService.authUser().getId(),
-            pageRequest
+                authService.authUser().getTenant().getId(),
+                authService.authUser().getId(),
+                pageRequest
         );
     }
 
@@ -97,22 +101,17 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Override
     public ArrayList<PurchaseMaster> getByContains(String search) {
         return purchaseRepo.searchAll(
-            authService.authUser().getTenant().getId(),
-            search.toLowerCase()
+                authService.authUser().getTenant().getId(),
+                search.toLowerCase()
         );
     }
 
     @Override
     @Transactional
     public ResponseEntity<ObjectNode> save(PurchaseMaster purchase)
-        throws NotFoundException {
+            throws NotFoundException {
         // Perform calculations
-        var calculationService =
-            new CoreCalculations.PurchaseCalculationService(
-                taxService,
-                discountService
-            );
-        calculationService.calculate(purchase);
+        purchaseCalculationService.calculate(purchase);
 
         // Set additional details
         purchase.setTenant(authService.authUser().getTenant());
@@ -123,7 +122,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             Approver approver = null;
             try {
                 approver = approverService.getByUserId(
-                    authService.authUser().getId()
+                        authService.authUser().getId()
                 );
             } catch (NotFoundException e) {
                 log.log(Level.ALL, e.getMessage(), e);
@@ -132,8 +131,8 @@ public class PurchaseServiceImpl implements PurchaseService {
                 purchase.getApprovers().add(approver);
                 purchase.setNextApprovedLevel(approver.getLevel());
                 if (
-                    approver.getLevel() >=
-                    settingsService.getSettings().getApprovalLevels()
+                        approver.getLevel() >=
+                                settingsService.getSettings().getApprovalLevels()
                 ) {
                     purchase.setApproved(true);
                     purchase.setApprovalStatus("Approved");
@@ -152,8 +151,8 @@ public class PurchaseServiceImpl implements PurchaseService {
 
             // Create account transaction of this purchase.
             var account = accountService.getByContains(
-                authService.authUser().getTenant(),
-                "Default Account"
+                    authService.authUser().getTenant(),
+                    "Default Account"
             );
             var accountTransaction = new AccountTransaction();
             accountTransaction.setTenant(authService.authUser().getTenant());
@@ -169,13 +168,13 @@ public class PurchaseServiceImpl implements PurchaseService {
             // Check if product cost price needs to be updated.
             for (PurchaseDetail detail : purchase.getPurchaseDetails()) {
                 var product = productService.getById(
-                    detail.getProduct().getId()
+                        detail.getProduct().getId()
                 );
                 if (
-                    !Objects.equals(
-                        product.getCostPrice(),
-                        detail.getUnitCost()
-                    )
+                        !Objects.equals(
+                                product.getCostPrice(),
+                                detail.getUnitCost()
+                        )
                 ) {
                     product.setCostPrice(detail.getUnitCost());
                     productService.save(product);
@@ -192,8 +191,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
             return spotyResponseImpl.custom(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
             );
         }
     }
@@ -201,7 +200,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Override
     @Transactional
     public ResponseEntity<ObjectNode> update(PurchaseMaster data)
-        throws NotFoundException {
+            throws NotFoundException {
         var opt = purchaseRepo.findById(data.getId());
         if (opt.isEmpty()) {
             throw new NotFoundException();
@@ -210,8 +209,8 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         // Update fields as needed
         if (
-            Objects.nonNull(data.getRef()) &&
-            !"".equalsIgnoreCase(data.getRef())
+                Objects.nonNull(data.getRef()) &&
+                        !"".equalsIgnoreCase(data.getRef())
         ) {
             purchase.setRef(data.getRef());
         }
@@ -225,47 +224,42 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchase.setBranch(data.getBranch());
         }
         if (
-            Objects.nonNull(data.getPurchaseDetails()) &&
-            !data.getPurchaseDetails().isEmpty()
+                Objects.nonNull(data.getPurchaseDetails()) &&
+                        !data.getPurchaseDetails().isEmpty()
         ) {
             purchase.setPurchaseDetails(data.getPurchaseDetails());
         }
 
         // Perform calculations
-        var calculationService =
-            new CoreCalculations.PurchaseCalculationService(
-                taxService,
-                discountService
-            );
-        calculationService.calculate(purchase);
+        purchaseCalculationService.calculate(purchase);
 
         // Update other fields
         if (
-            Objects.nonNull(data.getPurchaseStatus()) &&
-            !"".equalsIgnoreCase(data.getPurchaseStatus())
+                Objects.nonNull(data.getPurchaseStatus()) &&
+                        !"".equalsIgnoreCase(data.getPurchaseStatus())
         ) {
             purchase.setPurchaseStatus(data.getPurchaseStatus());
         }
         if (
-            Objects.nonNull(data.getPaymentStatus()) &&
-            !"".equalsIgnoreCase(data.getPaymentStatus())
+                Objects.nonNull(data.getPaymentStatus()) &&
+                        !"".equalsIgnoreCase(data.getPaymentStatus())
         ) {
             purchase.setPaymentStatus(data.getPaymentStatus());
         }
         if (
-            Objects.nonNull(data.getNotes()) &&
-            !"".equalsIgnoreCase(data.getNotes())
+                Objects.nonNull(data.getNotes()) &&
+                        !"".equalsIgnoreCase(data.getNotes())
         ) {
             purchase.setNotes(data.getNotes());
         }
         if (
-            Objects.nonNull(data.getApprovers()) &&
-            !data.getApprovers().isEmpty()
+                Objects.nonNull(data.getApprovers()) &&
+                        !data.getApprovers().isEmpty()
         ) {
             purchase.getApprovers().add(data.getApprovers().getFirst());
             if (
-                purchase.getNextApprovedLevel() >=
-                settingsService.getSettings().getApprovalLevels()
+                    purchase.getNextApprovedLevel() >=
+                            settingsService.getSettings().getApprovalLevels()
             ) {
                 purchase.setApproved(true);
                 purchase.setApprovalStatus("Approved");
@@ -282,13 +276,13 @@ public class PurchaseServiceImpl implements PurchaseService {
             // Check if product cost price needs to be updated.
             for (PurchaseDetail detail : purchase.getPurchaseDetails()) {
                 var product = productService.getById(
-                    detail.getProduct().getId()
+                        detail.getProduct().getId()
                 );
                 if (
-                    !Objects.equals(
-                        product.getCostPrice(),
-                        detail.getUnitCost()
-                    )
+                        !Objects.equals(
+                                product.getCostPrice(),
+                                detail.getUnitCost()
+                        )
                 ) {
                     product.setCostPrice(detail.getUnitCost());
                     productService.save(product);
@@ -299,8 +293,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
             return spotyResponseImpl.custom(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
             );
         }
     }
@@ -404,7 +398,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     @CacheEvict(value = "adjustment_masters", key = "#approvalModel.id")
     @Transactional
     public ResponseEntity<ObjectNode> approve(ApprovalModel approvalModel)
-        throws NotFoundException {
+            throws NotFoundException {
         var opt = purchaseRepo.findById(approvalModel.getId());
         if (opt.isEmpty()) {
             throw new NotFoundException();
@@ -412,26 +406,26 @@ public class PurchaseServiceImpl implements PurchaseService {
         var purchase = opt.get();
 
         if (
-            Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")
+                Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")
         ) {
             purchase.setApproved(false);
             purchase.setNextApprovedLevel(
-                purchase.getNextApprovedLevel() - 1
+                    purchase.getNextApprovedLevel() - 1
             );
             purchase.setApprovalStatus("Returned");
         }
 
         if (
-            Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")
+                Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")
         ) {
             var approver = approverService.getByUserId(
-                authService.authUser().getId()
+                    authService.authUser().getId()
             );
             purchase.getApprovers().add(approver);
             purchase.setNextApprovedLevel(approver.getLevel());
             if (
-                purchase.getNextApprovedLevel() >=
-                settingsService.getSettings().getApprovalLevels()
+                    purchase.getNextApprovedLevel() >=
+                            settingsService.getSettings().getApprovalLevels()
             ) {
                 purchase.setApproved(true);
                 purchase.setApprovalStatus("Approved");
@@ -439,12 +433,12 @@ public class PurchaseServiceImpl implements PurchaseService {
 
                 // Create account transaction of this purchase.
                 var account = accountService.getByContains(
-                    authService.authUser().getTenant(),
-                    "Default Account"
+                        authService.authUser().getTenant(),
+                        "Default Account"
                 );
                 var accountTransaction = new AccountTransaction();
                 accountTransaction.setTenant(
-                    authService.authUser().getTenant()
+                        authService.authUser().getTenant()
                 );
                 accountTransaction.setTransactionDate(LocalDateTime.now());
                 accountTransaction.setAccount(account);
@@ -458,13 +452,13 @@ public class PurchaseServiceImpl implements PurchaseService {
                 // Check if product cost price needs to be updated.
                 for (PurchaseDetail detail : purchase.getPurchaseDetails()) {
                     var product = productService.getById(
-                        detail.getProduct().getId()
+                            detail.getProduct().getId()
                     );
                     if (
-                        !Objects.equals(
-                            product.getCostPrice(),
-                            detail.getUnitCost()
-                        )
+                            !Objects.equals(
+                                    product.getCostPrice(),
+                                    detail.getUnitCost()
+                            )
                     ) {
                         product.setCostPrice(detail.getUnitCost());
                         productService.save(product);
@@ -474,7 +468,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
 
         if (
-            Objects.equals(approvalModel.getStatus().toLowerCase(), "rejected")
+                Objects.equals(approvalModel.getStatus().toLowerCase(), "rejected")
         ) {
             purchase.setApproved(false);
             purchase.setApprovalStatus("Rejected");
@@ -489,8 +483,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
             return spotyResponseImpl.custom(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
             );
         }
     }
@@ -504,8 +498,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
             return spotyResponseImpl.custom(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
             );
         }
     }
@@ -518,8 +512,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
             return spotyResponseImpl.custom(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
             );
         }
     }
