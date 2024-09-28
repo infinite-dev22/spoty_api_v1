@@ -60,10 +60,10 @@ public class Product implements Serializable {
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
-    private User createdBy;
+    private Employee createdBy;
     private LocalDateTime updatedAt;
     @ManyToOne(fetch = FetchType.LAZY)
-    private User updatedBy;
+    private Employee updatedBy;
 
     @Override
     public final boolean equals(Object o) {

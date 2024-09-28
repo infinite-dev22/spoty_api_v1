@@ -15,6 +15,8 @@
 package io.nomard.spoty_api_v1.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
+import io.nomard.spoty_api_v1.utils.Views;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Cascade;
@@ -36,7 +38,9 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
+    @JsonView(Views.Clean.class)
     private String name;
+    @JsonView(Views.Clean.class)
     private String label;
     private String description;
     @JoinColumn(name = "tenant_id")
@@ -46,13 +50,14 @@ public class Role {
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @Builder.Default
+    @JsonView(Views.Detailed.class)
     private List<Permission> permissions = new LinkedList<>();
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
-    private User createdBy;
+    private Employee createdBy;
     private LocalDateTime updatedAt;
     @ManyToOne(fetch = FetchType.LAZY)
-    private User updatedBy;
+    private Employee updatedBy;
 
     @Override
     public final boolean equals(Object o) {

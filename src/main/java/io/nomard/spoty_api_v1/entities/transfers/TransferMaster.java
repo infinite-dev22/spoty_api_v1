@@ -17,18 +17,17 @@ package io.nomard.spoty_api_v1.entities.transfers;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Approver;
 import io.nomard.spoty_api_v1.entities.Branch;
+import io.nomard.spoty_api_v1.entities.Employee;
 import io.nomard.spoty_api_v1.entities.Tenant;
-import io.nomard.spoty_api_v1.entities.User;
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.proxy.HibernateProxy;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import lombok.*;
+import org.hibernate.proxy.HibernateProxy;
 
 @Entity
 @Getter
@@ -37,49 +36,80 @@ import java.util.Objects;
 @NoArgsConstructor
 @Builder
 public class TransferMaster implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String ref;
+
     @Column(nullable = false)
     private LocalDateTime date;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private Branch fromBranch;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private Branch toBranch;
+
     @JoinColumn(nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     private Tenant tenant;
-    @OneToMany(orphanRemoval = true, mappedBy = "transfer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+
+    @OneToMany(
+        orphanRemoval = true,
+        mappedBy = "transfer",
+        fetch = FetchType.LAZY,
+        cascade = CascadeType.ALL
+    )
     @Builder.Default
     private List<TransferDetail> transferDetails = new LinkedList<>();
-    @Column(nullable = false)
-    private String status;
+
     private String notes;
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+
+    @ManyToMany(
+        cascade = {
+            CascadeType.DETACH,
+            CascadeType.MERGE,
+            CascadeType.PERSIST,
+            CascadeType.REFRESH,
+        }
+    )
     @Builder.Default
     private List<Approver> approvers = new ArrayList<>();
+
     @Builder.Default
     private Boolean approved = false;
+
     @Builder.Default
-    private Integer latestApprovedLevel = 0;
+    private Integer nextApprovedLevel = 0;
+
     private String approvalStatus;
     private LocalDateTime createdAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    private User createdBy;
+    private Employee createdBy;
+
     private LocalDateTime updatedAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    private User updatedBy;
+    private Employee updatedBy;
 
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;
         if (o == null) return false;
-        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
-        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        Class<?> oEffectiveClass = o instanceof HibernateProxy
+            ? ((HibernateProxy) o).getHibernateLazyInitializer()
+                .getPersistentClass()
+            : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy
+            ? ((HibernateProxy) this).getHibernateLazyInitializer()
+                .getPersistentClass()
+            : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
         TransferMaster that = (TransferMaster) o;
         return getId() != null && Objects.equals(getId(), that.getId());
@@ -87,6 +117,10 @@ public class TransferMaster implements Serializable {
 
     @Override
     public final int hashCode() {
-        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+        return this instanceof HibernateProxy
+            ? ((HibernateProxy) this).getHibernateLazyInitializer()
+                .getPersistentClass()
+                .hashCode()
+            : getClass().hashCode();
     }
 }

@@ -60,6 +60,8 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
     private TenantSettingsServiceImpl settingsService;
     @Autowired
     private ApproverServiceImpl approverService;
+    @Autowired
+    private CoreCalculations.PurchaseCalculationService purchaseCalculationService;
 
     @Override
     public Page<PurchaseReturnMaster> getAll(int pageNo, int pageSize) {
@@ -85,8 +87,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
     @Transactional
     public ResponseEntity<ObjectNode> save(PurchaseReturnMaster purchase) throws NotFoundException {
         // Perform calculations
-        var calculationService = new CoreCalculations.PurchaseCalculationService(taxService, discountService);
-        calculationService.calculate(purchase);
+        purchaseCalculationService.calculate(purchase);
 
         // Set additional details
         purchase.setTenant(authService.authUser().getTenant());
@@ -102,7 +103,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
             }
             if (Objects.nonNull(approver)) {
                 purchase.getApprovers().add(approver);
-                purchase.setLatestApprovedLevel(approver.getLevel());
+                purchase.setNextApprovedLevel(approver.getLevel());
                 if (approver.getLevel() >= settingsService.getSettings().getApprovalLevels()) {
                     purchase.setApproved(true);
                     purchase.setApprovalStatus("Approved");
@@ -110,6 +111,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
                     updateProductCost(purchase);
                 }
             } else {
+                purchase.setNextApprovedLevel(1);
                 purchase.setApproved(false);
             }
             purchase.setApprovalStatus("Pending");
@@ -158,8 +160,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
         }
 
         // Perform calculations
-        var calculationService = new CoreCalculations.PurchaseCalculationService(taxService, discountService);
-        calculationService.calculate(purchase);
+        purchaseCalculationService.calculate(purchase);
 
         // Update other fields
         if (Objects.nonNull(data.getPurchaseStatus()) && !"".equalsIgnoreCase(data.getPurchaseStatus())) {
@@ -173,7 +174,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
         }
         if (Objects.nonNull(data.getApprovers()) && !data.getApprovers().isEmpty()) {
             purchase.getApprovers().add(data.getApprovers().getFirst());
-            if (purchase.getLatestApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            if (purchase.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
                 purchase.setApproved(true);
                 purchase.setApprovalStatus("Approved");
                 createAccountTransaction(purchase);
@@ -215,15 +216,15 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
 
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")) {
             purchase.setApproved(false);
-            purchase.setLatestApprovedLevel(purchase.getLatestApprovedLevel() - 1);
+            purchase.setNextApprovedLevel(purchase.getNextApprovedLevel() - 1);
             purchase.setApprovalStatus("Returned");
         }
 
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")) {
             var approver = approverService.getByUserId(authService.authUser().getId());
             purchase.getApprovers().add(approver);
-            purchase.setLatestApprovedLevel(approver.getLevel());
-            if (purchase.getLatestApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            purchase.setNextApprovedLevel(approver.getLevel());
+            if (purchase.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
                 purchase.setApproved(true);
                 purchase.setApprovalStatus("Approved");
                 createAccountTransaction(purchase);
@@ -234,7 +235,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "rejected")) {
             purchase.setApproved(false);
             purchase.setApprovalStatus("Rejected");
-            purchase.setLatestApprovedLevel(0);
+            purchase.setNextApprovedLevel(0);
         }
 
         purchase.setUpdatedBy(authService.authUser());

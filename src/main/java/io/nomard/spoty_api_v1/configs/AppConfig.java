@@ -84,11 +84,6 @@ public class AppConfig {
     }
 
     @Bean
-    public UserProfile userProfile() {
-        return new UserProfile();
-    }
-
-    @Bean
     public Supplier supplier() {
         return new Supplier();
     }
@@ -101,11 +96,6 @@ public class AppConfig {
     @Bean
     public Expense expense() {
         return new Expense();
-    }
-
-    @Bean
-    public Currency currency() {
-        return new Currency();
     }
 
     @Bean

@@ -3,9 +3,9 @@ package io.nomard.spoty_api_v1.services.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Branch;
+import io.nomard.spoty_api_v1.entities.Employee;
 import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.User;
-import io.nomard.spoty_api_v1.entities.UserProfile;
 import io.nomard.spoty_api_v1.entities.accounting.Account;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.LoginModel;
@@ -15,6 +15,7 @@ import io.nomard.spoty_api_v1.repositories.*;
 import io.nomard.spoty_api_v1.repositories.accounting.AccountRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.implementations.TenantServiceImpl;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +28,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.logging.Level;
 
 @Service
+@Log
 public class AuthServiceImpl implements AuthService {
 
     @Autowired
@@ -46,7 +49,7 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private BranchRepository branchRepo;
     @Autowired
-    private UserProfileRepository userProfileRepo;
+    private EmployeeRepository employeeRepository;
     @Autowired
     private UserRepository userRepo;
     @Autowired
@@ -69,48 +72,16 @@ public class AuthServiceImpl implements AuthService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             var userDetails = spotyUserDetailsService.loadUserByUsername(loginDetails.getEmail());
-            var user = userRepo.findUserByEmail(loginDetails.getEmail());
-            var tenantId = user.getTenant().getId();
-            var now = LocalDateTime.now();
-            var gracePeriodEnd = tenantService.getSubscriptionEndDate(tenantId).plusDays(getGracePeriodDays());
-            var subscriptionWarningDate = tenantService.getSubscriptionEndDate(tenantId).minusDays(getGracePeriodDays());
-
-            boolean trial = tenantService.isTrial(tenantId);
-            boolean canTry = tenantService.canTry(tenantId);
-            boolean newTenancy = tenantService.isNewTenancy(tenantId);
-            boolean activeTenancy = tenantService.getSubscriptionEndDate(tenantId).isAfter(now);
-            boolean activeTenancyWarning = tenantService.getSubscriptionEndDate(tenantId).isAfter(now) && tenantService.getSubscriptionEndDate(tenantId).isBefore(subscriptionWarningDate.plusDays(getGracePeriodDays()));
-            boolean inActiveTenancyWarning = tenantService.getSubscriptionEndDate(tenantId).isBefore(now) && now.isBefore(gracePeriodEnd);
-
+            var employee = employeeRepository.findByEmail(loginDetails.getEmail());
             var response = objectMapper.createObjectNode();
-            response.put("status", 200);
-            response.put("trial", trial);
-            response.put("canTry", canTry);
-            response.put("newTenancy", newTenancy);
-            response.put("activeTenancy", activeTenancy);
-            response.put("activeTenancyWarning", activeTenancyWarning);
-            response.put("inActiveTenancyWarning", inActiveTenancyWarning);
             response.put("token", "Bearer " + spotyTokenService.generateToken(userDetails));
-            response.putPOJO("user", user);
-            response.putPOJO("role", user.getRole());
-
-            if (trial && tenantService.getTrialEndDate(tenantId).isBefore(LocalDateTime.now())) {
-                response.put("message", "Subscription required");
-            } else if (tenantService.getSubscriptionEndDate(tenantId).isBefore(now)) {
-                if (now.isBefore(subscriptionWarningDate)) {
-                    response.put("message", "Subscription required");
-                } else if (now.isBefore(gracePeriodEnd)) {
-                    response.put("message", "Subscription expired, please renew");
-                }
-            } else if (tenantService.getSubscriptionEndDate(tenantId).isBefore(subscriptionWarningDate)) {
-                response.put("message", "Subscription is about to expire, please renew");
-            } else {
-                response.put("message", "Process successfully completed");
-            }
+            response.putPOJO("user", employee);
+            response.putPOJO("role", employee.getRole());
 
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 
@@ -128,8 +99,8 @@ public class AuthServiceImpl implements AuthService {
 
         var tenant = new Tenant();
         tenant.setName(String.join(" ", signUpDetails.getFirstName(), signUpDetails.getLastName(), signUpDetails.getOtherName()));
+        tenant.setEmail(signUpDetails.getEmail());
         tenant.setSubscriptionEndDate(LocalDateTime.now().minusMonths(12));
-        tenant.setTrialEndDate(LocalDateTime.now().minusMonths(12));
 
         var branch = new Branch();
         branch.setName("Default Branch");
@@ -144,40 +115,37 @@ public class AuthServiceImpl implements AuthService {
         account.setDescription("Default account for sales, purchases, payroll, etc.");
         account.setTenant(tenant);
 
-        var userProfile = new UserProfile();
-        userProfile.setFirstName(signUpDetails.getFirstName());
-        userProfile.setLastName(signUpDetails.getLastName());
-        userProfile.setOtherName(signUpDetails.getOtherName());
-        userProfile.setPhone(signUpDetails.getPhone());
-        userProfile.setTenant(tenant);
-
         var user = new User();
-        user.setUserProfile(userProfile);
-        user.setTenant(tenant);
-        user.setBranch(branch);
         user.setEmail(signUpDetails.getEmail());
         user.setPassword(passwordEncoder.encode(signUpDetails.getPassword()));
-        user.setRole(roleRepo.searchAllByNameContainingIgnoreCase("admin").getFirst());
+
+        var employee = new Employee();
+        employee.setFirstName(signUpDetails.getFirstName());
+        employee.setLastName(signUpDetails.getLastName());
+        employee.setOtherName(signUpDetails.getOtherName());
+        employee.setPhone(signUpDetails.getPhone());
+        employee.setEmail(signUpDetails.getEmail());
+        employee.setTenant(tenant);
+        employee.setBranch(branch);
+        employee.setUser(user);
+        employee.setRole(roleRepo.searchAllByNameContainingIgnoreCase("admin").getFirst());
 
         try {
             tenantRepo.save(tenant);
             accountRepo.save(account);
             branchRepo.save(branch);
-            userProfileRepo.save(userProfile);
             userRepo.save(user);
+            employeeRepository.save(employee);
             return spotyResponseImpl.created();
         } catch (Exception e) {
-            return spotyResponseImpl.error(e);
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 
     @Override
-    public User authUser() {
+    public Employee authUser() {
         var principal = (SpotyUserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userRepo.findUserByEmail(principal.getUsername());
-    }
-
-    private int getGracePeriodDays() {
-        return 7; // Retrieve grace period duration from configuration
+        return employeeRepository.findByEmail(principal.getUsername());
     }
 }

@@ -10,5 +10,7 @@ public interface TenantSettingsService {
 
     ResponseEntity<ObjectNode> save(TenantSettings customer);
 
+    ResponseEntity<ObjectNode> update(TenantSettings customer);
+
     ResponseEntity<ObjectNode> delete(Long id);
 }

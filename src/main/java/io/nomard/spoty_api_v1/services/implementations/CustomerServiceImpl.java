@@ -32,7 +32,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public Page<Customer> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return customerRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+        return customerRepo.findByTenantId(authService.authUser().getTenant().getId(), pageRequest);
     }
 
     @Override
@@ -46,19 +46,19 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public ArrayList<Customer> getByContains(String search) {
-        return customerRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
+        return customerRepo.search(authService.authUser().getTenant().getId(), search.toLowerCase());
     }
 
     @Override
     @Transactional
     public ResponseEntity<ObjectNode> save(Customer customer) {
+        customer.setTenant(authService.authUser().getTenant());
+        if (Objects.isNull(customer.getBranch())) {
+            customer.setBranch(authService.authUser().getBranch());
+        }
+        customer.setCreatedBy(authService.authUser());
+        customer.setCreatedAt(LocalDateTime.now());
         try {
-            customer.setTenant(authService.authUser().getTenant());
-            if (Objects.isNull(customer.getBranch())) {
-                customer.setBranch(authService.authUser().getBranch());
-            }
-            customer.setCreatedBy(authService.authUser());
-            customer.setCreatedAt(LocalDateTime.now());
             customerRepo.save(customer);
             return spotyResponseImpl.created();
         } catch (Exception e) {
@@ -76,32 +76,36 @@ public class CustomerServiceImpl implements CustomerService {
         }
         var customer = opt.get();
 
-        if (Objects.nonNull(data.getName()) && !"".equalsIgnoreCase(data.getName())) {
-            customer.setName(data.getName());
+        if (Objects.nonNull(data.getFirstName()) && !"".equalsIgnoreCase(data.getFirstName())) {
+            customer.setFirstName(data.getFirstName());
+        }
+
+        if (Objects.nonNull(data.getOtherName()) && !"".equalsIgnoreCase(data.getOtherName())) {
+            customer.setOtherName(data.getOtherName());
+        }
+
+        if (Objects.nonNull(data.getLastName()) && !"".equalsIgnoreCase(data.getLastName())) {
+            customer.setLastName(data.getLastName());
         }
 
         if (Objects.nonNull(data.getEmail()) && !"".equalsIgnoreCase(data.getEmail())) {
             customer.setEmail(data.getEmail());
         }
 
-        if (Objects.nonNull(data.getCity()) && !"".equalsIgnoreCase(data.getCity())) {
-            customer.setCity(data.getCity());
-        }
-
         if (Objects.nonNull(data.getPhone()) && !"".equalsIgnoreCase(data.getPhone())) {
             customer.setPhone(data.getPhone());
-        }
-
-        if (Objects.nonNull(data.getAddress()) && !"".equalsIgnoreCase(data.getAddress())) {
-            customer.setAddress(data.getAddress());
         }
 
         if (Objects.nonNull(data.getCountry()) && !"".equalsIgnoreCase(data.getCountry())) {
             customer.setCountry(data.getCountry());
         }
 
-        if (Objects.nonNull(data.getCode()) && !"".equalsIgnoreCase(data.getCode())) {
-            customer.setCode(data.getCode());
+        if (Objects.nonNull(data.getCity()) && !"".equalsIgnoreCase(data.getCity())) {
+            customer.setCity(data.getCity());
+        }
+
+        if (Objects.nonNull(data.getAddress()) && !"".equalsIgnoreCase(data.getAddress())) {
+            customer.setAddress(data.getAddress());
         }
 
         if (Objects.nonNull(data.getTaxNumber()) && !"".equalsIgnoreCase(data.getTaxNumber())) {

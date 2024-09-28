@@ -1,7 +1,7 @@
 package io.nomard.spoty_api_v1.services.interfaces;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.User;
+import io.nomard.spoty_api_v1.entities.Employee;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.UserModel;
 import org.springframework.data.domain.Page;
@@ -9,14 +9,14 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-public interface UserService {
-    Page<User> getAll(int pageNo, int pageSize);
+public interface EmployeeService {
+    Page<Employee> getAll(int pageNo, int pageSize);
 
-    User getById(Long id) throws NotFoundException;
+    Employee getById(Long id) throws NotFoundException;
 
-    User getByEmail(String email) throws NotFoundException;
+    Employee getByEmail(String email) throws NotFoundException;
 
-    List<User> getByContains(String search);
+    List<Employee> getByContains(String search);
 
     ResponseEntity<ObjectNode> add(UserModel user) throws NotFoundException;
 

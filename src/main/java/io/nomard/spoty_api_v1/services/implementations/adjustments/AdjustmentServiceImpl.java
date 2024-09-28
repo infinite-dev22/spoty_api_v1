@@ -91,12 +91,13 @@ public class AdjustmentServiceImpl implements AdjustmentService {
             }
             if (Objects.nonNull(approver)) {
                 adjustment.getApprovers().add(approver);
-                adjustment.setLatestApprovedLevel(approver.getLevel());
+                adjustment.setNextApprovedLevel(approver.getLevel() + 1);
                 if (approver.getLevel() >= settingsService.getSettings().getApprovalLevels()) {
                     adjustment.setApproved(true);
                     adjustment.setApprovalStatus("Approved");
                 }
             } else {
+                adjustment.setNextApprovedLevel(1);
                 adjustment.setApproved(false);
             }
             adjustment.setApprovalStatus("Pending");
@@ -143,7 +144,7 @@ public class AdjustmentServiceImpl implements AdjustmentService {
         }
         if (Objects.nonNull(data.getApprovers()) && !data.getApprovers().isEmpty()) {
             adjustment.getApprovers().add(data.getApprovers().getFirst());
-            if (adjustment.getLatestApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            if (adjustment.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
                 adjustment.setApproved(true);
                 adjustment.setApprovalStatus("Approved");
             }
@@ -171,15 +172,15 @@ public class AdjustmentServiceImpl implements AdjustmentService {
 
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")) {
             adjustment.setApproved(false);
-            adjustment.setLatestApprovedLevel(adjustment.getLatestApprovedLevel() - 1);
+            adjustment.setNextApprovedLevel(adjustment.getNextApprovedLevel() - 1);
             adjustment.setApprovalStatus("Returned");
         }
 
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")) {
             var approver = approverService.getByUserId(authService.authUser().getId());
             adjustment.getApprovers().add(approver);
-            adjustment.setLatestApprovedLevel(approver.getLevel());
-            if (adjustment.getLatestApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            adjustment.setNextApprovedLevel(approver.getLevel());
+            if (adjustment.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
                 adjustment.setApproved(true);
                 adjustment.setApprovalStatus("Approved");
             }
@@ -188,7 +189,7 @@ public class AdjustmentServiceImpl implements AdjustmentService {
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "rejected")) {
             adjustment.setApproved(false);
             adjustment.setApprovalStatus("Rejected");
-            adjustment.setLatestApprovedLevel(0);
+            adjustment.setNextApprovedLevel(0);
         }
 
         adjustment.setUpdatedBy(authService.authUser());

@@ -15,8 +15,6 @@ public interface TenantService {
 
     LocalDateTime getSubscriptionEndDate(Long id) throws NotFoundException;
 
-    LocalDateTime getTrialEndDate(Long id) throws NotFoundException;
-
     boolean isTrial(Long id) throws NotFoundException;
 
     boolean canTry(Long id) throws NotFoundException;

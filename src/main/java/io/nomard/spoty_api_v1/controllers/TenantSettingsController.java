@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.TenantSettings;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.services.implementations.TenantSettingsServiceImpl;
+import com.fasterxml.jackson.annotation.JsonView;
+import io.nomard.spoty_api_v1.utils.Views;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,11 @@ public class TenantSettingsController {
     @PostMapping("/add")
     public ResponseEntity<ObjectNode> save(@Valid @RequestBody TenantSettings tenantSettings) {
         return tenantSettingsService.save(tenantSettings);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<ObjectNode> update(@Valid @RequestBody TenantSettings tenantSettings) {
+        return tenantSettingsService.update(tenantSettings);
     }
 
     @DeleteMapping("/delete")

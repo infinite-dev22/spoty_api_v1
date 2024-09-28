@@ -62,6 +62,8 @@ public class SaleServiceImpl implements SaleService {
     private TenantSettingsServiceImpl settingsService;
     @Autowired
     private ApproverServiceImpl approverService;
+    @Autowired
+    private CoreCalculations.SaleCalculationService saleCalculationService;
 
     @Override
     @Cacheable("sale_masters")
@@ -93,8 +95,7 @@ public class SaleServiceImpl implements SaleService {
 //    @Transactional
     public ResponseEntity<ObjectNode> save(SaleMaster sale) throws NotFoundException {
         // Perform calculations
-        var calculationService = new CoreCalculations.SaleCalculationService(taxService, discountService);
-        calculationService.calculate(sale);
+        saleCalculationService.calculate(sale);
 
         // Set additional details
         sale.setTenant(authService.authUser().getTenant());
@@ -111,7 +112,7 @@ public class SaleServiceImpl implements SaleService {
             }
             if (Objects.nonNull(approver)) {
                 sale.getApprovers().add(approver);
-                sale.setLatestApprovedLevel(approver.getLevel());
+                sale.setNextApprovedLevel(approver.getLevel());
                 if (approver.getLevel() >= settingsService.getSettings().getApprovalLevels()) {
                     sale.setApproved(true);
                     sale.setApprovalStatus("Approved");
@@ -119,6 +120,7 @@ public class SaleServiceImpl implements SaleService {
                     createTransaction(sale);
                 }
             } else {
+                sale.setNextApprovedLevel(1);
                 sale.setApproved(false);
             }
             sale.setApprovalStatus("Pending");
@@ -164,8 +166,7 @@ public class SaleServiceImpl implements SaleService {
         }
 
         // Perform calculations
-        var calculationService = new CoreCalculations.SaleCalculationService(taxService, discountService);
-        calculationService.calculate(sale);
+        saleCalculationService.calculate(sale);
 
         // Update other fields
         if (!Objects.equals(data.getTax(), sale.getTax()) && Objects.nonNull(data.getTax())) {
@@ -191,7 +192,7 @@ public class SaleServiceImpl implements SaleService {
         }
         if (Objects.nonNull(data.getApprovers()) && !data.getApprovers().isEmpty()) {
             sale.getApprovers().add(data.getApprovers().getFirst());
-            if (sale.getLatestApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            if (sale.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
                 sale.setApproved(true);
                 sale.setApprovalStatus("Approved");
                 createAccountTransaction(sale);
@@ -221,15 +222,15 @@ public class SaleServiceImpl implements SaleService {
 
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")) {
             sale.setApproved(false);
-            sale.setLatestApprovedLevel(sale.getLatestApprovedLevel() - 1);
+            sale.setNextApprovedLevel(sale.getNextApprovedLevel() - 1);
             sale.setApprovalStatus("Returned");
         }
 
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")) {
             var approver = approverService.getByUserId(authService.authUser().getId());
             sale.getApprovers().add(approver);
-            sale.setLatestApprovedLevel(approver.getLevel());
-            if (sale.getLatestApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            sale.setNextApprovedLevel(approver.getLevel());
+            if (sale.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
                 sale.setApproved(true);
                 sale.setApprovalStatus("Approved");
                 createAccountTransaction(sale);
@@ -240,7 +241,7 @@ public class SaleServiceImpl implements SaleService {
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "rejected")) {
             sale.setApproved(false);
             sale.setApprovalStatus("Rejected");
-            sale.setLatestApprovedLevel(0);
+            sale.setNextApprovedLevel(0);
         }
 
         sale.setUpdatedBy(authService.authUser());

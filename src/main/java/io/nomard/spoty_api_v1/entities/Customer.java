@@ -15,48 +15,69 @@
 package io.nomard.spoty_api_v1.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
+import io.nomard.spoty_api_v1.entities.hrm.hrm.EmploymentStatus;
+import io.nomard.spoty_api_v1.utils.Views;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+@Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity
-public class Customer {
+public class Customer implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
-    private String name;
-    private String code;
-    private String email;
-    @Column(nullable = false)
-    private String phone;
-    private String city;
-    private String address;
-    private String taxNumber;
-    private String avatar;
     @ManyToOne(targetEntity = Branch.class, fetch = FetchType.LAZY)
     @JsonIgnore
     private Branch branch;
-    @JoinColumn(name = "tenant_id")
+    @JoinColumn
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     private Tenant tenant;
-    @Column(nullable = false)
+    @JsonView(Views.Tiny.class)
+    private String firstName;
+    @JsonView(Views.Tiny.class)
+    private String lastName;
+    @JsonView(Views.Tiny.class)
+    private String otherName;
+    @JsonView(Views.Tiny.class)
+    private String email;
+    @JsonView(Views.Tiny.class)
+    private String phone;
+    @Column(unique = true)
+    @JsonView(Views.Tiny.class)
+    private String avatar;
+    @JsonView(Views.Tiny.class)
     private String country;
+    @JsonView(Views.Tiny.class)
+    private String city;
+    @JsonView(Views.Tiny.class)
+    private String address;
+    @JsonView(Views.Tiny.class)
+    private String taxNumber;
+    @JoinColumn
+    @OneToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    private User user;
+    @JsonView(Views.Moderate.class)
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
-    private User createdBy;
+    @JsonView(Views.Moderate.class)
+    private Employee createdBy;
+    @JsonView(Views.Moderate.class)
     private LocalDateTime updatedAt;
     @ManyToOne(fetch = FetchType.LAZY)
-    private User updatedBy;
+    @JsonView(Views.Moderate.class)
+    private Employee updatedBy;
 
     @Override
     public final boolean equals(Object o) {
@@ -65,8 +86,8 @@ public class Customer {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Customer customer = (Customer) o;
-        return getId() != null && Objects.equals(getId(), customer.getId());
+        Customer user = (Customer) o;
+        return getId() != null && Objects.equals(getId(), user.getId());
     }
 
     @Override

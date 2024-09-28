@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
 
@@ -35,7 +36,7 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
     @Override
     @Transactional
     public ResponseEntity<ObjectNode> save(TenantSettings settings) {
-        var opt = Optional.of(settingsRepo.findByTenantId(authService.authUser().getTenant().getId()));
+        var opt = Optional.ofNullable(settingsRepo.findByTenantId(authService.authUser().getTenant().getId()));
         if (opt.isEmpty()) {
             try {
                 for (int i = 0; i < settings.getApprovers().size(); i++) {
@@ -54,6 +55,177 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
             }
         } else {
             return spotyResponseImpl.custom(HttpStatus.CONFLICT, HttpStatus.CONFLICT.getReasonPhrase());
+        }
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<ObjectNode> update(TenantSettings settings) {
+        var opt = Optional.ofNullable(settingsRepo.findByTenantId(authService.authUser().getTenant().getId()));
+        if (opt.isPresent()) {
+            var tenantSettings = opt.get();
+
+            if (!Objects.equals(tenantSettings.getName(), settings.getName()) &&
+                    Objects.nonNull(settings.getName()) && settings.getName().isEmpty()) {
+                tenantSettings.setName(settings.getName());
+            }
+
+            if (!Objects.equals(tenantSettings.getWebsiteLink(), settings.getWebsiteLink()) &&
+                    Objects.nonNull(settings.getWebsiteLink()) && settings.getWebsiteLink().isEmpty()) {
+                tenantSettings.setWebsiteLink(settings.getWebsiteLink());
+            }
+
+            if (!Objects.equals(tenantSettings.getPhoneNumber(), settings.getPhoneNumber()) &&
+                    Objects.nonNull(settings.getPhoneNumber()) && settings.getPhoneNumber().isEmpty()) {
+                tenantSettings.setPhoneNumber(settings.getPhoneNumber());
+            }
+
+            if (!Objects.equals(tenantSettings.getEmail(), settings.getEmail()) &&
+                    Objects.nonNull(settings.getEmail()) && settings.getEmail().isEmpty()) {
+                tenantSettings.setEmail(settings.getEmail());
+            }
+
+            if (!Objects.equals(tenantSettings.getSupportEmail(), settings.getSupportEmail()) &&
+                    Objects.nonNull(settings.getSupportEmail()) && settings.getSupportEmail().isEmpty()) {
+                tenantSettings.setSupportEmail(settings.getSupportEmail());
+            }
+
+            if (!Objects.equals(tenantSettings.getInfoEmail(), settings.getInfoEmail()) &&
+                    Objects.nonNull(settings.getInfoEmail()) && settings.getInfoEmail().isEmpty()) {
+                tenantSettings.setInfoEmail(settings.getInfoEmail());
+            }
+
+            if (!Objects.equals(tenantSettings.getHrEmail(), settings.getHrEmail()) &&
+                    Objects.nonNull(settings.getHrEmail()) && settings.getHrEmail().isEmpty()) {
+                tenantSettings.setHrEmail(settings.getHrEmail());
+            }
+
+            if (!Objects.equals(tenantSettings.getSalesEmail(), settings.getSalesEmail()) &&
+                    Objects.nonNull(settings.getSalesEmail()) && settings.getSalesEmail().isEmpty()) {
+                tenantSettings.setSalesEmail(settings.getSalesEmail());
+            }
+
+            if (!Objects.equals(tenantSettings.getPostalAddress(), settings.getPostalAddress()) &&
+                    Objects.nonNull(settings.getPostalAddress()) && settings.getPostalAddress().isEmpty()) {
+                tenantSettings.setPostalAddress(settings.getPostalAddress());
+            }
+
+            if (!Objects.equals(tenantSettings.getPhysicalAddress(), settings.getPhysicalAddress()) &&
+                    Objects.nonNull(settings.getPhysicalAddress()) && settings.getPhysicalAddress().isEmpty()) {
+                tenantSettings.setPhysicalAddress(settings.getPhysicalAddress());
+            }
+
+            if (!Objects.equals(tenantSettings.getTagLine(), settings.getTagLine()) &&
+                    Objects.nonNull(settings.getTagLine()) && settings.getTagLine().isEmpty()) {
+                tenantSettings.setTagLine(settings.getTagLine());
+            }
+
+            if (!Objects.equals(tenantSettings.getReportLogo(), settings.getReportLogo()) &&
+                    Objects.nonNull(settings.getReportLogo())) {
+                tenantSettings.setReportLogo(settings.getReportLogo());
+            }
+
+            if (!Objects.equals(tenantSettings.getEmailLogo(), settings.getEmailLogo()) &&
+                    Objects.nonNull(settings.getEmailLogo())) {
+                tenantSettings.setEmailLogo(settings.getEmailLogo());
+            }
+
+            if (!Objects.equals(tenantSettings.getReceiptLogo(), settings.getReceiptLogo()) &&
+                    Objects.nonNull(settings.getReceiptLogo())) {
+                tenantSettings.setReceiptLogo(settings.getReceiptLogo());
+            }
+
+            if (!Objects.equals(tenantSettings.getTwitter(), settings.getTwitter()) &&
+                    Objects.nonNull(settings.getTwitter()) && settings.getTwitter().isEmpty()) {
+                tenantSettings.setTwitter(settings.getTwitter());
+            }
+
+            if (!Objects.equals(tenantSettings.getFacebook(), settings.getFacebook()) &&
+                    Objects.nonNull(settings.getFacebook()) && settings.getFacebook().isEmpty()) {
+                tenantSettings.setFacebook(settings.getFacebook());
+            }
+
+            if (!Objects.equals(tenantSettings.getLinkedIn(), settings.getLinkedIn()) &&
+                    Objects.nonNull(settings.getLinkedIn()) && settings.getLinkedIn().isEmpty()) {
+                tenantSettings.setLinkedIn(settings.getLinkedIn());
+            }
+
+            if (!Objects.equals(tenantSettings.getApproveAdjustments(), settings.getApproveAdjustments()) &&
+                    Objects.nonNull(settings.getApproveAdjustments())) {
+                tenantSettings.setApproveAdjustments(settings.getApproveAdjustments());
+            }
+
+            if (!Objects.equals(tenantSettings.getApproveRequisitions(), settings.getApproveRequisitions()) &&
+                    Objects.nonNull(settings.getApproveRequisitions())) {
+                tenantSettings.setApproveRequisitions(settings.getApproveRequisitions());
+            }
+
+            if (!Objects.equals(tenantSettings.getApproveTransfers(), settings.getApproveTransfers()) &&
+                    Objects.nonNull(settings.getApproveTransfers())) {
+                tenantSettings.setApproveTransfers(settings.getApproveTransfers());
+            }
+
+            if (!Objects.equals(tenantSettings.getApproveStockIns(), settings.getApproveStockIns()) &&
+                    Objects.nonNull(settings.getApproveStockIns())) {
+                tenantSettings.setApproveStockIns(settings.getApproveStockIns());
+            }
+
+            if (!Objects.equals(tenantSettings.getApproveQuotations(), settings.getApproveQuotations()) &&
+                    Objects.nonNull(settings.getApproveQuotations())) {
+                tenantSettings.setApproveQuotations(settings.getApproveQuotations());
+            }
+
+            if (!Objects.equals(tenantSettings.getApprovePurchases(), settings.getApprovePurchases()) &&
+                    Objects.nonNull(settings.getApprovePurchases())) {
+                tenantSettings.setApprovePurchases(settings.getApprovePurchases());
+            }
+
+            if (!Objects.equals(tenantSettings.getApproveSaleReturns(), settings.getApproveSaleReturns()) &&
+                    Objects.nonNull(settings.getApproveSaleReturns())) {
+                tenantSettings.setApproveSaleReturns(settings.getApproveSaleReturns());
+            }
+
+            if (!Objects.equals(tenantSettings.getApprovePurchaseReturns(), settings.getApprovePurchaseReturns()) &&
+                    Objects.nonNull(settings.getApprovePurchaseReturns())) {
+                tenantSettings.setApprovePurchaseReturns(settings.getApprovePurchaseReturns());
+            }
+
+            if (!Objects.equals(tenantSettings.getApprovalLevels(), settings.getApprovalLevels()) &&
+                    Objects.nonNull(settings.getApprovalLevels())) {
+                tenantSettings.setApprovalLevels(settings.getApprovalLevels());
+            }
+
+            if (!Objects.equals(tenantSettings.getApprovers(), settings.getApprovers()) &&
+                    Objects.nonNull(settings.getApprovers()) && settings.getApprovers().isEmpty()) {
+                for (int i = 0; i < settings.getApprovers().size(); i++) {
+                    settings.getApprovers().get(i).setTenant(authService.authUser().getTenant());
+                    settings.getApprovers().get(i).setBranch(authService.authUser().getBranch());
+                }
+                tenantSettings.setApprovers(settings.getApprovers());
+            }
+
+            if (!Objects.equals(tenantSettings.getDefaultCurrency(), settings.getDefaultCurrency()) &&
+                    Objects.nonNull(settings.getDefaultCurrency())) {
+                tenantSettings.setDefaultCurrency(settings.getDefaultCurrency());
+            }
+
+            if (!Objects.equals(tenantSettings.getLogo(), settings.getLogo()) &&
+                    Objects.nonNull(settings.getLogo()) && settings.getLogo().isEmpty()) {
+                tenantSettings.setLogo(settings.getLogo());
+            }
+
+            settings.setCreatedAt(LocalDateTime.now());
+            settings.setUpdatedAt(LocalDateTime.now());
+            settings.setTenant(authService.authUser().getTenant());
+            try {
+                settingsRepo.save(settings);
+                return spotyResponseImpl.created();
+            } catch (Exception e) {
+                log.log(Level.ALL, e.getMessage(), e);
+                return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+            }
+        } else {
+            return spotyResponseImpl.custom(HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.getReasonPhrase());
         }
     }
 
