@@ -35,24 +35,24 @@ public class Supplier implements Serializable {
     private String lastName;
     @JsonView(Views.Tiny.class)
     private String otherName;
-    @JsonView(Views.Moderate.class)
+    @JsonView(Views.Tiny.class)
     private String email;
-    @JsonView(Views.Moderate.class)
+    @JsonView(Views.Tiny.class)
     private String phone;
     @Column(unique = true)
-    @JsonView(Views.Moderate.class)
+    @JsonView(Views.Tiny.class)
     private String avatar;
     @JoinColumn
     @OneToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     private User user;
-    @JsonView(Views.Moderate.class)
+    @JsonView(Views.Tiny.class)
     private String country;
-    @JsonView(Views.Moderate.class)
+    @JsonView(Views.Tiny.class)
     private String city;
-    @JsonView(Views.Moderate.class)
+    @JsonView(Views.Tiny.class)
     private String address;
-    @JsonView(Views.Moderate.class)
+    @JsonView(Views.Tiny.class)
     private String taxNumber;
     @JsonView(Views.Moderate.class)
     private LocalDateTime createdAt;

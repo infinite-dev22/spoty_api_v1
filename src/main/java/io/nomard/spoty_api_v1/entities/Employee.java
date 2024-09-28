@@ -66,7 +66,7 @@ public class Employee implements Serializable {
         cascade = CascadeType.ALL
     )
     @JoinColumn(nullable = false)
-    @JsonView(Views.Detailed.class)
+    @JsonView(Views.Moderate.class)
     private Role role;
 
     @JsonView(Views.Tiny.class)
