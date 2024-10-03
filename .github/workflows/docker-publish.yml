@@ -26,12 +26,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Set up JDK 21 (required for jpackage)
-      - name: Set up JDK 21
-        uses: actions/setup-java@v3
+      # Set up JDK 22 (required for jpackage)
+      - name: Set up JDK 22
+        uses: graalvm/setup-graalvm@v1
         with:
-          distribution: 'temurin'
-          java-version: '21'
+          java-version: '22'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          distribution: liberica
+          cache: gradle
 
       # Cache Gradle dependencies
       - name: Cache Gradle dependencies
@@ -48,9 +50,8 @@ jobs:
       - name: Build core project with Gradle
         run: ./gradlew :build
 
-      # Run jpackage for platform-specific build (Linux)
+      # Run nativeCompile for platform-specific build (Linux)
       - name: Package with jpackage for Linux
-        if: runner.os != 'Windows'
         run: ./gradlew :nativeCompile
         
       - name: Install cosign
