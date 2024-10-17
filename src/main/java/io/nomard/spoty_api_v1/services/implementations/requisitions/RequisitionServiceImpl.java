@@ -1,7 +1,7 @@
 package io.nomard.spoty_api_v1.services.implementations.requisitions;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Approver;
+import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.entities.requisitions.RequisitionMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
@@ -92,20 +92,20 @@ public class RequisitionServiceImpl implements RequisitionService {
             if (Objects.isNull(requisition.getBranch())) {
                 requisition.setBranch(authService.authUser().getBranch());
             }
-            if (settingsService.getSettings().getApprove() && settingsService.getSettings().getApproveAdjustments()) {
-                Approver approver = null;
+            if (settingsService.getSettings().getReview() && settingsService.getSettings().getApproveAdjustments()) {
+                Reviewer reviewer = null;
                 try {
-                    approver = approverService.getByUserId(
+                    reviewer = approverService.getByUserId(
                         authService.authUser().getId()
                     );
                 } catch (NotFoundException e) {
                     log.log(Level.ALL, e.getMessage(), e);
                 }
-                if (Objects.nonNull(approver)) {
-                    requisition.getApprovers().add(approver);
-                    requisition.setNextApprovedLevel(approver.getLevel());
+                if (Objects.nonNull(reviewer)) {
+                    requisition.getReviewers().add(reviewer);
+                    requisition.setNextApprovedLevel(reviewer.getLevel());
                     if (
-                        approver.getLevel() >=
+                        reviewer.getLevel() >=
                         settingsService.getSettings().getApprovalLevels()
                     ) {
                         requisition.setApproved(true);
@@ -190,10 +190,10 @@ public class RequisitionServiceImpl implements RequisitionService {
             requisition.setStatus(data.getStatus());
         }
         if (
-            Objects.nonNull(data.getApprovers()) &&
-            !data.getApprovers().isEmpty()
+            Objects.nonNull(data.getReviewers()) &&
+            !data.getReviewers().isEmpty()
         ) {
-            requisition.getApprovers().add(data.getApprovers().getFirst());
+            requisition.getReviewers().add(data.getReviewers().getFirst());
             if (
                 requisition.getNextApprovedLevel() >=
                 settingsService.getSettings().getApprovalLevels()
@@ -245,7 +245,7 @@ public class RequisitionServiceImpl implements RequisitionService {
             var approver = approverService.getByUserId(
                 authService.authUser().getId()
             );
-            requisition.getApprovers().add(approver);
+            requisition.getReviewers().add(approver);
             requisition.setNextApprovedLevel(approver.getLevel());
             if (
                 requisition.getNextApprovedLevel() >=

@@ -1,7 +1,7 @@
 package io.nomard.spoty_api_v1.services.implementations;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Approver;
+import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.entities.TenantSettings;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.repositories.ApproverRepository;
@@ -49,7 +49,7 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
                 //     settings.getApprovers().get(i).setBranch(authService.authUser().getBranch());
                 // }
 
-                settings.setApprovers(settings.getApprovers().stream().peek(approver -> {
+                settings.setReviewers(settings.getReviewers().stream().peek(approver -> {
                     approver.setTenant(authService.authUser().getTenant());
                     approver.setBranch(authService.authUser().getBranch());
                 }).toList());
@@ -58,7 +58,7 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
                 settings.setCreatedAt(LocalDateTime.now());
                 settings.setUpdatedAt(LocalDateTime.now());
                 settings.setTenant(authService.authUser().getTenant());
-                settings.getApprovers().forEach(approver -> approver.setTenant(authService.authUser().getTenant()));
+                settings.getReviewers().forEach(approver -> approver.setTenant(authService.authUser().getTenant()));
                 settingsRepo.save(settings);
                 return spotyResponseImpl.created();
             } catch (Exception e) {
@@ -207,11 +207,11 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
                 tenantSettings.setApprovalLevels(settings.getApprovalLevels());
             }
 
-            if (!Objects.equals(tenantSettings.getApprovers(), settings.getApprovers()) &&
-                    Objects.nonNull(settings.getApprovers()) && !settings.getApprovers().isEmpty()) {
-                for (int i = 0; i < settings.getApprovers().size() + 1; i++) {
-                    settings.getApprovers().get(i).setTenant(authService.authUser().getTenant());
-                    settings.getApprovers().get(i).setBranch(authService.authUser().getBranch());
+            if (!Objects.equals(tenantSettings.getReviewers(), settings.getReviewers()) &&
+                    Objects.nonNull(settings.getReviewers()) && !settings.getReviewers().isEmpty()) {
+                for (int i = 0; i < settings.getReviewers().size() + 1; i++) {
+                    settings.getReviewers().get(i).setTenant(authService.authUser().getTenant());
+                    settings.getReviewers().get(i).setBranch(authService.authUser().getBranch());
                 }
 
 //                tenantSettings.setApprovers(settings.getApprovers().stream().peek(approver -> {
@@ -246,15 +246,15 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> addReviewer(Approver approver) {
+    public ResponseEntity<ObjectNode> addReviewer(Reviewer reviewer) {
         var opt = Optional.ofNullable(settingsRepo.findByTenantId(authService.authUser().getTenant().getId()));
         if (opt.isPresent()) {
             var tenantSettings = opt.get();
 
-            if (Objects.nonNull(approver)) {
-                approver.setTenant(authService.authUser().getTenant());
-                approver.setBranch(authService.authUser().getBranch());
-                tenantSettings.getApprovers().add(approver);
+            if (Objects.nonNull(reviewer)) {
+                reviewer.setTenant(authService.authUser().getTenant());
+                reviewer.setBranch(authService.authUser().getBranch());
+                tenantSettings.getReviewers().add(reviewer);
             }
 
             tenantSettings.setUpdatedAt(LocalDateTime.now());
@@ -280,7 +280,7 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
             var opt2 = approverRepo.findById(findModel.getId());
             if (opt2.isPresent()) {
                 var approver = opt2.get();
-                tenantSettings.getApprovers().remove(approver);
+                tenantSettings.getReviewers().remove(approver);
                 tenantSettings.setUpdatedAt(LocalDateTime.now());
                 try {
                     settingsRepo.save(tenantSettings);

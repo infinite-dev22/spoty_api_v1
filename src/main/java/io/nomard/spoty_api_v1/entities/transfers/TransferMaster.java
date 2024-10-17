@@ -15,7 +15,7 @@
 package io.nomard.spoty_api_v1.entities.transfers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.nomard.spoty_api_v1.entities.Approver;
+import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Employee;
 import io.nomard.spoty_api_v1.entities.Tenant;
@@ -79,7 +79,7 @@ public class TransferMaster implements Serializable {
         }
     )
     @Builder.Default
-    private List<Approver> approvers = new ArrayList<>();
+    private List<Reviewer> reviewers = new ArrayList<>();
 
     @Builder.Default
     private Boolean approved = false;

@@ -39,7 +39,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Builder
 @Entity
-public class Approver {
+public class Reviewer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -52,39 +52,39 @@ public class Approver {
     private Branch branch;
     @ManyToOne(fetch = FetchType.LAZY)
     private Employee employee;
-    @ManyToMany(mappedBy = "approvers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(mappedBy = "reviewers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @Builder.Default
     @JsonIgnore
     private List<AdjustmentMaster> adjustments = new ArrayList<>();
-    @ManyToMany(mappedBy = "approvers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(mappedBy = "reviewers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @Builder.Default
     @JsonIgnore
     private List<PurchaseMaster> purchases = new ArrayList<>();
-    @ManyToMany(mappedBy = "approvers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(mappedBy = "reviewers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @Builder.Default
     @JsonIgnore
     private List<QuotationMaster> quotations = new ArrayList<>();
-    @ManyToMany(mappedBy = "approvers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(mappedBy = "reviewers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @Builder.Default
     @JsonIgnore
     private List<RequisitionMaster> requisitions = new ArrayList<>();
-    @ManyToMany(mappedBy = "approvers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(mappedBy = "reviewers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @Builder.Default
     @JsonIgnore
     private List<SaleMaster> sales = new ArrayList<>();
-    @ManyToMany(mappedBy = "approvers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(mappedBy = "reviewers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @Builder.Default
     @JsonIgnore
     private List<StockInMaster> stockIns = new ArrayList<>();
-    @ManyToMany(mappedBy = "approvers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(mappedBy = "reviewers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @Builder.Default
     @JsonIgnore
     private List<TransferMaster> transfers = new ArrayList<>();
-    @ManyToMany(mappedBy = "approvers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(mappedBy = "reviewers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @Builder.Default
     @JsonIgnore
     private List<SaleReturnMaster> saleReturns = new ArrayList<>();
-    @ManyToMany(mappedBy = "approvers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(mappedBy = "reviewers", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @Builder.Default
     @JsonIgnore
     private List<PurchaseReturnMaster> purchaseReturns = new ArrayList<>();
@@ -107,7 +107,7 @@ public class Approver {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Approver currency = (Approver) o;
+        Reviewer currency = (Reviewer) o;
         return getId() != null && Objects.equals(getId(), currency.getId());
     }
 

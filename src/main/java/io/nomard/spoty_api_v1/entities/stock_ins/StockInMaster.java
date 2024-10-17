@@ -15,7 +15,7 @@
 package io.nomard.spoty_api_v1.entities.stock_ins;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.nomard.spoty_api_v1.entities.Approver;
+import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.Employee;
@@ -55,7 +55,7 @@ public class StockInMaster implements Serializable {
     private String notes;
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @Builder.Default
-    private List<Approver> approvers = new ArrayList<>();
+    private List<Reviewer> reviewers = new ArrayList<>();
     @Builder.Default
     private Boolean approved = false;
     @Builder.Default

@@ -1,7 +1,7 @@
 package io.nomard.spoty_api_v1.services.interfaces;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Approver;
+import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.entities.TenantSettings;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
@@ -14,7 +14,7 @@ public interface TenantSettingsService {
 
     ResponseEntity<ObjectNode> update(TenantSettings tenantSettings);
 
-    ResponseEntity<ObjectNode> addReviewer(Approver approver);
+    ResponseEntity<ObjectNode> addReviewer(Reviewer reviewer);
 
     ResponseEntity<ObjectNode> removeReviewer(FindModel findModel);
 

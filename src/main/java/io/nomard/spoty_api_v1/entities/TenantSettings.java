@@ -39,7 +39,7 @@ public class TenantSettings {
     private String facebook;
     private String linkedIn;
     @Builder.Default
-    private Boolean approve = false;
+    private Boolean review = false;
     @Builder.Default
     private Boolean approveAdjustments = false;
     @Builder.Default
@@ -60,7 +60,7 @@ public class TenantSettings {
     private Integer approvalLevels = 0;
     @OneToMany(orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default
-    private List<Approver> approvers = new ArrayList<>();
+    private List<Reviewer> reviewers = new ArrayList<>();
     private Currency defaultCurrency;
     private String logo;
     @JoinColumn(nullable = false)

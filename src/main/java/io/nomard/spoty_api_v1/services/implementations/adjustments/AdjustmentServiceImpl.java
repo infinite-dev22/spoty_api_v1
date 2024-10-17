@@ -1,7 +1,7 @@
 package io.nomard.spoty_api_v1.services.implementations.adjustments;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Approver;
+import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.entities.adjustments.AdjustmentMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
@@ -82,17 +82,17 @@ public class AdjustmentServiceImpl implements AdjustmentService {
         if (Objects.isNull(adjustment.getBranch())) {
             adjustment.setBranch(authService.authUser().getBranch());
         }
-        if (settingsService.getSettings().getApprove() && settingsService.getSettings().getApproveAdjustments()) {
-            Approver approver = null;
+        if (settingsService.getSettings().getReview() && settingsService.getSettings().getApproveAdjustments()) {
+            Reviewer reviewer = null;
             try {
-                approver = approverService.getByUserId(authService.authUser().getId());
+                reviewer = approverService.getByUserId(authService.authUser().getId());
             } catch (NotFoundException e) {
                 log.log(Level.ALL, e.getMessage(), e);
             }
-            if (Objects.nonNull(approver)) {
-                adjustment.getApprovers().add(approver);
-                adjustment.setNextApprovedLevel(approver.getLevel() + 1);
-                if (approver.getLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            if (Objects.nonNull(reviewer)) {
+                adjustment.getReviewers().add(reviewer);
+                adjustment.setNextApprovedLevel(reviewer.getLevel() + 1);
+                if (reviewer.getLevel() >= settingsService.getSettings().getApprovalLevels()) {
                     adjustment.setApproved(true);
                     adjustment.setApprovalStatus("Approved");
                 }
@@ -142,8 +142,8 @@ public class AdjustmentServiceImpl implements AdjustmentService {
         if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
             adjustment.setNotes(data.getNotes());
         }
-        if (Objects.nonNull(data.getApprovers()) && !data.getApprovers().isEmpty()) {
-            adjustment.getApprovers().add(data.getApprovers().getFirst());
+        if (Objects.nonNull(data.getReviewers()) && !data.getReviewers().isEmpty()) {
+            adjustment.getReviewers().add(data.getReviewers().getFirst());
             if (adjustment.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
                 adjustment.setApproved(true);
                 adjustment.setApprovalStatus("Approved");
@@ -178,7 +178,7 @@ public class AdjustmentServiceImpl implements AdjustmentService {
 
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")) {
             var approver = approverService.getByUserId(authService.authUser().getId());
-            adjustment.getApprovers().add(approver);
+            adjustment.getReviewers().add(approver);
             adjustment.setNextApprovedLevel(approver.getLevel());
             if (adjustment.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
                 adjustment.setApproved(true);
