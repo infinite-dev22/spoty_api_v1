@@ -93,7 +93,7 @@ public class StockInServiceImpl implements StockInService {
             if (Objects.isNull(stockIn.getBranch())) {
                 stockIn.setBranch(authService.authUser().getBranch());
             }
-            if (settingsService.getSettings().getApproveAdjustments()) {
+            if (settingsService.getSettings().getApprove() && settingsService.getSettings().getApproveAdjustments()) {
                 Approver approver = null;
                 try {
                     approver = approverService.getByUserId(

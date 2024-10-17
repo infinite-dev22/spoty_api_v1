@@ -92,7 +92,7 @@ public class RequisitionServiceImpl implements RequisitionService {
             if (Objects.isNull(requisition.getBranch())) {
                 requisition.setBranch(authService.authUser().getBranch());
             }
-            if (settingsService.getSettings().getApproveAdjustments()) {
+            if (settingsService.getSettings().getApprove() && settingsService.getSettings().getApproveAdjustments()) {
                 Approver approver = null;
                 try {
                     approver = approverService.getByUserId(

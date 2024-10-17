@@ -47,6 +47,7 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
                 settings.setCreatedAt(LocalDateTime.now());
                 settings.setUpdatedAt(LocalDateTime.now());
                 settings.setTenant(authService.authUser().getTenant());
+                settings.getApprovers().forEach(approver -> approver.setTenant(authService.authUser().getTenant()));
                 settingsRepo.save(settings);
                 return spotyResponseImpl.created();
             } catch (Exception e) {

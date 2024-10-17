@@ -109,7 +109,7 @@ public class QuotationServiceImpl implements QuotationService {
         if (Objects.isNull(quotation.getBranch())) {
             quotation.setBranch(authService.authUser().getBranch());
         }
-        if (settingsService.getSettings().getApproveAdjustments()) {
+        if (settingsService.getSettings().getApprove() && settingsService.getSettings().getApproveAdjustments()) {
             Approver approver = null;
             try {
                 approver = approverService.getByUserId(

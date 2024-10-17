@@ -82,7 +82,7 @@ public class AdjustmentServiceImpl implements AdjustmentService {
         if (Objects.isNull(adjustment.getBranch())) {
             adjustment.setBranch(authService.authUser().getBranch());
         }
-        if (settingsService.getSettings().getApproveAdjustments()) {
+        if (settingsService.getSettings().getApprove() && settingsService.getSettings().getApproveAdjustments()) {
             Approver approver = null;
             try {
                 approver = approverService.getByUserId(authService.authUser().getId());

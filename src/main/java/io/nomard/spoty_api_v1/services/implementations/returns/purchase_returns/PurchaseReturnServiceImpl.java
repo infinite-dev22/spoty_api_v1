@@ -94,7 +94,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
         if (purchase.getBranch() == null) {
             purchase.setBranch(authService.authUser().getBranch());
         }
-        if (settingsService.getSettings().getApproveAdjustments()) {
+        if (settingsService.getSettings().getApprove() && settingsService.getSettings().getApproveAdjustments()) {
             Approver approver = null;
             try {
                 approver = approverService.getByUserId(authService.authUser().getId());

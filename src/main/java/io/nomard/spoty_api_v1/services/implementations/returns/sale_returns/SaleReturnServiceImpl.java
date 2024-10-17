@@ -97,7 +97,7 @@ public class SaleReturnServiceImpl implements SaleReturnService {
         if (Objects.isNull(sale.getBranch())) {
             sale.setBranch(authService.authUser().getBranch());
         }
-        if (settingsService.getSettings().getApproveAdjustments()) {
+        if (settingsService.getSettings().getApprove() && settingsService.getSettings().getApproveAdjustments()) {
             Approver approver = null;
             try {
                 approver = approverService.getByUserId(authService.authUser().getId());

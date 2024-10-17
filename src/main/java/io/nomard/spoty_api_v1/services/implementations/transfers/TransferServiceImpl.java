@@ -97,7 +97,7 @@ public class TransferServiceImpl implements TransferService {
         CoreCalculations.TransferCalculationService.calculate(transfer);
         transfer.setRef(CoreUtils.referenceNumberGenerator("TRF"));
         transfer.setTenant(authService.authUser().getTenant());
-        if (settingsService.getSettings().getApproveAdjustments()) {
+        if (settingsService.getSettings().getApprove() && settingsService.getSettings().getApproveAdjustments()) {
             Approver approver = null;
             try {
                 approver = approverService.getByUserId(

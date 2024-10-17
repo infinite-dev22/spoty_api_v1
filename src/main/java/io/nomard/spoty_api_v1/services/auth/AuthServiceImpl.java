@@ -2,10 +2,7 @@ package io.nomard.spoty_api_v1.services.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Branch;
-import io.nomard.spoty_api_v1.entities.Employee;
-import io.nomard.spoty_api_v1.entities.Tenant;
-import io.nomard.spoty_api_v1.entities.User;
+import io.nomard.spoty_api_v1.entities.*;
 import io.nomard.spoty_api_v1.entities.accounting.Account;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.LoginModel;
@@ -46,6 +43,8 @@ public class AuthServiceImpl implements AuthService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private TenantRepository tenantRepo;
+    @Autowired
+    private TenantSettingsRepository tenantSettingRepo;
     @Autowired
     private BranchRepository branchRepo;
     @Autowired
@@ -102,6 +101,11 @@ public class AuthServiceImpl implements AuthService {
         tenant.setEmail(signUpDetails.getEmail());
         tenant.setSubscriptionEndDate(LocalDateTime.now().minusMonths(12));
 
+        var tenantSetting = new TenantSettings();
+        tenantSetting.setEmail(signUpDetails.getEmail());
+        tenantSetting.setName(String.join(" ", signUpDetails.getFirstName(), signUpDetails.getLastName(), signUpDetails.getOtherName()));
+        tenantSetting.setPhoneNumber(signUpDetails.getPhone());
+
         var branch = new Branch();
         branch.setName("Default Branch");
         branch.setCity("Default City");
@@ -132,6 +136,7 @@ public class AuthServiceImpl implements AuthService {
 
         try {
             tenantRepo.save(tenant);
+            tenantSettingRepo.save(tenantSetting);
             accountRepo.save(account);
             branchRepo.save(branch);
             userRepo.save(user);
