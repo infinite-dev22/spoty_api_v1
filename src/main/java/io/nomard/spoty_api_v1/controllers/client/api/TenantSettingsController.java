@@ -1,6 +1,7 @@
 package io.nomard.spoty_api_v1.controllers.client.api;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.Approver;
 import io.nomard.spoty_api_v1.entities.TenantSettings;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.services.implementations.TenantSettingsServiceImpl;
@@ -23,6 +24,16 @@ public class TenantSettingsController {
     @PostMapping("/add")
     public ResponseEntity<ObjectNode> save(@Valid @RequestBody TenantSettings tenantSettings) {
         return tenantSettingsService.save(tenantSettings);
+    }
+
+    @PostMapping("/add/reviewer")
+    public ResponseEntity<ObjectNode> addReviewer(@Valid @RequestBody Approver approver) {
+        return tenantSettingsService.addReviewer(approver);
+    }
+
+    @PostMapping("/remove/reviewer")
+    public ResponseEntity<ObjectNode> removeReviewer(@Valid @RequestBody FindModel findModel) {
+        return tenantSettingsService.removeReviewer(findModel);
     }
 
     @PutMapping("/update")

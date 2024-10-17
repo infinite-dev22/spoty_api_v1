@@ -1,7 +1,10 @@
 package io.nomard.spoty_api_v1.services.implementations;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.Approver;
 import io.nomard.spoty_api_v1.entities.TenantSettings;
+import io.nomard.spoty_api_v1.models.FindModel;
+import io.nomard.spoty_api_v1.repositories.ApproverRepository;
 import io.nomard.spoty_api_v1.repositories.TenantSettingsRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
@@ -24,6 +27,8 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
     @Autowired
     private TenantSettingsRepository settingsRepo;
     @Autowired
+    private ApproverRepository approverRepo;
+    @Autowired
     private SpotyResponseImpl spotyResponseImpl;
     @Autowired
     private AuthServiceImpl authService;
@@ -39,10 +44,16 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
         var opt = Optional.ofNullable(settingsRepo.findByTenantId(authService.authUser().getTenant().getId()));
         if (opt.isEmpty()) {
             try {
-                for (int i = 0; i < settings.getApprovers().size(); i++) {
-                    settings.getApprovers().get(i).setTenant(authService.authUser().getTenant());
-                    settings.getApprovers().get(i).setBranch(authService.authUser().getBranch());
-                }
+                // for (int i = 0; i < settings.getApprovers().size(); i++) {
+                //     settings.getApprovers().get(i).setTenant(authService.authUser().getTenant());
+                //     settings.getApprovers().get(i).setBranch(authService.authUser().getBranch());
+                // }
+
+                settings.setApprovers(settings.getApprovers().stream().peek(approver -> {
+                    approver.setTenant(authService.authUser().getTenant());
+                    approver.setBranch(authService.authUser().getBranch());
+                }).toList());
+
                 settings.setTenant(authService.authUser().getTenant());
                 settings.setCreatedAt(LocalDateTime.now());
                 settings.setUpdatedAt(LocalDateTime.now());
@@ -197,12 +208,16 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
             }
 
             if (!Objects.equals(tenantSettings.getApprovers(), settings.getApprovers()) &&
-                    Objects.nonNull(settings.getApprovers()) && settings.getApprovers().isEmpty()) {
-                for (int i = 0; i < settings.getApprovers().size(); i++) {
+                    Objects.nonNull(settings.getApprovers()) && !settings.getApprovers().isEmpty()) {
+                for (int i = 0; i < settings.getApprovers().size() + 1; i++) {
                     settings.getApprovers().get(i).setTenant(authService.authUser().getTenant());
                     settings.getApprovers().get(i).setBranch(authService.authUser().getBranch());
                 }
-                tenantSettings.setApprovers(settings.getApprovers());
+
+//                tenantSettings.setApprovers(settings.getApprovers().stream().peek(approver -> {
+//                    approver.setTenant(authService.authUser().getTenant());
+//                    approver.setBranch(authService.authUser().getBranch());
+//                }).toList());
             }
 
             if (!Objects.equals(tenantSettings.getDefaultCurrency(), settings.getDefaultCurrency()) &&
@@ -215,11 +230,10 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
                 tenantSettings.setLogo(settings.getLogo());
             }
 
-            settings.setCreatedAt(LocalDateTime.now());
-            settings.setUpdatedAt(LocalDateTime.now());
-            settings.setTenant(authService.authUser().getTenant());
+            tenantSettings.setUpdatedAt(LocalDateTime.now());
+            tenantSettings.setTenant(authService.authUser().getTenant());
             try {
-                settingsRepo.save(settings);
+                settingsRepo.save(tenantSettings);
                 return spotyResponseImpl.created();
             } catch (Exception e) {
                 log.log(Level.ALL, e.getMessage(), e);
@@ -227,6 +241,59 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
             }
         } else {
             return spotyResponseImpl.custom(HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.getReasonPhrase());
+        }
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<ObjectNode> addReviewer(Approver approver) {
+        var opt = Optional.ofNullable(settingsRepo.findByTenantId(authService.authUser().getTenant().getId()));
+        if (opt.isPresent()) {
+            var tenantSettings = opt.get();
+
+            if (Objects.nonNull(approver)) {
+                approver.setTenant(authService.authUser().getTenant());
+                approver.setBranch(authService.authUser().getBranch());
+                tenantSettings.getApprovers().add(approver);
+            }
+
+            tenantSettings.setUpdatedAt(LocalDateTime.now());
+            try {
+                settingsRepo.save(tenantSettings);
+                return spotyResponseImpl.created();
+            } catch (Exception e) {
+                log.log(Level.ALL, e.getMessage(), e);
+                return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+            }
+        } else {
+            return spotyResponseImpl.custom(HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.getReasonPhrase());
+        }
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<ObjectNode> removeReviewer(FindModel findModel) {
+        var opt1 = Optional.ofNullable(settingsRepo.findByTenantId(authService.authUser().getTenant().getId()));
+        if (opt1.isPresent()) {
+            var tenantSettings = opt1.get();
+
+            var opt2 = approverRepo.findById(findModel.getId());
+            if (opt2.isPresent()) {
+                var approver = opt2.get();
+                tenantSettings.getApprovers().remove(approver);
+                tenantSettings.setUpdatedAt(LocalDateTime.now());
+                try {
+                    settingsRepo.save(tenantSettings);
+                    return spotyResponseImpl.created();
+                } catch (Exception e) {
+                    log.log(Level.ALL, e.getMessage(), e);
+                    return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+                }
+            } else {
+                return spotyResponseImpl.custom(HttpStatus.NOT_FOUND, "Reviewer Not Found");
+            }
+        } else {
+            return spotyResponseImpl.custom(HttpStatus.NOT_FOUND, "Tenant Settings Not Found");
         }
     }
 
