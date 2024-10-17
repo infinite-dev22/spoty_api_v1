@@ -24,7 +24,7 @@ services:
 
   db:
     container_name: 'database'
-    image: 'postgres:latest'
+    image: 'postgres:alpine3.20'
     restart: unless-stopped
     ports:
       - ${POSTGRESQL_PORT_NUMBER}:${POSTGRESQL_PORT_NUMBER}
@@ -58,6 +58,7 @@ services:
       - '${PGADMIN_LOCAL_PORT}:${PGADMIN_DOCKER_PORT}'
     volumes:
       - pgadmin-data:/var/lib/pgadmin
+      - ./servers.json:/pgadmin4/servers.json
     networks:
       - api-net
 
