@@ -21,6 +21,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
+
+import jakarta.mail.MessagingException;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -302,14 +304,6 @@ public class EmployeeServiceImpl implements EmployeeService {
             return spotyResponseImpl.taken();
         }
 
-        var user = new User();
-        user.setEmail(data.getEmail());
-        var password = UUID.randomUUID().toString().substring(0, 12);
-        user.setPassword(new BCryptPasswordEncoder(8).encode(password));
-        user.setUserType("Employee");
-        user.setCreatedBy(authService.authUser());
-        user.setCreatedAt(LocalDateTime.now());
-
         var roleOpt = roleRepo.findById(data.getRole().getId());
         if (roleOpt.isEmpty()) {
             throw new NotFoundException();
@@ -331,6 +325,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (employmentStatusOpt.isEmpty()) {
             throw new NotFoundException();
         }
+
+        var user = new User();
+        user.setEmail(data.getEmail());
+        var password = UUID.randomUUID().toString().substring(0, 12);
+        user.setPassword(new BCryptPasswordEncoder(8).encode(password));
+        user.setUserType("Employee");
+        user.setCreatedBy(authService.authUser());
+        user.setCreatedAt(LocalDateTime.now());
 
         var employee = new Employee();
         employee.setUser(user);
@@ -357,10 +359,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         try {
             employeeRepo.save(employee);
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+            log.severe(e.getMessage());
             return spotyResponseImpl.custom(
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+                e.getMessage()
             );
         }
 
@@ -385,11 +387,11 @@ public class EmployeeServiceImpl implements EmployeeService {
                 content,
                 "/home/infinite/Documents/Job_Search/Resume_Jonathan_Mark_Mwigo.pdf"
             );
-        } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+        } catch (MessagingException e) {
+            log.severe(e.getMessage());
             return spotyResponseImpl.custom(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    e.getMessage()
             );
         }
 
