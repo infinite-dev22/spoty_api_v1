@@ -102,6 +102,7 @@ public class AuthServiceImpl implements AuthService {
         tenant.setSubscriptionEndDate(LocalDateTime.now().minusMonths(12));
 
         var tenantSetting = new TenantSettings();
+        tenantSetting.setTenant(tenant);
         tenantSetting.setEmail(signUpDetails.getEmail());
         tenantSetting.setName(String.join(" ", signUpDetails.getFirstName(), signUpDetails.getLastName(), signUpDetails.getOtherName()));
         tenantSetting.setPhoneNumber(signUpDetails.getPhone());
