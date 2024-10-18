@@ -78,57 +78,57 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
             var tenantSettings = opt.get();
 
             if (!Objects.equals(tenantSettings.getName(), settings.getName()) &&
-                    Objects.nonNull(settings.getName()) && settings.getName().isEmpty()) {
+                    Objects.nonNull(settings.getName()) && !settings.getName().isEmpty()) {
                 tenantSettings.setName(settings.getName());
             }
 
             if (!Objects.equals(tenantSettings.getWebsiteLink(), settings.getWebsiteLink()) &&
-                    Objects.nonNull(settings.getWebsiteLink()) && settings.getWebsiteLink().isEmpty()) {
+                    Objects.nonNull(settings.getWebsiteLink()) && !settings.getWebsiteLink().isEmpty()) {
                 tenantSettings.setWebsiteLink(settings.getWebsiteLink());
             }
 
             if (!Objects.equals(tenantSettings.getPhoneNumber(), settings.getPhoneNumber()) &&
-                    Objects.nonNull(settings.getPhoneNumber()) && settings.getPhoneNumber().isEmpty()) {
+                    Objects.nonNull(settings.getPhoneNumber()) && !settings.getPhoneNumber().isEmpty()) {
                 tenantSettings.setPhoneNumber(settings.getPhoneNumber());
             }
 
             if (!Objects.equals(tenantSettings.getEmail(), settings.getEmail()) &&
-                    Objects.nonNull(settings.getEmail()) && settings.getEmail().isEmpty()) {
+                    Objects.nonNull(settings.getEmail()) && !settings.getEmail().isEmpty()) {
                 tenantSettings.setEmail(settings.getEmail());
             }
 
             if (!Objects.equals(tenantSettings.getSupportEmail(), settings.getSupportEmail()) &&
-                    Objects.nonNull(settings.getSupportEmail()) && settings.getSupportEmail().isEmpty()) {
+                    Objects.nonNull(settings.getSupportEmail()) && !settings.getSupportEmail().isEmpty()) {
                 tenantSettings.setSupportEmail(settings.getSupportEmail());
             }
 
             if (!Objects.equals(tenantSettings.getInfoEmail(), settings.getInfoEmail()) &&
-                    Objects.nonNull(settings.getInfoEmail()) && settings.getInfoEmail().isEmpty()) {
+                    Objects.nonNull(settings.getInfoEmail()) && !settings.getInfoEmail().isEmpty()) {
                 tenantSettings.setInfoEmail(settings.getInfoEmail());
             }
 
             if (!Objects.equals(tenantSettings.getHrEmail(), settings.getHrEmail()) &&
-                    Objects.nonNull(settings.getHrEmail()) && settings.getHrEmail().isEmpty()) {
+                    Objects.nonNull(settings.getHrEmail()) && !settings.getHrEmail().isEmpty()) {
                 tenantSettings.setHrEmail(settings.getHrEmail());
             }
 
             if (!Objects.equals(tenantSettings.getSalesEmail(), settings.getSalesEmail()) &&
-                    Objects.nonNull(settings.getSalesEmail()) && settings.getSalesEmail().isEmpty()) {
+                    Objects.nonNull(settings.getSalesEmail()) && !settings.getSalesEmail().isEmpty()) {
                 tenantSettings.setSalesEmail(settings.getSalesEmail());
             }
 
             if (!Objects.equals(tenantSettings.getPostalAddress(), settings.getPostalAddress()) &&
-                    Objects.nonNull(settings.getPostalAddress()) && settings.getPostalAddress().isEmpty()) {
+                    Objects.nonNull(settings.getPostalAddress()) && !settings.getPostalAddress().isEmpty()) {
                 tenantSettings.setPostalAddress(settings.getPostalAddress());
             }
 
             if (!Objects.equals(tenantSettings.getPhysicalAddress(), settings.getPhysicalAddress()) &&
-                    Objects.nonNull(settings.getPhysicalAddress()) && settings.getPhysicalAddress().isEmpty()) {
+                    Objects.nonNull(settings.getPhysicalAddress()) && !settings.getPhysicalAddress().isEmpty()) {
                 tenantSettings.setPhysicalAddress(settings.getPhysicalAddress());
             }
 
             if (!Objects.equals(tenantSettings.getTagLine(), settings.getTagLine()) &&
-                    Objects.nonNull(settings.getTagLine()) && settings.getTagLine().isEmpty()) {
+                    Objects.nonNull(settings.getTagLine()) && !settings.getTagLine().isEmpty()) {
                 tenantSettings.setTagLine(settings.getTagLine());
             }
 
@@ -148,17 +148,17 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
             }
 
             if (!Objects.equals(tenantSettings.getTwitter(), settings.getTwitter()) &&
-                    Objects.nonNull(settings.getTwitter()) && settings.getTwitter().isEmpty()) {
+                    Objects.nonNull(settings.getTwitter()) && !settings.getTwitter().isEmpty()) {
                 tenantSettings.setTwitter(settings.getTwitter());
             }
 
             if (!Objects.equals(tenantSettings.getFacebook(), settings.getFacebook()) &&
-                    Objects.nonNull(settings.getFacebook()) && settings.getFacebook().isEmpty()) {
+                    Objects.nonNull(settings.getFacebook()) && !settings.getFacebook().isEmpty()) {
                 tenantSettings.setFacebook(settings.getFacebook());
             }
 
             if (!Objects.equals(tenantSettings.getLinkedIn(), settings.getLinkedIn()) &&
-                    Objects.nonNull(settings.getLinkedIn()) && settings.getLinkedIn().isEmpty()) {
+                    Objects.nonNull(settings.getLinkedIn()) && !settings.getLinkedIn().isEmpty()) {
                 tenantSettings.setLinkedIn(settings.getLinkedIn());
             }
 
@@ -209,15 +209,10 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
 
             if (!Objects.equals(tenantSettings.getReviewers(), settings.getReviewers()) &&
                     Objects.nonNull(settings.getReviewers()) && !settings.getReviewers().isEmpty()) {
-                for (int i = 0; i < settings.getReviewers().size() + 1; i++) {
-                    settings.getReviewers().get(i).setTenant(authService.authUser().getTenant());
-                    settings.getReviewers().get(i).setBranch(authService.authUser().getBranch());
-                }
-
-//                tenantSettings.setApprovers(settings.getApprovers().stream().peek(approver -> {
-//                    approver.setTenant(authService.authUser().getTenant());
-//                    approver.setBranch(authService.authUser().getBranch());
-//                }).toList());
+                tenantSettings.setReviewers(settings.getReviewers().stream().peek(approver -> {
+                    approver.setTenant(authService.authUser().getTenant());
+                    approver.setBranch(authService.authUser().getBranch());
+                }).toList());
             }
 
             if (!Objects.equals(tenantSettings.getDefaultCurrency(), settings.getDefaultCurrency()) &&
@@ -226,7 +221,7 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
             }
 
             if (!Objects.equals(tenantSettings.getLogo(), settings.getLogo()) &&
-                    Objects.nonNull(settings.getLogo()) && settings.getLogo().isEmpty()) {
+                    Objects.nonNull(settings.getLogo()) && !settings.getLogo().isEmpty()) {
                 tenantSettings.setLogo(settings.getLogo());
             }
 
