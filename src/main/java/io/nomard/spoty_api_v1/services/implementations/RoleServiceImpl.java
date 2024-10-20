@@ -18,10 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,7 +57,11 @@ public class RoleServiceImpl implements RoleService {
     public ResponseEntity<ObjectNode> save(Role role) {
         try {
             // Fetch permissions based on IDs
-            List<Permission> permissions = permissionRepo.findAllById(role.getPermissions().stream().map(Permission::getId).collect(Collectors.toList()));
+            Set<Permission> permissions = role.getPermissions().stream()
+                    .map(permission -> permissionRepo.findByName(permission.getName()))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toSet());
             role.setPermissions(permissions); // Set the fetched permissions
             role.setTenant(authService.authUser().getTenant());
             role.setCreatedBy(authService.authUser());
@@ -96,7 +97,11 @@ public class RoleServiceImpl implements RoleService {
 
         if (Objects.nonNull(data.getPermissions()) && !data.getPermissions().isEmpty()) {
             // Fetch permissions based on IDs
-            List<Permission> permissions = permissionRepo.findAllById(role.getPermissions().stream().map(Permission::getId).collect(Collectors.toList()));
+            Set<Permission> permissions = role.getPermissions().stream()
+                    .map(permission -> permissionRepo.findByName(permission.getName()))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toSet());
             role.setPermissions(permissions); // Set the fetched permissions
         }
 
