@@ -97,7 +97,7 @@ services:
       - "143:1143"  # IMAP
       - "443:1443"  # HTTPS
       - "1080:1080"   # HTTP
-    command: mox localserve -ip 0.0.0.0
+    command: mox localserve
     environment:
       - MOX_DOCKER=yes # Quickstart won't try to write systemd service file.
     # Mox needs host networking because it needs access to the IPs of the
