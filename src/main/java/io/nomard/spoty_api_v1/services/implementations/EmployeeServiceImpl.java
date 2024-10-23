@@ -14,6 +14,7 @@ import io.nomard.spoty_api_v1.repositories.hrm.hrm.EmploymentStatusRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.EmployeeService;
+import io.nomard.spoty_api_v1.templates.emails.EmploymentEmail;
 import jakarta.mail.MessagingException;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -365,13 +366,9 @@ public class EmployeeServiceImpl implements EmployeeService {
             );
         }
 
+        var content = new EmploymentEmail(employee, password, settingsService.getSettings().getHrEmail()).getTemplate();
+
         // Asynchronous email sending
-        var content =
-                "<html><h1>These are your employment details</h1><p>Email: " +
-                        employee.getEmail() +
-                        "</p><p>Password: " +
-                        password +
-                        "</p></html>";
 
         emailServiceImpl.sendSimpleMessage(
                 settingsService.getSettings().getHrEmail(),
