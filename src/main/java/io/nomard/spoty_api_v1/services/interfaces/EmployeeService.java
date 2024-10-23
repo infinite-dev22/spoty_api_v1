@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Employee;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.UserModel;
+import jakarta.mail.MessagingException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
@@ -18,7 +19,7 @@ public interface EmployeeService {
 
     List<Employee> getByContains(String search);
 
-    ResponseEntity<ObjectNode> add(UserModel user) throws NotFoundException;
+    ResponseEntity<ObjectNode> add(UserModel user) throws NotFoundException, MessagingException;
 
     ResponseEntity<ObjectNode> update(UserModel user) throws NotFoundException;
 
