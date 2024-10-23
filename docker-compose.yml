@@ -6,7 +6,7 @@ services:
       context: .
     restart: unless-stopped
     ports:
-      - ${SPRING_PORT}:${SPRING_PORT}
+      - '${SPRING_PORT}:${SPRING_PORT}'
     networks:
       - api-net
     environment:
@@ -27,9 +27,9 @@ services:
     image: 'postgres:alpine3.20'
     restart: unless-stopped
     ports:
-      - ${POSTGRESQL_PORT_NUMBER}:${POSTGRESQL_PORT_NUMBER}
+      - '${POSTGRESQL_PORT_NUMBER}:${POSTGRESQL_PORT_NUMBER}'
     expose:
-      - ${POSTGRESQL_PORT_NUMBER}
+      - '${POSTGRESQL_PORT_NUMBER}'
     networks:
       - api-net
     environment:
