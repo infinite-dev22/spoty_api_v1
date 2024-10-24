@@ -14,7 +14,8 @@ import io.nomard.spoty_api_v1.repositories.hrm.hrm.EmploymentStatusRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.EmployeeService;
-import io.nomard.spoty_api_v1.templates.emails.EmploymentEmail;
+import io.nomard.spoty_api_v1.templates.emails.EmploymentData;
+import io.nomard.spoty_api_v1.utils.HtmlToPDFConvert;
 import jakarta.mail.MessagingException;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -214,6 +215,10 @@ public class EmployeeServiceImpl implements EmployeeService {
             employee.setLocked(data.isLocked());
         }
 
+        if (data.getStartDate() != null && !Objects.equals(employee.getStartDate(), data.getStartDate())) {
+            employee.setStartDate(data.getStartDate());
+        }
+
         if (
                 Objects.nonNull(data.getAvatar()) &&
                         !"".equalsIgnoreCase(data.getAvatar())
@@ -291,7 +296,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    @Transactional
     public ResponseEntity<ObjectNode> add(UserModel data)
             throws NotFoundException, MessagingException {
         Employee existingUser = employeeRepo.findByEmail(data.getEmail());
@@ -343,6 +347,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setAvatar(data.getAvatar());
         employee.setEmail(data.getEmail());
         employee.setSalary(data.getSalary());
+        employee.setStartDate(data.getStartDate());
         employee.setRole(roleOpt.get());
         employee.setDepartment(departmentOpt.get());
         employee.setDesignation(designationOpt.get());
@@ -356,6 +361,18 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setCreatedBy(authService.authUser());
         employee.setCreatedAt(LocalDateTime.now());
 
+
+        var employmentData = new EmploymentData(employee,
+                password,
+                authService.authUser(),
+                settingsService.getSettings());
+        var content = employmentData.getTemplate();
+        var employmentConfirmationLetter = HtmlToPDFConvert.htmlConvertToPdf(employmentData.getEmploymentLetterHtml());
+
+        employee.setEmploymentConfirmationLetter(employmentConfirmationLetter);
+
+        System.out.println(employee.getEmploymentConfirmationLetter());
+
         try {
             employeeRepo.save(employee);
         } catch (Exception e) {
@@ -366,22 +383,12 @@ public class EmployeeServiceImpl implements EmployeeService {
             );
         }
 
-        var content = new EmploymentEmail(employee, password, settingsService.getSettings().getHrEmail()).getTemplate();
-
-        // Asynchronous email sending
-
-        emailServiceImpl.sendSimpleMessage(
-                settingsService.getSettings().getHrEmail(),
-                employee.getEmail(),
-                "Employment Letter & Work Details",
-                content
-        );
         emailServiceImpl.sendMessageWithAttachment(
                 settingsService.getSettings().getHrEmail(),
                 employee.getEmail(),
                 "Employment Letter & Work Details",
                 content,
-                "/home/infinite/Documents/Job_Search/Resume_Jonathan_Mark_Mwigo.pdf"
+                employmentConfirmationLetter
         );
 
         return spotyResponseImpl.created();

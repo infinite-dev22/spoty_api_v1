@@ -7,12 +7,14 @@ import io.nomard.spoty_api_v1.entities.hrm.hrm.Designation;
 import io.nomard.spoty_api_v1.entities.hrm.hrm.EmploymentStatus;
 import io.nomard.spoty_api_v1.utils.Views;
 import jakarta.persistence.*;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Objects;
 import lombok.*;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.proxy.HibernateProxy;
+
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -52,18 +54,18 @@ public class Employee implements Serializable {
 
     @JoinColumn(nullable = false)
     @OneToOne(
-        fetch = FetchType.LAZY,
-        orphanRemoval = true,
-        targetEntity = User.class
+            fetch = FetchType.LAZY,
+            orphanRemoval = true,
+            targetEntity = User.class
     )
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     @JsonIgnore
     private User user;
 
     @ManyToOne(
-        optional = false,
-        fetch = FetchType.LAZY,
-        cascade = CascadeType.ALL
+            optional = false,
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL
     )
     @JoinColumn(nullable = false)
     @JsonView(Views.Moderate.class)
@@ -83,6 +85,8 @@ public class Employee implements Serializable {
     private String email;
     @JsonView(Views.Moderate.class)
     private String salary;
+    private LocalDate startDate;
+    private String employmentConfirmationLetter;
 
     @JoinColumn
     @Column(nullable = false)
@@ -114,13 +118,13 @@ public class Employee implements Serializable {
         if (this == o) return true;
         if (o == null) return false;
         Class<?> oEffectiveClass = o instanceof HibernateProxy
-            ? ((HibernateProxy) o).getHibernateLazyInitializer()
+                ? ((HibernateProxy) o).getHibernateLazyInitializer()
                 .getPersistentClass()
-            : o.getClass();
+                : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy
-            ? ((HibernateProxy) this).getHibernateLazyInitializer()
+                ? ((HibernateProxy) this).getHibernateLazyInitializer()
                 .getPersistentClass()
-            : this.getClass();
+                : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
         Employee user = (Employee) o;
         return getId() != null && Objects.equals(getId(), user.getId());
@@ -129,9 +133,9 @@ public class Employee implements Serializable {
     @Override
     public final int hashCode() {
         return this instanceof HibernateProxy
-            ? ((HibernateProxy) this).getHibernateLazyInitializer()
+                ? ((HibernateProxy) this).getHibernateLazyInitializer()
                 .getPersistentClass()
                 .hashCode()
-            : getClass().hashCode();
+                : getClass().hashCode();
     }
 }

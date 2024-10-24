@@ -79,24 +79,36 @@ dependencies {
     implementation('com.flutterwave:f4b-java:3.0.1F') {
         exclude group: 'commons-logging', module: 'commons-logging'
     }
+    // PDF Creation
+    implementation 'io.github.openhtmltopdf:openhtmltopdf-pdfbox:1.1.22'
+    // JSON Creation
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.0'
-    implementation 'org.realityforge.org.jetbrains.annotations:org.jetbrains.annotations:1.7.0'
+    // JWT
     implementation 'com.auth0:java-jwt:4.4.0'
+    // SpringBoot Starters
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
-    testImplementation 'org.springframework.security:spring-security-test'
-    compileOnly 'org.projectlombok:lombok'
+    // Dev Tools
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    // SpringBoot Configurations
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    // JB Annotations
+    implementation 'org.realityforge.org.jetbrains.annotations:org.jetbrains.annotations:1.7.0'
+    // Containerization Tools
+    runtimeOnly 'org.springframework.boot:spring-boot-docker-compose'
+    // Database
+    runtimeOnly 'org.postgresql:postgresql'
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+    // Testing
+    testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-    runtimeOnly 'org.springframework.boot:spring-boot-docker-compose'
-    runtimeOnly 'org.postgresql:postgresql'
 }
 
 tasks.named('test') {
