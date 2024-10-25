@@ -25,4 +25,8 @@ public record BrandDTO(
         EmployeeDTO.EmployeeAsEditorDTO createdBy,
         LocalDateTime updatedAt,
         EmployeeDTO.EmployeeAsEditorDTO updatedBy) {
+    public record AsPart(
+            Long id,
+            String name) {
+    }
 }
