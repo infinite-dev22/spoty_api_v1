@@ -2,6 +2,7 @@ package io.nomard.spoty_api_v1.controllers.norm;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.PaymentTransaction;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.PaymentTransactionDTO;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.payments.CardModel;
@@ -23,13 +24,13 @@ public class PaymentTransactionController {
 
     @GetMapping("/all")
     @JsonView(Views.Tiny.class)
-    public Page<PaymentTransaction> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                           @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Page<PaymentTransactionDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                              @RequestParam(defaultValue = "50") Integer pageSize) {
         return paymentTransactionService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public PaymentTransaction getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public PaymentTransactionDTO getById(@RequestBody FindModel findModel) throws NotFoundException {
         return paymentTransactionService.getById(findModel.getId());
     }
 
