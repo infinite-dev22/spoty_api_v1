@@ -1,13 +1,13 @@
 package io.nomard.spoty_api_v1.controllers.norm;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Employee;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.EmployeeDTO;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.models.UserModel;
 import io.nomard.spoty_api_v1.services.implementations.EmployeeServiceImpl;
-import com.fasterxml.jackson.annotation.JsonView;
 import io.nomard.spoty_api_v1.utils.Views;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
@@ -26,18 +26,18 @@ public class EmployeeController {
 
     @GetMapping("/all")
     @JsonView(Views.Moderate.class)
-    public Page<Employee> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                             @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Page<EmployeeDTO.EmployeeAsWholeDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                                       @RequestParam(defaultValue = "50") Integer pageSize) {
         return userService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public Employee getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public EmployeeDTO.EmployeeAsWholeDTO getById(@RequestBody FindModel findModel) throws NotFoundException {
         return userService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<Employee> getByContains(@RequestBody SearchModel searchModel) {
+    public List<EmployeeDTO.EmployeeAsWholeDTO> getByContains(@RequestBody SearchModel searchModel) {
         return userService.getByContains(searchModel.getSearch());
     }
 

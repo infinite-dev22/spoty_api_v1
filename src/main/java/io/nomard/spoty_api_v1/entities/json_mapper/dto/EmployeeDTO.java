@@ -1,12 +1,6 @@
 package io.nomard.spoty_api_v1.entities.json_mapper.dto;
 
-import io.nomard.spoty_api_v1.entities.Branch;
-import io.nomard.spoty_api_v1.entities.Employee;
 import io.nomard.spoty_api_v1.entities.Role;
-import io.nomard.spoty_api_v1.entities.User;
-import io.nomard.spoty_api_v1.entities.hrm.hrm.Department;
-import io.nomard.spoty_api_v1.entities.hrm.hrm.Designation;
-import io.nomard.spoty_api_v1.entities.hrm.hrm.EmploymentStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,12 +9,11 @@ public record EmployeeDTO() {
 
     public record EmployeeAsWholeDTO(
             Long id,
-            Branch branch,
-            Department department,
-            Designation designation,
-            EmploymentStatus employmentStatus,
-            User user,
-            Role role,
+            DepartmentDTO.DepartmentAsPartDTO department,
+            DesignationDTO.DesignationAsPartDTO designation,
+            EmploymentStatusDTO.EmploymentStatusAsPartDTO employmentStatus,
+            UserDTO user,
+            RoleDTO.RoleForName role,
             String firstName,
             String lastName,
             String otherName,
@@ -33,16 +26,16 @@ public record EmployeeDTO() {
             boolean active,
             boolean locked,
             LocalDateTime createdAt,
-            Employee createdBy,
+            EmployeeAsEditorDTO createdBy,
             LocalDateTime updatedAt,
-            Employee updatedBy) {
+            EmployeeAsEditorDTO updatedBy) {
     }
 
     public record EmployeeAsAccessor(
-            Branch branch,
-            Department department,
-            Designation designation,
-            User user,
+            DepartmentDTO.DepartmentAsPartDTO department,
+            DesignationDTO.DesignationAsPartDTO designation,
+            EmploymentStatusDTO.EmploymentStatusAsPartDTO employmentStatus,
+            UserDTO user,
             Role role,
             String firstName,
             String lastName,

@@ -3,6 +3,8 @@ package io.nomard.spoty_api_v1.services.implementations;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Employee;
 import io.nomard.spoty_api_v1.entities.User;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.EmployeeDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.EmployeeMapper;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.PasswordChangeModel;
 import io.nomard.spoty_api_v1.models.UserModel;
@@ -29,11 +31,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 @Service
 @Log
@@ -65,9 +68,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private TenantSettingsServiceImpl settingsService;
+    @Autowired
+    private EmployeeMapper employeeMapper;
 
     @Override
-    public Page<Employee> getAll(int pageNo, int pageSize) {
+    public Page<EmployeeDTO.EmployeeAsWholeDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(
                 pageNo,
                 pageSize,
@@ -76,16 +81,16 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeRepo.findByEmail(
                 authService.authUser().getTenant().getId(),
                 pageRequest
-        );
+        ).map(employee -> employeeMapper.toWholeDTO(employee));
     }
 
     @Override
-    public Employee getById(Long id) throws NotFoundException {
+    public EmployeeDTO.EmployeeAsWholeDTO getById(Long id) throws NotFoundException {
         Optional<Employee> employee = employeeRepo.findById(id);
         if (employee.isEmpty()) {
             throw new NotFoundException();
         }
-        return employee.get();
+        return employeeMapper.toWholeDTO(employee.get());
     }
 
     @Override
@@ -94,11 +99,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public ArrayList<Employee> getByContains(String search) {
+    public List<EmployeeDTO.EmployeeAsWholeDTO> getByContains(String search) {
         return employeeRepo.searchEmployee(
-                authService.authUser().getTenant().getId(),
-                search.toLowerCase()
-        );
+                        authService.authUser().getTenant().getId(),
+                        search.toLowerCase()
+                )
+                .stream()
+                .map(employee -> employeeMapper.toWholeDTO(employee))
+                .collect(Collectors.toList());
     }
 
     @Override
