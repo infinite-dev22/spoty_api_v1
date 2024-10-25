@@ -79,6 +79,10 @@ dependencies {
     implementation('com.flutterwave:f4b-java:3.0.1F') {
         exclude group: 'commons-logging', module: 'commons-logging'
     }
+    // MapStruct
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
     // PDF Creation
     implementation 'io.github.openhtmltopdf:openhtmltopdf-pdfbox:1.1.22'
     // JSON Creation
