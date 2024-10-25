@@ -1,12 +1,13 @@
 package io.nomard.spoty_api_v1.controllers.norm;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Product;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.ProductDTO;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.ProductServiceImpl;
-import com.fasterxml.jackson.annotation.JsonView;
 import io.nomard.spoty_api_v1.utils.Views;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,28 +28,28 @@ public class ProductController {
 
     @GetMapping("/all")
     @JsonView(Views.Tiny.class)
-    public Page<Product> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Page<ProductDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                   @RequestParam(defaultValue = "50") Integer pageSize) {
         return productService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/all/non_paged")
-    public ArrayList<Product> getAllNonPaged() {
+    public List<ProductDTO> getAllNonPaged() {
         return productService.getAllNonPaged();
     }
 
     @GetMapping("/single")
-    public Product getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public ProductDTO getById(@RequestBody FindModel findModel) throws NotFoundException {
         return productService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<Product> getByContains(@RequestBody SearchModel searchModel) {
+    public List<ProductDTO> getByContains(@RequestBody SearchModel searchModel) {
         return productService.getByContains(searchModel.getSearch());
     }
 
     @GetMapping("/stock_alert")
-    public List<Product> getWarning() {
+    public List<ProductDTO> getWarning() {
         return productService.getWarning();
     }
 

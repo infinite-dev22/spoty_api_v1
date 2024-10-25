@@ -190,7 +190,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
 
             // Check if product cost price needs to be updated.
             for (PurchaseReturnDetail detail : purchase.getPurchaseReturnDetails()) {
-                var product = productService.getById(detail.getProduct().getId());
+                var product = productService.getByIdInternally(detail.getProduct().getId());
                 if (!Objects.equals(product.getCostPrice(), detail.getUnitCost())) {
                     product.setCostPrice(detail.getUnitCost());
                     productService.save(product);
@@ -290,7 +290,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
     public void updateProductCost(PurchaseReturnMaster purchase) throws NotFoundException {
         // Check if product cost price needs to be updated.
         for (PurchaseReturnDetail detail : purchase.getPurchaseReturnDetails()) {
-            var product = productService.getById(detail.getProduct().getId());
+            var product = productService.getByIdInternally(detail.getProduct().getId());
             if (!Objects.equals(product.getCostPrice(), detail.getUnitCost())) {
                 product.setCostPrice(detail.getUnitCost());
                 productService.save(product);

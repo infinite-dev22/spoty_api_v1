@@ -52,7 +52,7 @@ public class CoreCalculations {
                         .get(i)
                         .setPurchase(purchaseMaster);
 
-                var productOpt = Optional.ofNullable(productService.getById(purchaseMaster.getPurchaseDetails().get(i).getProduct().getId()));
+                var productOpt = Optional.ofNullable(productService.getByIdInternally(purchaseMaster.getPurchaseDetails().get(i).getProduct().getId()));
 
                 if (productOpt.isPresent()) {
                     subTotal +=
@@ -124,7 +124,7 @@ public class CoreCalculations {
                         .get(i)
                         .setPurchaseReturnMaster(purchaseReturn);
 
-                var productOpt = Optional.ofNullable(productService.getById(purchaseReturn.getPurchaseReturnDetails().get(i).getProduct().getId()));
+                var productOpt = Optional.ofNullable(productService.getByIdInternally(purchaseReturn.getPurchaseReturnDetails().get(i).getProduct().getId()));
 
                 if (productOpt.isPresent()) {
                     subTotal +=
@@ -204,7 +204,7 @@ public class CoreCalculations {
             for (int i = 0; i < sale.getSaleDetails().size(); i++) {
                 sale.getSaleDetails().get(i).setSale(sale);
 
-                var productOpt = Optional.ofNullable(productService.getById(sale.getSaleDetails().get(i).getProduct().getId()));
+                var productOpt = Optional.ofNullable(productService.getByIdInternally(sale.getSaleDetails().get(i).getProduct().getId()));
 
                 if (productOpt.isPresent()) {
                     subTotal +=
@@ -264,7 +264,7 @@ public class CoreCalculations {
                         .get(i)
                         .setSaleReturnMaster(saleReturn);
 
-                var productOpt = Optional.ofNullable(productService.getById(saleReturn.getSaleReturnDetails().get(i).getProduct().getId()));
+                var productOpt = Optional.ofNullable(productService.getByIdInternally(saleReturn.getSaleReturnDetails().get(i).getProduct().getId()));
 
                 if (productOpt.isPresent()) {
                     subTotal +=
@@ -345,7 +345,7 @@ public class CoreCalculations {
             for (int i = 0; i < quotation.getQuotationDetails().size(); i++) {
                 quotation.getQuotationDetails().get(i).setQuotation(quotation);
 
-                var productOpt = Optional.ofNullable(productService.getById(quotation.getQuotationDetails().get(i).getProduct().getId()));
+                var productOpt = Optional.ofNullable(productService.getByIdInternally(quotation.getQuotationDetails().get(i).getProduct().getId()));
 
                 if (productOpt.isPresent()) {
                     subTotal +=

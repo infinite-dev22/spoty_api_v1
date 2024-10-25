@@ -9,10 +9,12 @@ import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.ProductServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.stock_ins.StockInTransactionService;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -22,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class StockInTransactionServiceImpl
-    implements StockInTransactionService {
+        implements StockInTransactionService {
 
     @Autowired
     private StockInTransactionRepository stockInTransactionRepo;
@@ -41,7 +43,7 @@ public class StockInTransactionServiceImpl
     @Transactional(readOnly = true)
     public StockInTransaction getById(Long id) throws NotFoundException {
         Optional<StockInTransaction> stockInTransaction =
-            stockInTransactionRepo.findByStockInDetailId(id);
+                stockInTransactionRepo.findByStockInDetailId(id);
         if (stockInTransaction.isEmpty()) {
             throw new NotFoundException();
         }
@@ -53,10 +55,10 @@ public class StockInTransactionServiceImpl
     public ResponseEntity<ObjectNode> save(StockInDetail stockInDetail) {
         try {
             var productQuantity =
-                productService
-                    .getById(stockInDetail.getProduct().getId())
-                    .getQuantity() +
-                stockInDetail.getQuantity();
+                    productService
+                            .getByIdInternally(stockInDetail.getProduct().getId())
+                            .getQuantity() +
+                            stockInDetail.getQuantity();
 
             var product = stockInDetail.getProduct();
             product.setQuantity(productQuantity);
@@ -64,7 +66,7 @@ public class StockInTransactionServiceImpl
 
             StockInTransaction stockInTransaction = new StockInTransaction();
             stockInTransaction.setBranch(
-                stockInDetail.getStockIn().getBranch()
+                    stockInDetail.getStockIn().getBranch()
             );
             stockInTransaction.setProduct(stockInDetail.getProduct());
             stockInTransaction.setStockInDetail(stockInDetail);
@@ -84,7 +86,7 @@ public class StockInTransactionServiceImpl
     @Override
     @CacheEvict(value = "stockIn_transactions", key = "#data.id")
     public ResponseEntity<ObjectNode> update(StockInDetail data)
-        throws NotFoundException {
+            throws NotFoundException {
         var opt = stockInTransactionRepo.findByStockInDetailId(data.getId());
 
         if (opt.isEmpty()) {
@@ -93,28 +95,28 @@ public class StockInTransactionServiceImpl
         var stockInTransaction = opt.get();
 
         if (
-            !Objects.equals(
-                stockInTransaction.getBranch(),
-                data.getStockIn().getBranch()
-            ) &&
-            Objects.nonNull(data.getStockIn().getBranch())
+                !Objects.equals(
+                        stockInTransaction.getBranch(),
+                        data.getStockIn().getBranch()
+                ) &&
+                        Objects.nonNull(data.getStockIn().getBranch())
         ) {
             stockInTransaction.setBranch(data.getStockIn().getBranch());
         }
 
         if (
-            !Objects.equals(
-                stockInTransaction.getProduct(),
-                data.getProduct()
-            ) &&
-            Objects.nonNull(data.getProduct())
+                !Objects.equals(
+                        stockInTransaction.getProduct(),
+                        data.getProduct()
+                ) &&
+                        Objects.nonNull(data.getProduct())
         ) {
             var adjustQuantity = stockInTransaction.getStockInQuantity();
             var currentProductQuantity = productService
-                .getById(data.getProduct().getId())
-                .getQuantity();
+                    .getByIdInternally(data.getProduct().getId())
+                    .getQuantity();
             var productQuantity =
-                (currentProductQuantity - adjustQuantity) + data.getQuantity();
+                    (currentProductQuantity - adjustQuantity) + data.getQuantity();
 
             var product = data.getProduct();
             product.setQuantity(productQuantity);
@@ -128,20 +130,20 @@ public class StockInTransactionServiceImpl
         }
 
         if (
-            !Objects.equals(
-                stockInTransaction.getStockInDetail().getCreatedAt(),
-                data.getCreatedAt()
-            ) &&
-            Objects.nonNull(data.getCreatedAt())
+                !Objects.equals(
+                        stockInTransaction.getStockInDetail().getCreatedAt(),
+                        data.getCreatedAt()
+                ) &&
+                        Objects.nonNull(data.getCreatedAt())
         ) {
             stockInTransaction.setDate(data.getCreatedAt());
         }
 
         if (
-            !Objects.equals(
-                stockInTransaction.getStockInQuantity(),
-                data.getQuantity()
-            )
+                !Objects.equals(
+                        stockInTransaction.getStockInQuantity(),
+                        data.getQuantity()
+                )
         ) {
             stockInTransaction.setStockInQuantity(data.getQuantity());
         }

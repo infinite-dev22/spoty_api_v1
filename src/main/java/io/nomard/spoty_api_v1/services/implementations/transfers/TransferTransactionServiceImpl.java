@@ -50,7 +50,7 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
         if (transferDetail.getProduct().getQuantity() > 0 && transferDetail.getProduct().getQuantity() > transferDetail.getQuantity()) {
             try {
                 var productQuantity =
-                        productService.getById(transferDetail.getProduct().getId()).getQuantity() - transferDetail.getQuantity();
+                        productService.getByIdInternally(transferDetail.getProduct().getId()).getQuantity() - transferDetail.getQuantity();
 
                 var product = transferDetail.getProduct();
                 product.setQuantity(productQuantity);
@@ -96,7 +96,7 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
         if (!Objects.equals(transferTransaction.getProduct(), data.getProduct()) && Objects.nonNull(data.getProduct())) {
             if (data.getProduct().getQuantity() > 0 && data.getProduct().getQuantity() > data.getQuantity()) {
                 var adjustQuantity = transferTransaction.getTransferQuantity();
-                var currentProductQuantity = productService.getById(data.getProduct().getId()).getQuantity();
+                var currentProductQuantity = productService.getByIdInternally(data.getProduct().getId()).getQuantity();
                 var productQuantity =
                         (currentProductQuantity - adjustQuantity) + data.getQuantity();
 

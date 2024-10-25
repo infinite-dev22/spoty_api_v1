@@ -167,7 +167,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
             // Check if product cost price needs to be updated.
             for (PurchaseDetail detail : purchase.getPurchaseDetails()) {
-                var product = productService.getById(
+                var product = productService.getByIdInternally(
                         detail.getProduct().getId()
                 );
                 if (
@@ -275,7 +275,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
             // Check if product cost price needs to be updated.
             for (PurchaseDetail detail : purchase.getPurchaseDetails()) {
-                var product = productService.getById(
+                var product = productService.getByIdInternally(
                         detail.getProduct().getId()
                 );
                 if (
@@ -451,7 +451,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
                 // Check if product cost price needs to be updated.
                 for (PurchaseDetail detail : purchase.getPurchaseDetails()) {
-                    var product = productService.getById(
+                    var product = productService.getByIdInternally(
                             detail.getProduct().getId()
                     );
                     if (
