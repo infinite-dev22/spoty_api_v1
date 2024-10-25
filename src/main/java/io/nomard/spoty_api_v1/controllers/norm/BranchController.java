@@ -2,6 +2,7 @@ package io.nomard.spoty_api_v1.controllers.norm;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Branch;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.BranchDTO;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
@@ -25,18 +26,18 @@ public class BranchController {
 
     @GetMapping("/all")
     @JsonView(Views.Tiny.class)
-    public Page<Branch> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                               @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Page<BranchDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                  @RequestParam(defaultValue = "50") Integer pageSize) {
         return branchService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public Branch getById(@Valid @RequestBody FindModel findModel) throws NotFoundException {
+    public BranchDTO getById(@Valid @RequestBody FindModel findModel) throws NotFoundException {
         return branchService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<Branch> getByContains(@Valid @RequestBody SearchModel searchModel) {
+    public List<BranchDTO> getByContains(@Valid @RequestBody SearchModel searchModel) {
         return branchService.getByContains(searchModel.getSearch());
     }
 
