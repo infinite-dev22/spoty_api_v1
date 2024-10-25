@@ -2,6 +2,7 @@ package io.nomard.spoty_api_v1.controllers.norm;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Customer;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.CustomerDTO;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
@@ -25,18 +26,18 @@ public class CustomerController {
 
     @GetMapping("/all")
     @JsonView(Views.Tiny.class)
-    public Page<Customer> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                 @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Page<CustomerDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                    @RequestParam(defaultValue = "50") Integer pageSize) {
         return customerService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public Customer getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public CustomerDTO getById(@RequestBody FindModel findModel) throws NotFoundException {
         return customerService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<Customer> getByContains(@RequestBody SearchModel searchModel) {
+    public List<CustomerDTO> getByContains(@RequestBody SearchModel searchModel) {
         return customerService.getByContains(searchModel.getSearch());
     }
 

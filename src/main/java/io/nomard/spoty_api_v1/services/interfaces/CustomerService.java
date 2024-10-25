@@ -2,6 +2,7 @@ package io.nomard.spoty_api_v1.services.interfaces;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Customer;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.CustomerDTO;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -10,11 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface CustomerService {
-    Page<Customer> getAll(int pageNo, int pageSize);
+    Page<CustomerDTO> getAll(int pageNo, int pageSize);
 
-    Customer getById(Long id) throws NotFoundException;
+    CustomerDTO getById(Long id) throws NotFoundException;
 
-    List<Customer> getByContains(String search);
+    List<CustomerDTO> getByContains(String search);
 
     ResponseEntity<ObjectNode> save(Customer customer);
 
