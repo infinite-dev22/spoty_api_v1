@@ -2,6 +2,8 @@ package io.nomard.spoty_api_v1.services.implementations;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Permission;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.PermissionDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.PermissionMapper;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.PermissionRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
@@ -28,20 +30,22 @@ public class PermissionServiceImpl implements PermissionService {
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
+    @Autowired
+    private PermissionMapper permissionMapper;
 
     @Override
-    public Page<Permission> getAll(int pageNo, int pageSize) {
+    public Page<PermissionDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return permissionRepo.findAll(pageRequest);
+        return permissionRepo.findAll(pageRequest).map(permission -> permissionMapper.toDTO(permission));
     }
 
     @Override
-    public Permission getById(Long id) throws NotFoundException {
+    public PermissionDTO getById(Long id) throws NotFoundException {
         Optional<Permission> permission = permissionRepo.findById(id);
         if (permission.isEmpty()) {
             throw new NotFoundException();
         }
-        return permission.get();
+        return permissionMapper.toDTO(permission.get());
     }
 
     @Override
