@@ -2,6 +2,8 @@ package io.nomard.spoty_api_v1.services.implementations;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Supplier;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.SupplierDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.SupplierMapper;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.SupplierRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
@@ -17,8 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class SupplierServiceImpl implements SupplierService {
@@ -28,25 +32,30 @@ public class SupplierServiceImpl implements SupplierService {
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
+    @Autowired
+    private SupplierMapper supplierMapper;
 
     @Override
-    public Page<Supplier> getAll(int pageNo, int pageSize) {
+    public Page<SupplierDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return supplierRepo.findByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+        return supplierRepo.findByTenantId(authService.authUser().getTenant().getId(), pageRequest).map(supplier -> supplierMapper.toDTO(supplier));
     }
 
     @Override
-    public Supplier getById(Long id) throws NotFoundException {
+    public SupplierDTO getById(Long id) throws NotFoundException {
         Optional<Supplier> supplier = supplierRepo.findById(id);
         if (supplier.isEmpty()) {
             throw new NotFoundException();
         }
-        return supplier.get();
+        return supplierMapper.toDTO(supplier.get());
     }
 
     @Override
-    public ArrayList<Supplier> getByContains(String search) {
-        return supplierRepo.search(authService.authUser().getTenant().getId(), search.toLowerCase());
+    public List<SupplierDTO> getByContains(String search) {
+        return supplierRepo.search(authService.authUser().getTenant().getId(), search.toLowerCase())
+                .stream()
+                .map(supplier -> supplierMapper.toDTO(supplier))
+                .collect(Collectors.toList());
     }
 
     @Override
