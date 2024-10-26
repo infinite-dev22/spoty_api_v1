@@ -1,7 +1,12 @@
 package io.nomard.spoty_api_v1.services.implementations;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.entities.TenantSettings;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.TenantSettingsDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.TenantSettingsMapper;
+import io.nomard.spoty_api_v1.models.FindModel;
+import io.nomard.spoty_api_v1.repositories.ApproverRepository;
 import io.nomard.spoty_api_v1.repositories.TenantSettingsRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
@@ -24,12 +29,21 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
     @Autowired
     private TenantSettingsRepository settingsRepo;
     @Autowired
+    private ApproverRepository approverRepo;
+    @Autowired
     private SpotyResponseImpl spotyResponseImpl;
     @Autowired
     private AuthServiceImpl authService;
+    @Autowired
+    private TenantSettingsMapper tenantSettingsMapper;
 
     @Override
-    public TenantSettings getSettings() {
+    public TenantSettingsDTO getSettings() {
+        return tenantSettingsMapper.toDTO(settingsRepo.findByTenantId(authService.authUser().getTenant().getId()));
+    }
+
+    @Override
+    public TenantSettings getSettingsInternal() {
         return settingsRepo.findByTenantId(authService.authUser().getTenant().getId());
     }
 
@@ -39,14 +53,21 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
         var opt = Optional.ofNullable(settingsRepo.findByTenantId(authService.authUser().getTenant().getId()));
         if (opt.isEmpty()) {
             try {
-                for (int i = 0; i < settings.getApprovers().size(); i++) {
-                    settings.getApprovers().get(i).setTenant(authService.authUser().getTenant());
-                    settings.getApprovers().get(i).setBranch(authService.authUser().getBranch());
-                }
+                // for (int i = 0; i < settings.getApprovers().size(); i++) {
+                //     settings.getApprovers().get(i).setTenant(authService.authUser().getTenant());
+                //     settings.getApprovers().get(i).setBranch(authService.authUser().getBranch());
+                // }
+
+                settings.setReviewers(settings.getReviewers().stream().peek(approver -> {
+                    approver.setTenant(authService.authUser().getTenant());
+                    approver.setBranch(authService.authUser().getBranch());
+                }).toList());
+
                 settings.setTenant(authService.authUser().getTenant());
                 settings.setCreatedAt(LocalDateTime.now());
                 settings.setUpdatedAt(LocalDateTime.now());
                 settings.setTenant(authService.authUser().getTenant());
+                settings.getReviewers().forEach(approver -> approver.setTenant(authService.authUser().getTenant()));
                 settingsRepo.save(settings);
                 return spotyResponseImpl.created();
             } catch (Exception e) {
@@ -66,57 +87,57 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
             var tenantSettings = opt.get();
 
             if (!Objects.equals(tenantSettings.getName(), settings.getName()) &&
-                    Objects.nonNull(settings.getName()) && settings.getName().isEmpty()) {
+                    Objects.nonNull(settings.getName()) && !settings.getName().isEmpty()) {
                 tenantSettings.setName(settings.getName());
             }
 
             if (!Objects.equals(tenantSettings.getWebsiteLink(), settings.getWebsiteLink()) &&
-                    Objects.nonNull(settings.getWebsiteLink()) && settings.getWebsiteLink().isEmpty()) {
+                    Objects.nonNull(settings.getWebsiteLink()) && !settings.getWebsiteLink().isEmpty()) {
                 tenantSettings.setWebsiteLink(settings.getWebsiteLink());
             }
 
             if (!Objects.equals(tenantSettings.getPhoneNumber(), settings.getPhoneNumber()) &&
-                    Objects.nonNull(settings.getPhoneNumber()) && settings.getPhoneNumber().isEmpty()) {
+                    Objects.nonNull(settings.getPhoneNumber()) && !settings.getPhoneNumber().isEmpty()) {
                 tenantSettings.setPhoneNumber(settings.getPhoneNumber());
             }
 
             if (!Objects.equals(tenantSettings.getEmail(), settings.getEmail()) &&
-                    Objects.nonNull(settings.getEmail()) && settings.getEmail().isEmpty()) {
+                    Objects.nonNull(settings.getEmail()) && !settings.getEmail().isEmpty()) {
                 tenantSettings.setEmail(settings.getEmail());
             }
 
             if (!Objects.equals(tenantSettings.getSupportEmail(), settings.getSupportEmail()) &&
-                    Objects.nonNull(settings.getSupportEmail()) && settings.getSupportEmail().isEmpty()) {
+                    Objects.nonNull(settings.getSupportEmail()) && !settings.getSupportEmail().isEmpty()) {
                 tenantSettings.setSupportEmail(settings.getSupportEmail());
             }
 
             if (!Objects.equals(tenantSettings.getInfoEmail(), settings.getInfoEmail()) &&
-                    Objects.nonNull(settings.getInfoEmail()) && settings.getInfoEmail().isEmpty()) {
+                    Objects.nonNull(settings.getInfoEmail()) && !settings.getInfoEmail().isEmpty()) {
                 tenantSettings.setInfoEmail(settings.getInfoEmail());
             }
 
             if (!Objects.equals(tenantSettings.getHrEmail(), settings.getHrEmail()) &&
-                    Objects.nonNull(settings.getHrEmail()) && settings.getHrEmail().isEmpty()) {
+                    Objects.nonNull(settings.getHrEmail()) && !settings.getHrEmail().isEmpty()) {
                 tenantSettings.setHrEmail(settings.getHrEmail());
             }
 
             if (!Objects.equals(tenantSettings.getSalesEmail(), settings.getSalesEmail()) &&
-                    Objects.nonNull(settings.getSalesEmail()) && settings.getSalesEmail().isEmpty()) {
+                    Objects.nonNull(settings.getSalesEmail()) && !settings.getSalesEmail().isEmpty()) {
                 tenantSettings.setSalesEmail(settings.getSalesEmail());
             }
 
             if (!Objects.equals(tenantSettings.getPostalAddress(), settings.getPostalAddress()) &&
-                    Objects.nonNull(settings.getPostalAddress()) && settings.getPostalAddress().isEmpty()) {
+                    Objects.nonNull(settings.getPostalAddress()) && !settings.getPostalAddress().isEmpty()) {
                 tenantSettings.setPostalAddress(settings.getPostalAddress());
             }
 
             if (!Objects.equals(tenantSettings.getPhysicalAddress(), settings.getPhysicalAddress()) &&
-                    Objects.nonNull(settings.getPhysicalAddress()) && settings.getPhysicalAddress().isEmpty()) {
+                    Objects.nonNull(settings.getPhysicalAddress()) && !settings.getPhysicalAddress().isEmpty()) {
                 tenantSettings.setPhysicalAddress(settings.getPhysicalAddress());
             }
 
             if (!Objects.equals(tenantSettings.getTagLine(), settings.getTagLine()) &&
-                    Objects.nonNull(settings.getTagLine()) && settings.getTagLine().isEmpty()) {
+                    Objects.nonNull(settings.getTagLine()) && !settings.getTagLine().isEmpty()) {
                 tenantSettings.setTagLine(settings.getTagLine());
             }
 
@@ -136,17 +157,17 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
             }
 
             if (!Objects.equals(tenantSettings.getTwitter(), settings.getTwitter()) &&
-                    Objects.nonNull(settings.getTwitter()) && settings.getTwitter().isEmpty()) {
+                    Objects.nonNull(settings.getTwitter()) && !settings.getTwitter().isEmpty()) {
                 tenantSettings.setTwitter(settings.getTwitter());
             }
 
             if (!Objects.equals(tenantSettings.getFacebook(), settings.getFacebook()) &&
-                    Objects.nonNull(settings.getFacebook()) && settings.getFacebook().isEmpty()) {
+                    Objects.nonNull(settings.getFacebook()) && !settings.getFacebook().isEmpty()) {
                 tenantSettings.setFacebook(settings.getFacebook());
             }
 
             if (!Objects.equals(tenantSettings.getLinkedIn(), settings.getLinkedIn()) &&
-                    Objects.nonNull(settings.getLinkedIn()) && settings.getLinkedIn().isEmpty()) {
+                    Objects.nonNull(settings.getLinkedIn()) && !settings.getLinkedIn().isEmpty()) {
                 tenantSettings.setLinkedIn(settings.getLinkedIn());
             }
 
@@ -195,13 +216,12 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
                 tenantSettings.setApprovalLevels(settings.getApprovalLevels());
             }
 
-            if (!Objects.equals(tenantSettings.getApprovers(), settings.getApprovers()) &&
-                    Objects.nonNull(settings.getApprovers()) && settings.getApprovers().isEmpty()) {
-                for (int i = 0; i < settings.getApprovers().size(); i++) {
-                    settings.getApprovers().get(i).setTenant(authService.authUser().getTenant());
-                    settings.getApprovers().get(i).setBranch(authService.authUser().getBranch());
-                }
-                tenantSettings.setApprovers(settings.getApprovers());
+            if (!Objects.equals(tenantSettings.getReviewers(), settings.getReviewers()) &&
+                    Objects.nonNull(settings.getReviewers()) && !settings.getReviewers().isEmpty()) {
+                tenantSettings.setReviewers(settings.getReviewers().stream().peek(approver -> {
+                    approver.setTenant(authService.authUser().getTenant());
+                    approver.setBranch(authService.authUser().getBranch());
+                }).toList());
             }
 
             if (!Objects.equals(tenantSettings.getDefaultCurrency(), settings.getDefaultCurrency()) &&
@@ -210,15 +230,14 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
             }
 
             if (!Objects.equals(tenantSettings.getLogo(), settings.getLogo()) &&
-                    Objects.nonNull(settings.getLogo()) && settings.getLogo().isEmpty()) {
+                    Objects.nonNull(settings.getLogo()) && !settings.getLogo().isEmpty()) {
                 tenantSettings.setLogo(settings.getLogo());
             }
 
-            settings.setCreatedAt(LocalDateTime.now());
-            settings.setUpdatedAt(LocalDateTime.now());
-            settings.setTenant(authService.authUser().getTenant());
+            tenantSettings.setUpdatedAt(LocalDateTime.now());
+            tenantSettings.setTenant(authService.authUser().getTenant());
             try {
-                settingsRepo.save(settings);
+                settingsRepo.save(tenantSettings);
                 return spotyResponseImpl.created();
             } catch (Exception e) {
                 log.log(Level.ALL, e.getMessage(), e);
@@ -226,6 +245,59 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
             }
         } else {
             return spotyResponseImpl.custom(HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.getReasonPhrase());
+        }
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<ObjectNode> addReviewer(Reviewer reviewer) {
+        var opt = Optional.ofNullable(settingsRepo.findByTenantId(authService.authUser().getTenant().getId()));
+        if (opt.isPresent()) {
+            var tenantSettings = opt.get();
+
+            if (Objects.nonNull(reviewer)) {
+                reviewer.setTenant(authService.authUser().getTenant());
+                reviewer.setBranch(authService.authUser().getBranch());
+                tenantSettings.getReviewers().add(reviewer);
+            }
+
+            tenantSettings.setUpdatedAt(LocalDateTime.now());
+            try {
+                settingsRepo.save(tenantSettings);
+                return spotyResponseImpl.created();
+            } catch (Exception e) {
+                log.log(Level.ALL, e.getMessage(), e);
+                return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+            }
+        } else {
+            return spotyResponseImpl.custom(HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.getReasonPhrase());
+        }
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<ObjectNode> removeReviewer(FindModel findModel) {
+        var opt1 = Optional.ofNullable(settingsRepo.findByTenantId(authService.authUser().getTenant().getId()));
+        if (opt1.isPresent()) {
+            var tenantSettings = opt1.get();
+
+            var opt2 = approverRepo.findById(findModel.getId());
+            if (opt2.isPresent()) {
+                var approver = opt2.get();
+                tenantSettings.getReviewers().remove(approver);
+                tenantSettings.setUpdatedAt(LocalDateTime.now());
+                try {
+                    settingsRepo.save(tenantSettings);
+                    return spotyResponseImpl.created();
+                } catch (Exception e) {
+                    log.log(Level.ALL, e.getMessage(), e);
+                    return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+                }
+            } else {
+                return spotyResponseImpl.custom(HttpStatus.NOT_FOUND, "Reviewer Not Found");
+            }
+        } else {
+            return spotyResponseImpl.custom(HttpStatus.NOT_FOUND, "Tenant Settings Not Found");
         }
     }
 

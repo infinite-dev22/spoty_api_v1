@@ -1,7 +1,7 @@
 package io.nomard.spoty_api_v1.services.implementations.returns.purchase_returns;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Approver;
+import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
 import io.nomard.spoty_api_v1.entities.returns.purchase_returns.PurchaseReturnDetail;
 import io.nomard.spoty_api_v1.entities.returns.purchase_returns.PurchaseReturnMaster;
@@ -94,17 +94,17 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
         if (purchase.getBranch() == null) {
             purchase.setBranch(authService.authUser().getBranch());
         }
-        if (settingsService.getSettings().getApproveAdjustments()) {
-            Approver approver = null;
+        if (settingsService.getSettingsInternal().getReview() && settingsService.getSettingsInternal().getApproveAdjustments()) {
+            Reviewer reviewer = null;
             try {
-                approver = approverService.getByUserId(authService.authUser().getId());
+                reviewer = approverService.getByUserId(authService.authUser().getId());
             } catch (NotFoundException e) {
                 log.log(Level.ALL, e.getMessage(), e);
             }
-            if (Objects.nonNull(approver)) {
-                purchase.getApprovers().add(approver);
-                purchase.setNextApprovedLevel(approver.getLevel());
-                if (approver.getLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            if (Objects.nonNull(reviewer)) {
+                purchase.getReviewers().add(reviewer);
+                purchase.setNextApprovedLevel(reviewer.getLevel());
+                if (reviewer.getLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                     purchase.setApproved(true);
                     purchase.setApprovalStatus("Approved");
                     createAccountTransaction(purchase);
@@ -172,9 +172,9 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
         if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
             purchase.setNotes(data.getNotes());
         }
-        if (Objects.nonNull(data.getApprovers()) && !data.getApprovers().isEmpty()) {
-            purchase.getApprovers().add(data.getApprovers().getFirst());
-            if (purchase.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+        if (Objects.nonNull(data.getReviewers()) && !data.getReviewers().isEmpty()) {
+            purchase.getReviewers().add(data.getReviewers().getFirst());
+            if (purchase.getNextApprovedLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                 purchase.setApproved(true);
                 purchase.setApprovalStatus("Approved");
                 createAccountTransaction(purchase);
@@ -190,7 +190,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
 
             // Check if product cost price needs to be updated.
             for (PurchaseReturnDetail detail : purchase.getPurchaseReturnDetails()) {
-                var product = productService.getById(detail.getProduct().getId());
+                var product = productService.getByIdInternally(detail.getProduct().getId());
                 if (!Objects.equals(product.getCostPrice(), detail.getUnitCost())) {
                     product.setCostPrice(detail.getUnitCost());
                     productService.save(product);
@@ -222,9 +222,9 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
 
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")) {
             var approver = approverService.getByUserId(authService.authUser().getId());
-            purchase.getApprovers().add(approver);
+            purchase.getReviewers().add(approver);
             purchase.setNextApprovedLevel(approver.getLevel());
-            if (purchase.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            if (purchase.getNextApprovedLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                 purchase.setApproved(true);
                 purchase.setApprovalStatus("Approved");
                 createAccountTransaction(purchase);
@@ -290,7 +290,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
     public void updateProductCost(PurchaseReturnMaster purchase) throws NotFoundException {
         // Check if product cost price needs to be updated.
         for (PurchaseReturnDetail detail : purchase.getPurchaseReturnDetails()) {
-            var product = productService.getById(detail.getProduct().getId());
+            var product = productService.getByIdInternally(detail.getProduct().getId());
             if (!Objects.equals(product.getCostPrice(), detail.getUnitCost())) {
                 product.setCostPrice(detail.getUnitCost());
                 productService.save(product);

@@ -1,8 +1,10 @@
 package io.nomard.spoty_api_v1.services.implementations.adjustments;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Approver;
+import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.entities.adjustments.AdjustmentMaster;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.AdjustmentDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.AdjustmentMapper;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
 import io.nomard.spoty_api_v1.repositories.adjustments.AdjustmentMasterRepository;
@@ -30,6 +32,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 @Service
 @Log
@@ -46,31 +49,36 @@ public class AdjustmentServiceImpl implements AdjustmentService {
     private TenantSettingsServiceImpl settingsService;
     @Autowired
     private ApproverServiceImpl approverService;
+    @Autowired
+    private AdjustmentMapper adjustmentMapper;
 
     @Override
     @Cacheable("adjustment_masters")
     @Transactional(readOnly = true)
-    public Page<AdjustmentMaster> getAll(int pageNo, int pageSize) {
+    public Page<AdjustmentDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return adjustmentRepo.findAllByTenantId(authService.authUser().getTenant().getId(), authService.authUser().getId(), pageRequest);
+        return adjustmentRepo.findAllByTenantId(authService.authUser().getTenant().getId(), authService.authUser().getId(), pageRequest).map(adjustment -> adjustmentMapper.toMasterDTO(adjustment));
     }
 
     @Override
     @Cacheable("adjustment_masters")
     @Transactional(readOnly = true)
-    public AdjustmentMaster getById(Long id) throws NotFoundException {
+    public AdjustmentDTO getById(Long id) throws NotFoundException {
         Optional<AdjustmentMaster> adjustment = adjustmentRepo.findById(id);
         if (adjustment.isEmpty()) {
             throw new NotFoundException();
         }
-        return adjustment.get();
+        return adjustmentMapper.toMasterDTO(adjustment.get());
     }
 
     @Override
     @Cacheable("adjustment_masters")
     @Transactional(readOnly = true)
-    public List<AdjustmentMaster> getByContains(String search) {
-        return adjustmentRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
+    public List<AdjustmentDTO> getByContains(String search) {
+        return adjustmentRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase())
+                .stream()
+                .map(adjustment -> adjustmentMapper.toMasterDTO(adjustment))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -82,17 +90,17 @@ public class AdjustmentServiceImpl implements AdjustmentService {
         if (Objects.isNull(adjustment.getBranch())) {
             adjustment.setBranch(authService.authUser().getBranch());
         }
-        if (settingsService.getSettings().getApproveAdjustments()) {
-            Approver approver = null;
+        if (settingsService.getSettingsInternal().getReview() && settingsService.getSettingsInternal().getApproveAdjustments()) {
+            Reviewer reviewer = null;
             try {
-                approver = approverService.getByUserId(authService.authUser().getId());
+                reviewer = approverService.getByUserId(authService.authUser().getId());
             } catch (NotFoundException e) {
                 log.log(Level.ALL, e.getMessage(), e);
             }
-            if (Objects.nonNull(approver)) {
-                adjustment.getApprovers().add(approver);
-                adjustment.setNextApprovedLevel(approver.getLevel() + 1);
-                if (approver.getLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            if (Objects.nonNull(reviewer)) {
+                adjustment.getReviewers().add(reviewer);
+                adjustment.setNextApprovedLevel(reviewer.getLevel() + 1);
+                if (reviewer.getLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                     adjustment.setApproved(true);
                     adjustment.setApprovalStatus("Approved");
                 }
@@ -142,9 +150,9 @@ public class AdjustmentServiceImpl implements AdjustmentService {
         if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
             adjustment.setNotes(data.getNotes());
         }
-        if (Objects.nonNull(data.getApprovers()) && !data.getApprovers().isEmpty()) {
-            adjustment.getApprovers().add(data.getApprovers().getFirst());
-            if (adjustment.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+        if (Objects.nonNull(data.getReviewers()) && !data.getReviewers().isEmpty()) {
+            adjustment.getReviewers().add(data.getReviewers().getFirst());
+            if (adjustment.getNextApprovedLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                 adjustment.setApproved(true);
                 adjustment.setApprovalStatus("Approved");
             }
@@ -178,9 +186,9 @@ public class AdjustmentServiceImpl implements AdjustmentService {
 
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")) {
             var approver = approverService.getByUserId(authService.authUser().getId());
-            adjustment.getApprovers().add(approver);
+            adjustment.getReviewers().add(approver);
             adjustment.setNextApprovedLevel(approver.getLevel());
-            if (adjustment.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            if (adjustment.getNextApprovedLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                 adjustment.setApproved(true);
                 adjustment.setApprovalStatus("Approved");
             }

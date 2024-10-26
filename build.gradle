@@ -1,9 +1,9 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.3.3'
+    id 'org.springframework.boot' version '3.3.4'
     id 'io.spring.dependency-management' version '1.1.5'
-    id 'org.hibernate.orm' version '6.5.2.Final'
-    id 'org.graalvm.buildtools.native' version '0.10.2'
+    id 'org.hibernate.orm' version '6.5.3.Final'
+    id 'org.graalvm.buildtools.native' version '0.10.3'
     id 'org.asciidoctor.jvm.convert' version '4.0.2'
 }
 
@@ -18,87 +18,41 @@ graalvmNative {
     toolchainDetection = true
 
     agent {
-        defaultMode = "standard" // Default agent mode if one isn't specified using `-Pagent=mode_name`
-        enabled = true // Enables the agent
+        defaultMode = "standard"
+        enabled = true
 
         modes {
-            // The standard agent mode generates metadata without conditions.
             standard {
             }
-            // The conditional agent mode generates metadata with conditions.
-            // conditional {
-            //     userCodeFilterPath = "path-to-filter.json"
-            //     // Path to a filter file that determines classes which will be used in the metadata conditions.
-            //     extraFilterPath = "path-to-another-filter.json"
-            //     // Optional, extra filter used to further filter the collected metadata.
-            // }
-            // The direct agent mode allows users to directly pass options to the agent.
-            //  direct {
-            //      // {output_dir} is a special string expanded by the plugin to where the agent files would usually be output.
-            //      options.add("config-output-dir={output_dir}")
-            //      options.add("experimental-configuration-with-origins")
-            //  }
         }
 
-//        callerFilterFiles.from("filter.json")
-//        accessFilterFiles.from("filter.json")
         builtinCallerFilter = true
         builtinHeuristicFilter = true
-        enableExperimentalPredefinedClasses = false
-        enableExperimentalUnsafeAllocationTracing = false
+        enableExperimentalPredefinedClasses = true
+        enableExperimentalUnsafeAllocationTracing = true
         trackReflectionMetadata = true
-
-        // Copies metadata collected from tasks into the specified directories.
-        metadataCopy {
-            inputTaskNames.add("test") // Tasks previously executed with the agent attached.
-            outputDirectories.add("src/main/resources/META-INF/native-image/<groupId>/<artifactId>/")
-            // Replace <groupId> and <artifactId> with GAV coordinates of your project
-            mergeWithExisting = true // Instead of copying, merge with existing metadata in the output directories.
-        }
-
-        /*
-        By default, if `-Pagent` is specified, all tasks that extend JavaForkOptions are instrumented.
-        This can be limited to only specific tasks that match this predicate.
-         */
-        // tasksToInstrumentPredicate = t -> true
     }
 
     binaries {
         main {
-            // Main options
-            // imageName = 'OpenSale-ERP' // The name of the native image, defaults to the project name
-            // mainClass = 'inc.nomard.spoty.core.Main' // The main class to use, defaults to the application.mainClass
-            debug = true
-            // Determines if debug info should be generated, defaults to false (alternatively add --debug-native to the CLI)
-            verbose = true // Add verbose output, defaults to false
-            fallback = false // Sets the fallback mode of native-image, defaults to false
+            debug = false
+            verbose = false
+            fallback = false
             sharedLibrary = false
-            // Determines if image is a shared library, defaults to false if `java-library` plugin isn't included
             quickBuild = false
-            // Determines if image is being built in quick build mode (alternatively use GRAALVM_QUICK_BUILD environment variable, or add --native-quick-build to the CLI)
-            richOutput = false // Determines if native-image building should be done with rich output
-            // requiredVersion = '22.3' // The minimal GraalVM version, can be `MAJOR`, `MAJOR.MINOR` or `MAJOR.MINOR.PATCH`
-
-            // systemProperties = [name1: 'value1', name2: 'value2'] // Sets the system properties to use for the native image builder
-            // configurationFileDirectories.from(file('src/my-config')) // Adds a native image configuration file directory, containing files like reflection configuration
-            // excludeConfig.put("org.example.test:artifact:version", ["^/META-INF/native-image/.*", "^/config/.*"]) // Excludes configuration that matches one of given regexes from JAR of dependency with said coordinates.
-            // excludeConfig.put(file("path/to/artifact.jar"), listOf("^/META-INF/native-image/.*", "^/config/.*"))
-
-            // Advanced options
-            // buildArgs.add('--link-at-build-time')
-            // Passes '--link-at-build-time' to the native image builder options. This can be used to pass parameters which are not directly supported by this extension
+            richOutput = false
             buildArgs.add("-O4")
-            // jvmArgs.add('flag') // Passes 'flag' directly to the JVM running the native image builder
-
-            // Runtime options
-            runtimeArgs.add('--help') // Passes '--help' to built image, during "nativeRun" task
-
-            // useFatJar = true // Instead of passing each jar individually, builds a fat jar
+            buildArgs.add('-H:+UnlockExperimentalVMOptions')
+            buildArgs.add('-H:+RemoveSaturatedTypeFlows')
+//            buildArgs.add('-H:+RemoveDeadNodes')
+            buildArgs.add('-H:-ReportExceptionStackTraces')
+            // buildArgs.add('--link-at-build-time')
+            runtimeArgs.add('--help')
         }
     }
 
     binaries.configureEach {
-        buildArgs.add('--verbose')
+        // buildArgs.add('--verbose')
         resources.autodetect()
     }
 }
@@ -122,27 +76,43 @@ bootJar {
 }
 
 dependencies {
-    implementation ('com.flutterwave:f4b-java:3.0.1F'){
+    implementation('com.flutterwave:f4b-java:3.0.1F') {
         exclude group: 'commons-logging', module: 'commons-logging'
     }
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.2'
-    implementation 'org.realityforge.org.jetbrains.annotations:org.jetbrains.annotations:1.7.0'
+    // MapStruct
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    // PDF Creation
+    implementation 'io.github.openhtmltopdf:openhtmltopdf-pdfbox:1.1.22'
+    // JSON Creation
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.0'
+    // JWT
     implementation 'com.auth0:java-jwt:4.4.0'
+    // SpringBoot Starters
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
-    testImplementation 'org.springframework.security:spring-security-test'
-    compileOnly 'org.projectlombok:lombok'
+    // Dev Tools
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    // SpringBoot Configurations
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    // JB Annotations
+    implementation 'org.realityforge.org.jetbrains.annotations:org.jetbrains.annotations:1.7.0'
+    // Containerization Tools
+    runtimeOnly 'org.springframework.boot:spring-boot-docker-compose'
+    // Database
+    runtimeOnly 'org.postgresql:postgresql'
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+    // Testing
+    testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-    runtimeOnly 'org.springframework.boot:spring-boot-docker-compose'
-    runtimeOnly 'org.postgresql:postgresql'
 }
 
 tasks.named('test') {

@@ -47,7 +47,7 @@ public class DocumentServiceImpl implements DocumentService {
     private void createDirectories() {
         productImagesLocation = Paths.get(rootLocation, "images", "products");
         userImagesLocation = Paths.get(rootLocation, "images", "users");
-        documentLocation = Paths.get(rootLocation, "images", "documents");
+        documentLocation = Paths.get(rootLocation, "documents");
 
         createDirectory(productImagesLocation, "Product images");
         createDirectory(userImagesLocation, "User images");

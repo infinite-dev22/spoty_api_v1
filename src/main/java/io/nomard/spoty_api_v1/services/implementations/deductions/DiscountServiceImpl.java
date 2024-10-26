@@ -2,6 +2,8 @@ package io.nomard.spoty_api_v1.services.implementations.deductions;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.deductions.Discount;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.DiscountDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.DiscountMapper;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.deductions.DiscountRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
@@ -28,15 +30,26 @@ public class DiscountServiceImpl implements DiscountService {
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
+    @Autowired
+    private DiscountMapper discountMapper;
 
     @Override
-    public Page<Discount> getAll(int pageNo, int pageSize) {
+    public Page<DiscountDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return discountRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+        return discountRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest).map(discount -> discountMapper.toDTO(discount));
     }
 
     @Override
-    public Discount getById(Long id) throws NotFoundException {
+    public DiscountDTO getById(Long id) throws NotFoundException {
+        Optional<Discount> discount = discountRepo.findById(id);
+        if (discount.isEmpty()) {
+            throw new NotFoundException();
+        }
+        return discountMapper.toDTO(discount.get());
+    }
+
+    @Override
+    public Discount getByIdInternal(Long id) throws NotFoundException {
         Optional<Discount> discount = discountRepo.findById(id);
         if (discount.isEmpty()) {
             throw new NotFoundException();

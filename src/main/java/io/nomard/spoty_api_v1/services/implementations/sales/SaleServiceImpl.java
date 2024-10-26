@@ -1,10 +1,8 @@
 package io.nomard.spoty_api_v1.services.implementations.sales;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Approver;
+import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
-import io.nomard.spoty_api_v1.entities.returns.purchase_returns.PurchaseReturnDetail;
-import io.nomard.spoty_api_v1.entities.returns.purchase_returns.PurchaseReturnMaster;
 import io.nomard.spoty_api_v1.entities.sales.SaleMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
@@ -103,17 +101,17 @@ public class SaleServiceImpl implements SaleService {
         if (Objects.isNull(sale.getBranch())) {
             sale.setBranch(authService.authUser().getBranch());
         }
-        if (settingsService.getSettings().getApproveAdjustments()) {
-            Approver approver = null;
+        if (settingsService.getSettingsInternal().getApproveAdjustments()) {
+            Reviewer reviewer = null;
             try {
-                approver = approverService.getByUserId(authService.authUser().getId());
+                reviewer = approverService.getByUserId(authService.authUser().getId());
             } catch (NotFoundException e) {
                 log.log(Level.ALL, e.getMessage(), e);
             }
-            if (Objects.nonNull(approver)) {
-                sale.getApprovers().add(approver);
-                sale.setNextApprovedLevel(approver.getLevel());
-                if (approver.getLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            if (Objects.nonNull(reviewer)) {
+                sale.getReviewers().add(reviewer);
+                sale.setNextApprovedLevel(reviewer.getLevel());
+                if (reviewer.getLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                     sale.setApproved(true);
                     sale.setApprovalStatus("Approved");
                     createAccountTransaction(sale);
@@ -190,9 +188,9 @@ public class SaleServiceImpl implements SaleService {
         if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
             sale.setNotes(data.getNotes());
         }
-        if (Objects.nonNull(data.getApprovers()) && !data.getApprovers().isEmpty()) {
-            sale.getApprovers().add(data.getApprovers().getFirst());
-            if (sale.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+        if (Objects.nonNull(data.getReviewers()) && !data.getReviewers().isEmpty()) {
+            sale.getReviewers().add(data.getReviewers().getFirst());
+            if (sale.getNextApprovedLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                 sale.setApproved(true);
                 sale.setApprovalStatus("Approved");
                 createAccountTransaction(sale);
@@ -228,9 +226,9 @@ public class SaleServiceImpl implements SaleService {
 
         if (Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")) {
             var approver = approverService.getByUserId(authService.authUser().getId());
-            sale.getApprovers().add(approver);
+            sale.getReviewers().add(approver);
             sale.setNextApprovedLevel(approver.getLevel());
-            if (sale.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            if (sale.getNextApprovedLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                 sale.setApproved(true);
                 sale.setApprovalStatus("Approved");
                 createAccountTransaction(sale);

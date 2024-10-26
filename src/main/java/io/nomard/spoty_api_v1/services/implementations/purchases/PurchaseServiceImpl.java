@@ -1,7 +1,7 @@
 package io.nomard.spoty_api_v1.services.implementations.purchases;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Approver;
+import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
 import io.nomard.spoty_api_v1.entities.purchases.PurchaseDetail;
 import io.nomard.spoty_api_v1.entities.purchases.PurchaseMaster;
@@ -118,21 +118,21 @@ public class PurchaseServiceImpl implements PurchaseService {
         if (purchase.getBranch() == null) {
             purchase.setBranch(authService.authUser().getBranch());
         }
-        if (settingsService.getSettings().getApproveAdjustments()) {
-            Approver approver = null;
+        if (settingsService.getSettingsInternal().getReview() && settingsService.getSettingsInternal().getApproveAdjustments()) {
+            Reviewer reviewer = null;
             try {
-                approver = approverService.getByUserId(
+                reviewer = approverService.getByUserId(
                         authService.authUser().getId()
                 );
             } catch (NotFoundException e) {
                 log.log(Level.ALL, e.getMessage(), e);
             }
-            if (Objects.nonNull(approver)) {
-                purchase.getApprovers().add(approver);
-                purchase.setNextApprovedLevel(approver.getLevel());
+            if (Objects.nonNull(reviewer)) {
+                purchase.getReviewers().add(reviewer);
+                purchase.setNextApprovedLevel(reviewer.getLevel());
                 if (
-                        approver.getLevel() >=
-                                settingsService.getSettings().getApprovalLevels()
+                        reviewer.getLevel() >=
+                                settingsService.getSettingsInternal().getApprovalLevels()
                 ) {
                     purchase.setApproved(true);
                     purchase.setApprovalStatus("Approved");
@@ -167,7 +167,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
             // Check if product cost price needs to be updated.
             for (PurchaseDetail detail : purchase.getPurchaseDetails()) {
-                var product = productService.getById(
+                var product = productService.getByIdInternally(
                         detail.getProduct().getId()
                 );
                 if (
@@ -253,13 +253,13 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchase.setNotes(data.getNotes());
         }
         if (
-                Objects.nonNull(data.getApprovers()) &&
-                        !data.getApprovers().isEmpty()
+                Objects.nonNull(data.getReviewers()) &&
+                        !data.getReviewers().isEmpty()
         ) {
-            purchase.getApprovers().add(data.getApprovers().getFirst());
+            purchase.getReviewers().add(data.getReviewers().getFirst());
             if (
                     purchase.getNextApprovedLevel() >=
-                            settingsService.getSettings().getApprovalLevels()
+                            settingsService.getSettingsInternal().getApprovalLevels()
             ) {
                 purchase.setApproved(true);
                 purchase.setApprovalStatus("Approved");
@@ -275,7 +275,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
             // Check if product cost price needs to be updated.
             for (PurchaseDetail detail : purchase.getPurchaseDetails()) {
-                var product = productService.getById(
+                var product = productService.getByIdInternally(
                         detail.getProduct().getId()
                 );
                 if (
@@ -421,11 +421,11 @@ public class PurchaseServiceImpl implements PurchaseService {
             var approver = approverService.getByUserId(
                     authService.authUser().getId()
             );
-            purchase.getApprovers().add(approver);
+            purchase.getReviewers().add(approver);
             purchase.setNextApprovedLevel(approver.getLevel());
             if (
                     purchase.getNextApprovedLevel() >=
-                            settingsService.getSettings().getApprovalLevels()
+                            settingsService.getSettingsInternal().getApprovalLevels()
             ) {
                 purchase.setApproved(true);
                 purchase.setApprovalStatus("Approved");
@@ -451,7 +451,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
                 // Check if product cost price needs to be updated.
                 for (PurchaseDetail detail : purchase.getPurchaseDetails()) {
-                    var product = productService.getById(
+                    var product = productService.getByIdInternally(
                             detail.getProduct().getId()
                     );
                     if (

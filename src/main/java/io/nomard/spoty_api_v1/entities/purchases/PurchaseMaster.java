@@ -75,7 +75,7 @@ public class PurchaseMaster implements Serializable {
     private String notes;
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @Builder.Default
-    private List<Approver> approvers = new ArrayList<>();
+    private List<Reviewer> reviewers = new ArrayList<>();
     @Builder.Default
     private Boolean approved = false;
     @Builder.Default

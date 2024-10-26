@@ -2,6 +2,8 @@ package io.nomard.spoty_api_v1.services.implementations;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Product;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.ProductDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.ProductMapper;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.ProductRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
@@ -26,6 +28,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 @Service
 @Log
@@ -38,26 +41,42 @@ public class ProductServiceImpl implements ProductService {
     private DocumentServiceImpl documentService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
+    @Autowired
+    private ProductMapper productMapper;
 
     @Override
     @Cacheable("products")
     @Transactional(readOnly = true)
-    public Page<Product> getAll(int pageNo, int pageSize) {
+    public Page<ProductDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return productRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+        return productRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest).map(product -> productMapper.toDTO(product));
     }
 
     @Override
     @Cacheable("products_no_paged")
     @Transactional(readOnly = true)
-    public ArrayList<Product> getAllNonPaged() {
-        return productRepo.findAllByTenantIdNonPaged(authService.authUser().getTenant().getId());
+    public List<ProductDTO> getAllNonPaged() {
+        return productRepo.findAllByTenantIdNonPaged(authService.authUser().getTenant().getId())
+                .stream()
+                .map(product -> productMapper.toDTO(product))
+                .collect(Collectors.toList());
     }
 
     @Override
     @Cacheable("products")
     @Transactional(readOnly = true)
-    public Product getById(Long id) throws NotFoundException {
+    public ProductDTO getById(Long id) throws NotFoundException {
+        Optional<Product> product = productRepo.findById(id);
+        if (product.isEmpty()) {
+            throw new NotFoundException();
+        }
+        return productMapper.toDTO(product.get());
+    }
+
+    @Override
+    @Cacheable("products")
+    @Transactional(readOnly = true)
+    public Product getByIdInternally(Long id) throws NotFoundException {
         Optional<Product> product = productRepo.findById(id);
         if (product.isEmpty()) {
             throw new NotFoundException();
@@ -68,15 +87,21 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Cacheable("products")
     @Transactional(readOnly = true)
-    public List<Product> getByContains(String search) {
-        return productRepo.searchAll(search.toLowerCase());
+    public List<ProductDTO> getByContains(String search) {
+        return productRepo.searchAll(search.toLowerCase())
+                .stream()
+                .map(product -> productMapper.toDTO(product))
+                .collect(Collectors.toList());
     }
 
     @Override
     @Cacheable("products")
     @Transactional(readOnly = true)
-    public List<Product> getWarning() {
-        return productRepo.findAllByTenantIdByQuantityIsLessThanEqualStockAlert();
+    public List<ProductDTO> getWarning() {
+        return productRepo.findAllByTenantIdByQuantityIsLessThanEqualStockAlert()
+                .stream()
+                .map(product -> productMapper.toDTO(product))
+                .collect(Collectors.toList());
     }
 
     @Override

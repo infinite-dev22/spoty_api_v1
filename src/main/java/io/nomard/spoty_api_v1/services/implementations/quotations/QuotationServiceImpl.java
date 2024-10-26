@@ -1,7 +1,7 @@
 package io.nomard.spoty_api_v1.services.implementations.quotations;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Approver;
+import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.entities.quotations.QuotationMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
@@ -109,21 +109,21 @@ public class QuotationServiceImpl implements QuotationService {
         if (Objects.isNull(quotation.getBranch())) {
             quotation.setBranch(authService.authUser().getBranch());
         }
-        if (settingsService.getSettings().getApproveAdjustments()) {
-            Approver approver = null;
+        if (settingsService.getSettingsInternal().getReview() && settingsService.getSettingsInternal().getApproveAdjustments()) {
+            Reviewer reviewer = null;
             try {
-                approver = approverService.getByUserId(
+                reviewer = approverService.getByUserId(
                     authService.authUser().getId()
                 );
             } catch (NotFoundException e) {
                 log.log(Level.ALL, e.getMessage(), e);
             }
-            if (Objects.nonNull(approver)) {
-                quotation.getApprovers().add(approver);
-                quotation.setNextApprovedLevel(approver.getLevel());
+            if (Objects.nonNull(reviewer)) {
+                quotation.getReviewers().add(reviewer);
+                quotation.setNextApprovedLevel(reviewer.getLevel());
                 if (
-                    approver.getLevel() >=
-                    settingsService.getSettings().getApprovalLevels()
+                    reviewer.getLevel() >=
+                    settingsService.getSettingsInternal().getApprovalLevels()
                 ) {
                     quotation.setApproved(true);
                     quotation.setApprovalStatus("Approved");
@@ -220,13 +220,13 @@ public class QuotationServiceImpl implements QuotationService {
         }
 
         if (
-            Objects.nonNull(data.getApprovers()) &&
-            !data.getApprovers().isEmpty()
+            Objects.nonNull(data.getReviewers()) &&
+            !data.getReviewers().isEmpty()
         ) {
-            quotation.getApprovers().add(data.getApprovers().getFirst());
+            quotation.getReviewers().add(data.getReviewers().getFirst());
             if (
                 quotation.getNextApprovedLevel() >=
-                settingsService.getSettings().getApprovalLevels()
+                settingsService.getSettingsInternal().getApprovalLevels()
             ) {
                 quotation.setApproved(true);
                 quotation.setApprovalStatus("Approved");
@@ -275,11 +275,11 @@ public class QuotationServiceImpl implements QuotationService {
             var approver = approverService.getByUserId(
                 authService.authUser().getId()
             );
-            quotation.getApprovers().add(approver);
+            quotation.getReviewers().add(approver);
             quotation.setNextApprovedLevel(approver.getLevel());
             if (
                 quotation.getNextApprovedLevel() >=
-                settingsService.getSettings().getApprovalLevels()
+                settingsService.getSettingsInternal().getApprovalLevels()
             ) {
                 quotation.setApproved(true);
                 quotation.setApprovalStatus("Approved");

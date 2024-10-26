@@ -23,6 +23,7 @@ import io.nomard.spoty_api_v1.entities.hrm.hrm.EmploymentStatus;
 import lombok.*;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -44,6 +45,7 @@ public class UserModel implements Serializable {
     private EmploymentStatus employmentStatus;
     private Department department;
     private Designation designation;
+    private LocalDate startDate;
     @Builder.Default
     private boolean active = true;
     @Builder.Default

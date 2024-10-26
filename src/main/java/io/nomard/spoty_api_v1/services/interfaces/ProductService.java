@@ -2,6 +2,7 @@ package io.nomard.spoty_api_v1.services.interfaces;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Product;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.ProductDTO;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -11,15 +12,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface ProductService {
-    Page<Product> getAll(int pageNo, int pageSize);
+    Page<ProductDTO> getAll(int pageNo, int pageSize);
 
-    ArrayList<Product> getAllNonPaged();
+    List<ProductDTO> getAllNonPaged();
 
-    Product getById(Long id) throws NotFoundException;
+    ProductDTO getById(Long id) throws NotFoundException;
 
-    List<Product> getByContains(String search);
+    Product getByIdInternally(Long id) throws NotFoundException;
 
-    List<Product> getWarning();
+    List<ProductDTO> getByContains(String search);
+
+    List<ProductDTO> getWarning();
 
     ResponseEntity<ObjectNode> save(Product product, MultipartFile file);
 

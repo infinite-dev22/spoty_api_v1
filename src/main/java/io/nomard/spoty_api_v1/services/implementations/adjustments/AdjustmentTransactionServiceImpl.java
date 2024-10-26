@@ -51,10 +51,10 @@ public class AdjustmentTransactionServiceImpl implements AdjustmentTransactionSe
 
             if (adjustmentDetail.getAdjustmentType().equalsIgnoreCase("INCREMENT")) {
                 productQuantity =
-                        productService.getById(adjustmentDetail.getProduct().getId()).getQuantity() + adjustmentDetail.getQuantity();
+                        productService.getByIdInternally(adjustmentDetail.getProduct().getId()).getQuantity() + adjustmentDetail.getQuantity();
             } else if (adjustmentDetail.getAdjustmentType().equalsIgnoreCase("DECREMENT")) {
                 productQuantity =
-                        productService.getById(adjustmentDetail.getProduct().getId()).getQuantity() - adjustmentDetail.getQuantity();
+                        productService.getByIdInternally(adjustmentDetail.getProduct().getId()).getQuantity() - adjustmentDetail.getQuantity();
             }
 
             var product = adjustmentDetail.getProduct();
@@ -96,7 +96,7 @@ public class AdjustmentTransactionServiceImpl implements AdjustmentTransactionSe
 
         if (!Objects.equals(adjustmentTransaction.getProduct(), data.getProduct()) && Objects.nonNull(data.getProduct())) {
             var productQuantity = 0L;
-            var currentProductQuantity = productService.getById(data.getProduct().getId()).getQuantity();
+            var currentProductQuantity = productService.getByIdInternally(data.getProduct().getId()).getQuantity();
 
             var adjustQuantity = adjustmentTransaction.getAdjustQuantity();
 

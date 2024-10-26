@@ -8,6 +8,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -18,6 +19,7 @@ public class EmailServiceImpl implements EmailService {
     private JavaMailSender emailSender;
 
     @Override
+    @Async
     public void sendSimpleMessage(String from, String to, String subject, String body) throws MessagingException {
         var mimeMessage = emailSender.createMimeMessage();
         var message = new MimeMessageHelper(mimeMessage);
@@ -30,6 +32,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    @Async
     public void sendMessageWithAttachment(String from, String to, String subject, String body, String pathToAttachment) throws MessagingException {
         var message = emailSender.createMimeMessage();
         var helper = new MimeMessageHelper(message, true);

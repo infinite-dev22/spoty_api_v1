@@ -2,6 +2,8 @@ package io.nomard.spoty_api_v1.services.implementations;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.ProductCategory;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.ProductCategoryDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.ProductCategoryMapper;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.ProductCategoryRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
@@ -17,8 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductCategoryServiceImpl implements ProductCategoryService {
@@ -28,25 +32,30 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
+    @Autowired
+    private ProductCategoryMapper productCategoryMapper;
 
     @Override
-    public Page<ProductCategory> getAll(int pageNo, int pageSize) {
+    public Page<ProductCategoryDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return productCategoryRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+        return productCategoryRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest).map(productCategory -> productCategoryMapper.toDTO(productCategory));
     }
 
     @Override
-    public ProductCategory getById(Long id) throws NotFoundException {
+    public ProductCategoryDTO getById(Long id) throws NotFoundException {
         Optional<ProductCategory> productCategory = productCategoryRepo.findById(id);
         if (productCategory.isEmpty()) {
             throw new NotFoundException();
         }
-        return productCategory.get();
+        return productCategoryMapper.toDTO(productCategory.get());
     }
 
     @Override
-    public ArrayList<ProductCategory> getByContains(String search) {
-        return productCategoryRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
+    public List<ProductCategoryDTO> getByContains(String search) {
+        return productCategoryRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase())
+                .stream()
+                .map(productCategory -> productCategoryMapper.toDTO(productCategory))
+                .collect(Collectors.toList());
     }
 
     @Override

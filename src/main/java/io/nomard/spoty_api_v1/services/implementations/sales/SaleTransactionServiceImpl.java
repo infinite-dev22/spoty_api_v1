@@ -50,11 +50,11 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
     @Override
     @Transactional
     public ResponseEntity<ObjectNode> save(SaleDetail saleDetail) throws NotFoundException {
-        var product = productService.getById(saleDetail.getProduct().getId());
+        var product = productService.getByIdInternally(saleDetail.getProduct().getId());
         if (product.getQuantity() > 0 && product.getQuantity() >= saleDetail.getQuantity()) {
             try {
                 var productQuantity =
-                        productService.getById(product.getId()).getQuantity() - saleDetail.getQuantity();
+                        productService.getByIdInternally(product.getId()).getQuantity() - saleDetail.getQuantity();
 
                 product.setQuantity(productQuantity);
                 productService.update(product, null);
@@ -96,7 +96,7 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
         if (!Objects.equals(saleTransaction.getProduct(), data.getProduct()) && Objects.nonNull(data.getProduct())) {
             if (data.getProduct().getQuantity() > 0 && data.getProduct().getQuantity() >= data.getQuantity()) {
                 var adjustQuantity = saleTransaction.getSaleQuantity();
-                var currentProductQuantity = productService.getById(data.getProduct().getId()).getQuantity();
+                var currentProductQuantity = productService.getByIdInternally(data.getProduct().getId()).getQuantity();
                 var productQuantity =
                         (currentProductQuantity + adjustQuantity) - data.getQuantity();
 

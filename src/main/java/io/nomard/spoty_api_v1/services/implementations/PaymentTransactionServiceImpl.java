@@ -3,6 +3,8 @@ package io.nomard.spoty_api_v1.services.implementations;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.flutterwave.bean.Response;
 import io.nomard.spoty_api_v1.entities.PaymentTransaction;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.PaymentTransactionDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.PaymentTransactionMapper;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.payments.CardModel;
 import io.nomard.spoty_api_v1.models.payments.MoMoModel;
@@ -37,20 +39,22 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
     private FlutterWavePayments flutterWavePayments;
     @Autowired
     private PaymentTransaction paymentTransaction;
+    @Autowired
+    private PaymentTransactionMapper paymentTransactionMapper;
 
     @Override
-    public Page<PaymentTransaction> getAll(int pageNo, int pageSize) {
+    public Page<PaymentTransactionDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return paymentTransactionRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+        return paymentTransactionRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest).map(paymentTransaction -> paymentTransactionMapper.toDTO(paymentTransaction));
     }
 
     @Override
-    public PaymentTransaction getById(Long id) throws NotFoundException {
+    public PaymentTransactionDTO getById(Long id) throws NotFoundException {
         Optional<PaymentTransaction> paymentTransaction = paymentTransactionRepo.findById(id);
         if (paymentTransaction.isEmpty()) {
             throw new NotFoundException();
         }
-        return paymentTransaction.get();
+        return paymentTransactionMapper.toDTO(paymentTransaction.get());
     }
 
     @Override

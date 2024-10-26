@@ -2,6 +2,7 @@ package io.nomard.spoty_api_v1.services.interfaces;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Permission;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.PermissionDTO;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -9,9 +10,9 @@ import org.springframework.http.ResponseEntity;
 import java.util.ArrayList;
 
 public interface PermissionService {
-    Page<Permission> getAll(int pageNo, int pageSize);
+    Page<PermissionDTO> getAll(int pageNo, int pageSize);
 
-    Permission getById(Long id) throws NotFoundException;
+    PermissionDTO getById(Long id) throws NotFoundException;
 
     ResponseEntity<ObjectNode> save(Permission permission);
 

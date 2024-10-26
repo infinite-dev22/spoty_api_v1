@@ -2,6 +2,8 @@ package io.nomard.spoty_api_v1.services.implementations;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Brand;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.BrandDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.BrandMapper;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.BrandRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
@@ -17,8 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BrandServiceImpl implements BrandService {
@@ -28,25 +32,27 @@ public class BrandServiceImpl implements BrandService {
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
+    @Autowired
+    private BrandMapper brandMapper;
 
     @Override
-    public Page<Brand> getAll(int pageNo, int pageSize) {
+    public Page<BrandDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return brandRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+        return brandRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest).map(brand -> brandMapper.toDTO(brand));
     }
 
     @Override
-    public Brand getById(Long id) throws NotFoundException {
+    public BrandDTO getById(Long id) throws NotFoundException {
         Optional<Brand> brand = brandRepo.findById(id);
         if (brand.isEmpty()) {
             throw new NotFoundException();
         }
-        return brand.get();
+        return brandMapper.toDTO(brand.get());
     }
 
     @Override
-    public ArrayList<Brand> getByContains(String search) {
-        return brandRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
+    public List<BrandDTO> getByContains(String search) {
+        return brandRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase()).stream().map(brand -> brandMapper.toDTO(brand)).collect(Collectors.toList());
     }
 
     @Override

@@ -2,6 +2,8 @@ package io.nomard.spoty_api_v1.services.implementations.accounting;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.AccountTransactionDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.AccountTransactionMapper;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.accounting.AccountRepository;
 import io.nomard.spoty_api_v1.repositories.accounting.AccountTransactionRepository;
@@ -29,11 +31,13 @@ public class AccountTransactionServiceImpl implements AccountTransactionService 
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
+    @Autowired
+    private AccountTransactionMapper accountTransactionMapper;
 
     @Override
-    public Page<AccountTransaction> getAll(int pageNo, int pageSize) {
+    public Page<AccountTransactionDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return accountTransactionRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+        return accountTransactionRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest).map(branch -> accountTransactionMapper.toDTO(branch));
     }
 
     @Override

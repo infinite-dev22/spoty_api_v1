@@ -6,7 +6,7 @@ services:
       context: .
     restart: unless-stopped
     ports:
-      - ${SPRING_PORT}:${SPRING_PORT}
+      - '${SPRING_PORT}:${SPRING_PORT}'
     networks:
       - api-net
     environment:
@@ -24,12 +24,12 @@ services:
 
   db:
     container_name: 'database'
-    image: 'postgres:latest'
+    image: 'postgres:alpine3.20'
     restart: unless-stopped
     ports:
-      - ${POSTGRESQL_PORT_NUMBER}:${POSTGRESQL_PORT_NUMBER}
+      - '${POSTGRESQL_PORT_NUMBER}:${POSTGRESQL_PORT_NUMBER}'
     expose:
-      - ${POSTGRESQL_PORT_NUMBER}
+      - '${POSTGRESQL_PORT_NUMBER}'
     networks:
       - api-net
     environment:
@@ -58,47 +58,83 @@ services:
       - '${PGADMIN_LOCAL_PORT}:${PGADMIN_DOCKER_PORT}'
     volumes:
       - pgadmin-data:/var/lib/pgadmin
+      - ./servers.json:/pgadmin4/servers.json
     networks:
       - api-net
 
-  mail:
-    container_name: 'stalwart-mail'
-    image: 'stalwartlabs/mail-server:latest'
-    restart: unless-stopped
-    ports:
-      - "80:8080"
-      - "443:443"
-      - "25:25"
-      - "587:587"
-      - "465:465"
-      - "143:143"
-      - "993:993"
-      - "4190:4190"
-      - "110:110"
-      - "995:995"
-    volumes:
-      - mail-data:/opt/stalwart-mail
-    tty: true
-    stdin_open: true
-    networks:
-      - api-net
+#  mail:
+#    container_name: 'stalwart-mail'
+#    image: 'stalwartlabs/mail-server:latest'
+#    restart: unless-stopped
+#    ports:
+#      - "81:8080"
+#      - "443:443"
+#      - "1025:25"
+#      - "587:587"
+#      - "465:465"
+#      - "143:143"
+#      - "993:993"
+#      - "4190:4190"
+#      - "110:110"
+#      - "995:995"
+#    volumes:
+#      - mail-data:/opt/stalwart-mail
+#    tty: true
+#    stdin_open: true
+#    networks:
+#      - api-net
 
-  mail_test:
-    image: 'axllent/mailpit:latest'
-    container_name: 'mailpit'
-    restart: unless-stopped
-    volumes:
-      - ./data:/data
+  mox:
+    # Replace "latest" with the version you want to run, see https://r.xmox.nl/r/mox/.
+    # Include the @sha256:... digest to ensure you get the listed image.
+    image: r.xmox.nl/mox:latest
+    container_name: mox
     ports:
-      - "8025:8025"
-      - "1025:1025"
+      - "1025:1025"   # SMTP
+      - "465:1465"  # SMTPS (Secure SMTP)
+      - "587:1587"  # SMTP Submission
+      - "993:1993"  # IMAPS (Secure IMAP)
+      - "143:1143"  # IMAP
+      - "443:1443"  # HTTPS
+      - "1080:1080"   # HTTP
+    command: mox localserve
     environment:
-      MP_MAX_MESSAGES: 5000
-      MP_DATABASE: /data/mailpit.db
-      MP_SMTP_AUTH_ACCEPT_ANY: 1
-      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+      - MOX_DOCKER=yes # Quickstart won't try to write systemd service file.
+    # Mox needs host networking because it needs access to the IPs of the
+    # machine, and the IPs of incoming connections for spam filtering.
+    # network_mode: 'host'
+    volumes:
+      - ./config:/mox/config
+      - ./data:/mox/data
+      # web is optional but recommended to bind in, useful for serving static files with
+      # the webserver.
+      - ./web:/mox/web
+    working_dir: /mox
+    restart: on-failure
     networks:
       - api-net
+    healthcheck:
+      test: netstat -nlt | grep ':1025 '
+      interval: 1s
+      timeout: 1s
+      retries: 10
+
+#  mail_test:
+#    image: 'axllent/mailpit:latest'
+#    container_name: 'mailpit'
+#    restart: unless-stopped
+#    volumes:
+#      - ./data:/data
+#    ports:
+#      - "8025:8025"
+#      - "1026:1025"
+#    environment:
+#      MP_MAX_MESSAGES: 5000
+#      MP_DATABASE: /data/mailpit.db
+#      MP_SMTP_AUTH_ACCEPT_ANY: 1
+#      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+#    networks:
+#      - api-net
 
 volumes:
   postgres-data:

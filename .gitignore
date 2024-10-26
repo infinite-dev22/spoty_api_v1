@@ -40,3 +40,5 @@ out/
 .profileconfig.json
 
 data
+config
+web

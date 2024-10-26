@@ -23,9 +23,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.time.LocalDateTime;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Entity
 @Getter
@@ -51,7 +49,7 @@ public class Role {
     @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @Builder.Default
     @JsonView(Views.Detailed.class)
-    private List<Permission> permissions = new LinkedList<>();
+    private Set<Permission> permissions = new HashSet<>();
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
     private Employee createdBy;

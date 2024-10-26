@@ -1,7 +1,7 @@
 package io.nomard.spoty_api_v1.services.implementations.transfers;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Approver;
+import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.entities.transfers.TransferMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
@@ -97,21 +97,21 @@ public class TransferServiceImpl implements TransferService {
         CoreCalculations.TransferCalculationService.calculate(transfer);
         transfer.setRef(CoreUtils.referenceNumberGenerator("TRF"));
         transfer.setTenant(authService.authUser().getTenant());
-        if (settingsService.getSettings().getApproveAdjustments()) {
-            Approver approver = null;
+        if (settingsService.getSettingsInternal().getReview() && settingsService.getSettingsInternal().getApproveAdjustments()) {
+            Reviewer reviewer = null;
             try {
-                approver = approverService.getByUserId(
+                reviewer = approverService.getByUserId(
                         authService.authUser().getId()
                 );
             } catch (NotFoundException e) {
                 log.log(Level.ALL, e.getMessage(), e);
             }
-            if (Objects.nonNull(approver)) {
-                transfer.getApprovers().add(approver);
-                transfer.setNextApprovedLevel(approver.getLevel());
+            if (Objects.nonNull(reviewer)) {
+                transfer.getReviewers().add(reviewer);
+                transfer.setNextApprovedLevel(reviewer.getLevel());
                 if (
-                        approver.getLevel() >=
-                                settingsService.getSettings().getApprovalLevels()
+                        reviewer.getLevel() >=
+                                settingsService.getSettingsInternal().getApprovalLevels()
                 ) {
                     transfer.setApproved(true);
                     transfer.setApprovalStatus("Approved");
@@ -193,13 +193,13 @@ public class TransferServiceImpl implements TransferService {
             transfer.setNotes(data.getNotes());
         }
         if (
-                Objects.nonNull(data.getApprovers()) &&
-                        !data.getApprovers().isEmpty()
+                Objects.nonNull(data.getReviewers()) &&
+                        !data.getReviewers().isEmpty()
         ) {
-            transfer.getApprovers().add(data.getApprovers().getFirst());
+            transfer.getReviewers().add(data.getReviewers().getFirst());
             if (
                     transfer.getNextApprovedLevel() >=
-                            settingsService.getSettings().getApprovalLevels()
+                            settingsService.getSettingsInternal().getApprovalLevels()
             ) {
                 transfer.setApproved(true);
                 transfer.setApprovalStatus("Approved");
@@ -242,11 +242,11 @@ public class TransferServiceImpl implements TransferService {
             var approver = approverService.getByUserId(
                     authService.authUser().getId()
             );
-            transfer.getApprovers().add(approver);
+            transfer.getReviewers().add(approver);
             transfer.setNextApprovedLevel(approver.getLevel());
             if (
                     transfer.getNextApprovedLevel() >=
-                            settingsService.getSettings().getApprovalLevels()
+                            settingsService.getSettingsInternal().getApprovalLevels()
             ) {
                 transfer.setApproved(true);
                 transfer.setApprovalStatus("Approved");

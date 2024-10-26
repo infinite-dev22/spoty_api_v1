@@ -3,6 +3,8 @@ package io.nomard.spoty_api_v1.services.implementations.accounting;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
 import io.nomard.spoty_api_v1.entities.accounting.Expense;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.ExpenseDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.ExpenseMapper;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.accounting.ExpenseRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ExpenseServiceImpl implements ExpenseService {
@@ -34,25 +37,30 @@ public class ExpenseServiceImpl implements ExpenseService {
     private AccountTransactionServiceImpl accountTransactionService;
     @Autowired
     private AccountServiceImpl accountService;
+    @Autowired
+    private ExpenseMapper expenseMapper;
 
     @Override
-    public Page<Expense> getAll(int pageNo, int pageSize) {
+    public Page<ExpenseDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return expenseRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+        return expenseRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest).map(expense -> expenseMapper.toDTO(expense));
     }
 
     @Override
-    public Expense getById(Long id) throws NotFoundException {
+    public ExpenseDTO getById(Long id) throws NotFoundException {
         Optional<Expense> expense = expenseRepo.findById(id);
         if (expense.isEmpty()) {
             throw new NotFoundException();
         }
-        return expense.get();
+        return expenseMapper.toDTO(expense.get());
     }
 
     @Override
-    public List<Expense> getByContains(String search) {
-        return expenseRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
+    public List<ExpenseDTO> getByContains(String search) {
+        return expenseRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase())
+                .stream()
+                .map(expense -> expenseMapper.toDTO(expense))
+                .collect(Collectors.toList());
     }
 
     @Override

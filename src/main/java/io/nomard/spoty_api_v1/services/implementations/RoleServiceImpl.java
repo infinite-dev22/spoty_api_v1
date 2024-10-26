@@ -3,6 +3,8 @@ package io.nomard.spoty_api_v1.services.implementations;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Permission;
 import io.nomard.spoty_api_v1.entities.Role;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.RoleDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.RoleMapper;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.PermissionRepository;
 import io.nomard.spoty_api_v1.repositories.RoleRepository;
@@ -18,10 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,25 +33,30 @@ public class RoleServiceImpl implements RoleService {
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
+    @Autowired
+    private RoleMapper roleMapper;
 
     @Override
-    public Page<Role> getAll(int pageNo, int pageSize) {
+    public Page<RoleDTO.RoleAsWholeDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return roleRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+        return roleRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest).map(role -> roleMapper.toDTO(role));
     }
 
     @Override
-    public Role getById(Long id) throws NotFoundException {
+    public RoleDTO.RoleAsWholeDTO getById(Long id) throws NotFoundException {
         Optional<Role> role = roleRepo.findById(id);
         if (role.isEmpty()) {
             throw new NotFoundException();
         }
-        return role.get();
+        return roleMapper.toDTO(role.get());
     }
 
     @Override
-    public List<Role> search(String search) {
-        return roleRepo.searchAllByNameContainingIgnoreCase(search);
+    public List<RoleDTO.RoleAsWholeDTO> search(String search) {
+        return roleRepo.searchAllByNameContainingIgnoreCase(search)
+                .stream()
+                .map(role -> roleMapper.toDTO(role))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -60,7 +64,11 @@ public class RoleServiceImpl implements RoleService {
     public ResponseEntity<ObjectNode> save(Role role) {
         try {
             // Fetch permissions based on IDs
-            List<Permission> permissions = permissionRepo.findAllById(role.getPermissions().stream().map(Permission::getId).collect(Collectors.toList()));
+            Set<Permission> permissions = role.getPermissions().stream()
+                    .map(permission -> permissionRepo.findByName(permission.getName()))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toSet());
             role.setPermissions(permissions); // Set the fetched permissions
             role.setTenant(authService.authUser().getTenant());
             role.setCreatedBy(authService.authUser());
@@ -96,7 +104,11 @@ public class RoleServiceImpl implements RoleService {
 
         if (Objects.nonNull(data.getPermissions()) && !data.getPermissions().isEmpty()) {
             // Fetch permissions based on IDs
-            List<Permission> permissions = permissionRepo.findAllById(role.getPermissions().stream().map(Permission::getId).collect(Collectors.toList()));
+            Set<Permission> permissions = role.getPermissions().stream()
+                    .map(permission -> permissionRepo.findByName(permission.getName()))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toSet());
             role.setPermissions(permissions); // Set the fetched permissions
         }
 

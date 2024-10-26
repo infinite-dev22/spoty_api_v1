@@ -1,7 +1,7 @@
 package io.nomard.spoty_api_v1.services.implementations;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Approver;
+import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.ApproverRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
@@ -27,13 +27,13 @@ public class ApproverServiceImpl implements ApproverService {
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    public ArrayList<Approver> getAll(int pageNo, int pageSize) {
+    public ArrayList<Reviewer> getAll(int pageNo, int pageSize) {
         return approverRepo.findAllByTenantId(authService.authUser().getTenant().getId());
     }
 
     @Override
-    public Approver getById(Long id) throws NotFoundException {
-        Optional<Approver> approver = approverRepo.findById(id);
+    public Reviewer getById(Long id) throws NotFoundException {
+        Optional<Reviewer> approver = approverRepo.findById(id);
         if (approver.isEmpty()) {
             throw new NotFoundException();
         }
@@ -41,8 +41,8 @@ public class ApproverServiceImpl implements ApproverService {
     }
 
     @Override
-    public Approver getByUserId(Long id) throws NotFoundException {
-        Optional<Approver> approver = approverRepo.findByUserId(id);
+    public Reviewer getByUserId(Long id) throws NotFoundException {
+        Optional<Reviewer> approver = approverRepo.findByUserId(id);
         if (approver.isEmpty()) {
             throw new NotFoundException("User is not an approver");
         }
@@ -51,15 +51,15 @@ public class ApproverServiceImpl implements ApproverService {
 
     @Override
     @Transactional
-    public ResponseEntity<ObjectNode> save(Approver approver) {
+    public ResponseEntity<ObjectNode> save(Reviewer reviewer) {
         try {
-            approver.setTenant(authService.authUser().getTenant());
-            if (Objects.isNull(approver.getBranch())) {
-                approver.setBranch(authService.authUser().getBranch());
+            reviewer.setTenant(authService.authUser().getTenant());
+            if (Objects.isNull(reviewer.getBranch())) {
+                reviewer.setBranch(authService.authUser().getBranch());
             }
-            approver.setCreatedBy(authService.authUser());
-            approver.setCreatedAt(LocalDateTime.now());
-            approverRepo.save(approver);
+            reviewer.setCreatedBy(authService.authUser());
+            reviewer.setCreatedAt(LocalDateTime.now());
+            approverRepo.save(reviewer);
             return spotyResponseImpl.created();
         } catch (Exception e) {
             return spotyResponseImpl.error(e);

@@ -2,6 +2,8 @@ package io.nomard.spoty_api_v1.services.implementations.hrm.hrm;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.hrm.hrm.EmploymentStatus;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.EmploymentStatusDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.EmploymentStatusMapper;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.hrm.hrm.EmploymentStatusRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class EmploymentStatusServiceImpl implements EmploymentStatusService {
@@ -29,25 +32,30 @@ public class EmploymentStatusServiceImpl implements EmploymentStatusService {
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
+    @Autowired
+    private EmploymentStatusMapper employmentStatusMapper;
 
     @Override
-    public Page<EmploymentStatus> getAll(int pageNo, int pageSize) {
+    public Page<EmploymentStatusDTO.EmploymentStatusAsWholeDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return employmentStatusRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+        return employmentStatusRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest).map(employmentStatus -> employmentStatusMapper.toWholeDTO(employmentStatus));
     }
 
     @Override
-    public EmploymentStatus getById(Long id) throws NotFoundException {
+    public EmploymentStatusDTO.EmploymentStatusAsWholeDTO getById(Long id) throws NotFoundException {
         Optional<EmploymentStatus> employmentStatus = employmentStatusRepo.findById(id);
         if (employmentStatus.isEmpty()) {
             throw new NotFoundException();
         }
-        return employmentStatus.get();
+        return employmentStatusMapper.toWholeDTO(employmentStatus.get());
     }
 
     @Override
-    public ArrayList<EmploymentStatus> getByContains(String search) {
-        return employmentStatusRepo.searchAll(authService.authUser().getTenant().getId(), search);
+    public List<EmploymentStatusDTO.EmploymentStatusAsWholeDTO> getByContains(String search) {
+        return employmentStatusRepo.searchAll(authService.authUser().getTenant().getId(), search)
+                .stream()
+                .map(employmentStatus -> employmentStatusMapper.toWholeDTO(employmentStatus))
+                .collect(Collectors.toList());
     }
 
     @Override
