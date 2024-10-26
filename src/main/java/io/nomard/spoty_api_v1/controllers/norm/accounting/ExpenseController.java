@@ -2,6 +2,7 @@ package io.nomard.spoty_api_v1.controllers.norm.accounting;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.accounting.Expense;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.ExpenseDTO;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
@@ -25,18 +26,18 @@ public class ExpenseController {
 
     @GetMapping("/all")
     @JsonView(Views.Tiny.class)
-    public Page<Expense> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Page<ExpenseDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                   @RequestParam(defaultValue = "50") Integer pageSize) {
         return expenseService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public Expense getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public ExpenseDTO getById(@RequestBody FindModel findModel) throws NotFoundException {
         return expenseService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<Expense> getByContains(@RequestBody SearchModel searchModel) {
+    public List<ExpenseDTO> getByContains(@RequestBody SearchModel searchModel) {
         return expenseService.getByContains(searchModel.getSearch());
     }
 
