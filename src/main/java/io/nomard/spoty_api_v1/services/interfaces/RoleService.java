@@ -2,6 +2,7 @@ package io.nomard.spoty_api_v1.services.interfaces;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Role;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.RoleDTO;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -10,11 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface RoleService {
-    Page<Role> getAll(int pageNo, int pageSize);
+    Page<RoleDTO.RoleAsWholeDTO> getAll(int pageNo, int pageSize);
 
-    Role getById(Long id) throws NotFoundException;
+    RoleDTO.RoleAsWholeDTO getById(Long id) throws NotFoundException;
 
-    List<Role> search(String search);
+    List<RoleDTO.RoleAsWholeDTO> search(String search);
 
     ResponseEntity<ObjectNode> save(Role role);
 

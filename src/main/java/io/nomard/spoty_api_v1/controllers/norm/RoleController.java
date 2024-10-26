@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Permission;
 import io.nomard.spoty_api_v1.entities.Role;
 import io.nomard.spoty_api_v1.entities.json_mapper.dto.PermissionDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.RoleDTO;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.services.implementations.PermissionServiceImpl;
@@ -27,54 +28,28 @@ public class RoleController {
 
     @GetMapping("/all")
     @JsonView(Views.Tiny.class)
-    public Page<Role> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
-                                    @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Page<RoleDTO.RoleAsWholeDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                                      @RequestParam(defaultValue = "50") Integer pageSize) {
         return roleService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public Role getMastersById(@RequestBody FindModel findModel) throws NotFoundException {
+    public RoleDTO.RoleAsWholeDTO getById(@RequestBody FindModel findModel) throws NotFoundException {
         return roleService.getById(findModel.getId());
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ObjectNode> saveMaster(@Valid @RequestBody Role role) {
+    public ResponseEntity<ObjectNode> save(@Valid @RequestBody Role role) {
         return roleService.save(role);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ObjectNode> updateMaster(@Valid @RequestBody Role role) throws NotFoundException {
+    public ResponseEntity<ObjectNode> update(@Valid @RequestBody Role role) throws NotFoundException {
         return roleService.update(role);
     }
 
     @DeleteMapping("delete/multiple")
-    public ResponseEntity<ObjectNode> deleteMaster(@RequestBody FindModel findModel) {
+    public ResponseEntity<ObjectNode> delete(@RequestBody FindModel findModel) {
         return roleService.delete(findModel.getId());
-    }
-
-    @GetMapping("/permissions")
-    public Page<PermissionDTO> getAllDetails(@RequestParam(defaultValue = "0") Integer pageNo,
-                                             @RequestParam(defaultValue = "50") Integer pageSize) {
-        return permissionService.getAll(pageNo, pageSize);
-    }
-
-    @GetMapping("/permission")
-    public PermissionDTO getDetailById(@RequestBody FindModel findModel) throws NotFoundException {
-        return permissionService.getById(findModel.getId());
-    }
-
-    @PostMapping("/permission/add")
-    public ResponseEntity<ObjectNode> saveDetail(@Valid @RequestBody Permission permission) {
-        return permissionService.save(permission);
-    }
-
-    @PutMapping("/permission/update")
-    public ResponseEntity<ObjectNode> updateDetail(@Valid @RequestBody Permission permission) throws NotFoundException {
-        return permissionService.update(permission);
-    }
-
-    @DeleteMapping("/permission/delete")
-    public ResponseEntity<ObjectNode> deleteDetail(@RequestBody FindModel findModel) {
-        return permissionService.delete(findModel.getId());
     }
 }

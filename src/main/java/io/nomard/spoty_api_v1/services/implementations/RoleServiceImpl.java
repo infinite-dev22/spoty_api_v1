@@ -3,6 +3,8 @@ package io.nomard.spoty_api_v1.services.implementations;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Permission;
 import io.nomard.spoty_api_v1.entities.Role;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.RoleDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.RoleMapper;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.PermissionRepository;
 import io.nomard.spoty_api_v1.repositories.RoleRepository;
@@ -31,25 +33,30 @@ public class RoleServiceImpl implements RoleService {
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
+    @Autowired
+    private RoleMapper roleMapper;
 
     @Override
-    public Page<Role> getAll(int pageNo, int pageSize) {
+    public Page<RoleDTO.RoleAsWholeDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return roleRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+        return roleRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest).map(role -> roleMapper.toDTO(role));
     }
 
     @Override
-    public Role getById(Long id) throws NotFoundException {
+    public RoleDTO.RoleAsWholeDTO getById(Long id) throws NotFoundException {
         Optional<Role> role = roleRepo.findById(id);
         if (role.isEmpty()) {
             throw new NotFoundException();
         }
-        return role.get();
+        return roleMapper.toDTO(role.get());
     }
 
     @Override
-    public List<Role> search(String search) {
-        return roleRepo.searchAllByNameContainingIgnoreCase(search);
+    public List<RoleDTO.RoleAsWholeDTO> search(String search) {
+        return roleRepo.searchAllByNameContainingIgnoreCase(search)
+                .stream()
+                .map(role -> roleMapper.toDTO(role))
+                .collect(Collectors.toList());
     }
 
     @Override
