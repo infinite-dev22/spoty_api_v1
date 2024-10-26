@@ -3,6 +3,7 @@ package io.nomard.spoty_api_v1.controllers.norm;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.adjustments.AdjustmentMaster;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.AdjustmentDTO;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
 import io.nomard.spoty_api_v1.models.FindModel;
@@ -27,18 +28,18 @@ public class AdjustmentController {
     // ADJUSTMENT MASTERS.
     @GetMapping("/all")
     @JsonView(Views.Tiny.class)
-    public Page<AdjustmentMaster> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
-                                                @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Page<AdjustmentDTO> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
+                                             @RequestParam(defaultValue = "50") Integer pageSize) {
         return adjustmentService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public AdjustmentMaster getMastersById(@RequestBody FindModel findModel) throws NotFoundException {
+    public AdjustmentDTO getMastersById(@RequestBody FindModel findModel) throws NotFoundException {
         return adjustmentService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<AdjustmentMaster> getMastersByContains(@RequestBody SearchModel searchModel) {
+    public List<AdjustmentDTO> getMastersByContains(@RequestBody SearchModel searchModel) {
         return adjustmentService.getByContains(searchModel.getSearch());
     }
 
