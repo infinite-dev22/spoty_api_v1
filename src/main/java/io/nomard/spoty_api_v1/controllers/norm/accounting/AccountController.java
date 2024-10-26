@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.accounting.Account;
 import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
 import io.nomard.spoty_api_v1.entities.json_mapper.dto.AccountDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.AccountTransactionDTO;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
@@ -71,8 +72,8 @@ public class AccountController {
     }
 
     @GetMapping("/transactions")
-    public Page<AccountTransaction> getTransactions(@RequestParam(defaultValue = "0") Integer pageNo,
-                                                    @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Page<AccountTransactionDTO> getTransactions(@RequestParam(defaultValue = "0") Integer pageNo,
+                                                       @RequestParam(defaultValue = "50") Integer pageSize) {
         return accountTransactionService.getAll(pageNo, pageSize);
     }
 }
