@@ -3,6 +3,7 @@ package io.nomard.spoty_api_v1.controllers.norm.accounting;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.accounting.Account;
 import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.AccountDTO;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
@@ -29,18 +30,18 @@ public class AccountController {
 
     @GetMapping("/all")
     @JsonView(Views.Tiny.class)
-    public Page<Account> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+    public Page<AccountDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                 @RequestParam(defaultValue = "50") Integer pageSize) {
         return accountService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public Account getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public AccountDTO getById(@RequestBody FindModel findModel) throws NotFoundException {
         return accountService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<Account> getByContains(@RequestBody SearchModel searchModel) {
+    public List<AccountDTO> getByContains(@RequestBody SearchModel searchModel) {
         return accountService.getByContains(searchModel.getSearch());
     }
 

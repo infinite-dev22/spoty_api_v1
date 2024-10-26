@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.accounting.Account;
 import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.AccountDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.AccountMapper;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.accounting.AccountRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -33,25 +36,30 @@ public class AccountServiceImpl implements AccountService {
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
+    @Autowired
+    private AccountMapper accountMapper;
 
     @Override
-    public Page<Account> getAll(int pageNo, int pageSize) {
+    public Page<AccountDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return accountRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+        return accountRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest).map(account -> accountMapper.toDTO(account));
     }
 
     @Override
-    public Account getById(Long id) throws NotFoundException {
+    public AccountDTO getById(Long id) throws NotFoundException {
         Optional<Account> account = accountRepo.findById(id);
         if (account.isEmpty()) {
             throw new NotFoundException();
         }
-        return account.get();
+        return accountMapper.toDTO(account.get());
     }
 
     @Override
-    public List<Account> getByContains(String search) {
-        return accountRepo.searchAll(authService.authUser().getTenant().getId(), search);
+    public List<AccountDTO> getByContains(String search) {
+        return accountRepo.searchAll(authService.authUser().getTenant().getId(), search)
+                .stream()
+                .map(account -> accountMapper.toDTO(account))
+                .collect(Collectors.toList());
     }
 
     @Override
