@@ -2,6 +2,8 @@ package io.nomard.spoty_api_v1.services.implementations.hrm.hrm;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.hrm.hrm.Department;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.DepartmentDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.DepartmentMapper;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.hrm.hrm.DepartmentRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DepartmentServiceImpl implements DepartmentService {
@@ -29,25 +32,30 @@ public class DepartmentServiceImpl implements DepartmentService {
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
+    @Autowired
+    private DepartmentMapper departmentMapper;
 
     @Override
-    public Page<Department> getAll(int pageNo, int pageSize) {
+    public Page<DepartmentDTO.DepartmentAsWholeDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return departmentRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+        return departmentRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest).map(department -> departmentMapper.toDTO(department));
     }
 
     @Override
-    public Department getById(Long id) throws NotFoundException {
+    public DepartmentDTO.DepartmentAsWholeDTO getById(Long id) throws NotFoundException {
         Optional<Department> department = departmentRepo.findById(id);
         if (department.isEmpty()) {
             throw new NotFoundException();
         }
-        return department.get();
+        return departmentMapper.toDTO(department.get());
     }
 
     @Override
-    public ArrayList<Department> getByContains(String search) {
-        return departmentRepo.searchAll(authService.authUser().getTenant().getId(), search);
+    public List<DepartmentDTO.DepartmentAsWholeDTO> getByContains(String search) {
+        return departmentRepo.searchAll(authService.authUser().getTenant().getId(), search)
+                .stream()
+                .map(department -> departmentMapper.toDTO(department))
+                .collect(Collectors.toList());
     }
 
     @Override
