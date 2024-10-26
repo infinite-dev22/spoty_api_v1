@@ -17,7 +17,7 @@ package io.nomard.spoty_api_v1.entities.json_mapper.dto;
 import java.time.LocalDateTime;
 
 public record DesignationDTO() {
-    public record DesignationAssWholeDTO(
+    public record DesignationAsWholeDTO(
             Long id,
             String name,
             String description,

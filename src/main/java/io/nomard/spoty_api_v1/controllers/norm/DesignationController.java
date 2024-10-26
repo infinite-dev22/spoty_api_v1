@@ -2,6 +2,7 @@ package io.nomard.spoty_api_v1.controllers.norm;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.hrm.hrm.Designation;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.DesignationDTO;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
@@ -25,18 +26,18 @@ public class DesignationController {
 
     @GetMapping("/all")
     @JsonView(Views.Tiny.class)
-    public Page<Designation> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+    public Page<DesignationDTO.DesignationAsWholeDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                     @RequestParam(defaultValue = "50") Integer pageSize) {
         return designationService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public Designation getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public DesignationDTO.DesignationAsWholeDTO getById(@RequestBody FindModel findModel) throws NotFoundException {
         return designationService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<Designation> getByContains(@RequestBody SearchModel searchModel) {
+    public List<DesignationDTO.DesignationAsWholeDTO> getByContains(@RequestBody SearchModel searchModel) {
         return designationService.getByContains(searchModel.getSearch());
     }
 

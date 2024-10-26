@@ -2,6 +2,8 @@ package io.nomard.spoty_api_v1.services.implementations.hrm.hrm;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.hrm.hrm.Designation;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.DesignationDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.DesignationMapper;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.hrm.hrm.DesignationRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DesignationServiceImpl implements DesignationService {
@@ -29,25 +32,30 @@ public class DesignationServiceImpl implements DesignationService {
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
+    @Autowired
+    private DesignationMapper designationMapper;
 
     @Override
-    public Page<Designation> getAll(int pageNo, int pageSize) {
+    public Page<DesignationDTO.DesignationAsWholeDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return designationRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+        return designationRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest).map(designation -> designationMapper.toDTO(designation));
     }
 
     @Override
-    public Designation getById(Long id) throws NotFoundException {
+    public DesignationDTO.DesignationAsWholeDTO getById(Long id) throws NotFoundException {
         Optional<Designation> designation = designationRepo.findById(id);
         if (designation.isEmpty()) {
             throw new NotFoundException();
         }
-        return designation.get();
+        return designationMapper.toDTO(designation.get());
     }
 
     @Override
-    public ArrayList<Designation> getByContains(String search) {
-        return designationRepo.searchAll(authService.authUser().getTenant().getId(), search);
+    public List<DesignationDTO.DesignationAsWholeDTO> getByContains(String search) {
+        return designationRepo.searchAll(authService.authUser().getTenant().getId(), search)
+                .stream()
+                .map(designation -> designationMapper.toDTO(designation))
+                .collect(Collectors.toList());
     }
 
     @Override
