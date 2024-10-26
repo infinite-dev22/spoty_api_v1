@@ -8,5 +8,5 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface UnitOfMeasureMapper {
-    UnitOfMeasureDTO toDTO(UnitOfMeasure unitOfMeasure);
+    UnitOfMeasureDTO.AsWholeDTO toDTO(UnitOfMeasure unitOfMeasure);
 }

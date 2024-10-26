@@ -23,7 +23,7 @@ public record UnitOfMeasureDTO() {
             Long id,
             String name,
             String shortName,
-            UnitOfMeasure baseUnit,
+            UnitOfMeasureDTO.AsPartDTO baseUnit,
             String operator,
             double operatorValue,
             LocalDateTime createdAt,
