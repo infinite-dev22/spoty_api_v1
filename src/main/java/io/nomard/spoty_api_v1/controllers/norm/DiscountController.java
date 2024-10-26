@@ -2,6 +2,7 @@ package io.nomard.spoty_api_v1.controllers.norm;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.deductions.Discount;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.DiscountDTO;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.services.implementations.deductions.DiscountServiceImpl;
@@ -23,13 +24,13 @@ public class DiscountController {
 
     @GetMapping("/all")
     @JsonView(Views.Tiny.class)
-    public Page<Discount> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                 @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Page<DiscountDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                    @RequestParam(defaultValue = "50") Integer pageSize) {
         return discountService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public Discount getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public DiscountDTO getById(@RequestBody FindModel findModel) throws NotFoundException {
         return discountService.getById(findModel.getId());
     }
 

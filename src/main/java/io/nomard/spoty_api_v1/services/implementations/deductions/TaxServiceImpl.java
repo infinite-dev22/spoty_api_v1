@@ -2,6 +2,8 @@ package io.nomard.spoty_api_v1.services.implementations.deductions;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.deductions.Tax;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.TaxDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.TaxMapper;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.deductions.TaxRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
@@ -28,15 +30,26 @@ public class TaxServiceImpl implements TaxService {
     private AuthServiceImpl authService;
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
+    @Autowired
+    private TaxMapper taxMapper;
 
     @Override
-    public Page<Tax> getAll(int pageNo, int pageSize) {
+    public Page<TaxDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return taxRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest);
+        return taxRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest).map(tax -> taxMapper.toDTO(tax));
     }
 
     @Override
-    public Tax getById(Long id) throws NotFoundException {
+    public TaxDTO getById(Long id) throws NotFoundException {
+        Optional<Tax> tax = taxRepo.findById(id);
+        if (tax.isEmpty()) {
+            throw new NotFoundException();
+        }
+        return taxMapper.toDTO(tax.get());
+    }
+
+    @Override
+    public Tax getByIdInternal(Long id) throws NotFoundException {
         Optional<Tax> tax = taxRepo.findById(id);
         if (tax.isEmpty()) {
             throw new NotFoundException();

@@ -78,7 +78,7 @@ public class CoreCalculations {
                 double tax = Math.round(
                         subTotal *
                                 (taxService
-                                        .getById(purchaseMaster.getTax().getId())
+                                        .getByIdInternal(purchaseMaster.getTax().getId())
                                         .getPercentage() /
                                         100.0)
                 );
@@ -91,7 +91,7 @@ public class CoreCalculations {
                 double discount = Math.round(
                         subTotal *
                                 (discountService
-                                        .getById(purchaseMaster.getDiscount().getId())
+                                        .getByIdInternal(purchaseMaster.getDiscount().getId())
                                         .getPercentage() /
                                         100.0)
                 );
@@ -149,7 +149,7 @@ public class CoreCalculations {
                 double tax = Math.round(
                         subTotal *
                                 (taxService
-                                        .getById(purchaseReturn.getTax().getId())
+                                        .getByIdInternal(purchaseReturn.getTax().getId())
                                         .getPercentage() /
                                         100.0)
                 );
@@ -162,7 +162,7 @@ public class CoreCalculations {
                 double discount = Math.round(
                         subTotal *
                                 (discountService
-                                        .getById(purchaseReturn.getDiscount().getId())
+                                        .getByIdInternal(purchaseReturn.getDiscount().getId())
                                         .getPercentage() /
                                         100.0)
                 );
@@ -223,7 +223,7 @@ public class CoreCalculations {
             if (sale.getTax() != null) {
                 double tax = Math.round(
                         subTotal *
-                                (taxService.getById(sale.getTax().getId()).getPercentage() /
+                                (taxService.getByIdInternal(sale.getTax().getId()).getPercentage() /
                                         100.0)
                 );
                 sale.setTaxAmount(tax);
@@ -235,7 +235,7 @@ public class CoreCalculations {
                 double discount = Math.round(
                         subTotal *
                                 (discountService
-                                        .getById(sale.getDiscount().getId())
+                                        .getByIdInternal(sale.getDiscount().getId())
                                         .getPercentage() /
                                         100.0)
                 );
@@ -289,7 +289,7 @@ public class CoreCalculations {
                 double tax = Math.round(
                         subTotal *
                                 (taxService
-                                        .getById(saleReturn.getTax().getId())
+                                        .getByIdInternal(saleReturn.getTax().getId())
                                         .getPercentage() /
                                         100.0)
                 );
@@ -302,7 +302,7 @@ public class CoreCalculations {
                 double discount = Math.round(
                         subTotal *
                                 (discountService
-                                        .getById(saleReturn.getDiscount().getId())
+                                        .getByIdInternal(saleReturn.getDiscount().getId())
                                         .getPercentage() /
                                         100.0)
                 );
@@ -365,7 +365,7 @@ public class CoreCalculations {
                 double tax = Math.round(
                         subTotal *
                                 (taxService
-                                        .getById(quotation.getTax().getId())
+                                        .getByIdInternal(quotation.getTax().getId())
                                         .getPercentage() /
                                         100.0)
                 );
@@ -378,7 +378,7 @@ public class CoreCalculations {
                 double discount = Math.round(
                         subTotal *
                                 (discountService
-                                        .getById(quotation.getDiscount().getId())
+                                        .getByIdInternal(quotation.getDiscount().getId())
                                         .getPercentage() /
                                         100.0)
                 );
