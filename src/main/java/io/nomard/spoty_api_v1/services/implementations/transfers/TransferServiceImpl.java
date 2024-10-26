@@ -97,7 +97,7 @@ public class TransferServiceImpl implements TransferService {
         CoreCalculations.TransferCalculationService.calculate(transfer);
         transfer.setRef(CoreUtils.referenceNumberGenerator("TRF"));
         transfer.setTenant(authService.authUser().getTenant());
-        if (settingsService.getSettings().getReview() && settingsService.getSettings().getApproveAdjustments()) {
+        if (settingsService.getSettingsInternal().getReview() && settingsService.getSettingsInternal().getApproveAdjustments()) {
             Reviewer reviewer = null;
             try {
                 reviewer = approverService.getByUserId(
@@ -111,7 +111,7 @@ public class TransferServiceImpl implements TransferService {
                 transfer.setNextApprovedLevel(reviewer.getLevel());
                 if (
                         reviewer.getLevel() >=
-                                settingsService.getSettings().getApprovalLevels()
+                                settingsService.getSettingsInternal().getApprovalLevels()
                 ) {
                     transfer.setApproved(true);
                     transfer.setApprovalStatus("Approved");
@@ -199,7 +199,7 @@ public class TransferServiceImpl implements TransferService {
             transfer.getReviewers().add(data.getReviewers().getFirst());
             if (
                     transfer.getNextApprovedLevel() >=
-                            settingsService.getSettings().getApprovalLevels()
+                            settingsService.getSettingsInternal().getApprovalLevels()
             ) {
                 transfer.setApproved(true);
                 transfer.setApprovalStatus("Approved");
@@ -246,7 +246,7 @@ public class TransferServiceImpl implements TransferService {
             transfer.setNextApprovedLevel(approver.getLevel());
             if (
                     transfer.getNextApprovedLevel() >=
-                            settingsService.getSettings().getApprovalLevels()
+                            settingsService.getSettingsInternal().getApprovalLevels()
             ) {
                 transfer.setApproved(true);
                 transfer.setApprovalStatus("Approved");

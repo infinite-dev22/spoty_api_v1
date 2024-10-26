@@ -93,7 +93,7 @@ public class StockInServiceImpl implements StockInService {
             if (Objects.isNull(stockIn.getBranch())) {
                 stockIn.setBranch(authService.authUser().getBranch());
             }
-            if (settingsService.getSettings().getReview() && settingsService.getSettings().getApproveAdjustments()) {
+            if (settingsService.getSettingsInternal().getReview() && settingsService.getSettingsInternal().getApproveAdjustments()) {
                 Reviewer reviewer = null;
                 try {
                     reviewer = approverService.getByUserId(
@@ -107,7 +107,7 @@ public class StockInServiceImpl implements StockInService {
                     stockIn.setNextApprovedLevel(reviewer.getLevel());
                     if (
                         reviewer.getLevel() >=
-                        settingsService.getSettings().getApprovalLevels()
+                        settingsService.getSettingsInternal().getApprovalLevels()
                     ) {
                         stockIn.setApproved(true);
                         stockIn.setApprovalStatus("Approved");
@@ -179,7 +179,7 @@ public class StockInServiceImpl implements StockInService {
             stockIn.getReviewers().add(data.getReviewers().getFirst());
             if (
                 stockIn.getNextApprovedLevel() >=
-                settingsService.getSettings().getApprovalLevels()
+                settingsService.getSettingsInternal().getApprovalLevels()
             ) {
                 stockIn.setApproved(true);
                 stockIn.setApprovalStatus("Approved");
@@ -229,7 +229,7 @@ public class StockInServiceImpl implements StockInService {
             stockIn.setNextApprovedLevel(approver.getLevel());
             if (
                 stockIn.getNextApprovedLevel() >=
-                settingsService.getSettings().getApprovalLevels()
+                settingsService.getSettingsInternal().getApprovalLevels()
             ) {
                 stockIn.setApproved(true);
                 stockIn.setApprovalStatus("Approved");

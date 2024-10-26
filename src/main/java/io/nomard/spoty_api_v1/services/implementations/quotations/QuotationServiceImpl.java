@@ -109,7 +109,7 @@ public class QuotationServiceImpl implements QuotationService {
         if (Objects.isNull(quotation.getBranch())) {
             quotation.setBranch(authService.authUser().getBranch());
         }
-        if (settingsService.getSettings().getReview() && settingsService.getSettings().getApproveAdjustments()) {
+        if (settingsService.getSettingsInternal().getReview() && settingsService.getSettingsInternal().getApproveAdjustments()) {
             Reviewer reviewer = null;
             try {
                 reviewer = approverService.getByUserId(
@@ -123,7 +123,7 @@ public class QuotationServiceImpl implements QuotationService {
                 quotation.setNextApprovedLevel(reviewer.getLevel());
                 if (
                     reviewer.getLevel() >=
-                    settingsService.getSettings().getApprovalLevels()
+                    settingsService.getSettingsInternal().getApprovalLevels()
                 ) {
                     quotation.setApproved(true);
                     quotation.setApprovalStatus("Approved");
@@ -226,7 +226,7 @@ public class QuotationServiceImpl implements QuotationService {
             quotation.getReviewers().add(data.getReviewers().getFirst());
             if (
                 quotation.getNextApprovedLevel() >=
-                settingsService.getSettings().getApprovalLevels()
+                settingsService.getSettingsInternal().getApprovalLevels()
             ) {
                 quotation.setApproved(true);
                 quotation.setApprovalStatus("Approved");
@@ -279,7 +279,7 @@ public class QuotationServiceImpl implements QuotationService {
             quotation.setNextApprovedLevel(approver.getLevel());
             if (
                 quotation.getNextApprovedLevel() >=
-                settingsService.getSettings().getApprovalLevels()
+                settingsService.getSettingsInternal().getApprovalLevels()
             ) {
                 quotation.setApproved(true);
                 quotation.setApprovalStatus("Approved");

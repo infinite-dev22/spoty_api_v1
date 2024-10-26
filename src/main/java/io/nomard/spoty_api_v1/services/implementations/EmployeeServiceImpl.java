@@ -373,7 +373,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         var employmentData = new EmploymentData(employee,
                 password,
                 authService.authUser(),
-                settingsService.getSettings());
+                settingsService.getSettingsInternal());
         var content = employmentData.getTemplate();
         var employmentConfirmationLetter = HtmlToPDFConvert.htmlConvertToPdf(employmentData.getEmploymentLetterHtml());
 
@@ -392,7 +392,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         emailServiceImpl.sendMessageWithAttachment(
-                settingsService.getSettings().getHrEmail(),
+                settingsService.getSettingsInternal().getHrEmail(),
                 employee.getEmail(),
                 "Employment Letter & Work Details",
                 content,

@@ -94,7 +94,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
         if (purchase.getBranch() == null) {
             purchase.setBranch(authService.authUser().getBranch());
         }
-        if (settingsService.getSettings().getReview() && settingsService.getSettings().getApproveAdjustments()) {
+        if (settingsService.getSettingsInternal().getReview() && settingsService.getSettingsInternal().getApproveAdjustments()) {
             Reviewer reviewer = null;
             try {
                 reviewer = approverService.getByUserId(authService.authUser().getId());
@@ -104,7 +104,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
             if (Objects.nonNull(reviewer)) {
                 purchase.getReviewers().add(reviewer);
                 purchase.setNextApprovedLevel(reviewer.getLevel());
-                if (reviewer.getLevel() >= settingsService.getSettings().getApprovalLevels()) {
+                if (reviewer.getLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                     purchase.setApproved(true);
                     purchase.setApprovalStatus("Approved");
                     createAccountTransaction(purchase);
@@ -174,7 +174,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
         }
         if (Objects.nonNull(data.getReviewers()) && !data.getReviewers().isEmpty()) {
             purchase.getReviewers().add(data.getReviewers().getFirst());
-            if (purchase.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            if (purchase.getNextApprovedLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                 purchase.setApproved(true);
                 purchase.setApprovalStatus("Approved");
                 createAccountTransaction(purchase);
@@ -224,7 +224,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
             var approver = approverService.getByUserId(authService.authUser().getId());
             purchase.getReviewers().add(approver);
             purchase.setNextApprovedLevel(approver.getLevel());
-            if (purchase.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            if (purchase.getNextApprovedLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                 purchase.setApproved(true);
                 purchase.setApprovalStatus("Approved");
                 createAccountTransaction(purchase);

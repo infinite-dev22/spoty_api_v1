@@ -3,6 +3,8 @@ package io.nomard.spoty_api_v1.services.implementations;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.entities.TenantSettings;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.TenantSettingsDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.TenantSettingsMapper;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.repositories.ApproverRepository;
 import io.nomard.spoty_api_v1.repositories.TenantSettingsRepository;
@@ -32,9 +34,16 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
     private SpotyResponseImpl spotyResponseImpl;
     @Autowired
     private AuthServiceImpl authService;
+    @Autowired
+    private TenantSettingsMapper tenantSettingsMapper;
 
     @Override
-    public TenantSettings getSettings() {
+    public TenantSettingsDTO getSettings() {
+        return tenantSettingsMapper.toDTO(settingsRepo.findByTenantId(authService.authUser().getTenant().getId()));
+    }
+
+    @Override
+    public TenantSettings getSettingsInternal() {
         return settingsRepo.findByTenantId(authService.authUser().getTenant().getId());
     }
 

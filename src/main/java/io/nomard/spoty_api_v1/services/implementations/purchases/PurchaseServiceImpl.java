@@ -118,7 +118,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         if (purchase.getBranch() == null) {
             purchase.setBranch(authService.authUser().getBranch());
         }
-        if (settingsService.getSettings().getReview() && settingsService.getSettings().getApproveAdjustments()) {
+        if (settingsService.getSettingsInternal().getReview() && settingsService.getSettingsInternal().getApproveAdjustments()) {
             Reviewer reviewer = null;
             try {
                 reviewer = approverService.getByUserId(
@@ -132,7 +132,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                 purchase.setNextApprovedLevel(reviewer.getLevel());
                 if (
                         reviewer.getLevel() >=
-                                settingsService.getSettings().getApprovalLevels()
+                                settingsService.getSettingsInternal().getApprovalLevels()
                 ) {
                     purchase.setApproved(true);
                     purchase.setApprovalStatus("Approved");
@@ -259,7 +259,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchase.getReviewers().add(data.getReviewers().getFirst());
             if (
                     purchase.getNextApprovedLevel() >=
-                            settingsService.getSettings().getApprovalLevels()
+                            settingsService.getSettingsInternal().getApprovalLevels()
             ) {
                 purchase.setApproved(true);
                 purchase.setApprovalStatus("Approved");
@@ -425,7 +425,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchase.setNextApprovedLevel(approver.getLevel());
             if (
                     purchase.getNextApprovedLevel() >=
-                            settingsService.getSettings().getApprovalLevels()
+                            settingsService.getSettingsInternal().getApprovalLevels()
             ) {
                 purchase.setApproved(true);
                 purchase.setApprovalStatus("Approved");

@@ -82,7 +82,7 @@ public class AdjustmentServiceImpl implements AdjustmentService {
         if (Objects.isNull(adjustment.getBranch())) {
             adjustment.setBranch(authService.authUser().getBranch());
         }
-        if (settingsService.getSettings().getReview() && settingsService.getSettings().getApproveAdjustments()) {
+        if (settingsService.getSettingsInternal().getReview() && settingsService.getSettingsInternal().getApproveAdjustments()) {
             Reviewer reviewer = null;
             try {
                 reviewer = approverService.getByUserId(authService.authUser().getId());
@@ -92,7 +92,7 @@ public class AdjustmentServiceImpl implements AdjustmentService {
             if (Objects.nonNull(reviewer)) {
                 adjustment.getReviewers().add(reviewer);
                 adjustment.setNextApprovedLevel(reviewer.getLevel() + 1);
-                if (reviewer.getLevel() >= settingsService.getSettings().getApprovalLevels()) {
+                if (reviewer.getLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                     adjustment.setApproved(true);
                     adjustment.setApprovalStatus("Approved");
                 }
@@ -144,7 +144,7 @@ public class AdjustmentServiceImpl implements AdjustmentService {
         }
         if (Objects.nonNull(data.getReviewers()) && !data.getReviewers().isEmpty()) {
             adjustment.getReviewers().add(data.getReviewers().getFirst());
-            if (adjustment.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            if (adjustment.getNextApprovedLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                 adjustment.setApproved(true);
                 adjustment.setApprovalStatus("Approved");
             }
@@ -180,7 +180,7 @@ public class AdjustmentServiceImpl implements AdjustmentService {
             var approver = approverService.getByUserId(authService.authUser().getId());
             adjustment.getReviewers().add(approver);
             adjustment.setNextApprovedLevel(approver.getLevel());
-            if (adjustment.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            if (adjustment.getNextApprovedLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                 adjustment.setApproved(true);
                 adjustment.setApprovalStatus("Approved");
             }

@@ -92,7 +92,7 @@ public class RequisitionServiceImpl implements RequisitionService {
             if (Objects.isNull(requisition.getBranch())) {
                 requisition.setBranch(authService.authUser().getBranch());
             }
-            if (settingsService.getSettings().getReview() && settingsService.getSettings().getApproveAdjustments()) {
+            if (settingsService.getSettingsInternal().getReview() && settingsService.getSettingsInternal().getApproveAdjustments()) {
                 Reviewer reviewer = null;
                 try {
                     reviewer = approverService.getByUserId(
@@ -106,7 +106,7 @@ public class RequisitionServiceImpl implements RequisitionService {
                     requisition.setNextApprovedLevel(reviewer.getLevel());
                     if (
                         reviewer.getLevel() >=
-                        settingsService.getSettings().getApprovalLevels()
+                        settingsService.getSettingsInternal().getApprovalLevels()
                     ) {
                         requisition.setApproved(true);
                         requisition.setApprovalStatus("Approved");
@@ -196,7 +196,7 @@ public class RequisitionServiceImpl implements RequisitionService {
             requisition.getReviewers().add(data.getReviewers().getFirst());
             if (
                 requisition.getNextApprovedLevel() >=
-                settingsService.getSettings().getApprovalLevels()
+                settingsService.getSettingsInternal().getApprovalLevels()
             ) {
                 requisition.setApproved(true);
                 requisition.setApprovalStatus("Approved");
@@ -249,7 +249,7 @@ public class RequisitionServiceImpl implements RequisitionService {
             requisition.setNextApprovedLevel(approver.getLevel());
             if (
                 requisition.getNextApprovedLevel() >=
-                settingsService.getSettings().getApprovalLevels()
+                settingsService.getSettingsInternal().getApprovalLevels()
             ) {
                 requisition.setApproved(true);
                 requisition.setApprovalStatus("Approved");

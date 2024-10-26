@@ -101,7 +101,7 @@ public class SaleServiceImpl implements SaleService {
         if (Objects.isNull(sale.getBranch())) {
             sale.setBranch(authService.authUser().getBranch());
         }
-        if (settingsService.getSettings().getApproveAdjustments()) {
+        if (settingsService.getSettingsInternal().getApproveAdjustments()) {
             Reviewer reviewer = null;
             try {
                 reviewer = approverService.getByUserId(authService.authUser().getId());
@@ -111,7 +111,7 @@ public class SaleServiceImpl implements SaleService {
             if (Objects.nonNull(reviewer)) {
                 sale.getReviewers().add(reviewer);
                 sale.setNextApprovedLevel(reviewer.getLevel());
-                if (reviewer.getLevel() >= settingsService.getSettings().getApprovalLevels()) {
+                if (reviewer.getLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                     sale.setApproved(true);
                     sale.setApprovalStatus("Approved");
                     createAccountTransaction(sale);
@@ -190,7 +190,7 @@ public class SaleServiceImpl implements SaleService {
         }
         if (Objects.nonNull(data.getReviewers()) && !data.getReviewers().isEmpty()) {
             sale.getReviewers().add(data.getReviewers().getFirst());
-            if (sale.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            if (sale.getNextApprovedLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                 sale.setApproved(true);
                 sale.setApprovalStatus("Approved");
                 createAccountTransaction(sale);
@@ -228,7 +228,7 @@ public class SaleServiceImpl implements SaleService {
             var approver = approverService.getByUserId(authService.authUser().getId());
             sale.getReviewers().add(approver);
             sale.setNextApprovedLevel(approver.getLevel());
-            if (sale.getNextApprovedLevel() >= settingsService.getSettings().getApprovalLevels()) {
+            if (sale.getNextApprovedLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                 sale.setApproved(true);
                 sale.setApprovalStatus("Approved");
                 createAccountTransaction(sale);
