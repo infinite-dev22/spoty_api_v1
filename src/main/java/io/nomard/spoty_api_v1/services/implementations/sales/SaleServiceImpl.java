@@ -114,8 +114,6 @@ public class SaleServiceImpl implements SaleService {
                 if (reviewer.getLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                     sale.setApproved(true);
                     sale.setApprovalStatus("Approved");
-                    createAccountTransaction(sale);
-                    createTransaction(sale);
                 }
             } else {
                 sale.setNextApprovedLevel(1);
@@ -125,14 +123,16 @@ public class SaleServiceImpl implements SaleService {
         } else {
             sale.setApproved(true);
             sale.setApprovalStatus("Approved");
-            createAccountTransaction(sale);
-            createTransaction(sale);
         }
         sale.setCreatedBy(authService.authUser());
         sale.setCreatedAt(LocalDateTime.now());
 
         try {
             saleRepo.save(sale);
+            if (sale.getApprovalStatus().toLowerCase().contains("approved")) {
+                createAccountTransaction(sale);
+                createTransaction(sale);
+            }
             return spotyResponseImpl.created();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
@@ -188,15 +188,6 @@ public class SaleServiceImpl implements SaleService {
         if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
             sale.setNotes(data.getNotes());
         }
-        if (Objects.nonNull(data.getReviewers()) && !data.getReviewers().isEmpty()) {
-            sale.getReviewers().add(data.getReviewers().getFirst());
-            if (sale.getNextApprovedLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
-                sale.setApproved(true);
-                sale.setApprovalStatus("Approved");
-                createAccountTransaction(sale);
-                createTransaction(sale);
-            }
-        }
         sale.setUpdatedBy(authService.authUser());
         sale.setUpdatedAt(LocalDateTime.now());
         try {
@@ -231,8 +222,6 @@ public class SaleServiceImpl implements SaleService {
             if (sale.getNextApprovedLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                 sale.setApproved(true);
                 sale.setApprovalStatus("Approved");
-                createAccountTransaction(sale);
-                createTransaction(sale);
             }
         }
 
@@ -246,6 +235,10 @@ public class SaleServiceImpl implements SaleService {
         sale.setUpdatedAt(LocalDateTime.now());
         try {
             saleRepo.save(sale);
+            if (sale.getApprovalStatus().toLowerCase().contains("approved")) {
+                createAccountTransaction(sale);
+                createTransaction(sale);
+            }
             return spotyResponseImpl.ok();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);

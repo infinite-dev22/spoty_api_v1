@@ -2,6 +2,8 @@ package io.nomard.spoty_api_v1.services.implementations.quotations;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Reviewer;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.QuotationDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.QuotationMapper;
 import io.nomard.spoty_api_v1.entities.quotations.QuotationMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
@@ -15,12 +17,6 @@ import io.nomard.spoty_api_v1.services.implementations.deductions.TaxServiceImpl
 import io.nomard.spoty_api_v1.services.interfaces.quotations.QuotationService;
 import io.nomard.spoty_api_v1.utils.CoreCalculations;
 import io.nomard.spoty_api_v1.utils.CoreUtils;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.logging.Level;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -32,72 +28,76 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
+
 @Service
 @Log
 public class QuotationServiceImpl implements QuotationService {
-
     @Autowired
     private QuotationMasterRepository quotationRepo;
-
     @Autowired
     private AuthServiceImpl authService;
-
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
-
     @Autowired
     private TaxServiceImpl taxService;
-
     @Autowired
     private DiscountServiceImpl discountService;
-
     @Autowired
     private TenantSettingsServiceImpl settingsService;
-
     @Autowired
     private ApproverServiceImpl approverService;
+    @Autowired
+    private QuotationMapper quotationMapper;
 
     @Override
-    public Page<QuotationMaster> getAll(int pageNo, int pageSize) {
+    public Page<QuotationDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(
-            pageNo,
-            pageSize,
-            Sort.by(Sort.Order.desc("createdAt"))
+                pageNo,
+                pageSize,
+                Sort.by(Sort.Order.desc("createdAt"))
         );
         return quotationRepo.findAllByTenantId(
-            authService.authUser().getTenant().getId(),
-            authService.authUser().getId(),
-            pageRequest
-        );
+                authService.authUser().getTenant().getId(),
+                authService.authUser().getId(),
+                pageRequest
+        ).map(quotation -> quotationMapper.toMasterDTO(quotation));
     }
 
     @Override
-    public QuotationMaster getById(Long id) throws NotFoundException {
+    public QuotationDTO getById(Long id) throws NotFoundException {
         Optional<QuotationMaster> quotation = quotationRepo.findById(id);
         if (quotation.isEmpty()) {
             throw new NotFoundException();
         }
-        return quotation.get();
+        return quotationMapper.toMasterDTO(quotation.get());
     }
 
     @Override
-    public ArrayList<QuotationMaster> getByContains(String search) {
+    public List<QuotationDTO> getByContains(String search) {
         return quotationRepo.searchAll(
-            authService.authUser().getTenant().getId(),
-            search.toLowerCase()
-        );
+                        authService.authUser().getTenant().getId(),
+                        search.toLowerCase()
+                ).stream()
+                .map(quotation -> quotationMapper.toMasterDTO(quotation))
+                .collect(Collectors.toList());
     }
 
     @Override
     //    @Transactional
     public ResponseEntity<ObjectNode> save(QuotationMaster quotation)
-        throws NotFoundException {
+            throws NotFoundException {
         // Perform calculations
         var calculationService =
-            new CoreCalculations.QuotationCalculationService(
-                taxService,
-                discountService
-            );
+                new CoreCalculations.QuotationCalculationService(
+                        taxService,
+                        discountService
+                );
         calculationService.calculate(quotation);
 
         // Set additional details
@@ -113,7 +113,7 @@ public class QuotationServiceImpl implements QuotationService {
             Reviewer reviewer = null;
             try {
                 reviewer = approverService.getByUserId(
-                    authService.authUser().getId()
+                        authService.authUser().getId()
                 );
             } catch (NotFoundException e) {
                 log.log(Level.ALL, e.getMessage(), e);
@@ -122,8 +122,8 @@ public class QuotationServiceImpl implements QuotationService {
                 quotation.getReviewers().add(reviewer);
                 quotation.setNextApprovedLevel(reviewer.getLevel());
                 if (
-                    reviewer.getLevel() >=
-                    settingsService.getSettingsInternal().getApprovalLevels()
+                        reviewer.getLevel() >=
+                                settingsService.getSettingsInternal().getApprovalLevels()
                 ) {
                     quotation.setApproved(true);
                     quotation.setApprovalStatus("Approved");
@@ -143,8 +143,8 @@ public class QuotationServiceImpl implements QuotationService {
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
             return spotyResponseImpl.custom(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
             );
         }
     }
@@ -152,7 +152,7 @@ public class QuotationServiceImpl implements QuotationService {
     @Override
     @Transactional
     public ResponseEntity<ObjectNode> update(QuotationMaster data)
-        throws NotFoundException {
+            throws NotFoundException {
         var opt = quotationRepo.findById(data.getId());
 
         if (opt.isEmpty()) {
@@ -161,39 +161,39 @@ public class QuotationServiceImpl implements QuotationService {
         var quotation = opt.get();
 
         if (
-            Objects.nonNull(data.getRef()) &&
-            !"".equalsIgnoreCase(data.getRef())
+                Objects.nonNull(data.getRef()) &&
+                        !"".equalsIgnoreCase(data.getRef())
         ) {
             quotation.setRef(data.getRef());
         }
 
         if (
-            Objects.nonNull(data.getCustomer()) &&
-            !Objects.equals(data.getCustomer(), quotation.getCustomer())
+                Objects.nonNull(data.getCustomer()) &&
+                        !Objects.equals(data.getCustomer(), quotation.getCustomer())
         ) {
             quotation.setCustomer(data.getCustomer());
         }
 
         if (
-            Objects.nonNull(data.getBranch()) &&
-            !Objects.equals(data.getBranch(), quotation.getBranch())
+                Objects.nonNull(data.getBranch()) &&
+                        !Objects.equals(data.getBranch(), quotation.getBranch())
         ) {
             quotation.setBranch(data.getBranch());
         }
 
         if (
-            Objects.nonNull(data.getQuotationDetails()) &&
-            !data.getQuotationDetails().isEmpty()
+                Objects.nonNull(data.getQuotationDetails()) &&
+                        !data.getQuotationDetails().isEmpty()
         ) {
             quotation.setQuotationDetails(data.getQuotationDetails());
         }
 
         // Perform calculations
         var calculationService =
-            new CoreCalculations.QuotationCalculationService(
-                taxService,
-                discountService
-            );
+                new CoreCalculations.QuotationCalculationService(
+                        taxService,
+                        discountService
+                );
         calculationService.calculate(quotation);
 
         // Update other fields
@@ -206,27 +206,27 @@ public class QuotationServiceImpl implements QuotationService {
         }
 
         if (
-            Objects.nonNull(data.getStatus()) &&
-            !"".equalsIgnoreCase(data.getStatus())
+                Objects.nonNull(data.getStatus()) &&
+                        !"".equalsIgnoreCase(data.getStatus())
         ) {
             quotation.setStatus(data.getStatus());
         }
 
         if (
-            Objects.nonNull(data.getNotes()) &&
-            !"".equalsIgnoreCase(data.getNotes())
+                Objects.nonNull(data.getNotes()) &&
+                        !"".equalsIgnoreCase(data.getNotes())
         ) {
             quotation.setNotes(data.getNotes());
         }
 
         if (
-            Objects.nonNull(data.getReviewers()) &&
-            !data.getReviewers().isEmpty()
+                Objects.nonNull(data.getReviewers()) &&
+                        !data.getReviewers().isEmpty()
         ) {
             quotation.getReviewers().add(data.getReviewers().getFirst());
             if (
-                quotation.getNextApprovedLevel() >=
-                settingsService.getSettingsInternal().getApprovalLevels()
+                    quotation.getNextApprovedLevel() >=
+                            settingsService.getSettingsInternal().getApprovalLevels()
             ) {
                 quotation.setApproved(true);
                 quotation.setApprovalStatus("Approved");
@@ -242,17 +242,17 @@ public class QuotationServiceImpl implements QuotationService {
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
             return spotyResponseImpl.custom(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
             );
         }
     }
 
     @Override
-    @CacheEvict(value = "adjustment_masters", key = "#approvalModel.id")
+    @CacheEvict(value = "quotation_masters", key = "#approvalModel.id")
     @Transactional
     public ResponseEntity<ObjectNode> approve(ApprovalModel approvalModel)
-        throws NotFoundException {
+            throws NotFoundException {
         var opt = quotationRepo.findById(approvalModel.getId());
         if (opt.isEmpty()) {
             throw new NotFoundException();
@@ -260,26 +260,26 @@ public class QuotationServiceImpl implements QuotationService {
         var quotation = opt.get();
 
         if (
-            Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")
+                Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")
         ) {
             quotation.setApproved(false);
             quotation.setNextApprovedLevel(
-                quotation.getNextApprovedLevel() - 1
+                    quotation.getNextApprovedLevel() - 1
             );
             quotation.setApprovalStatus("Returned");
         }
 
         if (
-            Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")
+                Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")
         ) {
             var approver = approverService.getByUserId(
-                authService.authUser().getId()
+                    authService.authUser().getId()
             );
             quotation.getReviewers().add(approver);
             quotation.setNextApprovedLevel(approver.getLevel());
             if (
-                quotation.getNextApprovedLevel() >=
-                settingsService.getSettingsInternal().getApprovalLevels()
+                    quotation.getNextApprovedLevel() >=
+                            settingsService.getSettingsInternal().getApprovalLevels()
             ) {
                 quotation.setApproved(true);
                 quotation.setApprovalStatus("Approved");
@@ -287,7 +287,7 @@ public class QuotationServiceImpl implements QuotationService {
         }
 
         if (
-            Objects.equals(approvalModel.getStatus().toLowerCase(), "rejected")
+                Objects.equals(approvalModel.getStatus().toLowerCase(), "rejected")
         ) {
             quotation.setApproved(false);
             quotation.setApprovalStatus("Rejected");
@@ -302,8 +302,8 @@ public class QuotationServiceImpl implements QuotationService {
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
             return spotyResponseImpl.custom(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
             );
         }
     }
@@ -317,8 +317,8 @@ public class QuotationServiceImpl implements QuotationService {
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
             return spotyResponseImpl.custom(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
             );
         }
     }
@@ -331,8 +331,8 @@ public class QuotationServiceImpl implements QuotationService {
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
             return spotyResponseImpl.custom(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
             );
         }
     }
