@@ -1,6 +1,7 @@
 package io.nomard.spoty_api_v1.services.interfaces.purchases;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.PurchaseDTO;
 import io.nomard.spoty_api_v1.entities.purchases.PurchaseMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
@@ -10,11 +11,11 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface PurchaseService {
-    Page<PurchaseMaster> getAll(int pageNo, int pageSize);
+    Page<PurchaseDTO> getAll(int pageNo, int pageSize);
 
-    PurchaseMaster getById(Long id) throws NotFoundException;
+    PurchaseDTO getById(Long id) throws NotFoundException;
 
-    List<PurchaseMaster> getByContains(String search);
+    List<PurchaseDTO> getByContains(String search);
 
     ResponseEntity<ObjectNode> save(PurchaseMaster purchaseMaster) throws NotFoundException;
 

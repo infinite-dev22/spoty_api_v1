@@ -3,6 +3,8 @@ package io.nomard.spoty_api_v1.services.implementations.purchases;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.PurchaseDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.PurchaseMapper;
 import io.nomard.spoty_api_v1.entities.purchases.PurchaseDetail;
 import io.nomard.spoty_api_v1.entities.purchases.PurchaseMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
@@ -15,8 +17,6 @@ import io.nomard.spoty_api_v1.services.implementations.ProductServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.TenantSettingsServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.accounting.AccountServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.accounting.AccountTransactionServiceImpl;
-import io.nomard.spoty_api_v1.services.implementations.deductions.DiscountServiceImpl;
-import io.nomard.spoty_api_v1.services.implementations.deductions.TaxServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.purchases.PurchaseService;
 import io.nomard.spoty_api_v1.utils.CoreCalculations;
 import io.nomard.spoty_api_v1.utils.CoreUtils;
@@ -32,51 +32,38 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 @Service
 @Log
 public class PurchaseServiceImpl implements PurchaseService {
-
     @Autowired
     private PurchaseMasterRepository purchaseRepo;
-
     @Autowired
     private AuthServiceImpl authService;
-
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
-
     @Autowired
     private AccountTransactionServiceImpl accountTransactionService;
-
     @Autowired
     private AccountServiceImpl accountService;
-
     @Autowired
     private ProductServiceImpl productService;
-
-    @Autowired
-    private TaxServiceImpl taxService;
-
-    @Autowired
-    private DiscountServiceImpl discountService;
-
     @Autowired
     private TenantSettingsServiceImpl settingsService;
-
     @Autowired
     private ApproverServiceImpl approverService;
-
     @Autowired
     private CoreCalculations.PurchaseCalculationService purchaseCalculationService;
+    @Autowired
+    private PurchaseMapper purchaseMapper;
 
     @Override
-    public Page<PurchaseMaster> getAll(int pageNo, int pageSize) {
+    public Page<PurchaseDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(
                 pageNo,
                 pageSize,
@@ -86,24 +73,26 @@ public class PurchaseServiceImpl implements PurchaseService {
                 authService.authUser().getTenant().getId(),
                 authService.authUser().getId(),
                 pageRequest
-        );
+        ).map(purchase -> purchaseMapper.toMasterDTO(purchase));
     }
 
     @Override
-    public PurchaseMaster getById(Long id) throws NotFoundException {
+    public PurchaseDTO getById(Long id) throws NotFoundException {
         Optional<PurchaseMaster> purchase = purchaseRepo.findById(id);
         if (purchase.isEmpty()) {
             throw new NotFoundException();
         }
-        return purchase.get();
+        return purchaseMapper.toMasterDTO(purchase.get());
     }
 
     @Override
-    public ArrayList<PurchaseMaster> getByContains(String search) {
+    public List<PurchaseDTO> getByContains(String search) {
         return purchaseRepo.searchAll(
-                authService.authUser().getTenant().getId(),
-                search.toLowerCase()
-        );
+                        authService.authUser().getTenant().getId(),
+                        search.toLowerCase()
+                ).stream()
+                .map(purchase -> purchaseMapper.toMasterDTO(purchase))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -395,7 +384,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     }*/
 
     @Override
-    @CacheEvict(value = "adjustment_masters", key = "#approvalModel.id")
+    @CacheEvict(value = "purchase_masters", key = "#approvalModel.id")
     @Transactional
     public ResponseEntity<ObjectNode> approve(ApprovalModel approvalModel)
             throws NotFoundException {

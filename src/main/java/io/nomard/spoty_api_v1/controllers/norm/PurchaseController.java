@@ -2,6 +2,7 @@ package io.nomard.spoty_api_v1.controllers.norm;
 
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.PurchaseDTO;
 import io.nomard.spoty_api_v1.entities.purchases.PurchaseMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
@@ -26,18 +27,18 @@ public class PurchaseController {
 
     @GetMapping("/all")
     @JsonView(Views.Tiny.class)
-    public Page<PurchaseMaster> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                       @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Page<PurchaseDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                    @RequestParam(defaultValue = "50") Integer pageSize) {
         return purchaseService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public PurchaseMaster getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public PurchaseDTO getById(@RequestBody FindModel findModel) throws NotFoundException {
         return purchaseService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<PurchaseMaster> getByContains(@RequestBody SearchModel searchModel) {
+    public List<PurchaseDTO> getByContains(@RequestBody SearchModel searchModel) {
         return purchaseService.getByContains(searchModel.getSearch());
     }
 
