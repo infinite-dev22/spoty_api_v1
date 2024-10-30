@@ -2,6 +2,7 @@ package io.nomard.spoty_api_v1.controllers.norm;
 
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.StockInDTO;
 import io.nomard.spoty_api_v1.entities.stock_ins.StockInMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
@@ -26,18 +27,18 @@ public class StockInController {
 
     @GetMapping("/all")
     @JsonView(Views.Tiny.class)
-    public Page<StockInMaster> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                      @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Page<StockInDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                   @RequestParam(defaultValue = "50") Integer pageSize) {
         return stockInService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public StockInMaster getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public StockInDTO getById(@RequestBody FindModel findModel) throws NotFoundException {
         return stockInService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<StockInMaster> getByContains(@RequestBody SearchModel searchModel) {
+    public List<StockInDTO> getByContains(@RequestBody SearchModel searchModel) {
         return stockInService.getByContains(searchModel.getSearch());
     }
 
