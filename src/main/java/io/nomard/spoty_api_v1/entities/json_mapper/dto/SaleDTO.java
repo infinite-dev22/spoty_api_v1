@@ -14,41 +14,44 @@
 
 package io.nomard.spoty_api_v1.entities.json_mapper.dto;
 
-import io.nomard.spoty_api_v1.entities.*;
-import io.nomard.spoty_api_v1.entities.deductions.Discount;
-import io.nomard.spoty_api_v1.entities.deductions.Tax;
-
 import java.time.LocalDateTime;
+import java.util.List;
 
-public record ProductDTO(
+public record SaleDTO(
         Long id,
-        UnitOfMeasureDTO.AsPartDTO unit,
-        ProductCategoryDTO.AsPart category,
-        BrandDTO.AsPart brand,
-        String barcodeType,
-        String name,
-        Long quantity,
-        double costPrice,
-        double salePrice,
-        DiscountDTO.AsPart discount,
+        String ref,
+        CustomerDTO.AsPart customer,
+        List<SaleDetailDTO> saleDetails,
         TaxDTO.AsPart tax,
-        Long stockAlert,
-        String serialNumber,
-        String image,
+        DiscountDTO.AsPart discount,
+        Double taxAmount,
+        Double discountAmount,
+        Double total,
+        Double subTotal,
+        Double amountPaid,
+        Double amountDue,
+        Double shippingFee,
+        String paymentStatus,
+        String saleStatus,
+        String notes,
+        List<ReviewerDTO> reviewers,
+        Boolean approved,
+        Integer nextApprovedLevel,
+        String approvalStatus,
         LocalDateTime createdAt,
         EmployeeDTO.EmployeeAsEditorDTO createdBy,
         LocalDateTime updatedAt,
         EmployeeDTO.EmployeeAsEditorDTO updatedBy) {
 
-    public record AsPart(
+    public record SaleDetailDTO(
             Long id,
-            String name,
-            Long quantity,
-            double costPrice,
-            double salePrice,
-            DiscountDTO.AsPart discount,
-            TaxDTO.AsPart tax,
-            Long stockAlert,
-            String serialNumber) {
+            ProductDTO.AsPart product,
+            Double unitPrice,
+            Double totalPrice,
+            Integer quantity,
+            LocalDateTime createdAt,
+            EmployeeDTO.EmployeeAsEditorDTO createdBy,
+            LocalDateTime updatedAt,
+            EmployeeDTO.EmployeeAsEditorDTO updatedBy) {
     }
 }

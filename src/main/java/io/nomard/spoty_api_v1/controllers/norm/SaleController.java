@@ -1,14 +1,15 @@
 package io.nomard.spoty_api_v1.controllers.norm;
 
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.SaleDTO;
 import io.nomard.spoty_api_v1.entities.sales.SaleMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.sales.SaleServiceImpl;
-import com.fasterxml.jackson.annotation.JsonView;
 import io.nomard.spoty_api_v1.utils.Views;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,18 +28,18 @@ public class SaleController {
     // ADJUSTMENT MASTERS.
     @GetMapping("/all")
     @JsonView(Views.Tiny.class)
-    public Page<SaleMaster> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                   @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Page<SaleDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                @RequestParam(defaultValue = "50") Integer pageSize) {
         return saleService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public SaleMaster getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public SaleDTO getById(@RequestBody FindModel findModel) throws NotFoundException {
         return saleService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<SaleMaster> getByContains(@RequestBody SearchModel searchModel) {
+    public List<SaleDTO> getByContains(@RequestBody SearchModel searchModel) {
         return saleService.getByContains(searchModel.getSearch());
     }
 

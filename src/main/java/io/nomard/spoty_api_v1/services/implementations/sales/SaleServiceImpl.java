@@ -3,6 +3,8 @@ package io.nomard.spoty_api_v1.services.implementations.sales;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.SaleDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.SaleMapper;
 import io.nomard.spoty_api_v1.entities.sales.SaleMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
@@ -13,8 +15,6 @@ import io.nomard.spoty_api_v1.services.implementations.ApproverServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.TenantSettingsServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.accounting.AccountServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.accounting.AccountTransactionServiceImpl;
-import io.nomard.spoty_api_v1.services.implementations.deductions.DiscountServiceImpl;
-import io.nomard.spoty_api_v1.services.implementations.deductions.TaxServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.sales.SaleService;
 import io.nomard.spoty_api_v1.utils.CoreCalculations;
 import io.nomard.spoty_api_v1.utils.CoreUtils;
@@ -31,11 +31,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 @Service
 @Log
@@ -53,44 +53,45 @@ public class SaleServiceImpl implements SaleService {
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
     @Autowired
-    private TaxServiceImpl taxService;
-    @Autowired
-    private DiscountServiceImpl discountService;
-    @Autowired
     private TenantSettingsServiceImpl settingsService;
     @Autowired
     private ApproverServiceImpl approverService;
     @Autowired
     private CoreCalculations.SaleCalculationService saleCalculationService;
+    @Autowired
+    private SaleMapper saleMapper;
 
     @Override
     @Cacheable("sale_masters")
     @Transactional(readOnly = true)
-    public Page<SaleMaster> getAll(int pageNo, int pageSize) {
+    public Page<SaleDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return saleRepo.findAllByTenantId(authService.authUser().getTenant().getId(), authService.authUser().getId(), pageRequest);
+        return saleRepo.findAllByTenantId(authService.authUser().getTenant().getId(), authService.authUser().getId(), pageRequest).map(sale -> saleMapper.toMasterDTO(sale));
     }
 
     @Override
     @Cacheable("sale_masters")
     @Transactional(readOnly = true)
-    public SaleMaster getById(Long id) throws NotFoundException {
+    public SaleDTO getById(Long id) throws NotFoundException {
         Optional<SaleMaster> saleMaster = saleRepo.findById(id);
         if (saleMaster.isEmpty()) {
             throw new NotFoundException();
         }
-        return saleMaster.get();
+        return saleMapper.toMasterDTO(saleMaster.get());
     }
 
     @Override
     @Cacheable("sale_masters")
     @Transactional(readOnly = true)
-    public ArrayList<SaleMaster> getByContains(String search) {
-        return saleRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
+    public List<SaleDTO> getByContains(String search) {
+        return saleRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase())
+                .stream()
+                .map(sale -> saleMapper.toMasterDTO(sale))
+                .collect(Collectors.toList());
     }
 
     @Override
-//    @Transactional
+    @Transactional
     public ResponseEntity<ObjectNode> save(SaleMaster sale) throws NotFoundException {
         // Perform calculations
         saleCalculationService.calculate(sale);
@@ -129,6 +130,12 @@ public class SaleServiceImpl implements SaleService {
 
         try {
             saleRepo.save(sale);
+        } catch (Exception e) {
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+        }
+
+        try {
             if (sale.getApprovalStatus().toLowerCase().contains("approved")) {
                 createAccountTransaction(sale);
                 createTransaction(sale);
