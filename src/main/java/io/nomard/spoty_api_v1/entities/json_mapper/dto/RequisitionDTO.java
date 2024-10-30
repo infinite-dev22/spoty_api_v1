@@ -14,30 +14,37 @@
 
 package io.nomard.spoty_api_v1.entities.json_mapper.dto;
 
-import java.time.LocalDateTime;
+import io.nomard.spoty_api_v1.entities.Reviewer;
+import io.nomard.spoty_api_v1.entities.Supplier;
+import io.nomard.spoty_api_v1.entities.requisitions.RequisitionDetail;
 
-public record SupplierDTO(
+import java.time.LocalDateTime;
+import java.util.List;
+
+public record RequisitionDTO(
         Long id,
-        String firstName,
-        String lastName,
-        String otherName,
-        String email,
-        String phone,
-        String avatar,
-        String country,
-        String city,
-        String address,
-        String taxNumber,
-        UserDTO user,
+        String ref,
+        SupplierDTO.AsPart supplier,
+        List<RequisitionDetailDTO> requisitionDetails,
+        String notes,
+        String status,
+        List<ReviewerDTO> reviewers,
+        Boolean approved,
+        Integer nextApprovedLevel,
+        String approvalStatus,
         LocalDateTime createdAt,
         EmployeeDTO.EmployeeAsEditorDTO createdBy,
         LocalDateTime updatedAt,
         EmployeeDTO.EmployeeAsEditorDTO updatedBy) {
 
-    public record AsPart(
+    public record RequisitionDetailDTO(
             Long id,
-            String firstName,
-            String lastName,
-            String otherName) {
+            ProductDTO.AsPart product,
+            Integer quantity,
+            String description,
+            LocalDateTime createdAt,
+            EmployeeDTO.EmployeeAsEditorDTO createdBy,
+            LocalDateTime updatedAt,
+            EmployeeDTO.EmployeeAsEditorDTO updatedBy) {
     }
 }

@@ -2,6 +2,8 @@ package io.nomard.spoty_api_v1.services.implementations.requisitions;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Reviewer;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.RequisitionDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.RequisitionMapper;
 import io.nomard.spoty_api_v1.entities.requisitions.RequisitionMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
@@ -13,12 +15,6 @@ import io.nomard.spoty_api_v1.services.implementations.TenantSettingsServiceImpl
 import io.nomard.spoty_api_v1.services.interfaces.requisitions.RequisitionService;
 import io.nomard.spoty_api_v1.utils.CoreCalculations;
 import io.nomard.spoty_api_v1.utils.CoreUtils;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.logging.Level;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -30,54 +26,61 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
+
 @Service
 @Log
 public class RequisitionServiceImpl implements RequisitionService {
-
     @Autowired
     private RequisitionMasterRepository requisitionRepo;
-
     @Autowired
     private AuthServiceImpl authService;
-
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
-
     @Autowired
     private TenantSettingsServiceImpl settingsService;
-
     @Autowired
     private ApproverServiceImpl approverService;
+    @Autowired
+    private RequisitionMapper requisitionMapper;
 
     @Override
-    public Page<RequisitionMaster> getAll(int pageNo, int pageSize) {
+    public Page<RequisitionDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(
-            pageNo,
-            pageSize,
-            Sort.by(Sort.Order.desc("createdAt"))
+                pageNo,
+                pageSize,
+                Sort.by(Sort.Order.desc("createdAt"))
         );
         return requisitionRepo.findAllByTenantId(
-            authService.authUser().getTenant().getId(),
-            authService.authUser().getId(),
-            pageRequest
-        );
+                authService.authUser().getTenant().getId(),
+                authService.authUser().getId(),
+                pageRequest
+        ).map(requisition -> requisitionMapper.toMasterDTO(requisition));
     }
 
     @Override
-    public RequisitionMaster getById(Long id) throws NotFoundException {
+    public RequisitionDTO getById(Long id) throws NotFoundException {
         Optional<RequisitionMaster> requisition = requisitionRepo.findById(id);
         if (requisition.isEmpty()) {
             throw new NotFoundException();
         }
-        return requisition.get();
+        return requisitionMapper.toMasterDTO(requisition.get());
     }
 
     @Override
-    public ArrayList<RequisitionMaster> getByContains(String search) {
+    public List<RequisitionDTO> getByContains(String search) {
         return requisitionRepo.searchAll(
-            authService.authUser().getTenant().getId(),
-            search.toLowerCase()
-        );
+                        authService.authUser().getTenant().getId(),
+                        search.toLowerCase()
+                )
+                .stream()
+                .map(requisition -> requisitionMapper.toMasterDTO(requisition))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -85,7 +88,7 @@ public class RequisitionServiceImpl implements RequisitionService {
     public ResponseEntity<ObjectNode> save(RequisitionMaster requisition) {
         try {
             CoreCalculations.RequisitionCalculationService.calculate(
-                requisition
+                    requisition
             );
             requisition.setRef(CoreUtils.referenceNumberGenerator("REQ"));
             requisition.setTenant(authService.authUser().getTenant());
@@ -96,7 +99,7 @@ public class RequisitionServiceImpl implements RequisitionService {
                 Reviewer reviewer = null;
                 try {
                     reviewer = approverService.getByUserId(
-                        authService.authUser().getId()
+                            authService.authUser().getId()
                     );
                 } catch (NotFoundException e) {
                     log.log(Level.ALL, e.getMessage(), e);
@@ -105,8 +108,8 @@ public class RequisitionServiceImpl implements RequisitionService {
                     requisition.getReviewers().add(reviewer);
                     requisition.setNextApprovedLevel(reviewer.getLevel());
                     if (
-                        reviewer.getLevel() >=
-                        settingsService.getSettingsInternal().getApprovalLevels()
+                            reviewer.getLevel() >=
+                                    settingsService.getSettingsInternal().getApprovalLevels()
                     ) {
                         requisition.setApproved(true);
                         requisition.setApprovalStatus("Approved");
@@ -128,8 +131,8 @@ public class RequisitionServiceImpl implements RequisitionService {
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
             return spotyResponseImpl.custom(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
             );
         }
     }
@@ -137,7 +140,7 @@ public class RequisitionServiceImpl implements RequisitionService {
     @Override
     @Transactional
     public ResponseEntity<ObjectNode> update(RequisitionMaster data)
-        throws NotFoundException {
+            throws NotFoundException {
         var opt = requisitionRepo.findById(data.getId());
 
         if (opt.isEmpty()) {
@@ -146,57 +149,57 @@ public class RequisitionServiceImpl implements RequisitionService {
         var requisition = opt.get();
 
         if (
-            Objects.nonNull(data.getRef()) &&
-            !"".equalsIgnoreCase(data.getRef())
+                Objects.nonNull(data.getRef()) &&
+                        !"".equalsIgnoreCase(data.getRef())
         ) {
             requisition.setRef(data.getRef());
         }
 
         if (
-            Objects.nonNull(data.getSupplier()) &&
-            !Objects.equals(data.getSupplier(), requisition.getSupplier())
+                Objects.nonNull(data.getSupplier()) &&
+                        !Objects.equals(data.getSupplier(), requisition.getSupplier())
         ) {
             requisition.setSupplier(data.getSupplier());
         }
 
         if (
-            Objects.nonNull(data.getBranch()) &&
-            !Objects.equals(data.getBranch(), requisition.getBranch())
+                Objects.nonNull(data.getBranch()) &&
+                        !Objects.equals(data.getBranch(), requisition.getBranch())
         ) {
             requisition.setBranch(data.getBranch());
         }
 
         if (
-            Objects.nonNull(data.getRequisitionDetails()) &&
-            !data.getRequisitionDetails().isEmpty()
+                Objects.nonNull(data.getRequisitionDetails()) &&
+                        !data.getRequisitionDetails().isEmpty()
         ) {
             requisition.setRequisitionDetails(data.getRequisitionDetails());
             CoreCalculations.RequisitionCalculationService.calculate(
-                requisition
+                    requisition
             );
         }
 
         if (
-            Objects.nonNull(data.getNotes()) &&
-            !"".equalsIgnoreCase(data.getNotes())
+                Objects.nonNull(data.getNotes()) &&
+                        !"".equalsIgnoreCase(data.getNotes())
         ) {
             requisition.setNotes(data.getNotes());
         }
 
         if (
-            Objects.nonNull(data.getStatus()) &&
-            !"".equalsIgnoreCase(data.getStatus())
+                Objects.nonNull(data.getStatus()) &&
+                        !"".equalsIgnoreCase(data.getStatus())
         ) {
             requisition.setStatus(data.getStatus());
         }
         if (
-            Objects.nonNull(data.getReviewers()) &&
-            !data.getReviewers().isEmpty()
+                Objects.nonNull(data.getReviewers()) &&
+                        !data.getReviewers().isEmpty()
         ) {
             requisition.getReviewers().add(data.getReviewers().getFirst());
             if (
-                requisition.getNextApprovedLevel() >=
-                settingsService.getSettingsInternal().getApprovalLevels()
+                    requisition.getNextApprovedLevel() >=
+                            settingsService.getSettingsInternal().getApprovalLevels()
             ) {
                 requisition.setApproved(true);
                 requisition.setApprovalStatus("Approved");
@@ -212,8 +215,8 @@ public class RequisitionServiceImpl implements RequisitionService {
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
             return spotyResponseImpl.custom(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
             );
         }
     }
@@ -222,7 +225,7 @@ public class RequisitionServiceImpl implements RequisitionService {
     @CacheEvict(value = "requisitions", key = "#approvalModel.id")
     @Transactional
     public ResponseEntity<ObjectNode> approve(ApprovalModel approvalModel)
-        throws NotFoundException {
+            throws NotFoundException {
         var opt = requisitionRepo.findById(approvalModel.getId());
         if (opt.isEmpty()) {
             throw new NotFoundException();
@@ -230,26 +233,26 @@ public class RequisitionServiceImpl implements RequisitionService {
         var requisition = opt.get();
 
         if (
-            Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")
+                Objects.equals(approvalModel.getStatus().toLowerCase(), "returned")
         ) {
             requisition.setApproved(false);
             requisition.setNextApprovedLevel(
-                requisition.getNextApprovedLevel() - 1
+                    requisition.getNextApprovedLevel() - 1
             );
             requisition.setApprovalStatus("Returned");
         }
 
         if (
-            Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")
+                Objects.equals(approvalModel.getStatus().toLowerCase(), "approved")
         ) {
             var approver = approverService.getByUserId(
-                authService.authUser().getId()
+                    authService.authUser().getId()
             );
             requisition.getReviewers().add(approver);
             requisition.setNextApprovedLevel(approver.getLevel());
             if (
-                requisition.getNextApprovedLevel() >=
-                settingsService.getSettingsInternal().getApprovalLevels()
+                    requisition.getNextApprovedLevel() >=
+                            settingsService.getSettingsInternal().getApprovalLevels()
             ) {
                 requisition.setApproved(true);
                 requisition.setApprovalStatus("Approved");
@@ -257,7 +260,7 @@ public class RequisitionServiceImpl implements RequisitionService {
         }
 
         if (
-            Objects.equals(approvalModel.getStatus().toLowerCase(), "rejected")
+                Objects.equals(approvalModel.getStatus().toLowerCase(), "rejected")
         ) {
             requisition.setApproved(false);
             requisition.setApprovalStatus("Rejected");
@@ -272,8 +275,8 @@ public class RequisitionServiceImpl implements RequisitionService {
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
             return spotyResponseImpl.custom(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
             );
         }
     }
@@ -287,8 +290,8 @@ public class RequisitionServiceImpl implements RequisitionService {
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
             return spotyResponseImpl.custom(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
             );
         }
     }
@@ -301,8 +304,8 @@ public class RequisitionServiceImpl implements RequisitionService {
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
             return spotyResponseImpl.custom(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
             );
         }
     }

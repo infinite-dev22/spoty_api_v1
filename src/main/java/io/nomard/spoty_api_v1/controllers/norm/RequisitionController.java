@@ -2,6 +2,7 @@ package io.nomard.spoty_api_v1.controllers.norm;
 
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.RequisitionDTO;
 import io.nomard.spoty_api_v1.entities.requisitions.RequisitionMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
@@ -26,18 +27,18 @@ public class RequisitionController {
 
     @GetMapping("/all")
     @JsonView(Views.Tiny.class)
-    public Page<RequisitionMaster> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                          @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Page<RequisitionDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                       @RequestParam(defaultValue = "50") Integer pageSize) {
         return requisitionService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public RequisitionMaster getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public RequisitionDTO getById(@RequestBody FindModel findModel) throws NotFoundException {
         return requisitionService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<RequisitionMaster> getByContains(@RequestBody SearchModel searchModel) {
+    public List<RequisitionDTO> getByContains(@RequestBody SearchModel searchModel) {
         return requisitionService.getByContains(searchModel.getSearch());
     }
 
