@@ -20,7 +20,6 @@ public class PaySlipTypeController {
     private PaySlipTypeServiceImpl paySlipTypeService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<PaySlipType> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                     @RequestParam(defaultValue = "50") Integer pageSize) {
         return paySlipTypeService.getAll(pageNo, pageSize);

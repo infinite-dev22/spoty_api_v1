@@ -23,7 +23,6 @@ public class TaxController {
     private TaxServiceImpl taxService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<TaxDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                @RequestParam(defaultValue = "50") Integer pageSize) {
         return taxService.getAll(pageNo, pageSize);

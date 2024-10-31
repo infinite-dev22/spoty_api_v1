@@ -27,7 +27,6 @@ public class RoleController {
     private RoleServiceImpl roleService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<RoleDTO.RoleAsWholeDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                                       @RequestParam(defaultValue = "50") Integer pageSize) {
         return roleService.getAll(pageNo, pageSize);

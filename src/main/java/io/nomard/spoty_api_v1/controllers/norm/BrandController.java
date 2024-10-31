@@ -25,7 +25,6 @@ public class BrandController {
     private BrandServiceImpl brandService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<BrandDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                  @RequestParam(defaultValue = "50") Integer pageSize) {
         return brandService.getAll(pageNo, pageSize);

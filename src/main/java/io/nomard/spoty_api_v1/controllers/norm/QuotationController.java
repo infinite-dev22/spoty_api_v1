@@ -26,7 +26,6 @@ public class QuotationController {
     private QuotationServiceImpl quotationService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<QuotationDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                         @RequestParam(defaultValue = "50") Integer pageSize) {
         return quotationService.getAll(pageNo, pageSize);

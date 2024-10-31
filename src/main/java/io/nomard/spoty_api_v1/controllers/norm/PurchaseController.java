@@ -26,7 +26,6 @@ public class PurchaseController {
     private PurchaseServiceImpl purchaseService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<PurchaseDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                     @RequestParam(defaultValue = "50") Integer pageSize) {
         return purchaseService.getAll(pageNo, pageSize);

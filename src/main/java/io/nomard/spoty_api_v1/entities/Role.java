@@ -36,9 +36,7 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
-    @JsonView(Views.Clean.class)
     private String name;
-    @JsonView(Views.Clean.class)
     private String label;
     private String description;
     @JoinColumn(name = "tenant_id")
@@ -48,7 +46,6 @@ public class Role {
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @Builder.Default
-    @JsonView(Views.Detailed.class)
     private Set<Permission> permissions = new HashSet<>();
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)

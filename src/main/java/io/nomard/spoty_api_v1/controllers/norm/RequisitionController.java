@@ -26,7 +26,6 @@ public class RequisitionController {
     private RequisitionServiceImpl requisitionService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<RequisitionDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                        @RequestParam(defaultValue = "50") Integer pageSize) {
         return requisitionService.getAll(pageNo, pageSize);

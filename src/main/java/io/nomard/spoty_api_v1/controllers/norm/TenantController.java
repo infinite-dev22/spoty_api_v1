@@ -20,7 +20,6 @@ public class TenantController {
     private TenantServiceImpl tenantService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<Tenant> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                @RequestParam(defaultValue = "50") Integer pageSize) {
         return tenantService.getAll(pageNo, pageSize);

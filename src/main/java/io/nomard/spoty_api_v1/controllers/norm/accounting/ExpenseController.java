@@ -25,7 +25,6 @@ public class ExpenseController {
     private ExpenseServiceImpl expenseService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<ExpenseDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                    @RequestParam(defaultValue = "50") Integer pageSize) {
         return expenseService.getAll(pageNo, pageSize);

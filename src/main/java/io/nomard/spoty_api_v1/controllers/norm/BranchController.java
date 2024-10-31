@@ -25,7 +25,6 @@ public class BranchController {
     private BranchServiceImpl branchService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<BranchDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                   @RequestParam(defaultValue = "50") Integer pageSize) {
         return branchService.getAll(pageNo, pageSize);

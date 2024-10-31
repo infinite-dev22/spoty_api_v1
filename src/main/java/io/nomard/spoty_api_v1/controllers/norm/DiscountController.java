@@ -23,7 +23,6 @@ public class DiscountController {
     private DiscountServiceImpl discountService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<DiscountDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                     @RequestParam(defaultValue = "50") Integer pageSize) {
         return discountService.getAll(pageNo, pageSize);

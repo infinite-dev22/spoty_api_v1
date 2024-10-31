@@ -25,7 +25,6 @@ public class EmploymentStatusController {
     private EmploymentStatusServiceImpl employmentStatusService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<EmploymentStatusDTO.EmploymentStatusAsWholeDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                                                        @RequestParam(defaultValue = "50") Integer pageSize) {
         return employmentStatusService.getAll(pageNo, pageSize);

@@ -27,7 +27,6 @@ public class SaleController {
 
     // ADJUSTMENT MASTERS.
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<SaleDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                 @RequestParam(defaultValue = "50") Integer pageSize) {
         return saleService.getAll(pageNo, pageSize);

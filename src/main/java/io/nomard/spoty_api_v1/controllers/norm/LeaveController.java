@@ -23,7 +23,6 @@ public class LeaveController {
     private LeaveServiceImpl leaveStatusService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<Leave> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                               @RequestParam(defaultValue = "50") Integer pageSize) {
         return leaveStatusService.getAll(pageNo, pageSize);

@@ -25,7 +25,6 @@ public class SupplierController {
     private SupplierServiceImpl supplierService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<SupplierDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                  @RequestParam(defaultValue = "50") Integer pageSize) {
         return supplierService.getAll(pageNo, pageSize);

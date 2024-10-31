@@ -25,7 +25,6 @@ public class ProductCategoryController {
     private ProductCategoryServiceImpl productCategoryService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<ProductCategoryDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                            @RequestParam(defaultValue = "50") Integer pageSize) {
         return productCategoryService.getAll(pageNo, pageSize);

@@ -26,7 +26,6 @@ public class PurchaseReturnController {
     private PurchaseReturnServiceImpl purchaseReturnService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<PurchaseReturnDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                           @RequestParam(defaultValue = "50") Integer pageSize) {
         return purchaseReturnService.getAll(pageNo, pageSize);

@@ -25,7 +25,6 @@ public class UnitOfMeasureController {
     private UnitOfMeasureServiceImpl unit_of_measureService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<UnitOfMeasureDTO.AsWholeDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                                     @RequestParam(defaultValue = "50") Integer pageSize) {
         return unit_of_measureService.getAll(pageNo, pageSize);

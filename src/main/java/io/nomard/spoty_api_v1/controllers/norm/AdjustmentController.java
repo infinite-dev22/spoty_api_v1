@@ -27,7 +27,6 @@ public class AdjustmentController {
 
     // ADJUSTMENT MASTERS.
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<AdjustmentDTO> getAllMasters(@RequestParam(defaultValue = "0") Integer pageNo,
                                              @RequestParam(defaultValue = "50") Integer pageSize) {
         return adjustmentService.getAll(pageNo, pageSize);

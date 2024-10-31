@@ -25,7 +25,6 @@ public class EmployeeController {
     private EmployeeServiceImpl userService;
 
     @GetMapping("/all")
-    @JsonView(Views.Moderate.class)
     public Page<EmployeeDTO.EmployeeAsWholeDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                                        @RequestParam(defaultValue = "50") Integer pageSize) {
         return userService.getAll(pageNo, pageSize);

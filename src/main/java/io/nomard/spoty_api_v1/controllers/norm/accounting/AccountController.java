@@ -30,7 +30,6 @@ public class AccountController {
     private AccountTransactionServiceImpl accountTransactionService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<AccountDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                 @RequestParam(defaultValue = "50") Integer pageSize) {
         return accountService.getAll(pageNo, pageSize);

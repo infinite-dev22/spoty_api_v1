@@ -24,7 +24,6 @@ public class SalaryController {
     private SalaryServiceImpl salaryService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<Salary> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                @RequestParam(defaultValue = "50") Integer pageSize) {
         return salaryService.getAll(pageNo, pageSize);

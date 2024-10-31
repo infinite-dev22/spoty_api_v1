@@ -26,7 +26,6 @@ public class StockInController {
     private StockInServiceImpl stockInService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<StockInDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                    @RequestParam(defaultValue = "50") Integer pageSize) {
         return stockInService.getAll(pageNo, pageSize);

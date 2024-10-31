@@ -23,7 +23,6 @@ public class PaymentTransactionController {
     private PaymentTransactionServiceImpl paymentTransactionService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<PaymentTransactionDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                               @RequestParam(defaultValue = "50") Integer pageSize) {
         return paymentTransactionService.getAll(pageNo, pageSize);

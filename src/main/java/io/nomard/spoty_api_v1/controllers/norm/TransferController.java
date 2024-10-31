@@ -26,7 +26,6 @@ public class TransferController {
     private TransferServiceImpl transferService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<TransferDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                     @RequestParam(defaultValue = "50") Integer pageSize) {
         return transferService.getAll(pageNo, pageSize);

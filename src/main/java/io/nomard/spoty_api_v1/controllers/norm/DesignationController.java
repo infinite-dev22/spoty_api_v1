@@ -25,7 +25,6 @@ public class DesignationController {
     private DesignationServiceImpl designationService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<DesignationDTO.DesignationAsWholeDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                     @RequestParam(defaultValue = "50") Integer pageSize) {
         return designationService.getAll(pageNo, pageSize);

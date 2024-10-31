@@ -25,7 +25,6 @@ public class DepartmentController {
     private DepartmentServiceImpl departmentService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<DepartmentDTO.DepartmentAsWholeDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                                            @RequestParam(defaultValue = "50") Integer pageSize) {
         return departmentService.getAll(pageNo, pageSize);

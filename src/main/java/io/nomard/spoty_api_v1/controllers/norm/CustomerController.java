@@ -25,7 +25,6 @@ public class CustomerController {
     private CustomerServiceImpl customerService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<CustomerDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                     @RequestParam(defaultValue = "50") Integer pageSize) {
         return customerService.getAll(pageNo, pageSize);
