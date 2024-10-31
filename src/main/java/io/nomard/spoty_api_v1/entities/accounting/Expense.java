@@ -15,8 +15,8 @@
 package io.nomard.spoty_api_v1.entities.accounting;
 
 import io.nomard.spoty_api_v1.entities.Branch;
-import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.Employee;
+import io.nomard.spoty_api_v1.entities.Tenant;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;

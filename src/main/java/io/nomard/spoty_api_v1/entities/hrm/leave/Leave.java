@@ -2,8 +2,8 @@ package io.nomard.spoty_api_v1.entities.hrm.leave;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.Branch;
-import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.Employee;
+import io.nomard.spoty_api_v1.entities.Tenant;
 import io.nomard.spoty_api_v1.entities.hrm.hrm.Designation;
 import jakarta.persistence.*;
 import lombok.*;

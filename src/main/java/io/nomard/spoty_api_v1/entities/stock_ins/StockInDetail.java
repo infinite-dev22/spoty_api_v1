@@ -15,8 +15,8 @@
 package io.nomard.spoty_api_v1.entities.stock_ins;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.nomard.spoty_api_v1.entities.Product;
 import io.nomard.spoty_api_v1.entities.Employee;
+import io.nomard.spoty_api_v1.entities.Product;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
@@ -35,7 +35,7 @@ public class StockInDetail implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "stock_in_id", nullable = false)
     @JsonIgnore
     private StockInMaster stockIn;

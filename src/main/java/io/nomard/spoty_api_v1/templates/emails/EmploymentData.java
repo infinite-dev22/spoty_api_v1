@@ -63,45 +63,45 @@ public class EmploymentData {
     public String getEmploymentLetterHtml() {
         return "<!DOCTYPE html>" +
                 "<html>" +
-                    "<head>" +
-                        "<title>Confirmation of Employment</title>" +
-                        "<style>" +
-                            "body { font-family: Arial, sans-serif; line-height: 1.6; background-color: #f4f4f9; }" +
-                            ".container { padding: 20px; max-width: 800px; margin: auto; background: #fff; }" +
-                            ".header { text-align: center; padding-bottom: 20px; }" +
-                            ".content p { margin: 10px 0; }" +
-                            ".footer { text-align: center; color: #555; margin-top: 40px; }" +
-                        "</style>" +
-                    "</head>" +
-                    "<body>" +
-                        "<div class='container'>" +
-                            "<div class='header'><h1>Confirmation of Employment</h1></div>" +
-                            "<div class='content'>" +
-                                "<p>" + user.getFirstName() + " " + user.getLastName() +
-                                "<br/>" + userDesignation +
-                                "<br/>" + tenantSettings.getName() +
-                                "<br/>" + tenantSettings.getPhysicalAddress() +
-                                "<br/>" + LocalDate.now() + "</p>" +
-                                "<p>" + employee.getFirstName() + " " + middleName + employee.getLastName() + "</p>" +
-                                "<p>Dear " + employee.getFirstName() + " " + middleName + employee.getLastName() + ",</p>" +
-                                "<p>We are pleased to inform you that you have been confirmed as " +
-                                "a " + employee.getEmploymentStatus().getName() + " employee in the position of " +
-                                employee.getDesignation().getName() + " with <strong>" + tenantSettings.getName() + "</strong> as of " +
-                                "<strong>" + employee.getStartDate() + "</strong>. We value you and believe that will be an asset to " +
-                                "our organization.</p>" +
-                                "<p>Effective from " + employee.getStartDate() + ", your status as a " + employee.getDesignation().getName() + " will commence. You " +
-                                "will be entitled to the terms and conditions of employment as stated in your " +
-                                "employment contract, except for any changes that may be mutually agreed upon in writing.</p>" +
-                                "<p>Your employment will be subjected to the companies policies and procedures, and " +
-                                "we trust that you will offer high standards of performance and professionalism that you have demonstrated so far.</p>" +
-                                "<p>If you have any questions or need further clarification, please feel free to " +
-                                "contact the HR Department.</p>" +
-                                "<p>Congratulations once again on the confirmation of your employment, We look forward to your " +
-                                "contributions and success at " + tenantSettings.getName() + "</p>" +
-                            "</div>" +
-                            "<div class='footer'><p>© " + tenantSettings.getName() + " | All rights reserved</p></div>" +
-                        "</div>" +
-                    "</body>" +
+                "<head>" +
+                "<title>Confirmation of Employment</title>" +
+                "<style>" +
+                "body { font-family: Arial, sans-serif; line-height: 1.6; background-color: #f4f4f9; }" +
+                ".container { padding: 20px; max-width: 800px; margin: auto; background: #fff; }" +
+                ".header { text-align: center; padding-bottom: 20px; }" +
+                ".content p { margin: 10px 0; }" +
+                ".footer { text-align: center; color: #555; margin-top: 40px; }" +
+                "</style>" +
+                "</head>" +
+                "<body>" +
+                "<div class='container'>" +
+                "<div class='header'><h1>Confirmation of Employment</h1></div>" +
+                "<div class='content'>" +
+                "<p>" + user.getFirstName() + " " + user.getLastName() +
+                "<br/>" + userDesignation +
+                "<br/>" + tenantSettings.getName() +
+                "<br/>" + tenantSettings.getPhysicalAddress() +
+                "<br/>" + LocalDate.now() + "</p>" +
+                "<p>" + employee.getFirstName() + " " + middleName + employee.getLastName() + "</p>" +
+                "<p>Dear " + employee.getFirstName() + " " + middleName + employee.getLastName() + ",</p>" +
+                "<p>We are pleased to inform you that you have been confirmed as " +
+                "a " + employee.getEmploymentStatus().getName() + " employee in the position of " +
+                employee.getDesignation().getName() + " with <strong>" + tenantSettings.getName() + "</strong> as of " +
+                "<strong>" + employee.getStartDate() + "</strong>. We value you and believe that will be an asset to " +
+                "our organization.</p>" +
+                "<p>Effective from " + employee.getStartDate() + ", your status as a " + employee.getDesignation().getName() + " will commence. You " +
+                "will be entitled to the terms and conditions of employment as stated in your " +
+                "employment contract, except for any changes that may be mutually agreed upon in writing.</p>" +
+                "<p>Your employment will be subjected to the companies policies and procedures, and " +
+                "we trust that you will offer high standards of performance and professionalism that you have demonstrated so far.</p>" +
+                "<p>If you have any questions or need further clarification, please feel free to " +
+                "contact the HR Department.</p>" +
+                "<p>Congratulations once again on the confirmation of your employment, We look forward to your " +
+                "contributions and success at " + tenantSettings.getName() + "</p>" +
+                "</div>" +
+                "<div class='footer'><p>© " + tenantSettings.getName() + " | All rights reserved</p></div>" +
+                "</div>" +
+                "</body>" +
                 "</html>";
     }
 

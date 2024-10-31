@@ -9,7 +9,6 @@ import io.nomard.spoty_api_v1.repositories.ProductRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.ProductService;
-import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -27,11 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 @Service
-@Log
 public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository productRepo;
@@ -113,7 +110,6 @@ public class ProductServiceImpl implements ProductService {
                 product.setImage(fileURL);
             }
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
         return save(product);
@@ -131,7 +127,6 @@ public class ProductServiceImpl implements ProductService {
             productRepo.save(product);
             return spotyResponseImpl.created();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
@@ -171,15 +166,15 @@ public class ProductServiceImpl implements ProductService {
             product.setName(data.getName());
         }
 
-        if (!Objects.equals(data.getQuantity(), 0)) {
+        if (!Objects.equals(data.getQuantity(), 0d)) {
             product.setQuantity(data.getQuantity());
         }
 
-        if (!Objects.equals(data.getCostPrice(), 0)) {
+        if (!Objects.equals(data.getCostPrice(), 0d)) {
             product.setCostPrice(data.getCostPrice());
         }
 
-        if (!Objects.equals(data.getSalePrice(), 0)) {
+        if (!Objects.equals(data.getSalePrice(), 0d)) {
             product.setSalePrice(data.getSalePrice());
         }
 
@@ -191,7 +186,7 @@ public class ProductServiceImpl implements ProductService {
             product.setTax(data.getTax());
         }
 
-        if (!Objects.equals(data.getStockAlert(), 0)) {
+        if (!Objects.equals(data.getStockAlert(), 0d)) {
             product.setStockAlert(data.getStockAlert());
         }
 
@@ -203,7 +198,6 @@ public class ProductServiceImpl implements ProductService {
                 documentService.delete(product.getImage());
                 fileURL = String.valueOf(documentService.save(file));
             } catch (Exception e) {
-                log.log(Level.ALL, e.getMessage(), e);
                 return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
             }
             product.setImage(fileURL);
@@ -216,7 +210,6 @@ public class ProductServiceImpl implements ProductService {
             productRepo.save(product);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
@@ -228,7 +221,6 @@ public class ProductServiceImpl implements ProductService {
             productRepo.deleteById(id);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
@@ -239,7 +231,6 @@ public class ProductServiceImpl implements ProductService {
             productRepo.deleteAllById(idList);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }

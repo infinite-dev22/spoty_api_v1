@@ -15,9 +15,8 @@
 package io.nomard.spoty_api_v1.entities.quotations;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.nomard.spoty_api_v1.entities.Product;
-import io.nomard.spoty_api_v1.entities.UnitOfMeasure;
 import io.nomard.spoty_api_v1.entities.Employee;
+import io.nomard.spoty_api_v1.entities.Product;
 import io.nomard.spoty_api_v1.entities.deductions.Discount;
 import io.nomard.spoty_api_v1.entities.deductions.Tax;
 import jakarta.persistence.*;

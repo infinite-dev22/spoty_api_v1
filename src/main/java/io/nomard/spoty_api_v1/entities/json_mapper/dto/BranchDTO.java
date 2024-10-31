@@ -14,9 +14,6 @@
 
 package io.nomard.spoty_api_v1.entities.json_mapper.dto;
 
-import io.nomard.spoty_api_v1.entities.Employee;
-import io.nomard.spoty_api_v1.entities.Tenant;
-
 import java.time.LocalDateTime;
 
 public record BranchDTO(
@@ -31,4 +28,11 @@ public record BranchDTO(
         EmployeeDTO.EmployeeAsEditorDTO createdBy,
         LocalDateTime updatedAt,
         EmployeeDTO.EmployeeAsEditorDTO updatedBy) {
+
+    public record AsPart(
+            Long id,
+            String name,
+            String city,
+            String town) {
+    }
 }

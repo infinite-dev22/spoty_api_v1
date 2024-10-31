@@ -1,6 +1,7 @@
 package io.nomard.spoty_api_v1.services.interfaces.stock_ins;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.StockInDTO;
 import io.nomard.spoty_api_v1.entities.stock_ins.StockInMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
@@ -10,11 +11,11 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface StockInService {
-    Page<StockInMaster> getAll(int pageNo, int pageSize);
+    Page<StockInDTO> getAll(int pageNo, int pageSize);
 
-    StockInMaster getById(Long id) throws NotFoundException;
+    StockInDTO getById(Long id) throws NotFoundException;
 
-    List<StockInMaster> getByContains(String search);
+    List<StockInDTO> getByContains(String search);
 
     ResponseEntity<ObjectNode> save(StockInMaster stockInMaster);
 

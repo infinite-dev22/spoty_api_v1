@@ -1,8 +1,8 @@
 package io.nomard.spoty_api_v1.entities.purchases;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.nomard.spoty_api_v1.entities.Product;
 import io.nomard.spoty_api_v1.entities.Employee;
+import io.nomard.spoty_api_v1.entities.Product;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;

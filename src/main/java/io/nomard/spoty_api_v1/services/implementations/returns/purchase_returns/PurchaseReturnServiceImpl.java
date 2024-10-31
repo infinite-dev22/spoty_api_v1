@@ -3,6 +3,8 @@ package io.nomard.spoty_api_v1.services.implementations.returns.purchase_returns
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.PurchaseReturnDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.PurchaseReturnMapper;
 import io.nomard.spoty_api_v1.entities.returns.purchase_returns.PurchaseReturnDetail;
 import io.nomard.spoty_api_v1.entities.returns.purchase_returns.PurchaseReturnMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
@@ -15,8 +17,6 @@ import io.nomard.spoty_api_v1.services.implementations.ProductServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.TenantSettingsServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.accounting.AccountServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.accounting.AccountTransactionServiceImpl;
-import io.nomard.spoty_api_v1.services.implementations.deductions.DiscountServiceImpl;
-import io.nomard.spoty_api_v1.services.implementations.deductions.TaxServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.returns.purchase_returns.PurchaseReturnService;
 import io.nomard.spoty_api_v1.utils.CoreCalculations;
 import lombok.extern.java.Log;
@@ -31,11 +31,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 @Service
 @Log
@@ -53,34 +53,35 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
     @Autowired
     private ProductServiceImpl productService;
     @Autowired
-    private TaxServiceImpl taxService;
-    @Autowired
-    private DiscountServiceImpl discountService;
-    @Autowired
     private TenantSettingsServiceImpl settingsService;
     @Autowired
     private ApproverServiceImpl approverService;
     @Autowired
     private CoreCalculations.PurchaseCalculationService purchaseCalculationService;
+    @Autowired
+    private PurchaseReturnMapper purchaseReturnMapper;
 
     @Override
-    public Page<PurchaseReturnMaster> getAll(int pageNo, int pageSize) {
+    public Page<PurchaseReturnDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return purchaseReturnRepo.findAllByTenantId(authService.authUser().getTenant().getId(), authService.authUser().getId(), pageRequest);
+        return purchaseReturnRepo.findAllByTenantId(authService.authUser().getTenant().getId(), authService.authUser().getId(), pageRequest).map(purchaseReturn -> purchaseReturnMapper.toMasterDTO(purchaseReturn));
     }
 
     @Override
-    public PurchaseReturnMaster getById(Long id) throws NotFoundException {
+    public PurchaseReturnDTO getById(Long id) throws NotFoundException {
         Optional<PurchaseReturnMaster> purchase = purchaseReturnRepo.findById(id);
         if (purchase.isEmpty()) {
             throw new NotFoundException();
         }
-        return purchase.get();
+        return purchaseReturnMapper.toMasterDTO(purchase.get());
     }
 
     @Override
-    public ArrayList<PurchaseReturnMaster> getByContains(String search) {
-        return purchaseReturnRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
+    public List<PurchaseReturnDTO> getByContains(String search) {
+        return purchaseReturnRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase())
+                .stream()
+                .map(purchaseReturn -> purchaseReturnMapper.toMasterDTO(purchaseReturn))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -94,7 +95,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
         if (purchase.getBranch() == null) {
             purchase.setBranch(authService.authUser().getBranch());
         }
-        if (settingsService.getSettingsInternal().getReview() && settingsService.getSettingsInternal().getApproveAdjustments()) {
+        if (settingsService.getSettingsInternal().getReview() && settingsService.getSettingsInternal().getApprovePurchaseReturns()) {
             Reviewer reviewer = null;
             try {
                 reviewer = approverService.getByUserId(authService.authUser().getId());

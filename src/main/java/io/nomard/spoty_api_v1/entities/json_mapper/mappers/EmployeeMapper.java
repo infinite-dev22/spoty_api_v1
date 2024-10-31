@@ -7,6 +7,8 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface EmployeeMapper {
     EmployeeDTO.EmployeeAsWholeDTO toWholeDTO(Employee employee);
+
     EmployeeDTO.EmployeeAsAccessor toAccessorDTO(Employee employee);
+
     EmployeeDTO.EmployeeAsEditorDTO toEditorDTO(Employee employee);
 }

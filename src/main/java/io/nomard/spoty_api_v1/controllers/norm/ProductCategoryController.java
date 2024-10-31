@@ -1,6 +1,5 @@
 package io.nomard.spoty_api_v1.controllers.norm;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.ProductCategory;
 import io.nomard.spoty_api_v1.entities.json_mapper.dto.ProductCategoryDTO;
@@ -8,7 +7,6 @@ import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.ProductCategoryServiceImpl;
-import io.nomard.spoty_api_v1.utils.Views;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,7 +23,6 @@ public class ProductCategoryController {
     private ProductCategoryServiceImpl productCategoryService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<ProductCategoryDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                            @RequestParam(defaultValue = "50") Integer pageSize) {
         return productCategoryService.getAll(pageNo, pageSize);

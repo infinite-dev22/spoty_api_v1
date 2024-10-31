@@ -5,8 +5,6 @@ import io.nomard.spoty_api_v1.entities.hrm.pay_roll.PaySlipType;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.services.implementations.hrm.pay_roll.PaySlipTypeServiceImpl;
-import com.fasterxml.jackson.annotation.JsonView;
-import io.nomard.spoty_api_v1.utils.Views;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,7 +18,6 @@ public class PaySlipTypeController {
     private PaySlipTypeServiceImpl paySlipTypeService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<PaySlipType> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                     @RequestParam(defaultValue = "50") Integer pageSize) {
         return paySlipTypeService.getAll(pageNo, pageSize);

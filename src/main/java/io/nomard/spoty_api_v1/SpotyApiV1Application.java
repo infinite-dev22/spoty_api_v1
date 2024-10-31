@@ -6,7 +6,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication
-@EnableAsync(proxyTargetClass=true)
+@EnableAsync(proxyTargetClass = true)
 @EnableCaching
 public class SpotyApiV1Application {
 

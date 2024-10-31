@@ -15,8 +15,8 @@
 package io.nomard.spoty_api_v1.entities.transfers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.nomard.spoty_api_v1.entities.Product;
 import io.nomard.spoty_api_v1.entities.Employee;
+import io.nomard.spoty_api_v1.entities.Product;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
@@ -44,7 +44,6 @@ public class TransferDetail implements Serializable {
     private Product product;
     @Column(nullable = false)
     private Long quantity;
-    private String serialNo;
     private String description;
     @Column(nullable = false)
     private double price;

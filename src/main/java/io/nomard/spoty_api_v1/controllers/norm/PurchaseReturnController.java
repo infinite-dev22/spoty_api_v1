@@ -2,14 +2,13 @@ package io.nomard.spoty_api_v1.controllers.norm;
 
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.PurchaseReturnDTO;
 import io.nomard.spoty_api_v1.entities.returns.purchase_returns.PurchaseReturnMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.returns.purchase_returns.PurchaseReturnServiceImpl;
-import com.fasterxml.jackson.annotation.JsonView;
-import io.nomard.spoty_api_v1.utils.Views;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,19 +24,18 @@ public class PurchaseReturnController {
     private PurchaseReturnServiceImpl purchaseReturnService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
-    public Page<PurchaseReturnMaster> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                             @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Page<PurchaseReturnDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                          @RequestParam(defaultValue = "50") Integer pageSize) {
         return purchaseReturnService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public PurchaseReturnMaster getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public PurchaseReturnDTO getById(@RequestBody FindModel findModel) throws NotFoundException {
         return purchaseReturnService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<PurchaseReturnMaster> getByContains(@RequestBody SearchModel searchModel) {
+    public List<PurchaseReturnDTO> getByContains(@RequestBody SearchModel searchModel) {
         return purchaseReturnService.getByContains(searchModel.getSearch());
     }
 

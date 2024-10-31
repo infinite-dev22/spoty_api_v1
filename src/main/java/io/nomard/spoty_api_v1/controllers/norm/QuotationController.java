@@ -2,14 +2,13 @@ package io.nomard.spoty_api_v1.controllers.norm;
 
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.QuotationDTO;
 import io.nomard.spoty_api_v1.entities.quotations.QuotationMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.quotations.QuotationServiceImpl;
-import com.fasterxml.jackson.annotation.JsonView;
-import io.nomard.spoty_api_v1.utils.Views;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,19 +24,18 @@ public class QuotationController {
     private QuotationServiceImpl quotationService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
-    public Page<QuotationMaster> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                        @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Page<QuotationDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                     @RequestParam(defaultValue = "50") Integer pageSize) {
         return quotationService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public QuotationMaster getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public QuotationDTO getById(@RequestBody FindModel findModel) throws NotFoundException {
         return quotationService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<QuotationMaster> getByContains(@RequestBody SearchModel searchModel) {
+    public List<QuotationDTO> getByContains(@RequestBody SearchModel searchModel) {
         return quotationService.getByContains(searchModel.getSearch());
     }
 

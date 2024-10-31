@@ -15,9 +15,6 @@
 package io.nomard.spoty_api_v1.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonView;
-import io.nomard.spoty_api_v1.entities.hrm.hrm.EmploymentStatus;
-import io.nomard.spoty_api_v1.utils.Views;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;

@@ -14,10 +14,6 @@
 
 package io.nomard.spoty_api_v1.entities.json_mapper.dto;
 
-import io.nomard.spoty_api_v1.entities.*;
-import io.nomard.spoty_api_v1.entities.deductions.Discount;
-import io.nomard.spoty_api_v1.entities.deductions.Tax;
-
 import java.time.LocalDateTime;
 
 public record ProductDTO(
@@ -39,4 +35,16 @@ public record ProductDTO(
         EmployeeDTO.EmployeeAsEditorDTO createdBy,
         LocalDateTime updatedAt,
         EmployeeDTO.EmployeeAsEditorDTO updatedBy) {
+
+    public record AsPart(
+            Long id,
+            String name,
+            Long quantity,
+            double costPrice,
+            double salePrice,
+            DiscountDTO.AsPart discount,
+            TaxDTO.AsPart tax,
+            Long stockAlert,
+            String serialNumber) {
+    }
 }

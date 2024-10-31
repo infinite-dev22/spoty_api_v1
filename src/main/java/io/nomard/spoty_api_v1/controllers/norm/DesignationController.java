@@ -7,8 +7,6 @@ import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.hrm.hrm.DesignationServiceImpl;
-import com.fasterxml.jackson.annotation.JsonView;
-import io.nomard.spoty_api_v1.utils.Views;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,9 +23,8 @@ public class DesignationController {
     private DesignationServiceImpl designationService;
 
     @GetMapping("/all")
-    @JsonView(Views.Tiny.class)
     public Page<DesignationDTO.DesignationAsWholeDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                    @RequestParam(defaultValue = "50") Integer pageSize) {
+                                                             @RequestParam(defaultValue = "50") Integer pageSize) {
         return designationService.getAll(pageNo, pageSize);
     }
 

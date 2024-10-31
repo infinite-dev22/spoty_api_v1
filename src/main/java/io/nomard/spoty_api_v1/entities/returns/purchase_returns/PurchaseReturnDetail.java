@@ -15,8 +15,8 @@
 package io.nomard.spoty_api_v1.entities.returns.purchase_returns;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.nomard.spoty_api_v1.entities.Product;
 import io.nomard.spoty_api_v1.entities.Employee;
+import io.nomard.spoty_api_v1.entities.Product;
 import io.nomard.spoty_api_v1.entities.purchases.PurchaseDetail;
 import jakarta.persistence.*;
 import lombok.*;

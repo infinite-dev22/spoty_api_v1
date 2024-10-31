@@ -3,6 +3,8 @@ package io.nomard.spoty_api_v1.services.implementations.returns.sale_returns;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.SaleReturnDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.SaleReturnMapper;
 import io.nomard.spoty_api_v1.entities.returns.sale_returns.SaleReturnMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
@@ -13,8 +15,6 @@ import io.nomard.spoty_api_v1.services.implementations.ApproverServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.TenantSettingsServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.accounting.AccountServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.accounting.AccountTransactionServiceImpl;
-import io.nomard.spoty_api_v1.services.implementations.deductions.DiscountServiceImpl;
-import io.nomard.spoty_api_v1.services.implementations.deductions.TaxServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.returns.sale_returns.SaleReturnService;
 import io.nomard.spoty_api_v1.utils.CoreCalculations;
 import lombok.extern.java.Log;
@@ -30,11 +30,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 @Service
 @Log
@@ -50,40 +50,41 @@ public class SaleReturnServiceImpl implements SaleReturnService {
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
     @Autowired
-    private TaxServiceImpl taxService;
-    @Autowired
-    private DiscountServiceImpl discountService;
-    @Autowired
     private TenantSettingsServiceImpl settingsService;
     @Autowired
     private ApproverServiceImpl approverService;
     @Autowired
     private CoreCalculations.SaleCalculationService saleCalculationService;
+    @Autowired
+    private SaleReturnMapper saleReturnMapper;
 
     @Override
     @Cacheable("sale_masters")
     @Transactional(readOnly = true)
-    public Page<SaleReturnMaster> getAll(int pageNo, int pageSize) {
+    public Page<SaleReturnDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
-        return saleReturnRepo.findAllByTenantId(authService.authUser().getTenant().getId(), authService.authUser().getId(), pageRequest);
+        return saleReturnRepo.findAllByTenantId(authService.authUser().getTenant().getId(), authService.authUser().getId(), pageRequest).map(saleReturn -> saleReturnMapper.toMasterDTO(saleReturn));
     }
 
     @Override
     @Cacheable("sale_masters")
     @Transactional(readOnly = true)
-    public SaleReturnMaster getById(Long id) throws NotFoundException {
-        Optional<SaleReturnMaster> saleMaster = saleReturnRepo.findById(id);
-        if (saleMaster.isEmpty()) {
+    public SaleReturnDTO getById(Long id) throws NotFoundException {
+        Optional<SaleReturnMaster> saleReturn = saleReturnRepo.findById(id);
+        if (saleReturn.isEmpty()) {
             throw new NotFoundException();
         }
-        return saleMaster.get();
+        return saleReturnMapper.toMasterDTO(saleReturn.get());
     }
 
     @Override
     @Cacheable("sale_masters")
     @Transactional(readOnly = true)
-    public ArrayList<SaleReturnMaster> getByContains(String search) {
-        return saleReturnRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase());
+    public List<SaleReturnDTO> getByContains(String search) {
+        return saleReturnRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase())
+                .stream()
+                .map(saleReturn -> saleReturnMapper.toMasterDTO(saleReturn))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -97,7 +98,7 @@ public class SaleReturnServiceImpl implements SaleReturnService {
         if (Objects.isNull(sale.getBranch())) {
             sale.setBranch(authService.authUser().getBranch());
         }
-        if (settingsService.getSettingsInternal().getReview() && settingsService.getSettingsInternal().getApproveAdjustments()) {
+        if (settingsService.getSettingsInternal().getReview() && settingsService.getSettingsInternal().getApproveSaleReturns()) {
             Reviewer reviewer = null;
             try {
                 reviewer = approverService.getByUserId(authService.authUser().getId());
@@ -110,7 +111,6 @@ public class SaleReturnServiceImpl implements SaleReturnService {
                 if (reviewer.getLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                     sale.setApproved(true);
                     sale.setApprovalStatus("Approved");
-                    createAccountTransaction(sale);
                 }
             } else {
                 sale.setNextApprovedLevel(1);
@@ -120,13 +120,21 @@ public class SaleReturnServiceImpl implements SaleReturnService {
         } else {
             sale.setApproved(true);
             sale.setApprovalStatus("Approved");
-            createAccountTransaction(sale);
         }
         sale.setCreatedBy(authService.authUser());
         sale.setCreatedAt(LocalDateTime.now());
 
         try {
             saleReturnRepo.save(sale);
+        } catch (Exception e) {
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+        }
+
+        try {
+            if (sale.getApprovalStatus().toLowerCase().contains("approved")) {
+                createAccountTransaction(sale);
+            }
             return spotyResponseImpl.created();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
@@ -182,14 +190,6 @@ public class SaleReturnServiceImpl implements SaleReturnService {
         if (Objects.nonNull(data.getNotes()) && !"".equalsIgnoreCase(data.getNotes())) {
             sale.setNotes(data.getNotes());
         }
-        if (Objects.nonNull(data.getReviewers()) && !data.getReviewers().isEmpty()) {
-            sale.getReviewers().add(data.getReviewers().getFirst());
-            if (sale.getNextApprovedLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
-                sale.setApproved(true);
-                sale.setApprovalStatus("Approved");
-                createAccountTransaction(sale);
-            }
-        }
         sale.setUpdatedBy(authService.authUser());
         sale.setUpdatedAt(LocalDateTime.now());
         try {
@@ -224,7 +224,6 @@ public class SaleReturnServiceImpl implements SaleReturnService {
             if (sale.getNextApprovedLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                 sale.setApproved(true);
                 sale.setApprovalStatus("Approved");
-                createAccountTransaction(sale);
             }
         }
 
@@ -238,7 +237,16 @@ public class SaleReturnServiceImpl implements SaleReturnService {
         sale.setUpdatedAt(LocalDateTime.now());
         try {
             saleReturnRepo.save(sale);
-            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+        }
+
+        try {
+            if (sale.getApprovalStatus().toLowerCase().contains("approved")) {
+                createAccountTransaction(sale);
+            }
+            return spotyResponseImpl.created();
         } catch (Exception e) {
             log.log(Level.ALL, e.getMessage(), e);
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());

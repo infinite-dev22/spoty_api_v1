@@ -33,4 +33,11 @@ public record CustomerDTO(
         EmployeeDTO.EmployeeAsEditorDTO createdBy,
         LocalDateTime updatedAt,
         EmployeeDTO.EmployeeAsEditorDTO updatedBy) {
+
+    public record AsPart(
+            Long id,
+            String firstName,
+            String lastName,
+            String otherName) {
+    }
 }

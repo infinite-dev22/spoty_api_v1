@@ -15,15 +15,15 @@
 package io.nomard.spoty_api_v1.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonView;
-import io.nomard.spoty_api_v1.utils.Views;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -36,9 +36,7 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
-    @JsonView(Views.Clean.class)
     private String name;
-    @JsonView(Views.Clean.class)
     private String label;
     private String description;
     @JoinColumn(name = "tenant_id")
@@ -48,7 +46,6 @@ public class Role {
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @Builder.Default
-    @JsonView(Views.Detailed.class)
     private Set<Permission> permissions = new HashSet<>();
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
