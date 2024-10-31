@@ -1,6 +1,7 @@
 package io.nomard.spoty_api_v1.services.interfaces.returns.sale_returns;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.SaleReturnDTO;
 import io.nomard.spoty_api_v1.entities.returns.sale_returns.SaleReturnMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
@@ -10,11 +11,11 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface SaleReturnService {
-    Page<SaleReturnMaster> getAll(int pageNo, int pageSize);
+    Page<SaleReturnDTO> getAll(int pageNo, int pageSize);
 
-    SaleReturnMaster getById(Long id) throws NotFoundException;
+    SaleReturnDTO getById(Long id) throws NotFoundException;
 
-    List<SaleReturnMaster> getByContains(String search);
+    List<SaleReturnDTO> getByContains(String search);
 
     ResponseEntity<ObjectNode> save(SaleReturnMaster saleMaster) throws NotFoundException;
 
