@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface StockInMapper {
-    StockInDTO toMasterDTO(StockInMaster adjustmentMaster);
+    StockInDTO toMasterDTO(StockInMaster stockInMaster);
 
-    StockInDTO.StockInDetailDTO toDetailDTO(StockInDetail adjustmentDetail);
+    StockInDTO.StockInDetailDTO toDetailDTO(StockInDetail stockInDetail);
 }

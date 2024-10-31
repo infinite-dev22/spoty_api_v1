@@ -51,7 +51,6 @@ public record PurchaseDTO(
             Long id,
             double unitCost,
             double totalCost,
-            PurchaseMaster purchase,
             ProductDTO product,
             int quantity,
             LocalDateTime createdAt,

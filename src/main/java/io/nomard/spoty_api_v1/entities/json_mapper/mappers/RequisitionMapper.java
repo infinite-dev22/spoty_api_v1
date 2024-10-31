@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface RequisitionMapper {
-    RequisitionDTO toMasterDTO(RequisitionMaster purchaseMaster);
+    RequisitionDTO toMasterDTO(RequisitionMaster requisitionMaster);
 
-    RequisitionDTO.RequisitionDetailDTO toDetailDTO(RequisitionDetail purchaseDetail);
+    RequisitionDTO.RequisitionDetailDTO toDetailDTO(RequisitionDetail requisitionDetail);
 }
