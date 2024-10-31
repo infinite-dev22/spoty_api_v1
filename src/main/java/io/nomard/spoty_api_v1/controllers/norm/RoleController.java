@@ -2,16 +2,12 @@ package io.nomard.spoty_api_v1.controllers.norm;
 
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.Permission;
 import io.nomard.spoty_api_v1.entities.Role;
-import io.nomard.spoty_api_v1.entities.json_mapper.dto.PermissionDTO;
 import io.nomard.spoty_api_v1.entities.json_mapper.dto.RoleDTO;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.services.implementations.PermissionServiceImpl;
 import io.nomard.spoty_api_v1.services.implementations.RoleServiceImpl;
-import com.fasterxml.jackson.annotation.JsonView;
-import io.nomard.spoty_api_v1.utils.Views;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,7 +24,7 @@ public class RoleController {
 
     @GetMapping("/all")
     public Page<RoleDTO.RoleAsWholeDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                                      @RequestParam(defaultValue = "50") Integer pageSize) {
+                                               @RequestParam(defaultValue = "50") Integer pageSize) {
         return roleService.getAll(pageNo, pageSize);
     }
 

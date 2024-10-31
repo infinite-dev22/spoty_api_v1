@@ -3,7 +3,6 @@ package io.nomard.spoty_api_v1.utils;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import lombok.extern.java.Log;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.*;
 

@@ -182,11 +182,10 @@ public class CoreCalculations {
 
     @Service
     public static class SaleCalculationService {
-        @Autowired
-        private ProductServiceImpl productService;
-
         private final TaxService taxService;
         private final DiscountService discountService;
+        @Autowired
+        private ProductServiceImpl productService;
 
         public SaleCalculationService(
                 TaxService taxService,
@@ -322,11 +321,10 @@ public class CoreCalculations {
 
     @Service
     public static class QuotationCalculationService {
-        @Autowired
-        private ProductServiceImpl productService;
-
         private final TaxService taxService;
         private final DiscountService discountService;
+        @Autowired
+        private ProductServiceImpl productService;
 
         public QuotationCalculationService(
                 TaxService taxService,

@@ -14,10 +14,6 @@
 
 package io.nomard.spoty_api_v1.entities.json_mapper.dto;
 
-import io.nomard.spoty_api_v1.entities.*;
-import io.nomard.spoty_api_v1.entities.deductions.Discount;
-import io.nomard.spoty_api_v1.entities.deductions.Tax;
-
 import java.time.LocalDateTime;
 
 public record ProductDTO(

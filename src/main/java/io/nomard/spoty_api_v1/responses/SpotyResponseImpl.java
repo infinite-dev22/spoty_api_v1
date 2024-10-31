@@ -56,8 +56,8 @@ public class SpotyResponseImpl implements SpotyResponse {
 
     @Override
     public ResponseEntity<ObjectNode> custom(
-        HttpStatus httpStatus,
-        String message
+            HttpStatus httpStatus,
+            String message
     ) {
         var response = objectMapper.createObjectNode();
         response.put("status", httpStatus.value());

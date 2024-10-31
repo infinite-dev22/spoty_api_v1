@@ -7,5 +7,6 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface EmploymentStatusMapper {
     EmploymentStatusDTO.EmploymentStatusAsWholeDTO toWholeDTO(EmploymentStatus employmentStatus);
+
     EmploymentStatusDTO.EmploymentStatusAsPartDTO toPartDTO(EmploymentStatus employmentStatus);
 }

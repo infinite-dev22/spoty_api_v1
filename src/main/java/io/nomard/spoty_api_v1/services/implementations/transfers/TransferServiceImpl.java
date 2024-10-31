@@ -28,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -85,9 +84,9 @@ public class TransferServiceImpl implements TransferService {
     @Transactional(readOnly = true)
     public List<TransferDTO> getByContains(String search) {
         return transferRepo.searchAll(
-                authService.authUser().getTenant().getId(),
-                search.toLowerCase()
-        ).stream()
+                        authService.authUser().getTenant().getId(),
+                        search.toLowerCase()
+                ).stream()
                 .map(transfer -> transferMapper.toMasterDTO(transfer))
                 .collect(Collectors.toList());
     }

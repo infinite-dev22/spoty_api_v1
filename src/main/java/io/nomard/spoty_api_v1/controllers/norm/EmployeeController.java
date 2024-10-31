@@ -1,6 +1,5 @@
 package io.nomard.spoty_api_v1.controllers.norm;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.json_mapper.dto.EmployeeDTO;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
@@ -8,7 +7,6 @@ import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.models.UserModel;
 import io.nomard.spoty_api_v1.services.implementations.EmployeeServiceImpl;
-import io.nomard.spoty_api_v1.utils.Views;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

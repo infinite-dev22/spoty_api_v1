@@ -14,10 +14,6 @@
 
 package io.nomard.spoty_api_v1.entities.json_mapper.dto;
 
-import io.nomard.spoty_api_v1.entities.Branch;
-import io.nomard.spoty_api_v1.entities.Tenant;
-import io.nomard.spoty_api_v1.entities.accounting.Account;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 

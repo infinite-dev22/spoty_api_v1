@@ -15,19 +15,20 @@
 package io.nomard.spoty_api_v1.entities.transfers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.entities.Branch;
 import io.nomard.spoty_api_v1.entities.Employee;
+import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.entities.Tenant;
 import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.proxy.HibernateProxy;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import lombok.*;
-import org.hibernate.proxy.HibernateProxy;
 
 @Entity
 @Getter
@@ -60,10 +61,10 @@ public class TransferMaster implements Serializable {
     private Tenant tenant;
 
     @OneToMany(
-        orphanRemoval = true,
-        mappedBy = "transfer",
-        fetch = FetchType.LAZY,
-        cascade = CascadeType.ALL
+            orphanRemoval = true,
+            mappedBy = "transfer",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL
     )
     @Builder.Default
     private List<TransferDetail> transferDetails = new LinkedList<>();
@@ -71,12 +72,12 @@ public class TransferMaster implements Serializable {
     private String notes;
 
     @ManyToMany(
-        cascade = {
-            CascadeType.DETACH,
-            CascadeType.MERGE,
-            CascadeType.PERSIST,
-            CascadeType.REFRESH,
-        }
+            cascade = {
+                    CascadeType.DETACH,
+                    CascadeType.MERGE,
+                    CascadeType.PERSIST,
+                    CascadeType.REFRESH,
+            }
     )
     @Builder.Default
     private List<Reviewer> reviewers = new ArrayList<>();
@@ -103,13 +104,13 @@ public class TransferMaster implements Serializable {
         if (this == o) return true;
         if (o == null) return false;
         Class<?> oEffectiveClass = o instanceof HibernateProxy
-            ? ((HibernateProxy) o).getHibernateLazyInitializer()
+                ? ((HibernateProxy) o).getHibernateLazyInitializer()
                 .getPersistentClass()
-            : o.getClass();
+                : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy
-            ? ((HibernateProxy) this).getHibernateLazyInitializer()
+                ? ((HibernateProxy) this).getHibernateLazyInitializer()
                 .getPersistentClass()
-            : this.getClass();
+                : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
         TransferMaster that = (TransferMaster) o;
         return getId() != null && Objects.equals(getId(), that.getId());
@@ -118,9 +119,9 @@ public class TransferMaster implements Serializable {
     @Override
     public final int hashCode() {
         return this instanceof HibernateProxy
-            ? ((HibernateProxy) this).getHibernateLazyInitializer()
+                ? ((HibernateProxy) this).getHibernateLazyInitializer()
                 .getPersistentClass()
                 .hashCode()
-            : getClass().hashCode();
+                : getClass().hashCode();
     }
 }

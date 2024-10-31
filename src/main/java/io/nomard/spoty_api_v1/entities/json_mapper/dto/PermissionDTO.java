@@ -14,8 +14,6 @@
 
 package io.nomard.spoty_api_v1.entities.json_mapper.dto;
 
-import java.time.LocalDateTime;
-
 public record PermissionDTO(
         Long id,
         String name,
