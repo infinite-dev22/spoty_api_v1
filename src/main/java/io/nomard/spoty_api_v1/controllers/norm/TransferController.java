@@ -2,6 +2,7 @@ package io.nomard.spoty_api_v1.controllers.norm;
 
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.TransferDTO;
 import io.nomard.spoty_api_v1.entities.transfers.TransferMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
@@ -26,18 +27,18 @@ public class TransferController {
 
     @GetMapping("/all")
     @JsonView(Views.Tiny.class)
-    public Page<TransferMaster> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
-                                       @RequestParam(defaultValue = "50") Integer pageSize) {
+    public Page<TransferDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+                                    @RequestParam(defaultValue = "50") Integer pageSize) {
         return transferService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public TransferMaster getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public TransferDTO getById(@RequestBody FindModel findModel) throws NotFoundException {
         return transferService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<TransferMaster> getByContains(@RequestBody SearchModel searchModel) {
+    public List<TransferDTO> getByContains(@RequestBody SearchModel searchModel) {
         return transferService.getByContains(searchModel.getSearch());
     }
 

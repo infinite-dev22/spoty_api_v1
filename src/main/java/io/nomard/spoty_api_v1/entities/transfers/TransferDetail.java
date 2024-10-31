@@ -44,7 +44,6 @@ public class TransferDetail implements Serializable {
     private Product product;
     @Column(nullable = false)
     private Long quantity;
-    private String serialNo;
     private String description;
     @Column(nullable = false)
     private double price;

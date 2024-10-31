@@ -1,6 +1,7 @@
 package io.nomard.spoty_api_v1.services.interfaces.transfers;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.TransferDTO;
 import io.nomard.spoty_api_v1.entities.transfers.TransferMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
@@ -10,11 +11,11 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface TransferService {
-    Page<TransferMaster> getAll(int pageNo, int pageSize);
+    Page<TransferDTO> getAll(int pageNo, int pageSize);
 
-    TransferMaster getById(Long id) throws NotFoundException;
+    TransferDTO getById(Long id) throws NotFoundException;
 
-    List<TransferMaster> getByContains(String search);
+    List<TransferDTO> getByContains(String search);
 
     ResponseEntity<ObjectNode> save(TransferMaster transferMaster);
 

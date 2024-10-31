@@ -15,24 +15,35 @@
 package io.nomard.spoty_api_v1.entities.json_mapper.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-public record BranchDTO(
+public record TransferDTO(
         Long id,
-        String name,
-        String city,
-        String phone,
-        String email,
-        String town,
-        String zipCode,
+        String ref,
+        LocalDateTime date,
+        BranchDTO.AsPart fromBranch,
+        BranchDTO.AsPart toBranch,
+        List<TransferDetailDTO> transferDetails,
+        String notes,
+        List<ReviewerDTO> reviewers,
+        Boolean approved,
+        Integer nextApprovedLevel,
+        String approvalStatus,
         LocalDateTime createdAt,
         EmployeeDTO.EmployeeAsEditorDTO createdBy,
         LocalDateTime updatedAt,
         EmployeeDTO.EmployeeAsEditorDTO updatedBy) {
 
-    public record AsPart(
+    public record TransferDetailDTO(
             Long id,
-            String name,
-            String city,
-            String town) {
+            ProductDTO.AsPart product,
+            Long quantity,
+            String description,
+            Double price,
+            Double total,
+            LocalDateTime createdAt,
+            EmployeeDTO.EmployeeAsEditorDTO createdBy,
+            LocalDateTime updatedAt,
+            EmployeeDTO.EmployeeAsEditorDTO updatedBy) {
     }
 }

@@ -2,6 +2,8 @@ package io.nomard.spoty_api_v1.services.implementations.transfers;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Reviewer;
+import io.nomard.spoty_api_v1.entities.json_mapper.dto.TransferDTO;
+import io.nomard.spoty_api_v1.entities.json_mapper.mappers.TransferMapper;
 import io.nomard.spoty_api_v1.entities.transfers.TransferMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
@@ -31,33 +33,30 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 @Service
 @Log
 public class TransferServiceImpl implements TransferService {
-
     @Autowired
     private TransferMasterRepository transferRepo;
-
     @Autowired
     private TransferTransactionServiceImpl transferTransactionService;
-
     @Autowired
     private AuthServiceImpl authService;
-
     @Autowired
     private SpotyResponseImpl spotyResponseImpl;
-
     @Autowired
     private TenantSettingsServiceImpl settingsService;
-
     @Autowired
     private ApproverServiceImpl approverService;
+    @Autowired
+    private TransferMapper transferMapper;
 
     @Override
     @Cacheable("transfer_masters")
     @Transactional(readOnly = true)
-    public Page<TransferMaster> getAll(int pageNo, int pageSize) {
+    public Page<TransferDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(
                 pageNo,
                 pageSize,
@@ -67,28 +66,30 @@ public class TransferServiceImpl implements TransferService {
                 authService.authUser().getTenant().getId(),
                 authService.authUser().getId(),
                 pageRequest
-        );
+        ).map(transfer -> transferMapper.toMasterDTO(transfer));
     }
 
     @Override
     @Cacheable("transfer_masters")
     @Transactional(readOnly = true)
-    public TransferMaster getById(Long id) throws NotFoundException {
+    public TransferDTO getById(Long id) throws NotFoundException {
         Optional<TransferMaster> transfer = transferRepo.findById(id);
         if (transfer.isEmpty()) {
             throw new NotFoundException();
         }
-        return transfer.get();
+        return transferMapper.toMasterDTO(transfer.get());
     }
 
     @Override
     @Cacheable("transfer_masters")
     @Transactional(readOnly = true)
-    public ArrayList<TransferMaster> getByContains(String search) {
+    public List<TransferDTO> getByContains(String search) {
         return transferRepo.searchAll(
                 authService.authUser().getTenant().getId(),
                 search.toLowerCase()
-        );
+        ).stream()
+                .map(transfer -> transferMapper.toMasterDTO(transfer))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -97,7 +98,7 @@ public class TransferServiceImpl implements TransferService {
         CoreCalculations.TransferCalculationService.calculate(transfer);
         transfer.setRef(CoreUtils.referenceNumberGenerator("TRF"));
         transfer.setTenant(authService.authUser().getTenant());
-        if (settingsService.getSettingsInternal().getReview() && settingsService.getSettingsInternal().getApproveAdjustments()) {
+        if (settingsService.getSettingsInternal().getReview() && settingsService.getSettingsInternal().getApproveTransfers()) {
             Reviewer reviewer = null;
             try {
                 reviewer = approverService.getByUserId(
