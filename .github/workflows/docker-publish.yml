@@ -9,7 +9,7 @@ env:
   # Use docker.io for Docker Hub
   REGISTRY: docker.io
   # Docker Hub repository (username/repo)
-  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO_NAME }}
+  IMAGE_NAME: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPO_NAME }}
 
 jobs:
   build:
