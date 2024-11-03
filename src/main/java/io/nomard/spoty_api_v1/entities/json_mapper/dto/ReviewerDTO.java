@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 
 public record ReviewerDTO(
         Long id,
-        EmployeeDTO.EmployeeAsEditorDTO employee,
+        EmployeeDTO.EmployeeAsReviewerDTO employee,
         Integer level,
         LocalDateTime createdAt,
         EmployeeDTO.EmployeeAsEditorDTO createdBy,

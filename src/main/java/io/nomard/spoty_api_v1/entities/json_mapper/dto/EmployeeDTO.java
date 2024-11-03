@@ -53,4 +53,11 @@ public record EmployeeDTO() {
             String lastName,
             String otherName) {
     }
+
+    public record EmployeeAsReviewerDTO(
+            String firstName,
+            String lastName,
+            String otherName,
+            String avatar) {
+    }
 }
