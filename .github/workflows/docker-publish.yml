@@ -21,6 +21,12 @@ jobs:
       id-token: write
 
     steps:
+      - name: Update Package List
+        run: sudo apt update
+        
+      - name: Install qemu-user-static
+        run: sudo apt install -y qemu-user-static
+        
       - name: Checkout repository
         uses: actions/checkout@v4
 
