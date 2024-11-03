@@ -1,7 +1,7 @@
 FROM debian:latest
 ENV APP_HOME=/usr/app/
 WORKDIR $APP_HOME
-COPY /usr/bin/qemu-x86_64-static /usr/bin/
+COPY /usr/bin/qemu-user-static /usr/bin/
 COPY build/native/nativeCompile/spoty_api_v1 spoty
 VOLUME /var/lib/opencore/static/uploads
 EXPOSE 8080
