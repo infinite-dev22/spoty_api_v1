@@ -2,8 +2,8 @@ package io.nomard.spoty_api_v1.services.implementations.hrm.hrm;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.hrm.hrm.EmploymentStatus;
-import io.nomard.spoty_api_v1.entities.json_mapper.dto.EmploymentStatusDTO;
-import io.nomard.spoty_api_v1.entities.json_mapper.mappers.EmploymentStatusMapper;
+import io.nomard.spoty_api_v1.utils.json_mapper.dto.EmploymentStatusDTO;
+import io.nomard.spoty_api_v1.utils.json_mapper.mappers.EmploymentStatusMapper;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.hrm.hrm.EmploymentStatusRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;

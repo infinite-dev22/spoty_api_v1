@@ -3,8 +3,8 @@ package io.nomard.spoty_api_v1.services.implementations.returns.purchase_returns
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
-import io.nomard.spoty_api_v1.entities.json_mapper.dto.PurchaseReturnDTO;
-import io.nomard.spoty_api_v1.entities.json_mapper.mappers.PurchaseReturnMapper;
+import io.nomard.spoty_api_v1.utils.json_mapper.dto.PurchaseReturnDTO;
+import io.nomard.spoty_api_v1.utils.json_mapper.mappers.PurchaseReturnMapper;
 import io.nomard.spoty_api_v1.entities.returns.purchase_returns.PurchaseReturnDetail;
 import io.nomard.spoty_api_v1.entities.returns.purchase_returns.PurchaseReturnMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;

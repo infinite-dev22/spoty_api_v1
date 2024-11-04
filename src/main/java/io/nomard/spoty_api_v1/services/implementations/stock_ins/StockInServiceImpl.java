@@ -2,8 +2,8 @@ package io.nomard.spoty_api_v1.services.implementations.stock_ins;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Reviewer;
-import io.nomard.spoty_api_v1.entities.json_mapper.dto.StockInDTO;
-import io.nomard.spoty_api_v1.entities.json_mapper.mappers.StockInMapper;
+import io.nomard.spoty_api_v1.utils.json_mapper.dto.StockInDTO;
+import io.nomard.spoty_api_v1.utils.json_mapper.mappers.StockInMapper;
 import io.nomard.spoty_api_v1.entities.stock_ins.StockInMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;

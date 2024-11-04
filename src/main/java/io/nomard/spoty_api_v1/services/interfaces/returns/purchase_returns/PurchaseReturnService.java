@@ -1,7 +1,7 @@
 package io.nomard.spoty_api_v1.services.interfaces.returns.purchase_returns;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.json_mapper.dto.PurchaseReturnDTO;
+import io.nomard.spoty_api_v1.utils.json_mapper.dto.PurchaseReturnDTO;
 import io.nomard.spoty_api_v1.entities.returns.purchase_returns.PurchaseReturnMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;

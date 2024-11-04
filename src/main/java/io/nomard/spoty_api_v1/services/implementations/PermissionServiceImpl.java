@@ -2,8 +2,8 @@ package io.nomard.spoty_api_v1.services.implementations;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Permission;
-import io.nomard.spoty_api_v1.entities.json_mapper.dto.PermissionDTO;
-import io.nomard.spoty_api_v1.entities.json_mapper.mappers.PermissionMapper;
+import io.nomard.spoty_api_v1.utils.json_mapper.dto.PermissionDTO;
+import io.nomard.spoty_api_v1.utils.json_mapper.mappers.PermissionMapper;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.PermissionRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;

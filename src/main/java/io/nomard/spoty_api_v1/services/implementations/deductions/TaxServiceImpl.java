@@ -2,8 +2,8 @@ package io.nomard.spoty_api_v1.services.implementations.deductions;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.deductions.Tax;
-import io.nomard.spoty_api_v1.entities.json_mapper.dto.TaxDTO;
-import io.nomard.spoty_api_v1.entities.json_mapper.mappers.TaxMapper;
+import io.nomard.spoty_api_v1.utils.json_mapper.dto.TaxDTO;
+import io.nomard.spoty_api_v1.utils.json_mapper.mappers.TaxMapper;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.repositories.deductions.TaxRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;

@@ -2,8 +2,8 @@ package io.nomard.spoty_api_v1.controllers.norm.accounting;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.accounting.Account;
-import io.nomard.spoty_api_v1.entities.json_mapper.dto.AccountDTO;
-import io.nomard.spoty_api_v1.entities.json_mapper.dto.AccountTransactionDTO;
+import io.nomard.spoty_api_v1.utils.json_mapper.dto.AccountDTO;
+import io.nomard.spoty_api_v1.utils.json_mapper.dto.AccountTransactionDTO;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;

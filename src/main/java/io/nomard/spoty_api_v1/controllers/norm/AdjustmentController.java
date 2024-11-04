@@ -3,7 +3,7 @@ package io.nomard.spoty_api_v1.controllers.norm;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.adjustments.AdjustmentMaster;
-import io.nomard.spoty_api_v1.entities.json_mapper.dto.AdjustmentDTO;
+import io.nomard.spoty_api_v1.utils.json_mapper.dto.AdjustmentDTO;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
 import io.nomard.spoty_api_v1.models.FindModel;

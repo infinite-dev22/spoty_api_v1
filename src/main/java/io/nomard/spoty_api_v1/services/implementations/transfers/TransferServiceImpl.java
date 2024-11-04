@@ -2,8 +2,8 @@ package io.nomard.spoty_api_v1.services.implementations.transfers;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Reviewer;
-import io.nomard.spoty_api_v1.entities.json_mapper.dto.TransferDTO;
-import io.nomard.spoty_api_v1.entities.json_mapper.mappers.TransferMapper;
+import io.nomard.spoty_api_v1.utils.json_mapper.dto.TransferDTO;
+import io.nomard.spoty_api_v1.utils.json_mapper.mappers.TransferMapper;
 import io.nomard.spoty_api_v1.entities.transfers.TransferMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;

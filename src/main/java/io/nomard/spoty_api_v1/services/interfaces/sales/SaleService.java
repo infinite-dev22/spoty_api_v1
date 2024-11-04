@@ -1,7 +1,7 @@
 package io.nomard.spoty_api_v1.services.interfaces.sales;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.entities.json_mapper.dto.SaleDTO;
+import io.nomard.spoty_api_v1.utils.json_mapper.dto.SaleDTO;
 import io.nomard.spoty_api_v1.entities.sales.SaleMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
