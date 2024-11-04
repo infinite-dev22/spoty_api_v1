@@ -1,20 +1,20 @@
-name: 'spoty_app_web_debug'
+name: "spoty_app_web_debug"
 services:
   app:
-    container_name: 'rest_api'
+    container_name: "rest_api"
     build:
       context: .
     restart: unless-stopped
     ports:
-      - '${SPRING_PORT}:${SPRING_PORT}'
+      - "${SPRING_PORT}:${SPRING_PORT}"
     networks:
       - api-net
     environment:
-      POSTGRES_USER: '${POSTGRESQL_USER}'
-      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
-      SPRING_DATASOURCE_URL: 'jdbc:postgresql://db:5432/${POSTGRESQL_DB}'
-      SPRING_DATASOURCE_USERNAME: '${POSTGRESQL_USER}'
-      SPRING_DATASOURCE_PASSWORD: '${POSTGRES_PASSWORD}'
+      POSTGRES_USER: "${POSTGRESQL_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://db:5432/${POSTGRESQL_DB}"
+      SPRING_DATASOURCE_USERNAME: "${POSTGRESQL_USER}"
+      SPRING_DATASOURCE_PASSWORD: "${POSTGRES_PASSWORD}"
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     volumes:
       - static-files:/var/lib/opencore/static/uploads
@@ -23,19 +23,19 @@ services:
         condition: service_healthy
 
   db:
-    container_name: 'database'
-    image: 'postgres:alpine3.20'
+    container_name: "database"
+    image: "postgres:latest"
     restart: unless-stopped
     ports:
-      - '${POSTGRESQL_PORT_NUMBER}:${POSTGRESQL_PORT_NUMBER}'
+      - "${POSTGRESQL_PORT_NUMBER}:${POSTGRESQL_PORT_NUMBER}"
     expose:
-      - '${POSTGRESQL_PORT_NUMBER}'
+      - "${POSTGRESQL_PORT_NUMBER}"
     networks:
       - api-net
     environment:
-      POSTGRES_DB: '${POSTGRESQL_DB}'
-      POSTGRES_USER: '${POSTGRESQL_USER}'
-      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
+      POSTGRES_DB: "${POSTGRESQL_DB}"
+      POSTGRES_USER: "${POSTGRESQL_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
@@ -45,17 +45,17 @@ services:
       retries: 5
 
   pgadmin:
-    container_name: 'pgadmin'
-    image: 'elestio/pgadmin:latest'
+    container_name: "pgadmin"
+    image: "elestio/pgadmin:latest"
     restart: unless-stopped
     environment:
-      PGADMIN_DEFAULT_EMAIL: '${ADMIN_EMAIL}'
-      PGADMIN_DEFAULT_PASSWORD: '${POSTGRESQL_POSTGRES_PASSWORD}'
+      PGADMIN_DEFAULT_EMAIL: "${ADMIN_EMAIL}"
+      PGADMIN_DEFAULT_PASSWORD: "${POSTGRESQL_POSTGRES_PASSWORD}"
     depends_on:
       db:
         condition: service_healthy
     ports:
-      - '${PGADMIN_LOCAL_PORT}:${PGADMIN_DOCKER_PORT}'
+      - "${PGADMIN_LOCAL_PORT}:${PGADMIN_DOCKER_PORT}"
     volumes:
       - pgadmin-data:/var/lib/pgadmin
       - ./servers.json:/pgadmin4/servers.json
