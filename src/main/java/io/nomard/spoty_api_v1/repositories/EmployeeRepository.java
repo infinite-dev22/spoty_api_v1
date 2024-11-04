@@ -17,8 +17,8 @@ public interface EmployeeRepository extends PagingAndSortingRepository<Employee,
             "AND TRIM(LOWER(e.email)) LIKE %:search%")
     ArrayList<Employee> searchEmployee(@Param("tenantId") Long tenantId, @Param("search") String search);
 
-    @Query("SELECT e FROM Employee e WHERE e.tenant.id = :tenantId")
-    Page<Employee> findByEmail(@Param("tenantId") Long tenantId, Pageable pageable);
+    @Query("SELECT e FROM Employee e WHERE e.tenant.id = :tenantId AND e.designation IS NOT NULL")
+    Page<Employee> findByTenantId(@Param("tenantId") Long tenantId, Pageable pageable);
 
     @Query("SELECT e FROM Employee e WHERE  e.email = :email")
     Employee findByEmail(String email);

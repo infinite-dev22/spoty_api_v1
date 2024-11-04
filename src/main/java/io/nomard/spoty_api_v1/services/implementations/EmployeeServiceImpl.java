@@ -78,7 +78,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 pageSize,
                 Sort.by(Sort.Order.desc("createdAt"))
         );
-        return employeeRepo.findByEmail(
+        return employeeRepo.findByTenantId(
                 authService.authUser().getTenant().getId(),
                 pageRequest
         ).map(employee -> employeeMapper.toWholeDTO(employee));
