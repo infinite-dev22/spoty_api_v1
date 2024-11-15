@@ -1,7 +1,6 @@
 package io.nomard.spoty_api_v1.services.interfaces.dashboard;
 
 import io.nomard.spoty_api_v1.entities.sales.SaleMaster;
-import io.nomard.spoty_api_v1.models.DashboardKPIModel;
 import io.nomard.spoty_api_v1.models.LineChartModel;
 import io.nomard.spoty_api_v1.models.ProductSalesModel;
 import io.nomard.spoty_api_v1.models.StockAlertModel;
@@ -35,13 +34,33 @@ public interface MainDashboardService {
 
     List<StockAlertModel> getProductsStockAlert();
 
-    DashboardKPIModel getTotalEarningsKPI();
+    Number getTotalSalesKPI();
 
-    DashboardKPIModel getTotalPurchasesKPI();
+    Number getRevenueKPI();
 
-    DashboardKPIModel getCountProductsKPI();
+    Number getSaleCostKPI();
 
-    DashboardKPIModel getCountCustomersKPI();
+    Number getProfitKPI();
 
-    DashboardKPIModel getCountSuppliersKPI();
+    Number getPurchasesKPI();
+
+    Number getPurchaseCostKPI();
+
+    Number getCancelledOrdersKPI();
+
+    Number getPurchaseReturnsKPI();
+
+    Number getStockQuantityAtHandKPI();
+
+    Number getStockQuantityValueKPI();
+
+    Number getLowStockItemsKPI();
+
+    Number getTotalProductCategoriesKPI();
+
+    Number getProductsKPI();
+
+    Number getCustomersKPI();
+
+    Number getSuppliersKPI();
 }

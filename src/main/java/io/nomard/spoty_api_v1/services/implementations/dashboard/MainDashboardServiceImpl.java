@@ -1,14 +1,15 @@
 package io.nomard.spoty_api_v1.services.implementations.dashboard;
 
 import io.nomard.spoty_api_v1.entities.sales.SaleMaster;
-import io.nomard.spoty_api_v1.models.DashboardKPIModel;
 import io.nomard.spoty_api_v1.models.LineChartModel;
 import io.nomard.spoty_api_v1.models.ProductSalesModel;
 import io.nomard.spoty_api_v1.models.StockAlertModel;
 import io.nomard.spoty_api_v1.repositories.CustomerRepository;
+import io.nomard.spoty_api_v1.repositories.ProductCategoryRepository;
 import io.nomard.spoty_api_v1.repositories.ProductRepository;
 import io.nomard.spoty_api_v1.repositories.SupplierRepository;
 import io.nomard.spoty_api_v1.repositories.purchases.PurchaseMasterRepository;
+import io.nomard.spoty_api_v1.repositories.returns.purchase_returns.PurchaseReturnMasterRepository;
 import io.nomard.spoty_api_v1.repositories.sales.SaleMasterRepository;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.dashboard.MainDashboardService;
@@ -27,7 +28,11 @@ public class MainDashboardServiceImpl implements MainDashboardService {
     @Autowired
     private PurchaseMasterRepository purchaseMasterRepo;
     @Autowired
+    private PurchaseReturnMasterRepository purchaseReturnRepo;
+    @Autowired
     private ProductRepository productRepo;
+    @Autowired
+    private ProductCategoryRepository productCategoryRepo;
     @Autowired
     private SaleMasterRepository saleMasterRepo;
     @Autowired
@@ -126,35 +131,83 @@ public class MainDashboardServiceImpl implements MainDashboardService {
     @Override
     @Cacheable("total_earnings")
     @Transactional(readOnly = true)
-    public DashboardKPIModel getTotalEarningsKPI() {
-        return saleMasterRepo.totalEarnings(authService.authUser().getTenant().getId());
+    public Number getTotalSalesKPI() {
+        return saleMasterRepo.numberOfSales(authService.authUser().getTenant().getId());
     }
 
     @Override
-    @Cacheable("total_purchases")
-    @Transactional(readOnly = true)
-    public DashboardKPIModel getTotalPurchasesKPI() {
-        return purchaseMasterRepo.totalPurchases(authService.authUser().getTenant().getId());
+    public Number getRevenueKPI() {
+        return saleMasterRepo.revenue(authService.authUser().getTenant().getId());
     }
 
     @Override
-    @Cacheable("total_products")
-    @Transactional(readOnly = true)
-    public DashboardKPIModel getCountProductsKPI() {
-        return productRepo.countProducts(authService.authUser().getTenant().getId());
+    public Number getSaleCostKPI() {
+        return saleMasterRepo.salesForCost(authService.authUser().getTenant().getId())
+                .stream().flatMap(sale -> sale.getSaleDetails().stream())
+                .mapToDouble(saleDetail -> saleDetail.getProduct().getCostPrice()).sum();
+    }
+
+    @Override
+    public Number getProfitKPI() {
+        return (double) getRevenueKPI() - (double) getSaleCostKPI();
+    }
+
+    @Override
+    public Number getPurchasesKPI() {
+        return purchaseMasterRepo.numberOfPurchases(authService.authUser().getTenant().getId());
+    }
+
+    @Override
+    public Number getPurchaseCostKPI() {
+        return purchaseMasterRepo.purchaseCost(authService.authUser().getTenant().getId());
+    }
+
+    @Override
+    public Number getCancelledOrdersKPI() {
+        return purchaseMasterRepo.totalCancelledPurchases(authService.authUser().getTenant().getId());
+    }
+
+    @Override
+    public Number getPurchaseReturnsKPI() {
+        return purchaseReturnRepo.numberOfPurchaseReturns(authService.authUser().getTenant().getId());
+    }
+
+    @Override
+    public Number getStockQuantityAtHandKPI() {
+        return productRepo.productQuantityAtHand(authService.authUser().getTenant().getId());
+    }
+
+    @Override
+    public Number getStockQuantityValueKPI() {
+        return productRepo.productQuantityValue(authService.authUser().getTenant().getId());
+    }
+
+    @Override
+    public Number getLowStockItemsKPI() {
+        return productRepo.lowStockProducts(authService.authUser().getTenant().getId());
+    }
+
+    @Override
+    public Number getTotalProductCategoriesKPI() {
+        return productCategoryRepo.numberOfProductCategories(authService.authUser().getTenant().getId());
+    }
+
+    @Override
+    public Number getProductsKPI() {
+        return productRepo.totalProducts(authService.authUser().getTenant().getId());
     }
 
     @Override
     @Cacheable("total_customers")
     @Transactional(readOnly = true)
-    public DashboardKPIModel getCountCustomersKPI() {
+    public Number getCustomersKPI() {
         return customerRepo.countCustomers(authService.authUser().getTenant().getId());
     }
 
     @Override
     @Cacheable("total_suppliers")
     @Transactional(readOnly = true)
-    public DashboardKPIModel getCountSuppliersKPI() {
+    public Number getSuppliersKPI() {
         return supplierRepo.countSuppliers(authService.authUser().getTenant().getId());
     }
 }

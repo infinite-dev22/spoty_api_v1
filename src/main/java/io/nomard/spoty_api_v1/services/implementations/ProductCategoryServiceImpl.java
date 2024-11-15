@@ -36,13 +36,13 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     private ProductCategoryMapper productCategoryMapper;
 
     @Override
-    public Page<ProductCategoryDTO> getAll(int pageNo, int pageSize) {
+    public Page<ProductCategoryDTO.AsWhole> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
         return productCategoryRepo.findAllByTenantId(authService.authUser().getTenant().getId(), pageRequest).map(productCategory -> productCategoryMapper.toDTO(productCategory));
     }
 
     @Override
-    public ProductCategoryDTO getById(Long id) throws NotFoundException {
+    public ProductCategoryDTO.AsWhole getById(Long id) throws NotFoundException {
         Optional<ProductCategory> productCategory = productCategoryRepo.findById(id);
         if (productCategory.isEmpty()) {
             throw new NotFoundException();
@@ -51,7 +51,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     }
 
     @Override
-    public List<ProductCategoryDTO> getByContains(String search) {
+    public List<ProductCategoryDTO.AsWhole> getByContains(String search) {
         return productCategoryRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase())
                 .stream()
                 .map(productCategory -> productCategoryMapper.toDTO(productCategory))

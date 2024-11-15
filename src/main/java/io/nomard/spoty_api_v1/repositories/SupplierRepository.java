@@ -1,7 +1,6 @@
 package io.nomard.spoty_api_v1.repositories;
 
 import io.nomard.spoty_api_v1.entities.Supplier;
-import io.nomard.spoty_api_v1.models.DashboardKPIModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,8 +27,8 @@ public interface SupplierRepository extends PagingAndSortingRepository<Supplier,
     @Query("select p from Supplier p where p.tenant.id = :id OR p.tenant IS NULL")
     Page<Supplier> findByTenantId(@Param("id") Long id, Pageable pageable);
 
-    @Query("SELECT new io.nomard.spoty_api_v1.models.DashboardKPIModel('Total Suppliers', COUNT(s)) " +
+    @Query("SELECT COUNT(s) " +
             "FROM Supplier s " +
             "WHERE s.tenant.id = :id OR s.tenant IS NULL")
-    DashboardKPIModel countSuppliers(@Param("id") Long id);
+    Number countSuppliers(@Param("id") Long id);
 }

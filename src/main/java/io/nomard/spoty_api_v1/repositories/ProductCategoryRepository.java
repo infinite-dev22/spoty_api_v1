@@ -19,4 +19,9 @@ public interface ProductCategoryRepository extends PagingAndSortingRepository<Pr
 
     @Query("select p from ProductCategory p where p.tenant.id = :id")
     Page<ProductCategory> findAllByTenantId(@Param("id") Long id, Pageable pageable);
+
+    @Query("SELECT COUNT(p) " +
+            "FROM ProductCategory p " +
+            "WHERE p.tenant.id = :id")
+    Number numberOfProductCategories(@Param("id") Long tenantId);
 }

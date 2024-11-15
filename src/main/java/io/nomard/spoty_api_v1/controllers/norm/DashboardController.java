@@ -1,7 +1,6 @@
 package io.nomard.spoty_api_v1.controllers.norm;
 
 import io.nomard.spoty_api_v1.entities.sales.SaleMaster;
-import io.nomard.spoty_api_v1.models.DashboardKPIModel;
 import io.nomard.spoty_api_v1.models.LineChartModel;
 import io.nomard.spoty_api_v1.models.ProductSalesModel;
 import io.nomard.spoty_api_v1.models.StockAlertModel;
@@ -81,28 +80,78 @@ public class DashboardController {
         return mainDashboardService.getProductsStockAlert();
     }
 
-    @GetMapping("/kpi/earnings")
-    public DashboardKPIModel totalEarningsKPI() {
-        return mainDashboardService.getTotalEarningsKPI();
+    @GetMapping("kpi/total/sales")
+    public Number getTotalSalesKPI() {
+        return mainDashboardService.getTotalSalesKPI();
     }
 
-    @GetMapping("/kpi/purchases")
-    public DashboardKPIModel totalPurchasesKPI() {
-        return mainDashboardService.getTotalPurchasesKPI();
+    @GetMapping("kpi/revenue")
+    public Number getRevenueKPI() {
+        return mainDashboardService.getRevenueKPI();
     }
 
-    @GetMapping("/kpi/products")
-    public DashboardKPIModel countProductsKPI() {
-        return mainDashboardService.getCountProductsKPI();
+    @GetMapping("kpi/sale/cost")
+    public Number getSaleCostKPI() {
+        return mainDashboardService.getSaleCostKPI();
     }
 
-    @GetMapping("/kpi/customers")
-    public DashboardKPIModel countCustomersKPI() {
-        return mainDashboardService.getCountCustomersKPI();
+    @GetMapping("kpi/profit")
+    public Number getProfitKPI() {
+        return mainDashboardService.getProfitKPI();
     }
 
-    @GetMapping("/kpi/suppliers")
-    public DashboardKPIModel countSuppliersKPI() {
-        return mainDashboardService.getCountSuppliersKPI();
+    @GetMapping("kpi/purchases")
+    public Number getPurchasesKPI() {
+        return mainDashboardService.getPurchasesKPI();
+    }
+
+    @GetMapping("kpi/purchase/cost")
+    public Number getPurchaseCostKPI() {
+        return mainDashboardService.getPurchaseCostKPI();
+    }
+
+    @GetMapping("kpi/cancelled/orders")
+    public Number getCancelledOrdersKPI() {
+        return mainDashboardService.getCancelledOrdersKPI();
+    }
+
+    @GetMapping("kpi/purchase/returns")
+    public Number getPurchaseReturnsKPI() {
+        return mainDashboardService.getPurchaseReturnsKPI();
+    }
+
+    @GetMapping("kpi/product/quantity/at_hand")
+    public Number getStockQuantityAtHandKPI() {
+        return mainDashboardService.getStockQuantityAtHandKPI();
+    }
+
+    @GetMapping("kpi/product/quantity/value")
+    public Number getStockQuantityValueKPI() {
+        return mainDashboardService.getStockQuantityValueKPI();
+    }
+
+    @GetMapping("kpi/product/low/stock")
+    public Number getLowStockItemsKPI() {
+        return mainDashboardService.getLowStockItemsKPI();
+    }
+
+    @GetMapping("kpi/products/categories")
+    public Number getTotalProductCategoriesKPI() {
+        return mainDashboardService.getTotalProductCategoriesKPI();
+    }
+
+    @GetMapping("kpi/products")
+    public Number getProductsKPI() {
+        return mainDashboardService.getProductsKPI();
+    }
+
+    @GetMapping("kpi/customers")
+    public Number getCustomersKPI() {
+        return mainDashboardService.getCustomersKPI();
+    }
+
+    @GetMapping("kpi/suppliers")
+    public Number getSuppliersKPI() {
+        return mainDashboardService.getSuppliersKPI();
     }
 }

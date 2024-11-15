@@ -23,18 +23,18 @@ public class ProductCategoryController {
     private ProductCategoryServiceImpl productCategoryService;
 
     @GetMapping("/all")
-    public Page<ProductCategoryDTO> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
+    public Page<ProductCategoryDTO.AsWhole> getAll(@RequestParam(defaultValue = "0") Integer pageNo,
                                            @RequestParam(defaultValue = "50") Integer pageSize) {
         return productCategoryService.getAll(pageNo, pageSize);
     }
 
     @GetMapping("/single")
-    public ProductCategoryDTO getById(@RequestBody FindModel findModel) throws NotFoundException {
+    public ProductCategoryDTO.AsWhole getById(@RequestBody FindModel findModel) throws NotFoundException {
         return productCategoryService.getById(findModel.getId());
     }
 
     @GetMapping("/search")
-    public List<ProductCategoryDTO> getByContains(@RequestBody SearchModel searchModel) {
+    public List<ProductCategoryDTO.AsWhole> getByContains(@RequestBody SearchModel searchModel) {
         return productCategoryService.getByContains(searchModel.getSearch());
     }
 

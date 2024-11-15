@@ -40,4 +40,26 @@ public interface ProductRepository extends PagingAndSortingRepository<Product, L
             "WHERE p.tenant.id = :id " +
             "AND p.quantity <= p.stockAlert")
     List<StockAlertModel> productsStockAlert(@Param("id") Long tenantId);
+
+    @Query("SELECT COUNT(p) " +
+            "FROM Product p " +
+            "WHERE p.tenant.id = :id " +
+            "AND p.quantity <= p.stockAlert")
+    Number lowStockProducts(@Param("id") Long tenantId);
+
+    @Query("SELECT COUNT(p) " +
+            "FROM Product p " +
+            "WHERE p.tenant.id = :id")
+    Number totalProducts(@Param("id") Long tenantId);
+
+    @Query("SELECT SUM(p.quantity) " +
+            "FROM Product p " +
+            "WHERE p.tenant.id = :id")
+    Number productQuantityAtHand(@Param("id") Long tenantId);
+
+    @Query("SELECT SUM(p.quantity * p.salePrice) " +
+            "FROM Product p " +
+            "WHERE p.tenant.id = :id " +
+            "AND p.quantity > 0")
+    Number productQuantityValue(@Param("id") Long tenantId);
 }

@@ -19,4 +19,13 @@ public interface PurchaseReturnMasterRepository extends PagingAndSortingReposito
 
     @Query("select prm from PurchaseReturnMaster prm where prm.tenant.id = :tenantId AND (prm.approved = true OR prm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Reviewer a WHERE a.employee.id = :userId AND a.level = prm.nextApprovedLevel) > 0)")
     Page<PurchaseReturnMaster> findAllByTenantId(@Param("tenantId") Long tenantId, @Param("userId") Long userId, Pageable pageable);
+
+    @Query(
+            "SELECT COUNT(prm) " +
+                    "FROM PurchaseReturnMaster prm " +
+                    "WHERE prm.tenant.id = :id " +
+                    "AND prm.approved = true " +
+                    "AND TO_CHAR(CAST(prm.createdAt AS date), 'YYYY-MM') = TO_CHAR(CAST(CURRENT_DATE AS date), 'YYYY-MM')"
+    )
+    Number numberOfPurchaseReturns(@Param("id") Long id);
 }

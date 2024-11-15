@@ -1,7 +1,6 @@
 package io.nomard.spoty_api_v1.repositories.purchases;
 
 import io.nomard.spoty_api_v1.entities.purchases.PurchaseMaster;
-import io.nomard.spoty_api_v1.models.DashboardKPIModel;
 import io.nomard.spoty_api_v1.models.LineChartModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -71,9 +70,29 @@ public interface PurchaseMasterRepository
     );
 
     @Query(
-            "SELECT new io.nomard.spoty_api_v1.models.DashboardKPIModel('Total Purchases', SUM(pm.amountPaid)) " +
+            "SELECT SUM(pm.amountPaid) " +
                     "FROM PurchaseMaster pm " +
-                    "WHERE pm.tenant.id = :id AND pm.approved = true"
+                    "WHERE pm.tenant.id = :id " +
+                    "AND pm.approved = true " +
+                    "AND TO_CHAR(CAST(pm.createdAt AS date), 'YYYY-MM') = TO_CHAR(CAST(CURRENT_DATE AS date), 'YYYY-MM')"
     )
-    DashboardKPIModel totalPurchases(@Param("id") Long id);
+    Number purchaseCost(@Param("id") Long id);
+
+    @Query(
+            "SELECT COUNT(pm) " +
+                    "FROM PurchaseMaster pm " +
+                    "WHERE pm.tenant.id = :id " +
+                    "AND pm.approved = true " +
+                    "AND TO_CHAR(CAST(pm.createdAt AS date), 'YYYY-MM') = TO_CHAR(CAST(CURRENT_DATE AS date), 'YYYY-MM')"
+    )
+    Number numberOfPurchases(@Param("id") Long id);
+
+    @Query(
+            "SELECT COUNT(pm) " +
+                    "FROM PurchaseMaster pm " +
+                    "WHERE pm.tenant.id = :id " +
+                    "AND LOWER(pm.purchaseStatus) LIKE LOWER('%cancelled%') " +
+                    "AND TO_CHAR(CAST(pm.createdAt AS date), 'YYYY-MM') = TO_CHAR(CAST(CURRENT_DATE AS date), 'YYYY-MM')"
+    )
+    Number totalCancelledPurchases(@Param("id") Long id);
 }

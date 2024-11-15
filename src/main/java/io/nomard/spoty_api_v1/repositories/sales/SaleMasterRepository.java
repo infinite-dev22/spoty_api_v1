@@ -1,7 +1,6 @@
 package io.nomard.spoty_api_v1.repositories.sales;
 
 import io.nomard.spoty_api_v1.entities.sales.SaleMaster;
-import io.nomard.spoty_api_v1.models.DashboardKPIModel;
 import io.nomard.spoty_api_v1.models.LineChartModel;
 import io.nomard.spoty_api_v1.models.ProductSalesModel;
 import org.springframework.data.domain.Page;
@@ -76,10 +75,30 @@ public interface SaleMasterRepository extends PagingAndSortingRepository<SaleMas
 //            "WHERE s.tenant.id = :id")
 //    DashboardKPIModel countOrders(@Param("id") Long id);
 
-    @Query("SELECT new io.nomard.spoty_api_v1.models.DashboardKPIModel('Total Earnings', SUM(sm.amountPaid)) " +
+    @Query("SELECT SUM(sm.amountPaid) " +
             "FROM SaleMaster sm " +
-            "WHERE sm.tenant.id = :id AND sm.approved = true")
-    DashboardKPIModel totalEarnings(@Param("id") Long id);
+            "WHERE sm.tenant.id = :id " +
+            "AND sm.approved = true " +
+            "AND TO_CHAR(CAST(sm.createdAt AS date), 'YYYY-MM') = TO_CHAR(CAST(CURRENT_DATE AS date), 'YYYY-MM')"
+    )
+    Number revenue(@Param("id") Long id);
+
+    @Query(
+            "SELECT COUNT(sm) " +
+                    "FROM SaleMaster sm " +
+                    "WHERE sm.tenant.id = :id " +
+                    "AND sm.approved = true " +
+                    "AND TO_CHAR(CAST(sm.createdAt AS date), 'YYYY-MM') = TO_CHAR(CAST(CURRENT_DATE AS date), 'YYYY-MM')"
+    )
+    Number numberOfSales(@Param("id") Long id);
+
+    @Query("SELECT sm " +
+            "FROM SaleMaster sm " +
+            "WHERE sm.tenant.id = :id " +
+            "AND sm.approved = true " +
+            "AND TO_CHAR(CAST(sm.createdAt AS date), 'YYYY-MM') = TO_CHAR(CAST(CURRENT_DATE AS date), 'YYYY-MM')"
+    )
+    ArrayList<SaleMaster> salesForCost(@Param("id") Long id);
 
     @Query("SELECT sm FROM SaleMaster sm WHERE sm.tenant.id = :tenantId " +
             "AND TRIM(LOWER(sm.ref)) LIKE %:search% AND (sm.approved = true OR sm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Reviewer a WHERE a.employee.id = :userId AND a.level = sm.nextApprovedLevel) > 0)")

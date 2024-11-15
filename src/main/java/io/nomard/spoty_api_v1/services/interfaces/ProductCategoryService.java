@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface ProductCategoryService {
-    Page<ProductCategoryDTO> getAll(int pageNo, int pageSize);
+    Page<ProductCategoryDTO.AsWhole> getAll(int pageNo, int pageSize);
 
-    ProductCategoryDTO getById(Long id) throws NotFoundException;
+    ProductCategoryDTO.AsWhole getById(Long id) throws NotFoundException;
 
-    List<ProductCategoryDTO> getByContains(String search);
+    List<ProductCategoryDTO.AsWhole> getByContains(String search);
 
     ResponseEntity<ObjectNode> save(ProductCategory productCategory);
 
