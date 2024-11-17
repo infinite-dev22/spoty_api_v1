@@ -43,63 +43,54 @@ public class MainDashboardServiceImpl implements MainDashboardService {
     private AuthServiceImpl authService;
 
     @Override
-    @Cacheable("yearly_expenses")
     @Transactional(readOnly = true)
     public List<LineChartModel> getYearlyPurchases() {
         return purchaseMasterRepo.yearlyPurchases(authService.authUser().getTenant().getId());
     }
 
     @Override
-    @Cacheable("monthly_expenses")
     @Transactional(readOnly = true)
     public List<LineChartModel> getMonthlyPurchases() {
         return purchaseMasterRepo.monthlyPurchases(authService.authUser().getTenant().getId());
     }
 
     @Override
-    @Cacheable("weekly_expenses")
     @Transactional(readOnly = true)
     public List<LineChartModel> getWeeklyPurchases() {
         return purchaseMasterRepo.weeklyPurchases(authService.authUser().getTenant().getId());
     }
 
     @Override
-    @Cacheable("yearly_incomes")
     @Transactional(readOnly = true)
     public List<LineChartModel> getYearlySales() {
         return saleMasterRepo.yearlySales(authService.authUser().getTenant().getId());
     }
 
     @Override
-    @Cacheable("monthly_incomes")
     @Transactional(readOnly = true)
     public List<LineChartModel> getMonthlySales() {
         return saleMasterRepo.monthlySales(authService.authUser().getTenant().getId());
     }
 
-    @Cacheable("weekly_incomes")
-    @Transactional(readOnly = true)
     @Override
+    @Transactional(readOnly = true)
     public List<LineChartModel> getWeeklySales() {
         return saleMasterRepo.weeklySales(authService.authUser().getTenant().getId());
     }
 
     @Override
-    @Cacheable("monthly_revenue")
     @Transactional(readOnly = true)
     public List<LineChartModel> getYearlyRevenue() {
         return saleMasterRepo.yearlyRevenue(authService.authUser().getTenant().getId());
     }
 
     @Override
-    @Cacheable("monthly_revenue")
     @Transactional(readOnly = true)
     public List<LineChartModel> getMonthlyRevenue() {
         return saleMasterRepo.monthlyRevenue(authService.authUser().getTenant().getId());
     }
 
     @Override
-    @Cacheable("weekly_revenue")
     @Transactional(readOnly = true)
     public List<LineChartModel> getWeeklyRevenue() {
         return saleMasterRepo.weeklyRevenue(authService.authUser().getTenant().getId());
@@ -129,7 +120,6 @@ public class MainDashboardServiceImpl implements MainDashboardService {
     }
 
     @Override
-    @Cacheable("total_earnings")
     @Transactional(readOnly = true)
     public Number getTotalSalesKPI() {
         return saleMasterRepo.numberOfSales(authService.authUser().getTenant().getId());
@@ -198,14 +188,12 @@ public class MainDashboardServiceImpl implements MainDashboardService {
     }
 
     @Override
-    @Cacheable("total_customers")
     @Transactional(readOnly = true)
     public Number getCustomersKPI() {
         return customerRepo.countCustomers(authService.authUser().getTenant().getId());
     }
 
     @Override
-    @Cacheable("total_suppliers")
     @Transactional(readOnly = true)
     public Number getSuppliersKPI() {
         return supplierRepo.countSuppliers(authService.authUser().getTenant().getId());

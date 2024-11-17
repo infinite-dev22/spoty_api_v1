@@ -40,25 +40,36 @@ public interface SaleMasterRepository extends PagingAndSortingRepository<SaleMas
             "ORDER BY CAST(sm.createdAt AS date)")
     List<LineChartModel> weeklySales(@Param("id") Long id);
 
-    @Query("SELECT DATE_PART('year', CAST(sm.createdAt AS date)) AS period, SUM(sm.amountPaid) AS totalValue " +
-            "FROM SaleMaster sm " +
-            "WHERE sm.tenant.id = :id AND sm.approved = true " +
-            "GROUP BY period " +
-            "ORDER BY DATE_PART('year', CAST(sm.createdAt AS date))")
+    @Query(value = "SELECT TO_CHAR(CAST(sm.created_at AS date), 'Mon YYYY') AS period, " +
+            "SUM(sm.amount_paid) AS totalValue " +
+            "FROM sale_master sm " +
+            "WHERE sm.tenant_id = :id AND sm.approved = true " +
+            "AND TO_CHAR(CAST(sm.created_at AS date), 'YYYY-MM-dd') " +
+            "BETWEEN TO_CHAR(CAST(CURRENT_DATE - 365 AS date), 'YYYY-MM-dd') " +
+            "AND TO_CHAR(CAST(CURRENT_DATE AS date), 'YYYY-MM-dd') " +
+            "GROUP BY period, EXTRACT(MONTH FROM sm.created_at), EXTRACT(YEAR FROM sm.created_at) " +
+            "ORDER BY EXTRACT(YEAR FROM sm.created_at), EXTRACT(MONTH FROM sm.created_at)",
+            nativeQuery = true)
     List<LineChartModel> yearlyRevenue(@Param("id") Long id);
 
-    @Query("SELECT DATE_PART('month', CAST(sm.createdAt AS date)) AS period, SUM(sm.amountPaid) AS totalValue " +
-            "FROM SaleMaster sm " +
-            "WHERE sm.tenant.id = :id AND sm.approved = true " +
+    @Query(value="SELECT TO_CHAR(CAST(sm.created_at AS date), 'ddth Mon') AS period, SUM(sm.amount_paid) AS totalValue " +
+            "FROM sale_master sm " +
+            "WHERE sm.tenant_id = :id AND sm.approved = true " +
+            "AND TO_CHAR(CAST(sm.created_at AS date), 'YYYY-MM-dd') " +
+            "BETWEEN TO_CHAR(CAST(CURRENT_DATE - 31 AS date), 'YYYY-MM-dd') " +
+            "AND TO_CHAR(CAST(CURRENT_DATE AS date), 'YYYY-MM-dd') " +
             "GROUP BY period " +
-            "ORDER BY DATE_PART('month', CAST(sm.createdAt AS date))")
+            "ORDER BY period", nativeQuery = true)
     List<LineChartModel> monthlyRevenue(@Param("id") Long id);
 
-    @Query("SELECT CAST(sm.createdAt AS date) AS period, SUM(sm.amountPaid) AS totalValue " +
-            "FROM SaleMaster sm " +
-            "WHERE sm.tenant.id = :id AND sm.approved = true " +
+    @Query(value="SELECT TO_CHAR(CAST(sm.created_at AS date), 'ddth Dy') AS period, SUM(sm.amount_paid) AS totalValue " +
+            "FROM sale_master sm " +
+            "WHERE sm.tenant_id = :id AND sm.approved = true " +
+            "AND TO_CHAR(CAST(sm.created_at AS date), 'YYYY-MM-dd') " +
+            "BETWEEN TO_CHAR(CAST(CURRENT_DATE - 7 AS date), 'YYYY-MM-dd') " +
+            "AND TO_CHAR(CAST(CURRENT_DATE AS date), 'YYYY-MM-dd') " +
             "GROUP BY period " +
-            "ORDER BY CAST(sm.createdAt AS date)")
+            "ORDER BY period", nativeQuery = true)
     List<LineChartModel> weeklyRevenue(@Param("id") Long id);
 
     @Query("SELECT new io.nomard.spoty_api_v1.models.ProductSalesModel(p.name, SUM(sd.quantity), p.salePrice, p.costPrice) " +
