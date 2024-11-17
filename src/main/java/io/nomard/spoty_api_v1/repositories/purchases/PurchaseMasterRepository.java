@@ -25,7 +25,7 @@ public interface PurchaseMasterRepository
                     "GROUP BY period " +
                     "ORDER BY DATE_PART('year', CAST(pm.createdAt AS date))"
     )
-    List<LineChartModel> yearlyExpenses(@Param("id") Long id);
+    List<LineChartModel> yearlyPurchases(@Param("id") Long id);
 
     @Query(
             value = "SELECT TO_CHAR(TO_DATE(CONCAT(EXTRACT(YEAR FROM CURRENT_DATE), '-', months.month, '-01'), 'YYYY-MM-DD'), 'YYYY Month') AS period, COALESCE(SUM(pm.amount_paid), 0) AS totalValue " +
@@ -38,7 +38,7 @@ public interface PurchaseMasterRepository
                     "ORDER BY months.month::int",
             nativeQuery = true
     )
-    List<LineChartModel> monthlyExpenses(@Param("id") Long id);
+    List<LineChartModel> monthlyPurchases(@Param("id") Long id);
 
     @Query(
             "SELECT CAST(pm.createdAt AS date) AS period, SUM(pm.amountPaid) AS totalValue " +
@@ -47,7 +47,7 @@ public interface PurchaseMasterRepository
                     "GROUP BY period " +
                     "ORDER BY CAST(pm.createdAt AS date)"
     )
-    List<LineChartModel> weeklyExpenses(@Param("id") Long id);
+    List<LineChartModel> weeklyPurchases(@Param("id") Long id);
 
     @Query(
             "SELECT pm FROM PurchaseMaster pm WHERE pm.tenant.id = :tenantId " +

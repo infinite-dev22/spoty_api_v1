@@ -8,19 +8,19 @@ import io.nomard.spoty_api_v1.models.StockAlertModel;
 import java.util.List;
 
 public interface MainDashboardService {
-    // Expenses.
-    List<LineChartModel> getYearlyExpenses();
+    // Purchases.
+    List<LineChartModel> getYearlyPurchases();
 
-    List<LineChartModel> getMonthlyExpenses();
+    List<LineChartModel> getMonthlyPurchases();
 
-    List<LineChartModel> getWeeklyExpenses();
+    List<LineChartModel> getWeeklyPurchases();
 
-    // Incomes.
-    List<LineChartModel> getYearlyIncomes();
+    // Sales.
+    List<LineChartModel> getYearlySales();
 
-    List<LineChartModel> getMonthlyIncomes();
+    List<LineChartModel> getMonthlySales();
 
-    List<LineChartModel> getWeeklyIncomes();
+    List<LineChartModel> getWeeklySales();
 
     List<LineChartModel> getYearlyRevenue();
 

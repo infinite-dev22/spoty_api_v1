@@ -20,34 +20,34 @@ public class DashboardController {
     @Autowired
     private MainDashboardServiceImpl mainDashboardService;
 
-    @GetMapping("/expense/yearly")
-    public List<LineChartModel> expenseYearlySse() {
-        return mainDashboardService.getYearlyExpenses();
+    @GetMapping("/purchase/yearly")
+    public List<LineChartModel> purchaseYearlySse() {
+        return mainDashboardService.getYearlyPurchases();
     }
 
-    @GetMapping("/expense/monthly")
-    public List<LineChartModel> expenseMonthlySse() {
-        return mainDashboardService.getMonthlyExpenses();
+    @GetMapping("/purchase/monthly")
+    public List<LineChartModel> purchaseMonthlySse() {
+        return mainDashboardService.getMonthlyPurchases();
     }
 
-    @GetMapping("/expense/weekly")
-    public List<LineChartModel> expenseWeeklySse() {
-        return mainDashboardService.getWeeklyExpenses();
+    @GetMapping("/purchase/weekly")
+    public List<LineChartModel> purchaseWeeklySse() {
+        return mainDashboardService.getWeeklyPurchases();
     }
 
-    @GetMapping("/income/yearly")
-    public List<LineChartModel> incomeYearlySse() {
-        return mainDashboardService.getYearlyIncomes();
+    @GetMapping("/sale/yearly")
+    public List<LineChartModel> saleYearlySse() {
+        return mainDashboardService.getYearlySales();
     }
 
-    @GetMapping("/income/monthly")
-    public List<LineChartModel> incomeMonthlySse() {
-        return mainDashboardService.getMonthlyIncomes();
+    @GetMapping("/sale/monthly")
+    public List<LineChartModel> saleMonthlySse() {
+        return mainDashboardService.getMonthlySales();
     }
 
-    @GetMapping("/income/weekly")
-    public List<LineChartModel> incomeWeeklySse() {
-        return mainDashboardService.getWeeklyIncomes();
+    @GetMapping("/sale/weekly")
+    public List<LineChartModel> saleWeeklySse() {
+        return mainDashboardService.getWeeklySales();
     }
 
     @GetMapping("/revenue/yearly")

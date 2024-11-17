@@ -21,7 +21,7 @@ public interface SaleMasterRepository extends PagingAndSortingRepository<SaleMas
             "WHERE sm.tenant.id = :id AND sm.approved = true " +
             "GROUP BY period " +
             "ORDER BY DATE_PART('year', CAST(sm.createdAt AS date))")
-    List<LineChartModel> yearlyIncomes(@Param("id") Long id);
+    List<LineChartModel> yearlySales(@Param("id") Long id);
 
     @Query(value = "SELECT TO_CHAR(TO_DATE(CONCAT(EXTRACT(YEAR FROM CURRENT_DATE), '-', months.month, '-01'), 'YYYY-MM-DD'), 'YYYY Month') AS period, COALESCE(SUM(sm.amount_paid), 0) AS totalValue " +
             "FROM (SELECT '01' AS month UNION ALL SELECT '02' UNION ALL SELECT '03' UNION ALL SELECT '04' UNION ALL " +
@@ -31,14 +31,14 @@ public interface SaleMasterRepository extends PagingAndSortingRepository<SaleMas
             "AND sm.tenant_id = :id AND sm.approved = true " +
             "GROUP BY months.month " +
             "ORDER BY months.month::int", nativeQuery = true)
-    List<LineChartModel> monthlyIncomes(@Param("id") Long id);
+    List<LineChartModel> monthlySales(@Param("id") Long id);
 
     @Query("SELECT CAST(sm.createdAt AS date) AS period, SUM(sm.amountPaid) AS totalValue " +
             "FROM SaleMaster sm " +
             "WHERE sm.tenant.id = :id AND sm.approved = true " +
             "GROUP BY period " +
             "ORDER BY CAST(sm.createdAt AS date)")
-    List<LineChartModel> weeklyIncomes(@Param("id") Long id);
+    List<LineChartModel> weeklySales(@Param("id") Long id);
 
     @Query("SELECT DATE_PART('year', CAST(sm.createdAt AS date)) AS period, SUM(sm.amountPaid) AS totalValue " +
             "FROM SaleMaster sm " +
