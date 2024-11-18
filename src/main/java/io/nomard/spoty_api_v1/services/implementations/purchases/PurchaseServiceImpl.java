@@ -3,8 +3,6 @@ package io.nomard.spoty_api_v1.services.implementations.purchases;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
-import io.nomard.spoty_api_v1.utils.json_mapper.dto.PurchaseDTO;
-import io.nomard.spoty_api_v1.utils.json_mapper.mappers.PurchaseMapper;
 import io.nomard.spoty_api_v1.entities.purchases.PurchaseDetail;
 import io.nomard.spoty_api_v1.entities.purchases.PurchaseMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
@@ -20,6 +18,8 @@ import io.nomard.spoty_api_v1.services.implementations.accounting.AccountTransac
 import io.nomard.spoty_api_v1.services.interfaces.purchases.PurchaseService;
 import io.nomard.spoty_api_v1.utils.CoreCalculations;
 import io.nomard.spoty_api_v1.utils.CoreUtils;
+import io.nomard.spoty_api_v1.utils.json_mapper.dto.PurchaseDTO;
+import io.nomard.spoty_api_v1.utils.json_mapper.mappers.PurchaseMapper;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -32,9 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -186,106 +184,134 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
     }
 
-    @Override
     @Transactional
-    public ResponseEntity<ObjectNode> update(PurchaseMaster data)
-            throws NotFoundException {
-        var opt = purchaseRepo.findById(data.getId());
-        if (opt.isEmpty()) {
-            throw new NotFoundException();
-        }
-        var purchase = opt.get();
+    @Override
+    public ResponseEntity<ObjectNode> update(PurchaseMaster data) throws NotFoundException {
+        var existingPurchase = purchaseRepo.findById(data.getId())
+                .orElseThrow(() -> new NotFoundException("PurchaseMaster not found with ID: " + data.getId()));
 
-        // Update fields as needed
-        if (
-                Objects.nonNull(data.getRef()) &&
-                        !"".equalsIgnoreCase(data.getRef())
-        ) {
-            purchase.setRef(data.getRef());
+        updateBasicFields(existingPurchase, data);
+        updatePurchaseDetails(existingPurchase, data);
+        purchaseCalculationService.calculate(existingPurchase);
+        updateApprovalStatus(existingPurchase, data);
+
+        existingPurchase.setUpdatedBy(authService.authUser());
+        existingPurchase.setUpdatedAt(LocalDateTime.now());
+
+        try {
+            purchaseRepo.save(existingPurchase);
+            updateProductCostPrice(existingPurchase);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            log.severe("Error updating PurchaseMaster: " + e.getMessage());
+            return spotyResponseImpl.custom(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Failed to update PurchaseMaster. Please try again."
+            );
         }
-        if (Objects.nonNull(data.getDate())) {
-            purchase.setDate(data.getDate());
+    }
+
+    private void updateBasicFields(PurchaseMaster existingPurchase, PurchaseMaster data) {
+        if (isNonEmpty(data.getRef())) {
+            existingPurchase.setRef(data.getRef());
         }
-        if (Objects.nonNull(data.getSupplier())) {
-            purchase.setSupplier(data.getSupplier());
+        if (data.getDate() != null) {
+            existingPurchase.setDate(data.getDate());
         }
-        if (Objects.nonNull(data.getBranch())) {
-            purchase.setBranch(data.getBranch());
+        if (data.getSupplier() != null) {
+            existingPurchase.setSupplier(data.getSupplier());
         }
-        if (
-                Objects.nonNull(data.getPurchaseDetails()) &&
-                        !data.getPurchaseDetails().isEmpty()
-        ) {
-            purchase.setPurchaseDetails(data.getPurchaseDetails());
+        if (data.getBranch() != null) {
+            existingPurchase.setBranch(data.getBranch());
+        }
+        if (data.getTax() != null) {
+            existingPurchase.setTax(data.getTax());
+        }
+        if (data.getDiscount() != null) {
+            existingPurchase.setDiscount(data.getDiscount());
+        }
+        if (data.getShippingFee() != 0) {
+            existingPurchase.setShippingFee(data.getShippingFee());
+        }
+        if (data.getAmountPaid() != 0) {
+            existingPurchase.setAmountPaid(data.getAmountPaid());
+        }
+        if (isNonEmpty(data.getPurchaseStatus())) {
+            existingPurchase.setPurchaseStatus(data.getPurchaseStatus());
+        }
+        if (isNonEmpty(data.getPaymentStatus())) {
+            existingPurchase.setPaymentStatus(data.getPaymentStatus());
+        }
+        if (isNonEmpty(data.getNotes())) {
+            existingPurchase.setNotes(data.getNotes());
+        }
+    }
+
+    // Update purchase details (handles additions, updates, and deletions)
+    private void updatePurchaseDetails(PurchaseMaster existingPurchase, PurchaseMaster data) {List<PurchaseDetail> currentDetails = existingPurchase.getPurchaseDetails();
+        List<PurchaseDetail> updatedDetails = data.getPurchaseDetails();
+
+        // Map existing details by ID for quick lookup
+        Map<Long, PurchaseDetail> existingDetailMap = currentDetails.stream()
+                .collect(Collectors.toMap(PurchaseDetail::getId, detail -> detail));
+
+        // Create a new list for updates
+        List<PurchaseDetail> finalDetails = new ArrayList<>();
+
+        // Process updated details
+        for (PurchaseDetail newDetail : updatedDetails) {
+            if (newDetail.getId() != null && existingDetailMap.containsKey(newDetail.getId())) {
+                // Update existing detail
+                var existingDetail = existingDetailMap.get(newDetail.getId());
+                updateDetailFields(existingDetail, newDetail);
+                finalDetails.add(existingDetail); // Retain reference to the existing object
+            } else {
+                // Add new detail
+                newDetail.setPurchase(existingPurchase); // Set the parent reference
+                finalDetails.add(newDetail);
+            }
         }
 
-        // Perform calculations
-        purchaseCalculationService.calculate(purchase);
+        // Remove orphaned details
+        currentDetails.removeIf(existingDetail -> updatedDetails.stream()
+                .noneMatch(updatedDetail -> Objects.equals(existingDetail.getId(), updatedDetail.getId())));
 
-        // Update other fields
-        if (
-                Objects.nonNull(data.getPurchaseStatus()) &&
-                        !"".equalsIgnoreCase(data.getPurchaseStatus())
-        ) {
-            purchase.setPurchaseStatus(data.getPurchaseStatus());
-        }
-        if (
-                Objects.nonNull(data.getPaymentStatus()) &&
-                        !"".equalsIgnoreCase(data.getPaymentStatus())
-        ) {
-            purchase.setPaymentStatus(data.getPaymentStatus());
-        }
-        if (
-                Objects.nonNull(data.getNotes()) &&
-                        !"".equalsIgnoreCase(data.getNotes())
-        ) {
-            purchase.setNotes(data.getNotes());
-        }
-        if (
-                Objects.nonNull(data.getReviewers()) &&
-                        !data.getReviewers().isEmpty()
-        ) {
+        // Add remaining details to the collection (maintain the same reference)
+        currentDetails.clear();
+        currentDetails.addAll(finalDetails);
+    }
+
+    private void updateDetailFields(PurchaseDetail existingDetail, PurchaseDetail newDetail) {
+        existingDetail.setProduct(newDetail.getProduct());
+        existingDetail.setUnitCost(newDetail.getUnitCost());
+        existingDetail.setQuantity(newDetail.getQuantity());
+        existingDetail.setTotalCost(newDetail.getTotalCost());
+        existingDetail.setPurchase(newDetail.getPurchase());
+    }
+
+    private void updateApprovalStatus(PurchaseMaster purchase, PurchaseMaster data) {
+        if (data.getReviewers() != null && !data.getReviewers().isEmpty()) {
             purchase.getReviewers().add(data.getReviewers().getFirst());
-            if (
-                    purchase.getNextApprovedLevel() >=
-                            settingsService.getSettingsInternal().getApprovalLevels()
-            ) {
+            if (purchase.getNextApprovedLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                 purchase.setApproved(true);
                 purchase.setApprovalStatus("Approved");
                 purchase.setPurchaseStatus("Ordered");
             }
         }
+    }
 
-        purchase.setUpdatedBy(authService.authUser());
-        purchase.setUpdatedAt(LocalDateTime.now());
-
-        try {
-            purchaseRepo.save(purchase);
-
-            // Check if product cost price needs to be updated.
-            for (PurchaseDetail detail : purchase.getPurchaseDetails()) {
-                var product = productService.getByIdInternally(
-                        detail.getProduct().getId()
-                );
-                if (
-                        !Objects.equals(
-                                product.getCostPrice(),
-                                detail.getUnitCost()
-                        )
-                ) {
-                    product.setCostPrice(detail.getUnitCost());
-                    productService.save(product);
-                }
+    private void updateProductCostPrice(PurchaseMaster purchase) throws NotFoundException {
+        for (PurchaseDetail detail : purchase.getPurchaseDetails()) {
+            var product = productService.getByIdInternally(detail.getProduct().getId());
+            if (!Objects.equals(product.getCostPrice(), detail.getUnitCost())) {
+                product.setCostPrice(detail.getUnitCost());
+                productService.save(product);
             }
-
-            return spotyResponseImpl.ok();
-        } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
-            return spotyResponseImpl.custom(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
-            );
         }
+    }
+
+    private boolean isNonEmpty(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 
     @Override
