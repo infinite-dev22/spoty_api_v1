@@ -3,12 +3,14 @@ package io.nomard.spoty_api_v1.services.implementations.returns.purchase_returns
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
-import io.nomard.spoty_api_v1.utils.json_mapper.dto.PurchaseReturnDTO;
-import io.nomard.spoty_api_v1.utils.json_mapper.mappers.PurchaseReturnMapper;
 import io.nomard.spoty_api_v1.entities.returns.purchase_returns.PurchaseReturnDetail;
 import io.nomard.spoty_api_v1.entities.returns.purchase_returns.PurchaseReturnMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
+import io.nomard.spoty_api_v1.repositories.ProductRepository;
+import io.nomard.spoty_api_v1.repositories.SupplierRepository;
+import io.nomard.spoty_api_v1.repositories.deductions.DiscountRepository;
+import io.nomard.spoty_api_v1.repositories.deductions.TaxRepository;
 import io.nomard.spoty_api_v1.repositories.returns.purchase_returns.PurchaseReturnMasterRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
@@ -19,6 +21,8 @@ import io.nomard.spoty_api_v1.services.implementations.accounting.AccountService
 import io.nomard.spoty_api_v1.services.implementations.accounting.AccountTransactionServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.returns.purchase_returns.PurchaseReturnService;
 import io.nomard.spoty_api_v1.utils.CoreCalculations;
+import io.nomard.spoty_api_v1.utils.json_mapper.dto.PurchaseReturnDTO;
+import io.nomard.spoty_api_v1.utils.json_mapper.mappers.PurchaseReturnMapper;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -31,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -40,6 +45,14 @@ import java.util.stream.Collectors;
 @Service
 @Log
 public class PurchaseReturnServiceImpl implements PurchaseReturnService {
+    @Autowired
+    private ProductRepository productRepo;
+    @Autowired
+    private SupplierRepository supplierRepo;
+    @Autowired
+    private TaxRepository taxRepo;
+    @Autowired
+    private DiscountRepository discountRepo;
     @Autowired
     private PurchaseReturnMasterRepository purchaseReturnRepo;
     @Autowired
@@ -87,6 +100,32 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
     @Override
     @Transactional
     public ResponseEntity<ObjectNode> save(PurchaseReturnMaster purchase) throws NotFoundException {
+        var supplier = supplierRepo.findById(purchase.getSupplier().getId())
+                .orElseThrow(() -> new NotFoundException("Supplier not found with ID: " + purchase.getSupplier().getId()));
+        var tax = taxRepo.findById(purchase.getSupplier().getId())
+                .orElseThrow(() -> new NotFoundException("Tax not found with ID: " + purchase.getTax().getId()));
+        var discount = discountRepo.findById(purchase.getSupplier().getId())
+                .orElseThrow(() -> new NotFoundException("Discount not found with ID: " + purchase.getDiscount().getId()));
+        // var list = purchase.getPurchaseReturnDetails().stream().filter(purchaseReturnDetail -> {
+        //     Product product;
+        //     try {
+        //         product = productRepo.findById(purchaseReturnDetail.getProduct().getId())
+        //                 .orElseThrow(() -> new NotFoundException("Product not found with ID: " + purchaseReturnDetail.getProduct().getId()));
+        //     } catch (NotFoundException e) {
+        //         throw new RuntimeException(e);
+        //     }
+        //     System.out.println(product != null);
+        //     return product != null;
+        // }).toList();
+        // System.out.println(list.size());
+        // purchase.getPurchaseReturnDetails().clear();
+        // purchase.setPurchaseReturnDetails(list);
+        // System.out.println(purchase.getPurchaseReturnDetails().size());
+
+        ArrayList<PurchaseReturnDetail> list = (ArrayList<PurchaseReturnDetail>) purchase.getPurchaseReturnDetails().stream().peek(detail -> detail.setId(null)).collect(Collectors.toList());
+        purchase.getPurchaseReturnDetails().clear();
+        purchase.setPurchaseReturnDetails(list);
+
         // Perform calculations
         purchaseCalculationService.calculate(purchase);
 
@@ -94,6 +133,15 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
         purchase.setTenant(authService.authUser().getTenant());
         if (purchase.getBranch() == null) {
             purchase.setBranch(authService.authUser().getBranch());
+        }
+        if (supplier != null) {
+            purchase.setSupplier(supplier);
+        }
+        if (tax != null) {
+            purchase.setTax(tax);
+        }
+        if (discount != null) {
+            purchase.setDiscount(discount);
         }
         if (settingsService.getSettingsInternal().getReview() && settingsService.getSettingsInternal().getApprovePurchaseReturns()) {
             Reviewer reviewer = null;
@@ -108,6 +156,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
                 if (reviewer.getLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                     purchase.setApproved(true);
                     purchase.setApprovalStatus("Approved");
+                    purchase.setPurchaseStatus("Returned");
                     createAccountTransaction(purchase);
                     updateProductCost(purchase);
                 }
@@ -116,9 +165,11 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
                 purchase.setApproved(false);
             }
             purchase.setApprovalStatus("Pending");
+            purchase.setPurchaseStatus("Pending");
         } else {
             purchase.setApproved(true);
             purchase.setApprovalStatus("Approved");
+            purchase.setPurchaseStatus("Returned");
             createAccountTransaction(purchase);
             updateProductCost(purchase);
         }
@@ -129,8 +180,9 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
             purchaseReturnRepo.save(purchase);
             return spotyResponseImpl.created();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
-            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+//            log.log(Level.ALL, e.getMessage(), e);
+//            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+            throw new RuntimeException(e);
         }
     }
 
@@ -228,6 +280,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
             if (purchase.getNextApprovedLevel() >= settingsService.getSettingsInternal().getApprovalLevels()) {
                 purchase.setApproved(true);
                 purchase.setApprovalStatus("Approved");
+                purchase.setPurchaseStatus("Returned");
                 createAccountTransaction(purchase);
                 updateProductCost(purchase);
             }
