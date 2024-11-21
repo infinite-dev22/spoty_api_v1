@@ -52,7 +52,7 @@ public interface SaleMasterRepository extends PagingAndSortingRepository<SaleMas
             nativeQuery = true)
     List<LineChartModel> yearlyRevenue(@Param("id") Long id);
 
-    @Query(value="SELECT TO_CHAR(CAST(sm.created_at AS date), 'ddth Month') AS period, SUM(sm.amount_paid) AS totalValue " +
+    @Query(value="SELECT TO_CHAR(CAST(sm.created_at AS date), 'ddth Mon') AS period, SUM(sm.amount_paid) AS totalValue " +
             "FROM sale_master sm " +
             "WHERE sm.tenant_id = :id AND sm.approved = true " +
             "AND TO_CHAR(CAST(sm.created_at AS date), 'YYYY-MM-dd') " +
