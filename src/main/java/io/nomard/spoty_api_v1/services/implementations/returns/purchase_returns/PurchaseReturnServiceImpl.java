@@ -7,7 +7,6 @@ import io.nomard.spoty_api_v1.entities.returns.purchase_returns.PurchaseReturnDe
 import io.nomard.spoty_api_v1.entities.returns.purchase_returns.PurchaseReturnMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
-import io.nomard.spoty_api_v1.repositories.ProductRepository;
 import io.nomard.spoty_api_v1.repositories.SupplierRepository;
 import io.nomard.spoty_api_v1.repositories.deductions.DiscountRepository;
 import io.nomard.spoty_api_v1.repositories.deductions.TaxRepository;
@@ -39,14 +38,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 @Service
 @Log
 public class PurchaseReturnServiceImpl implements PurchaseReturnService {
-    @Autowired
-    private ProductRepository productRepo;
     @Autowired
     private SupplierRepository supplierRepo;
     @Autowired
@@ -102,9 +98,9 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
     public ResponseEntity<ObjectNode> save(PurchaseReturnMaster purchase) throws NotFoundException {
         var supplier = supplierRepo.findById(purchase.getSupplier().getId())
                 .orElseThrow(() -> new NotFoundException("Supplier not found with ID: " + purchase.getSupplier().getId()));
-        var tax = taxRepo.findById(purchase.getSupplier().getId())
+        var tax = taxRepo.findById(purchase.getTax().getId())
                 .orElseThrow(() -> new NotFoundException("Tax not found with ID: " + purchase.getTax().getId()));
-        var discount = discountRepo.findById(purchase.getSupplier().getId())
+        var discount = discountRepo.findById(purchase.getDiscount().getId())
                 .orElseThrow(() -> new NotFoundException("Discount not found with ID: " + purchase.getDiscount().getId()));
 
         ArrayList<PurchaseReturnDetail> list = (ArrayList<PurchaseReturnDetail>) purchase.getPurchaseReturnDetails().stream().peek(detail -> detail.setId(null)).collect(Collectors.toList());
@@ -133,7 +129,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
             try {
                 reviewer = approverService.getByUserId(authService.authUser().getId());
             } catch (NotFoundException e) {
-                 log.severe(e.getMessage());
+                log.severe(e.getMessage());
             }
             if (Objects.nonNull(reviewer)) {
                 purchase.getReviewers().add(reviewer);
@@ -236,7 +232,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
 
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-             log.severe(e.getMessage());
+            log.severe(e.getMessage());
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
@@ -282,7 +278,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
             purchaseReturnRepo.save(purchase);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-             log.severe(e.getMessage());
+            log.severe(e.getMessage());
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
@@ -294,7 +290,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
             purchaseReturnRepo.deleteById(id);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-             log.severe(e.getMessage());
+            log.severe(e.getMessage());
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
@@ -305,7 +301,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
             purchaseReturnRepo.deleteAllById(idList);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-             log.severe(e.getMessage());
+            log.severe(e.getMessage());
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
