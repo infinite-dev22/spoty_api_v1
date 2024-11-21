@@ -3,11 +3,13 @@ package io.nomard.spoty_api_v1.services.implementations.returns.sale_returns;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nomard.spoty_api_v1.entities.Reviewer;
 import io.nomard.spoty_api_v1.entities.accounting.AccountTransaction;
-import io.nomard.spoty_api_v1.utils.json_mapper.dto.SaleReturnDTO;
-import io.nomard.spoty_api_v1.utils.json_mapper.mappers.SaleReturnMapper;
+import io.nomard.spoty_api_v1.entities.returns.sale_returns.SaleReturnDetail;
 import io.nomard.spoty_api_v1.entities.returns.sale_returns.SaleReturnMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
+import io.nomard.spoty_api_v1.repositories.CustomerRepository;
+import io.nomard.spoty_api_v1.repositories.deductions.DiscountRepository;
+import io.nomard.spoty_api_v1.repositories.deductions.TaxRepository;
 import io.nomard.spoty_api_v1.repositories.returns.sale_returns.SaleReturnMasterRepository;
 import io.nomard.spoty_api_v1.responses.SpotyResponseImpl;
 import io.nomard.spoty_api_v1.services.auth.AuthServiceImpl;
@@ -17,6 +19,8 @@ import io.nomard.spoty_api_v1.services.implementations.accounting.AccountService
 import io.nomard.spoty_api_v1.services.implementations.accounting.AccountTransactionServiceImpl;
 import io.nomard.spoty_api_v1.services.interfaces.returns.sale_returns.SaleReturnService;
 import io.nomard.spoty_api_v1.utils.CoreCalculations;
+import io.nomard.spoty_api_v1.utils.json_mapper.dto.SaleReturnDTO;
+import io.nomard.spoty_api_v1.utils.json_mapper.mappers.SaleReturnMapper;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -30,15 +34,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 @Service
 @Log
 public class SaleReturnServiceImpl implements SaleReturnService {
+    @Autowired
+    private CustomerRepository customerRepo;
+    @Autowired
+    private TaxRepository taxRepo;
+    @Autowired
+    private DiscountRepository discountRepo;
     @Autowired
     private SaleReturnMasterRepository saleReturnRepo;
     @Autowired
@@ -92,6 +102,27 @@ public class SaleReturnServiceImpl implements SaleReturnService {
     @Override
 //    @Transactional
     public ResponseEntity<ObjectNode> save(SaleReturnMaster sale) throws NotFoundException {
+        var customer = customerRepo.findById(sale.getCustomer().getId())
+                .orElseThrow(() -> new NotFoundException("Customer not found with ID: " + sale.getCustomer().getId()));
+        if (sale.getTax() != null) {
+            var tax = taxRepo.findById(sale.getTax().getId())
+                    .orElseThrow(() -> new NotFoundException("Tax not found with ID: " + sale.getTax().getId()));
+            if (tax != null) {
+                sale.setTax(tax);
+            }
+        }
+        if (sale.getDiscount() != null) {
+            var discount = discountRepo.findById(sale.getDiscount().getId())
+                    .orElseThrow(() -> new NotFoundException("Discount not found with ID: " + sale.getDiscount().getId()));
+            if (discount != null) {
+                sale.setDiscount(discount);
+            }
+        }
+
+        ArrayList<SaleReturnDetail> list = (ArrayList<SaleReturnDetail>) sale.getSaleReturnDetails().stream().peek(detail -> detail.setId(null)).collect(Collectors.toList());
+        sale.getSaleReturnDetails().clear();
+        sale.setSaleReturnDetails(list);
+
         // Perform calculations
         saleCalculationService.calculate(sale);
 
@@ -100,12 +131,15 @@ public class SaleReturnServiceImpl implements SaleReturnService {
         if (Objects.isNull(sale.getBranch())) {
             sale.setBranch(authService.authUser().getBranch());
         }
+        if (customer != null) {
+            sale.setCustomer(customer);
+        }
         if (settingsService.getSettingsInternal().getReview() && settingsService.getSettingsInternal().getApproveSaleReturns()) {
             Reviewer reviewer = null;
             try {
                 reviewer = approverService.getByUserId(authService.authUser().getId());
             } catch (NotFoundException e) {
-                 log.severe(e.getMessage());
+                log.severe(e.getMessage());
             }
             if (Objects.nonNull(reviewer)) {
                 sale.getReviewers().add(reviewer);
