@@ -104,7 +104,7 @@ public class SaleServiceImpl implements SaleService {
         if (Objects.isNull(sale.getBranch())) {
             sale.setBranch(authService.authUser().getBranch());
         }
-        if (settingsService.getSettingsInternal().getApproveAdjustments()) {
+        if (settingsService.getSettingsInternal().getApproveSales()) {
             Reviewer reviewer = null;
             try {
                 reviewer = approverService.getByUserId(authService.authUser().getId());

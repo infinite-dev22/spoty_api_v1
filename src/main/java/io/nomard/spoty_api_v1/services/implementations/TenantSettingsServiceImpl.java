@@ -206,6 +206,11 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
                 tenantSettings.setApproveSaleReturns(settings.getApproveSaleReturns());
             }
 
+            if (!Objects.equals(tenantSettings.getApproveSales(), settings.getApproveSales()) &&
+                    Objects.nonNull(settings.getApproveSales())) {
+                tenantSettings.setApproveSales(settings.getApproveSales());
+            }
+
             if (!Objects.equals(tenantSettings.getApprovePurchaseReturns(), settings.getApprovePurchaseReturns()) &&
                     Objects.nonNull(settings.getApprovePurchaseReturns())) {
                 tenantSettings.setApprovePurchaseReturns(settings.getApprovePurchaseReturns());

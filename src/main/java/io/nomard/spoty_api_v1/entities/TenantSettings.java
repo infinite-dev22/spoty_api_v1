@@ -55,6 +55,8 @@ public class TenantSettings {
     @Builder.Default
     private Boolean approveSaleReturns = false;
     @Builder.Default
+    private Boolean approveSales = false;
+    @Builder.Default
     private Boolean approvePurchaseReturns = false;
     @Builder.Default
     private Integer approvalLevels = 0;
