@@ -55,6 +55,7 @@ public interface PurchaseMasterRepository
     )
     ArrayList<PurchaseMaster> searchAll(
             @Param("tenantId") Long tenantId,
+            @Param("userId") Long userId,
             @Param("search") String search
     );
 

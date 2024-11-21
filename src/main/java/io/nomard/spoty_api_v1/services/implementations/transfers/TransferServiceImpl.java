@@ -85,6 +85,7 @@ public class TransferServiceImpl implements TransferService {
     public List<TransferDTO> getByContains(String search) {
         return transferRepo.searchAll(
                         authService.authUser().getTenant().getId(),
+                        authService.authUser().getId(),
                         search.toLowerCase()
                 ).stream()
                 .map(transfer -> transferMapper.toMasterDTO(transfer))

@@ -82,6 +82,7 @@ public class QuotationServiceImpl implements QuotationService {
     public List<QuotationDTO> getByContains(String search) {
         return quotationRepo.searchAll(
                         authService.authUser().getTenant().getId(),
+                        authService.authUser().getId(),
                         search.toLowerCase()
                 ).stream()
                 .map(quotation -> quotationMapper.toMasterDTO(quotation))

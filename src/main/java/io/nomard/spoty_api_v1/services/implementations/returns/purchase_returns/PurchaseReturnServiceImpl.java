@@ -91,7 +91,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
 
     @Override
     public List<PurchaseReturnDTO> getByContains(String search) {
-        return purchaseReturnRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase())
+        return purchaseReturnRepo.searchAll(authService.authUser().getTenant().getId(), authService.authUser().getId(), search.toLowerCase())
                 .stream()
                 .map(purchaseReturn -> purchaseReturnMapper.toMasterDTO(purchaseReturn))
                 .collect(Collectors.toList());

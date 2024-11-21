@@ -113,7 +113,9 @@ public interface SaleMasterRepository extends PagingAndSortingRepository<SaleMas
 
     @Query("SELECT sm FROM SaleMaster sm WHERE sm.tenant.id = :tenantId " +
             "AND TRIM(LOWER(sm.ref)) LIKE %:search% AND (sm.approved = true OR sm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Reviewer a WHERE a.employee.id = :userId AND a.level = sm.nextApprovedLevel) > 0)")
-    ArrayList<SaleMaster> searchAll(@Param("tenantId") Long tenantId, @Param("search") String search);
+    ArrayList<SaleMaster> searchAll(@Param("tenantId") Long tenantId,
+                                    @Param("userId") Long userId,
+                                    @Param("search") String search);
 
     @Query("SELECT sm FROM SaleMaster sm WHERE sm.tenant.id = :tenantId AND (sm.approved = true OR sm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Reviewer a WHERE a.employee.id = :userId AND a.level = sm.nextApprovedLevel) > 0)")
     Page<SaleMaster> findAllByTenantId(@Param("tenantId") Long tenantId, @Param("userId") Long userId, Pageable pageable);

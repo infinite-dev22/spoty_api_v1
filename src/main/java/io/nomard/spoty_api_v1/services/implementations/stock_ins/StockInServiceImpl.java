@@ -78,6 +78,7 @@ public class StockInServiceImpl implements StockInService {
     public List<StockInDTO> getByContains(String search) {
         return stockInRepo.searchAll(
                         authService.authUser().getTenant().getId(),
+                        authService.authUser().getId(),
                         search.toLowerCase()
                 ).stream()
                 .map(stockIn -> stockInMapper.toMasterDTO(stockIn))

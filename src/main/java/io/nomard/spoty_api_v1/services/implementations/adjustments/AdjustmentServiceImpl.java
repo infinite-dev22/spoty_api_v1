@@ -75,7 +75,9 @@ public class AdjustmentServiceImpl implements AdjustmentService {
     @Cacheable("adjustment_masters")
     @Transactional(readOnly = true)
     public List<AdjustmentDTO> getByContains(String search) {
-        return adjustmentRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase())
+        return adjustmentRepo.searchAll(authService.authUser().getTenant().getId(),
+                        authService.authUser().getId(),
+                        search.toLowerCase())
                 .stream()
                 .map(adjustment -> adjustmentMapper.toMasterDTO(adjustment))
                 .collect(Collectors.toList());

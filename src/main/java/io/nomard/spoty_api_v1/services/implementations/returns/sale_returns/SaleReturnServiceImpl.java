@@ -81,7 +81,9 @@ public class SaleReturnServiceImpl implements SaleReturnService {
     @Cacheable("sale_masters")
     @Transactional(readOnly = true)
     public List<SaleReturnDTO> getByContains(String search) {
-        return saleReturnRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase())
+        return saleReturnRepo.searchAll(authService.authUser().getTenant().getId(),
+                        authService.authUser().getId(),
+                        search.toLowerCase())
                 .stream()
                 .map(saleReturn -> saleReturnMapper.toMasterDTO(saleReturn))
                 .collect(Collectors.toList());

@@ -84,7 +84,9 @@ public class SaleServiceImpl implements SaleService {
     @Cacheable("sale_masters")
     @Transactional(readOnly = true)
     public List<SaleDTO> getByContains(String search) {
-        return saleRepo.searchAll(authService.authUser().getTenant().getId(), search.toLowerCase())
+        return saleRepo.searchAll(authService.authUser().getTenant().getId(),
+                        authService.authUser().getId(),
+                        search.toLowerCase())
                 .stream()
                 .map(sale -> saleMapper.toMasterDTO(sale))
                 .collect(Collectors.toList());

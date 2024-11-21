@@ -15,7 +15,9 @@ import java.util.ArrayList;
 public interface StockInMasterRepository extends PagingAndSortingRepository<StockInMaster, Long>, JpaRepository<StockInMaster, Long> {
     @Query("SELECT sim FROM StockInMaster sim WHERE sim.tenant.id = :tenantId " +
             "AND TRIM(LOWER(sim.ref)) LIKE %:search% AND (sim.approved = true OR sim.createdBy.id = :userId OR (SELECT COUNT(a) FROM Reviewer a WHERE a.employee.id = :userId AND a.level = sim.nextApprovedLevel) > 0)")
-    ArrayList<StockInMaster> searchAll(@Param("tenantId") Long tenantId, @Param("search") String search);
+    ArrayList<StockInMaster> searchAll(@Param("tenantId") Long tenantId,
+                                       @Param("userId") Long userId,
+                                       @Param("search") String search);
 
     @Query("select sim from StockInMaster sim where sim.tenant.id = :tenantId AND (sim.approved = true OR sim.createdBy.id = :userId OR (SELECT COUNT(a) FROM Reviewer a WHERE a.employee.id = :userId AND a.level = sim.nextApprovedLevel) > 0)")
     Page<StockInMaster> findAllByTenantId(@Param("tenantId") Long tenantId, @Param("userId") Long userId, Pageable pageable);

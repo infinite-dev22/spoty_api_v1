@@ -87,6 +87,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     public List<PurchaseDTO> getByContains(String search) {
         return purchaseRepo.searchAll(
                         authService.authUser().getTenant().getId(),
+                        authService.authUser().getId(),
                         search.toLowerCase()
                 ).stream()
                 .map(purchase -> purchaseMapper.toMasterDTO(purchase))

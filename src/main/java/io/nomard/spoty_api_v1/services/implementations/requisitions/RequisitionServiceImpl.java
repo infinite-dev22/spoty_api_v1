@@ -76,6 +76,7 @@ public class RequisitionServiceImpl implements RequisitionService {
     public List<RequisitionDTO> getByContains(String search) {
         return requisitionRepo.searchAll(
                         authService.authUser().getTenant().getId(),
+                        authService.authUser().getId(),
                         search.toLowerCase()
                 )
                 .stream()
