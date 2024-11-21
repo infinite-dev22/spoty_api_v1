@@ -26,7 +26,7 @@ public interface PurchaseReturnMasterRepository extends PagingAndSortingReposito
             "SELECT COUNT(prm) " +
                     "FROM PurchaseReturnMaster prm " +
                     "WHERE prm.tenant.id = :id " +
-                    "AND prm.approved = true " +
+                    "AND (prm.approved = true OR prm.createdBy.id = :userId OR (SELECT COUNT(a) FROM Reviewer a WHERE a.employee.id = :userId AND a.level = prm.nextApprovedLevel) > 0)" +
                     "AND TO_CHAR(CAST(prm.createdAt AS date), 'YYYY-MM') = TO_CHAR(CAST(CURRENT_DATE AS date), 'YYYY-MM')"
     )
     Number numberOfPurchaseReturns(@Param("id") Long id);
