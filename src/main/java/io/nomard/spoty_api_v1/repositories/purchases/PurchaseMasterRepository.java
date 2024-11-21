@@ -92,8 +92,9 @@ public interface PurchaseMasterRepository
             "SELECT COUNT(pm) " +
                     "FROM PurchaseMaster pm " +
                     "WHERE pm.tenant.id = :id " +
-                    "AND LOWER(pm.purchaseStatus) LIKE LOWER('%cancelled%') " +
-                    "AND TO_CHAR(CAST(pm.createdAt AS date), 'YYYY-MM') = TO_CHAR(CAST(CURRENT_DATE AS date), 'YYYY-MM')"
+                    "AND LOWER(pm.purchaseStatus) LIKE LOWER('cancelled') " +
+                    "AND pm.approved = true " +
+                    "AND TO_CHAR(CAST(pm.updatedAt AS date), 'YYYY-MM') = TO_CHAR(CAST(CURRENT_DATE AS date), 'YYYY-MM')"
     )
     Number totalCancelledPurchases(@Param("id") Long id);
 }

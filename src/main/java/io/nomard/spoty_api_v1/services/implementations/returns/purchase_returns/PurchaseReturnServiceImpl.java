@@ -106,21 +106,6 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
                 .orElseThrow(() -> new NotFoundException("Tax not found with ID: " + purchase.getTax().getId()));
         var discount = discountRepo.findById(purchase.getSupplier().getId())
                 .orElseThrow(() -> new NotFoundException("Discount not found with ID: " + purchase.getDiscount().getId()));
-        // var list = purchase.getPurchaseReturnDetails().stream().filter(purchaseReturnDetail -> {
-        //     Product product;
-        //     try {
-        //         product = productRepo.findById(purchaseReturnDetail.getProduct().getId())
-        //                 .orElseThrow(() -> new NotFoundException("Product not found with ID: " + purchaseReturnDetail.getProduct().getId()));
-        //     } catch (NotFoundException e) {
-        //         throw new RuntimeException(e);
-        //     }
-        //     System.out.println(product != null);
-        //     return product != null;
-        // }).toList();
-        // System.out.println(list.size());
-        // purchase.getPurchaseReturnDetails().clear();
-        // purchase.setPurchaseReturnDetails(list);
-        // System.out.println(purchase.getPurchaseReturnDetails().size());
 
         ArrayList<PurchaseReturnDetail> list = (ArrayList<PurchaseReturnDetail>) purchase.getPurchaseReturnDetails().stream().peek(detail -> detail.setId(null)).collect(Collectors.toList());
         purchase.getPurchaseReturnDetails().clear();

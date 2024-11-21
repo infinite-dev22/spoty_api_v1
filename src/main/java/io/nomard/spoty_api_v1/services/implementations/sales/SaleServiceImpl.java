@@ -93,7 +93,7 @@ public class SaleServiceImpl implements SaleService {
     }
 
     @Override
-    @Transactional
+//    @Transactional
     public ResponseEntity<ObjectNode> save(SaleMaster sale) throws NotFoundException {
         // Perform calculations
         saleCalculationService.calculate(sale);

@@ -2,13 +2,13 @@ package io.nomard.spoty_api_v1.controllers.norm;
 
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nomard.spoty_api_v1.utils.json_mapper.dto.PurchaseDTO;
 import io.nomard.spoty_api_v1.entities.purchases.PurchaseMaster;
 import io.nomard.spoty_api_v1.errors.NotFoundException;
 import io.nomard.spoty_api_v1.models.ApprovalModel;
 import io.nomard.spoty_api_v1.models.FindModel;
 import io.nomard.spoty_api_v1.models.SearchModel;
 import io.nomard.spoty_api_v1.services.implementations.purchases.PurchaseServiceImpl;
+import io.nomard.spoty_api_v1.utils.json_mapper.dto.PurchaseDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -52,6 +52,11 @@ public class PurchaseController {
     @PutMapping("/approve")
     public ResponseEntity<ObjectNode> approve(@RequestBody ApprovalModel approvalModel) throws NotFoundException {
         return purchaseService.approve(approvalModel);
+    }
+
+    @PutMapping("/cancel")
+    public ResponseEntity<ObjectNode> cancel(@RequestBody FindModel findModel) throws NotFoundException {
+        return purchaseService.cancel(findModel.getId());
     }
 
     @DeleteMapping("/delete/single")

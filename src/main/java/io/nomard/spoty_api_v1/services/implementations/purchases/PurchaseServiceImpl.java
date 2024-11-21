@@ -316,8 +316,6 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    @CacheEvict(value = "purchase_masters", key = "#approvalModel.id")
-    @Transactional
     public ResponseEntity<ObjectNode> approve(ApprovalModel approvalModel)
             throws NotFoundException {
         var opt = purchaseRepo.findById(approvalModel.getId());
@@ -396,6 +394,29 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchase.setNextApprovedLevel(0);
         }
 
+        purchase.setUpdatedBy(authService.authUser());
+        purchase.setUpdatedAt(LocalDateTime.now());
+        try {
+            purchaseRepo.save(purchase);
+            return spotyResponseImpl.ok();
+        } catch (Exception e) {
+            log.log(Level.ALL, e.getMessage(), e);
+            return spotyResponseImpl.custom(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
+            );
+        }
+    }
+
+    @Override
+    public ResponseEntity<ObjectNode> cancel(Long id)
+            throws NotFoundException {
+        var opt = purchaseRepo.findById(id);
+        if (opt.isEmpty()) {
+            throw new NotFoundException();
+        }
+        var purchase = opt.get();
+        purchase.setPurchaseStatus("Cancelled");
         purchase.setUpdatedBy(authService.authUser());
         purchase.setUpdatedAt(LocalDateTime.now());
         try {
