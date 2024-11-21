@@ -103,7 +103,7 @@ public class RequisitionServiceImpl implements RequisitionService {
                             authService.authUser().getId()
                     );
                 } catch (NotFoundException e) {
-                    log.log(Level.ALL, e.getMessage(), e);
+                     log.severe(e.getMessage());
                 }
                 if (Objects.nonNull(reviewer)) {
                     requisition.getReviewers().add(reviewer);
@@ -130,7 +130,7 @@ public class RequisitionServiceImpl implements RequisitionService {
             requisitionRepo.save(requisition);
             return spotyResponseImpl.created();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
@@ -214,7 +214,7 @@ public class RequisitionServiceImpl implements RequisitionService {
             requisitionRepo.save(requisition);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
@@ -274,7 +274,7 @@ public class RequisitionServiceImpl implements RequisitionService {
             requisitionRepo.save(requisition);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
@@ -289,7 +289,7 @@ public class RequisitionServiceImpl implements RequisitionService {
             requisitionRepo.deleteById(id);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
@@ -303,7 +303,7 @@ public class RequisitionServiceImpl implements RequisitionService {
             requisitionRepo.deleteAllById(idList);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()

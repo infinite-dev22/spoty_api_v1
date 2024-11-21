@@ -117,7 +117,7 @@ public class QuotationServiceImpl implements QuotationService {
                         authService.authUser().getId()
                 );
             } catch (NotFoundException e) {
-                log.log(Level.ALL, e.getMessage(), e);
+                 log.severe(e.getMessage());
             }
             if (Objects.nonNull(reviewer)) {
                 quotation.getReviewers().add(reviewer);
@@ -142,7 +142,7 @@ public class QuotationServiceImpl implements QuotationService {
             quotationRepo.save(quotation);
             return spotyResponseImpl.created();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
@@ -241,7 +241,7 @@ public class QuotationServiceImpl implements QuotationService {
             quotationRepo.save(quotation);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
@@ -301,7 +301,7 @@ public class QuotationServiceImpl implements QuotationService {
             quotationRepo.save(quotation);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
@@ -316,7 +316,7 @@ public class QuotationServiceImpl implements QuotationService {
             quotationRepo.deleteById(id);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
@@ -330,7 +330,7 @@ public class QuotationServiceImpl implements QuotationService {
             quotationRepo.deleteAllById(idList);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()

@@ -113,7 +113,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                         authService.authUser().getId()
                 );
             } catch (NotFoundException e) {
-                log.log(Level.ALL, e.getMessage(), e);
+                 log.severe(e.getMessage());
             }
             if (Objects.nonNull(reviewer)) {
                 purchase.getReviewers().add(reviewer);
@@ -177,7 +177,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchaseRepo.save(purchase);
             return spotyResponseImpl.created();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
@@ -400,7 +400,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchaseRepo.save(purchase);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
@@ -423,7 +423,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchaseRepo.save(purchase);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
@@ -438,7 +438,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchaseRepo.deleteById(id);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
@@ -452,7 +452,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchaseRepo.deleteAllById(idList);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()

@@ -101,7 +101,7 @@ public class StockInServiceImpl implements StockInService {
                         authService.authUser().getId()
                 );
             } catch (NotFoundException e) {
-                log.log(Level.ALL, e.getMessage(), e);
+                 log.severe(e.getMessage());
             }
             if (Objects.nonNull(reviewer)) {
                 stockIn.getReviewers().add(reviewer);
@@ -128,7 +128,7 @@ public class StockInServiceImpl implements StockInService {
         try {
             stockInRepo.save(stockIn);
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
@@ -139,7 +139,7 @@ public class StockInServiceImpl implements StockInService {
             productStockUpdate(stockIn);
             return spotyResponseImpl.created();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
@@ -202,7 +202,7 @@ public class StockInServiceImpl implements StockInService {
             stockInRepo.save(stockIn);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
@@ -258,7 +258,7 @@ public class StockInServiceImpl implements StockInService {
         try {
             stockInRepo.save(stockIn);
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
@@ -268,7 +268,7 @@ public class StockInServiceImpl implements StockInService {
             productStockUpdate(stockIn);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
@@ -283,7 +283,7 @@ public class StockInServiceImpl implements StockInService {
             stockInRepo.deleteById(id);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
@@ -297,7 +297,7 @@ public class StockInServiceImpl implements StockInService {
             stockInRepo.deleteAllById(idList);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()

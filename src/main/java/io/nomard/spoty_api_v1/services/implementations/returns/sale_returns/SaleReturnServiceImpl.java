@@ -105,7 +105,7 @@ public class SaleReturnServiceImpl implements SaleReturnService {
             try {
                 reviewer = approverService.getByUserId(authService.authUser().getId());
             } catch (NotFoundException e) {
-                log.log(Level.ALL, e.getMessage(), e);
+                 log.severe(e.getMessage());
             }
             if (Objects.nonNull(reviewer)) {
                 sale.getReviewers().add(reviewer);
@@ -129,7 +129,7 @@ public class SaleReturnServiceImpl implements SaleReturnService {
         try {
             saleReturnRepo.save(sale);
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+            log.severe(e.getMessage());
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
 
@@ -139,7 +139,7 @@ public class SaleReturnServiceImpl implements SaleReturnService {
             }
             return spotyResponseImpl.created();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+            log.severe(e.getMessage());
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
@@ -198,7 +198,7 @@ public class SaleReturnServiceImpl implements SaleReturnService {
             saleReturnRepo.save(sale);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+            log.severe(e.getMessage());
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
@@ -240,7 +240,7 @@ public class SaleReturnServiceImpl implements SaleReturnService {
         try {
             saleReturnRepo.save(sale);
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+            log.severe(e.getMessage());
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
 
@@ -250,7 +250,7 @@ public class SaleReturnServiceImpl implements SaleReturnService {
             }
             return spotyResponseImpl.created();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+            log.severe(e.getMessage());
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
@@ -262,7 +262,7 @@ public class SaleReturnServiceImpl implements SaleReturnService {
             saleReturnRepo.deleteById(id);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+            log.severe(e.getMessage());
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
@@ -273,7 +273,7 @@ public class SaleReturnServiceImpl implements SaleReturnService {
             saleReturnRepo.deleteAllById(idList);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+            log.severe(e.getMessage());
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }

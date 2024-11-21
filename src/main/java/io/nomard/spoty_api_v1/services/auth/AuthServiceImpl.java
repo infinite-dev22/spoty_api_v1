@@ -79,7 +79,7 @@ public class AuthServiceImpl implements AuthService {
 
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
@@ -144,7 +144,7 @@ public class AuthServiceImpl implements AuthService {
             employeeRepository.save(employee);
             return spotyResponseImpl.created();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }

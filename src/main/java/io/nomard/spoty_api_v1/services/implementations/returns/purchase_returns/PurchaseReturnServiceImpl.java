@@ -133,7 +133,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
             try {
                 reviewer = approverService.getByUserId(authService.authUser().getId());
             } catch (NotFoundException e) {
-                log.log(Level.ALL, e.getMessage(), e);
+                 log.severe(e.getMessage());
             }
             if (Objects.nonNull(reviewer)) {
                 purchase.getReviewers().add(reviewer);
@@ -165,9 +165,8 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
             purchaseReturnRepo.save(purchase);
             return spotyResponseImpl.created();
         } catch (Exception e) {
-//            log.log(Level.ALL, e.getMessage(), e);
-//            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
-            throw new RuntimeException(e);
+            log.severe(e.getMessage());
+            return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 
@@ -237,7 +236,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
 
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
@@ -283,7 +282,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
             purchaseReturnRepo.save(purchase);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
@@ -295,7 +294,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
             purchaseReturnRepo.deleteById(id);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
@@ -306,7 +305,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
             purchaseReturnRepo.deleteAllById(idList);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }

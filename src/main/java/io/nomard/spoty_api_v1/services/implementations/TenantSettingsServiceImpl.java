@@ -71,7 +71,7 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
                 settingsRepo.save(settings);
                 return spotyResponseImpl.created();
             } catch (Exception e) {
-                log.log(Level.ALL, e.getMessage(), e);
+                 log.severe(e.getMessage());
                 return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
             }
         } else {
@@ -245,7 +245,7 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
                 settingsRepo.save(tenantSettings);
                 return spotyResponseImpl.created();
             } catch (Exception e) {
-                log.log(Level.ALL, e.getMessage(), e);
+                 log.severe(e.getMessage());
                 return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
             }
         } else {
@@ -271,7 +271,7 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
                 settingsRepo.save(tenantSettings);
                 return spotyResponseImpl.created();
             } catch (Exception e) {
-                log.log(Level.ALL, e.getMessage(), e);
+                 log.severe(e.getMessage());
                 return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
             }
         } else {
@@ -295,7 +295,7 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
                     settingsRepo.save(tenantSettings);
                     return spotyResponseImpl.created();
                 } catch (Exception e) {
-                    log.log(Level.ALL, e.getMessage(), e);
+                     log.severe(e.getMessage());
                     return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
                 }
             } else {
@@ -313,7 +313,7 @@ public class TenantSettingsServiceImpl implements TenantSettingsService {
             settingsRepo.deleteById(id);
             return spotyResponseImpl.ok();
         } catch (Exception e) {
-            log.log(Level.ALL, e.getMessage(), e);
+             log.severe(e.getMessage());
             return spotyResponseImpl.custom(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
