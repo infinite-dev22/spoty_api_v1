@@ -38,7 +38,7 @@ public class StockInTransactionServiceImpl
     private SpotyResponseImpl spotyResponseImpl;
 
     @Override
-    @Cacheable("stockIn_transactions")
+    @Cacheable("stock_in_transactions")
     @Transactional(readOnly = true)
     public StockInTransaction getById(Long id) throws NotFoundException {
         Optional<StockInTransaction> stockInTransaction =
@@ -83,7 +83,7 @@ public class StockInTransactionServiceImpl
     }
 
     @Override
-    @CacheEvict(value = "stockIn_transactions", key = "#data.id")
+    @CacheEvict(value = "stock_in_transactions", key = "#data.id")
     public ResponseEntity<ObjectNode> update(StockInDetail data)
             throws NotFoundException {
         var opt = stockInTransactionRepo.findByStockInDetailId(data.getId());

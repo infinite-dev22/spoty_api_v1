@@ -50,7 +50,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @Cacheable("products_no_paged")
+    @Cacheable("products")
     @Transactional(readOnly = true)
     public List<ProductDTO> getAllNonPaged() {
         return productRepo.findAllByTenantIdNonPaged(authService.authUser().getTenant().getId())
