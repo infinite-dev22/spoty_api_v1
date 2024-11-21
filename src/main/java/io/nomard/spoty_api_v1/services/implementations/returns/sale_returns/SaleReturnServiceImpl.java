@@ -69,7 +69,7 @@ public class SaleReturnServiceImpl implements SaleReturnService {
     private SaleReturnMapper saleReturnMapper;
 
     @Override
-    @Cacheable("sale_masters")
+    @Cacheable("sale_return_masters")
     @Transactional(readOnly = true)
     public Page<SaleReturnDTO> getAll(int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Order.desc("createdAt")));
@@ -77,7 +77,7 @@ public class SaleReturnServiceImpl implements SaleReturnService {
     }
 
     @Override
-    @Cacheable("sale_masters")
+    @Cacheable("sale_return_masters")
     @Transactional(readOnly = true)
     public SaleReturnDTO getById(Long id) throws NotFoundException {
         Optional<SaleReturnMaster> saleReturn = saleReturnRepo.findById(id);
@@ -88,7 +88,7 @@ public class SaleReturnServiceImpl implements SaleReturnService {
     }
 
     @Override
-    @Cacheable("sale_masters")
+    @Cacheable("sale_return_masters")
     @Transactional(readOnly = true)
     public List<SaleReturnDTO> getByContains(String search) {
         return saleReturnRepo.searchAll(authService.authUser().getTenant().getId(),
@@ -179,7 +179,7 @@ public class SaleReturnServiceImpl implements SaleReturnService {
     }
 
     @Override
-    @CacheEvict(value = "sale_masters", key = "#data.id")
+    @CacheEvict(value = "sale_return_masters", key = "#data.id")
     public ResponseEntity<ObjectNode> update(SaleReturnMaster data) throws NotFoundException {
         var opt = saleReturnRepo.findById(data.getId());
         if (opt.isEmpty()) {
@@ -238,7 +238,7 @@ public class SaleReturnServiceImpl implements SaleReturnService {
     }
 
     @Override
-    @CacheEvict(value = "sale_masters", key = "#approvalModel.id")
+    @CacheEvict(value = "sale_return_masters", key = "#approvalModel.id")
     @Transactional
     public ResponseEntity<ObjectNode> approve(ApprovalModel approvalModel) throws NotFoundException {
         var opt = saleReturnRepo.findById(approvalModel.getId());
