@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.nomard.spoty_api_v1.entities.*;
 import io.nomard.spoty_api_v1.entities.deductions.Discount;
 import io.nomard.spoty_api_v1.entities.deductions.Tax;
-import io.nomard.spoty_api_v1.entities.purchases.PurchaseMaster;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import lombok.*;
@@ -84,7 +83,7 @@ public class PurchaseReturnMaster implements Serializable {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        PurchaseMaster that = (PurchaseMaster) o;
+        PurchaseReturnMaster that = (PurchaseReturnMaster) o;
         return getId() != null && Objects.equals(getId(), that.getId());
     }
 
